@@ -1,14 +1,16 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import {
   Link,
   Flex,
   Heading,
-  Box
+  Box,
+  Spinner
 } from '@chakra-ui/react'
 
 function Home() {
   const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(true)
 
   const handleLogout = () => {
     localStorage.removeItem('access_token')
@@ -38,15 +40,26 @@ function Home() {
           throw new Error('Token verification failed')
         }
 
-        return await response.json()
+        const data = await response.json()
+        console.log('Token verified:', data)
       } catch (error) {
         localStorage.removeItem('access_token')
         navigate('/login')
+      } finally {
+        setIsLoading(false)
       }
     }
 
     verifyToken()
   }, [navigate])
+
+  if (isLoading) {
+    return (
+      <Flex align="center" justify="center" minH="100vh">
+        <Spinner size="xl" color="teal.500" />
+      </Flex>
+    )
+  }
 
   return (
     <Flex
@@ -55,20 +68,19 @@ function Home() {
       justify="flex-start"
       minH="100vh"
       bg="gray.50"
-      pt={8} // Add padding at the top
+      pt={8}
     >
       <Box textAlign="center">
         <Heading as="h1" size="2xl" color="teal.500">
           Dashboard
         </Heading>
-        {/* Add spacing here */}
-        <Box mt={4}> {/* Add margin-top for space */}
+        <Box mt={4}>
           <Link
             color="teal.500"
             fontWeight="semibold"
-            href="#" // Add href to make it a valid link
-            onClick={handleLogout} // Handle logout on click
-            _hover={{ textDecoration: 'underline' }} // Add hover effect
+            href="#"
+            onClick={handleLogout}
+            _hover={{ textDecoration: 'underline' }}
           >
             Log Out
           </Link>
