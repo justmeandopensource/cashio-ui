@@ -9,15 +9,16 @@ import {
   Input,
   InputGroup,
   InputRightElement,
-  Link,
   Text,
   VStack,
   useToast,
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
-const Login = () => {
+const Register = () => {
+  const [name, setName] = useState('')
   const [username, setUsername] = useState('')
+  const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
 
@@ -27,7 +28,7 @@ const Login = () => {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (!username || !password) {
+    if (!name || !username || !email || !password) {
       toast({
         title: 'Error',
         description: 'Please fill in all fields.',
@@ -38,42 +39,19 @@ const Login = () => {
       return
     }
 
-    const formDetails = new URLSearchParams()
-    formDetails.append("username", username)
-    formDetails.append("password", password)
+    // TODO: Implement the API call for sign-up
+    console.log('Sign Up Details:', { name, username, email, password });
 
-    try {
-      const response = await fetch("http://localhost:8000/user/login", {
-        method: 'Post',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: formDetails,
-      })
+    // Show success toast (for now)
+    toast({
+      title: 'Account Created',
+      description: 'Your account has been created successfully!',
+      status: 'success',
+      position: 'top-right',
+      duration: 2000,
+    })
 
-      if (response.ok) {
-        const data = await response.json()
-        localStorage.setItem('access_token', data.access_token)
-        navigate('/')
-      } else {
-        const errorData = await response.json()
-        toast({
-          title: 'Login Failed',
-          description: errorData.detail || 'Invalid username or password.',
-          status: 'error',
-          position: 'top-right',
-          duration: 2000,
-        })
-      }
-    } catch (error) {
-        toast({
-          title: 'Error',
-          description: 'An error occurred while logging in. Please try again.',
-          status: 'error',
-          position: 'top-right',
-          duration: 2000,
-        })
-    }
+    navigate('/login')
   }
 
   return (
@@ -88,8 +66,19 @@ const Login = () => {
       >
         <VStack as="form" spacing={6} onSubmit={handleSubmit}>
           <Text fontSize="2xl" fontWeight="bold" color="teal.500">
-            Welcome Back
+            Create an Account
           </Text>
+
+          <FormControl>
+            <Input
+              type="text"
+              placeholder="Name"
+              size="lg"
+              focusBorderColor="teal.500"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </FormControl>
 
           <FormControl>
             <Input
@@ -99,6 +88,17 @@ const Login = () => {
               focusBorderColor="teal.500"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+            />
+          </FormControl>
+
+          <FormControl>
+            <Input
+              type="email"
+              placeholder="Email"
+              size="lg"
+              focusBorderColor="teal.500"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
             />
           </FormControl>
 
@@ -131,14 +131,14 @@ const Login = () => {
             w="full"
             _hover={{ bg: 'teal.600' }}
           >
-            Log In
+            Create Account
           </Button>
 
           <Text textAlign="center">
-            New user?{' '}
-            <RouterLink to="/register">
+            Already have an account?{' '}
+            <RouterLink to="/login">
               <Text as="span" color="teal.500" fontWeight="semibold">
-                Create an account
+                Log In
               </Text>
             </RouterLink>
           </Text>
@@ -148,4 +148,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default Register
