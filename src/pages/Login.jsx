@@ -1,6 +1,7 @@
 import React from 'react'
-import { useState } from "react"
-import { useNavigate, Link as RouterLink } from "react-router-dom"
+import { useState } from 'react'
+import { useNavigate, Link as RouterLink } from 'react-router-dom'
+import axios from 'axios'
 import {
   Box,
   Button,
@@ -43,32 +44,20 @@ const Login = () => {
     formDetails.append("password", password)
 
     try {
-      const response = await fetch("http://localhost:8000/user/login", {
-        method: 'Post',
+      const response = await axios.post("http://localhost:8000/user/login", formDetails, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: formDetails,
       })
 
-      if (response.ok) {
-        const data = await response.json()
-        localStorage.setItem('access_token', data.access_token)
+      if (response.status == 200) {
+        localStorage.setItem('access_token', response.data.access_token)
         navigate('/')
-      } else {
-        const errorData = await response.json()
-        toast({
-          title: 'Login Failed',
-          description: errorData.detail || 'Invalid username or password.',
-          status: 'error',
-          position: 'top-right',
-          duration: 2000,
-        })
-      }
+      } 
     } catch (error) {
         toast({
           title: 'Error',
-          description: 'An error occurred while logging in. Please try again.',
+          description: error.response?.data?.detail || error.message,
           status: 'error',
           position: 'top-right',
           duration: 2000,

@@ -1,6 +1,7 @@
 import React from 'react'
-import { useState } from "react"
-import { useNavigate, Link as RouterLink } from "react-router-dom"
+import { useState, useRef } from 'react'
+import { useNavigate, Link as RouterLink } from 'react-router-dom'
+import axios from 'axios'
 import {
   Box,
   Button,
@@ -16,7 +17,7 @@ import {
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 const Register = () => {
-  const [name, setName] = useState('')
+  const [full_name, setFullName] = useState('')
   const [username, setUsername] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -24,34 +25,56 @@ const Register = () => {
 
   const navigate = useNavigate()
   const toast = useToast()
+  const fullNameRef = useRef(null)
 
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    if (!name || !username || !email || !password) {
+    if (!full_name || !username || !email || !password) {
       toast({
         title: 'Error',
         description: 'Please fill in all fields.',
         status: 'error',
         position: 'top-right',
-        duration: 2000,
+        duration: 3000,
       })
       return
     }
 
-    // TODO: Implement the API call for sign-up
-    console.log('Sign Up Details:', { name, username, email, password });
+  const formDetails = {
+    full_name,
+    username,
+    email,
+    password,
+  }
 
-    // Show success toast (for now)
-    toast({
-      title: 'Account Created',
-      description: 'Your account has been created successfully!',
-      status: 'success',
-      position: 'top-right',
-      duration: 2000,
-    })
+    try {
+      const response = await axios.post("http://localhost:8000/user/create", formDetails)
 
-    navigate('/login')
+      if (response.status == 200) {
+        toast({
+          title: 'Account created',
+          description: 'Your account has been created successfully!',
+          status: 'success',
+          position: 'top-right',
+          duration: 3000,
+        })
+        navigate('/login')
+      } 
+    } catch (error) {
+      toast({
+        title: 'Account creation failed',
+        description: error.response?.data?.detail || error.message,
+        status: 'error',
+        position: 'top-right',
+        duration: 3000,
+      })
+      setFullName('') 
+      setUsername('')
+      setEmail('')
+      setPassword('')
+      fullNameRef.current?.focus()
+    }
   }
 
   return (
@@ -71,12 +94,13 @@ const Register = () => {
 
           <FormControl>
             <Input
+              ref={fullNameRef}
               type="text"
               placeholder="Name"
               size="lg"
               focusBorderColor="teal.500"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              value={full_name}
+              onChange={(e) => setFullName(e.target.value)}
             />
           </FormControl>
 

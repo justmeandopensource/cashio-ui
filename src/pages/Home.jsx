@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import React, { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Link,
   Flex,
@@ -8,7 +8,7 @@ import {
   Spinner
 } from '@chakra-ui/react'
 
-function Home() {
+const Home = () => {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
 
