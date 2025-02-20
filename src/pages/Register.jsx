@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useRef } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link as RouterLink } from 'react-router-dom'
 import axios from 'axios'
 import {
@@ -26,6 +26,10 @@ const Register = () => {
   const navigate = useNavigate()
   const toast = useToast()
   const fullNameRef = useRef(null)
+
+  useEffect(() => {
+    fullNameRef.current?.focus()
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()

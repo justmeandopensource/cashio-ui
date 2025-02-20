@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link as RouterLink } from 'react-router-dom'
 import axios from 'axios'
 import {
@@ -24,6 +24,11 @@ const Login = () => {
 
   const navigate = useNavigate()
   const toast = useToast()
+  const usernameInputRef = useRef(null)
+
+  useEffect(() => {
+    usernameInputRef.current?.focus()
+  }, [])
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -55,13 +60,16 @@ const Login = () => {
         navigate('/')
       } 
     } catch (error) {
-        toast({
-          title: 'Error',
-          description: error.response?.data?.detail || error.message,
-          status: 'error',
-          position: 'top-right',
-          duration: 2000,
-        })
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || error.message,
+        status: 'error',
+        position: 'top-right',
+        duration: 2000,
+      })
+      setUsername('')
+      setPassword('')
+      usernameInputRef.current?.focus()
     }
   }
 
@@ -82,6 +90,7 @@ const Login = () => {
 
           <FormControl>
             <Input
+              ref={usernameInputRef}
               type="text"
               placeholder="Username"
               size="lg"
