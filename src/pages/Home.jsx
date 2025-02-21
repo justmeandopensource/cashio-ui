@@ -65,8 +65,13 @@ const Home = () => {
           }
         })
 
-        console.log('token verified:', response.data)
+        if (!response.ok) {
+          throw new Error('Token verification failed')
+        }
+        const data = await response.json()
+        console.log('token verified:', data)
       } catch (error) {
+        console.error('Token verification error:', error)
         localStorage.removeItem('access_token')
         navigate('/login')
       } finally {
