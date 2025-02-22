@@ -17,7 +17,7 @@ class ReactBuilder {
     async runSemanticRelease() {
         console.log('Running semantic-release...');
         try {
-            execSync('npx semantic-release', { stdio: 'inherit' });
+            execSync('npx semantic-release --ci false', { stdio: 'inherit' });
             return this.getPackageVersion();
         } catch (error) {
             if (error.status === 0) {
@@ -46,7 +46,7 @@ class ReactBuilder {
             console.log(`New version determined by semantic-release: ${version}`);
 
             const { versionTag, latestTag } = this.buildDockerImage(version);
-            
+
             console.log('\nSuccessfully built Docker images with tags:');
             console.log(`- ${versionTag}`);
             console.log(`- ${latestTag}`);
