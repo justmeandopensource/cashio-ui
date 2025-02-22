@@ -28,7 +28,7 @@ class ReactBuilder {
     }
 
     buildDockerImage(version) {
-        const versionTag = `${this.dockerImageName}:${version}`;
+        const versionTag = `${this.dockerImageName}:v${version}`;
         const latestTag = `${this.dockerImageName}:latest`;
 
         console.log(`Building Docker image with tags: ${versionTag}, ${latestTag}`);
