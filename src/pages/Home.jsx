@@ -12,6 +12,7 @@ import HomeMain from './components/HomeMain'
 const Home = () => {
   const navigate = useNavigate()
   const [isLoading, setIsLoading] = useState(true)
+  const [isFetchingLedgers, setIsFetchingLedgers] = useState(true)
   const [ledgers, setLedgers] = useState([])
   const [newLedgerName, setNewLedgerName] = useState('')
   const [newLedgerCurrency, setNewLedgerCurrency] = useState('')
@@ -74,7 +75,9 @@ const Home = () => {
       setLedgers(data)
     } catch (error) {
       console.error('Error fetching ledgers')
-    } 
+    } finally {
+      setIsFetchingLedgers(false)
+    }
   }
 
   // handle ledger creation
@@ -160,11 +163,10 @@ const Home = () => {
     }
   }, [isLoading])
 
-  if (isLoading) {
+  if (isLoading || isFetchingLedgers) {
     return (
-      <Flex align="center" justify="center" minH="100vh">
-        <Spinner size="xl" color="teal.500" />
-      </Flex>
+      <Layout handleLogout={handleLogout}>
+      </Layout>
     )
   }
 

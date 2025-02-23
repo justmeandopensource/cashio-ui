@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 import {
   Box,
   Button,
@@ -52,7 +53,6 @@ const RegisterForm = ({
             type="text"
             placeholder="Name"
             size="lg"
-            focusBorderColor="teal.500"
             value={full_name}
             onChange={(e) => setFullName(e.target.value)}
           />
@@ -63,7 +63,6 @@ const RegisterForm = ({
             type="text"
             placeholder="Username"
             size="lg"
-            focusBorderColor="teal.500"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -74,7 +73,6 @@ const RegisterForm = ({
             type="email"
             placeholder="Email"
             size="lg"
-            focusBorderColor="teal.500"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -86,7 +84,6 @@ const RegisterForm = ({
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               size="lg"
-              focusBorderColor="teal.500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -104,19 +101,19 @@ const RegisterForm = ({
 
         <Button
           type="submit"
-          colorScheme="teal"
           size="lg"
           w="full"
-          _hover={{ bg: 'teal.600' }}
         >
           Create Account
         </Button>
 
         <Text textAlign="center">
           Already have an account?{' '}
-          <Text as="span" color="teal.500" fontWeight="semibold">
-            Log In
-          </Text>
+          <RouterLink to="/login">
+            <Text as="span" color="teal.500" fontWeight="semibold">
+              Log In
+            </Text>
+          </RouterLink>
         </Text>
       </VStack>
     </Box>

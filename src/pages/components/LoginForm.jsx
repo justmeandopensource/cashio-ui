@@ -47,7 +47,6 @@ const LoginForm = ({
             type="text"
             placeholder="Username"
             size="lg"
-            focusBorderColor="teal.500"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -59,7 +58,6 @@ const LoginForm = ({
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               size="lg"
-              focusBorderColor="teal.500"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -77,10 +75,8 @@ const LoginForm = ({
 
         <Button
           type="submit"
-          colorScheme="teal"
           size="lg"
           w="full"
-          _hover={{ bg: 'teal.600' }}
         >
           Log In
         </Button>

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Heading,
@@ -12,6 +13,12 @@ import {
 import { FiFileText, FiPlus } from 'react-icons/fi'
 
 const HomeLedgerCards= ({ ledgers, onOpen }) => {
+  const navigate = useNavigate()
+
+  const handleLedgerClick = (ledgerId) => {
+    navigate(`/ledger/${ledgerId}`)
+  }
+
   return (
     <Box mb={8}>
       {ledgers.length === 0 ? (
@@ -24,7 +31,6 @@ const HomeLedgerCards= ({ ledgers, onOpen }) => {
             You don't have any ledgers yet. Create one to get started.
           </Text>
           <Button
-            colorScheme="teal"
             onClick={onOpen}
             leftIcon={<FiPlus />}
           >
@@ -38,7 +44,13 @@ const HomeLedgerCards= ({ ledgers, onOpen }) => {
           </Heading>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 5 }} spacing={6}>
             {ledgers.map((ledger) => (
-              <Card key={ledger.ledger_id} bg="teal.50" _hover={{ transform: 'scale(1.05)', transition: 'transform 0.2s' }}>
+              <Card 
+                  key={ledger.ledger_id}
+                  bg="teal.50"
+                  _hover={{ transform: 'scale(1.04)', transition: 'transform 0.2s' }}
+                  cursor="pointer"
+                  onClick={() => handleLedgerClick(ledger.ledger_id)}
+              >
                 <CardBody display="flex" alignItems="center">
                   <Box
                     bg="teal.100"

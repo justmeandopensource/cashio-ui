@@ -34,7 +34,6 @@ const CreateLedgerModal = ({
             <Input
               placeholder="Ledger Name"
               value={newLedgerName}
-              focusBorderColor="teal.500"
               onChange={(e) => setNewLedgerName(e.target.value)}
               autoFocus
               ref={ledgerNameInputRef}
@@ -42,13 +41,12 @@ const CreateLedgerModal = ({
             <Input
               placeholder="Currency Symbol"
               value={newLedgerCurrency}
-              focusBorderColor="teal.500"
               onChange={(e) => setNewLedgerCurrency(e.target.value)}
             />
           </VStack>
         </ModalBody>
         <ModalFooter>
-          <Button colorScheme="teal" mr={3} onClick={handleCreateLedger}>
+          <Button mr={3} onClick={handleCreateLedger}>
             Create
           </Button>
           <Button variant="ghost" onClick={onClose}>

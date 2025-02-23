@@ -3,7 +3,7 @@ import {
   Flex,
   VStack,
   Heading,
-  Link,
+  Link as ChakraLink,
   Icon,
   Text,
   useColorModeValue,
@@ -16,10 +16,17 @@ import {
   FiLogOut,
 } from 'react-icons/fi'
 
+import { useNavigate } from 'react-router-dom'
+
 const Sidebar = ({ handleLogout }) => {
 
   const sidebarBg = useColorModeValue('teal.500', 'teal.700')
   const sidebarColor = useColorModeValue('white', 'gray.200')
+  const navigate = useNavigate()
+
+  const handleHomeClick = () => {
+    navigate('/')
+  }
 
   return (
       <Box
@@ -35,18 +42,10 @@ const Sidebar = ({ handleLogout }) => {
           <Heading as="h1" size="lg" mb={6}>
             Cashio
           </Heading>
-          <Link href="#" display="flex" alignItems="center">
+          <ChakraLink display="flex" alignItems="center" onClick={handleHomeClick}>
             <Icon as={FiHome} mr={2} />
             Home
-          </Link>
-          <Link href="#" display="flex" alignItems="center">
-            <Icon as={FiTrendingUp} mr={2} />
-            Investments
-          </Link>
-          <Link href="#" display="flex" alignItems="center">
-            <Icon as={FiFileText} mr={2} />
-            Reports
-          </Link>
+          </ChakraLink>
         </VStack>
 
         {/* User Info and Logout */}
@@ -54,15 +53,14 @@ const Sidebar = ({ handleLogout }) => {
           <Text fontSize="sm" mb={2}>
             Username
           </Text>
-          <Link
-            href="#"
+          <ChakraLink
             display="flex"
             alignItems="center"
             onClick={handleLogout}
           >
             <Icon as={FiLogOut} mr={2} />
             Log Out
-          </Link>
+          </ChakraLink>
         </Box>
       </Box>
   )
