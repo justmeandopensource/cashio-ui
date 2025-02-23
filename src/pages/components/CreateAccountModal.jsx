@@ -151,7 +151,6 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
               value={accountName}
               onChange={(e) => setAccountName(e.target.value)}
               placeholder="Enter account name"
-              ref={accountNameRef}
             />
           </FormControl>
 
