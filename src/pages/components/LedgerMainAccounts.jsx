@@ -14,54 +14,79 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
 
   // Helper function to format balance with currency symbol
   const formatBalance = (balance, currencySymbol) => {
-    return `${Number(balance).toLocaleString('en-US')} ${currencySymbol}`
+    return `${Number(balance).toLocaleString('en-GB')} ${currencySymbol}`
+  }
+
+  // Function to compute the balance for group accounts
+  const computeGroupBalance = (accountId) => {
+    let totalBalance = 0
+
+    // Find all child accounts
+    const childAccounts = accounts.filter((account) => account.parent_account_id === accountId)
+
+    // Sum the balances of child accounts
+    childAccounts.forEach((childAccount) => {
+      if (childAccount.is_group) {
+        // If the child is a group account, recursively compute its balance
+        totalBalance += computeGroupBalance(childAccount.account_id)
+      } else {
+        // If the child is a real account, add its balance
+        totalBalance += childAccount.net_balance || 0
+      }
+    })
+
+    return totalBalance
   }
 
   // Function to render accounts in a nested table format
   const renderAccountsTable = (accounts, parentId = null, level = 0) => {
     return accounts
       .filter((account) => account.parent_account_id === parentId)
-      .map((account) => (
-        <React.Fragment key={account.account_id}>
-          {/* Row for the current account */}
-          <Tr
-            bg={account.is_group ? 'teal.50' : 'transparent'}
-            _hover={!account.is_group ? { bg: 'gray.50' } : undefined} // No hover for group accounts
-          >
-            <Td pl={`${level * 4 + 4}px`} > {/* Add padding to the left */}
-              <Text
-                fontWeight={account.is_group ? 'bold' : 'normal'}
-                color={account.is_group ? 'teal.600' : 'gray.700'}
-                fontSize={account.is_group ? 'md' : 'sm'}
-              >
-                {account.name}
-              </Text>
-            </Td>
-            <Td>
-              <Text
-                fontWeight={account.is_group ? 'bold' : 'normal'}
-                color={account.is_group ? 'teal.600' : 'gray.700'}
-                fontSize={account.is_group ? 'md' : 'sm'}
-              >
-                {formatBalance(account.balance, ledger.currency_symbol)} {/* Format balance */}
-              </Text>
-            </Td>
-            <Td>
-              <Box display="flex" gap={2}>
-                {/* Add Child Account Button (for group accounts) */}
-                {account.is_group && (
-                  <Link onClick={() => handleCreateAccountClick(account.type, account.account_id)} _hover={{ textDecoration: 'none' }}>
-                    <Icon as={FiPlus} boxSize={4} color="teal.500" _hover={{ color: 'teal.600' }} />
-                  </Link>
-                )}
-              </Box>
-            </Td>
-          </Tr>
+      .map((account) => {
+        const balance = account.is_group ? computeGroupBalance(account.account_id) : account.net_balance
+        return (
+          <React.Fragment key={account.account_id}>
+            {/* Row for the current account */}
+            <Tr
+              bg={account.is_group ? 'teal.50' : 'transparent'}
+              _hover={!account.is_group ? { bg: 'gray.50' } : undefined} // No hover for group accounts
+            >
+              <Td pl={`${level * 4 + 4}px`} > {/* Add padding to the left */}
+                <Text
+                  fontWeight={account.is_group ? 'bold' : 'normal'}
+                  color={account.is_group ? 'teal.600' : 'gray.700'}
+                  fontSize={account.is_group ? 'md' : 'sm'}
+                >
+                  {account.name}
+                </Text>
+              </Td>
+              <Td isNumeric>
+                <Text
+                  fontWeight={account.is_group ? 'bold' : 'normal'}
+                  color={account.is_group ? 'teal.600' : 'gray.700'}
+                  fontSize={account.is_group ? 'md' : 'sm'}
+                >
+                  {formatBalance(balance, ledger.currency_symbol)} {/* Format balance */}
+                </Text>
+              </Td>
+              <Td>
+                <Box display="flex" gap={2}>
+                  {/* Add Child Account Button (for group accounts) */}
+                  {account.is_group && (
+                    <Link onClick={() => handleCreateAccountClick(account.type, account.account_id)} _hover={{ textDecoration: 'none' }}>
+                      <Icon as={FiPlus} boxSize={4} color="teal.500" _hover={{ color: 'teal.600' }} />
+                    </Link>
+                  )}
+                </Box>
+              </Td>
+            </Tr>
 
-          {/* Recursively render child accounts */}
-          {renderAccountsTable(accounts, account.account_id, level + 1)}
-        </React.Fragment>
-      ))
+            {/* Recursively render child accounts */}
+            {renderAccountsTable(accounts, account.account_id, level + 1)}
+          </React.Fragment>
+        )
+
+      })
   }
 
   // Open modal for creating a new account
