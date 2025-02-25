@@ -117,12 +117,8 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
         isClosable: true,
       })
 
-      // Refresh the accounts list
       fetchAccounts()
-
       resetForm()
-
-      // Close the modal
       onClose()
     } catch (error) {
       console.error('Error creating account:', error)

@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Text, Button, Icon, useDisclosure, SimpleGrid, Link } from '@chakra-ui/react'
+import { Box, Table, Thead, Tbody, Tr, Th, Td, Text, Button, Icon, useDisclosure, SimpleGrid, Link as ChakraLink } from '@chakra-ui/react'
+import { Link as RouterLink } from 'react-router-dom'
 import { FiPlus } from 'react-icons/fi'
 import CreateAccountModal from './CreateAccountModal'
 
@@ -51,14 +52,27 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
               bg={account.is_group ? 'teal.50' : 'transparent'}
               _hover={!account.is_group ? { bg: 'gray.50' } : undefined} // No hover for group accounts
             >
-              <Td pl={`${level * 4 + 4}px`} > {/* Add padding to the left */}
-                <Text
-                  fontWeight={account.is_group ? 'bold' : 'normal'}
-                  color={account.is_group ? 'teal.600' : 'gray.700'}
-                  fontSize={account.is_group ? 'md' : 'sm'}
-                >
-                  {account.name}
-                </Text>
+              <Td pl={`${level * 4 + 4}px`}>
+                {!account.is_group ? (
+                  <ChakraLink as={RouterLink} to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`} _hover={{ textDecoration: 'none' }}>
+                    <Text
+                      fontWeight="normal"
+                      color="gray.700"
+                      fontSize="sm"
+                      _hover={{ color: 'teal.500' }}
+                    >
+                      {account.name}
+                    </Text>
+                  </ChakraLink>
+                ) : (
+                  <Text
+                    fontWeight="bold"
+                    color="teal.600"
+                    fontSize="md"
+                  >
+                    {account.name}
+                  </Text>
+                )}
               </Td>
               <Td isNumeric>
                 <Text
@@ -73,9 +87,9 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
                 <Box display="flex" gap={2}>
                   {/* Add Child Account Button (for group accounts) */}
                   {account.is_group && (
-                    <Link onClick={() => handleCreateAccountClick(account.type, account.account_id)} _hover={{ textDecoration: 'none' }}>
+                    <ChakraLink onClick={() => handleCreateAccountClick(account.type, account.account_id)} _hover={{ textDecoration: 'none' }}>
                       <Icon as={FiPlus} boxSize={4} color="teal.500" _hover={{ color: 'teal.600' }} />
-                    </Link>
+                    </ChakraLink>
                   )}
                 </Box>
               </Td>
@@ -106,15 +120,15 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
           p={4}
           borderRadius="md"
           boxShadow="sm"
-          _hover={{ boxShadow: 'md', transform: 'translateY(-2px)', transition: 'all 0.2s' }} // Hover effect
+          _hover={{ boxShadow: 'md', transition: 'all 0.2s' }} // Hover effect
         >
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
             <Text fontSize="xl" fontWeight="bold" color="teal.500">
               Assets
             </Text>
-            <Link onClick={() => handleCreateAccountClick('asset')} _hover={{ textDecoration: 'none' }}>
+            <ChakraLink onClick={() => handleCreateAccountClick('asset')} _hover={{ textDecoration: 'none' }}>
               <Icon as={FiPlus} boxSize={5} color="teal.500" _hover={{ color: 'teal.600' }} />
-            </Link>
+            </ChakraLink>
           </Box>
           {assetAccounts.length === 0 ? (
             <Box textAlign="center" py={10} px={6}>
@@ -143,15 +157,15 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
           p={4}
           borderRadius="md"
           boxShadow="sm"
-          _hover={{ boxShadow: 'md', transform: 'translateY(-1px)', transition: 'all 0.2s' }} // Hover effect
+          _hover={{ boxShadow: 'md', transition: 'all 0.2s' }} // Hover effect
         >
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
             <Text fontSize="xl" fontWeight="bold" color="teal.500">
               Liabilities
             </Text>
-            <Link onClick={() => handleCreateAccountClick('liability')} _hover={{ textDecoration: 'none' }}>
+            <ChakraLink onClick={() => handleCreateAccountClick('liability')} _hover={{ textDecoration: 'none' }}>
               <Icon as={FiPlus} boxSize={5} color="teal.500" _hover={{ color: 'teal.600' }} />
-            </Link>
+            </ChakraLink>
           </Box>
           {liabilityAccounts.length === 0 ? (
             <Box textAlign="center" py={10} px={6}>

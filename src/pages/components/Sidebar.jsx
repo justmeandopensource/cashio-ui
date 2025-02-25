@@ -11,8 +11,7 @@ import {
 
 import {
   FiHome,
-  FiTrendingUp,
-  FiFileText,
+  FiBookmark,
   FiLogOut,
 } from 'react-icons/fi'
 
@@ -23,10 +22,6 @@ const Sidebar = ({ handleLogout }) => {
   const sidebarBg = useColorModeValue('teal.500', 'teal.700')
   const sidebarColor = useColorModeValue('white', 'gray.200')
   const navigate = useNavigate()
-
-  const handleHomeClick = () => {
-    navigate('/')
-  }
 
   return (
       <Box
@@ -42,9 +37,13 @@ const Sidebar = ({ handleLogout }) => {
           <Heading as="h1" size="lg" mb={6}>
             Cashio
           </Heading>
-          <ChakraLink display="flex" alignItems="center" onClick={handleHomeClick}>
+          <ChakraLink display="flex" alignItems="center" onClick={() => {navigate('/')}}>
             <Icon as={FiHome} mr={2} />
             Home
+          </ChakraLink>
+          <ChakraLink display="flex" alignItems="center" onClick={() => {navigate('/categories')}}>
+            <Icon as={FiBookmark} mr={2} />
+            Manage Categories
           </ChakraLink>
         </VStack>
 
