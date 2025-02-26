@@ -73,7 +73,7 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
                   </Td>
                   <Td width="15%" isNumeric>
                     {transaction.debit !== 0 && (
-                      <Text color="red.300">{parseFloat(transaction.debit).toFixed(2)}</Text>
+                      <Text color="red.500">{parseFloat(transaction.debit).toFixed(2)}</Text>
                     )}
                   </Td>                    
                 </Tr>
