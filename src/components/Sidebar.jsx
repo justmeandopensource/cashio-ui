@@ -33,7 +33,7 @@ const Sidebar = ({ handleLogout }) => {
         flexDirection="column"
         justifyContent="space-between"
       >
-        <VStack align="flex-start" spacing={6}>
+        <VStack align="flex-start" spacing={3}>
           <Heading as="h1" size="lg" mb={6}>
             Cashio
           </Heading>
@@ -49,9 +49,6 @@ const Sidebar = ({ handleLogout }) => {
 
         {/* User Info and Logout */}
         <Box>
-          <Text fontSize="sm" mb={2}>
-            Username
-          </Text>
           <ChakraLink
             display="flex"
             alignItems="center"
