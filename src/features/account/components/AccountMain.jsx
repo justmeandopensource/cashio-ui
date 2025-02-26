@@ -5,6 +5,7 @@ import { Box, Spinner, useToast } from '@chakra-ui/react'
 import AccountMainHeader from "@features/account/components/AccountMainHeader"
 import AccountMainTransactions from "@features/account/components/AccountMainTransactions"
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
+import TransferFundsModal from '@components/modals/TransferFundsModal'
 
 const AccountMain = () => {
   const { ledgerId, accountId } = useParams()
@@ -17,7 +18,8 @@ const AccountMain = () => {
     current_page: 1,
     per_page: 25,
   })
-  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const toast = useToast()
 
   // Fetch account details
@@ -114,7 +116,8 @@ const AccountMain = () => {
       {/* Account Details Section */}
       <AccountMainHeader
         account={account}
-        onAddTransaction={() => setIsModalOpen(true)}
+        onAddTransaction={() => setIsCreateModalOpen(true)}
+        onTransferFunds={() => setIsTransferModalOpen(true)}
       />
 
       {/* Transactions Section */}
@@ -123,16 +126,25 @@ const AccountMain = () => {
         account={account}
         fetchTransactions={fetchTransactions}
         pagination={pagination}
-        onAddTransaction={() => setIsModalOpen(true)}
+        onAddTransaction={() => setIsCreateModalOpen(true)}
       />
 
       {/* Create Transaction Modal */}
       <CreateTransactionModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        accountId={accountId}
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
         ledgerId={ledgerId}
+        accountId={accountId}
         onTransactionAdded={refreshData}
+      />
+
+      {/* Transfer Funds Modal */}
+      <TransferFundsModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        ledgerId={ledgerId}
+        accountId={accountId}
+        onTransferCompleted={refreshData}
       />
     </Box>
   )

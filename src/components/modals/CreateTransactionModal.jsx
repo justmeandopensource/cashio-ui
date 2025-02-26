@@ -270,6 +270,9 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
         notes: notes,
         credit: type === 'income' ? parsedAmount : 0,
         debit: type === 'expense' ? parsedAmount : 0,
+        is_transfer: false,
+        transfer_id: null,
+        transfer_type: null,
         is_split: isSplit,
         splits: isSplit ? splits.map(split => ({
           credit: type === 'income' ? parseFloat(split.amount) || 0 : 0,

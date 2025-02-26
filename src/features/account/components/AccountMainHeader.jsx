@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { Box, Heading, Text, Button, Flex, useColorModeValue } from '@chakra-ui/react'
 import { AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
-import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 
-const AccountMainHeader = ({ account, onAddTransaction }) => {
+const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds }) => {
   // Determine the color for the balance based on its value
   const balanceColor = account.net_balance >= 0 ? 'gray.600' : 'red.500'
 
@@ -46,7 +45,7 @@ const AccountMainHeader = ({ account, onAddTransaction }) => {
             rightIcon={<ArrowForwardIcon />}
             colorScheme={buttonColorScheme}
             variant="outline"
-            onClick={() => console.log('Transfer Funds clicked')}
+            onClick={onTransferFunds}
           >
             Transfer Funds
           </Button>
