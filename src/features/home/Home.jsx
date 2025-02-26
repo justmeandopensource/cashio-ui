@@ -6,8 +6,8 @@ import {
   useDisclosure,
   useToast,
 } from '@chakra-ui/react'
-import Layout from './components/Layout'
-import HomeMain from './components/HomeMain'
+import Layout from '@components/Layout'
+import HomeMain from '@features/home/components/HomeMain'
 
 const Home = () => {
   const navigate = useNavigate()

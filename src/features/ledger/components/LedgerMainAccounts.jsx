@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { Box, Table, Thead, Tbody, Tr, Th, Td, Text, Button, Icon, useDisclosure, SimpleGrid, Link as ChakraLink } from '@chakra-ui/react'
 import { Link as RouterLink } from 'react-router-dom'
 import { FiPlus } from 'react-icons/fi'
-import CreateAccountModal from './CreateAccountModal'
+import CreateAccountModal from '@components/modals/CreateAccountModal'
 
 const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()

@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { Box, Spinner, useToast } from '@chakra-ui/react'
-import LedgerMainHeader from './LedgerMainHeader'
-import LedgerMainAccounts from './LedgerMainAccounts'
+import LedgerMainHeader from '@features/ledger/components/LedgerMainHeader'
+import LedgerMainAccounts from '@features/ledger/components/LedgerMainAccounts'
 
 const LedgerMain = () => {
   const { ledgerId } = useParams()

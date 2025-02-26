@@ -14,7 +14,7 @@ import {
   useDisclosure,
 } from '@chakra-ui/react'
 import { FiPlus, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
-import CreateTransactionModal from './CreateTransactionModal'
+import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 
 const AccountMainTransactions = ({ transactions, account, fetchTransactions, pagination, onAddTransaction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()

@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Layout from './components/Layout'
-import AccountMain from './components/AccountMain'
+import Layout from '@components/Layout'
+import CategoriesMain from '@features/categories/components/CategoriesMain'
 
-const Account = () => {
+const Categories = () => {
+
   const navigate = useNavigate()
 
   // Token verification
@@ -49,9 +50,9 @@ const Account = () => {
 
   return (
     <Layout handleLogout={handleLogout}>
-      <AccountMain />
+      <CategoriesMain />
     </Layout>
   )
 }
 
-export default Account
+export default Categories

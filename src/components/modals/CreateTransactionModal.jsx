@@ -20,7 +20,7 @@ import {
   Box,
 } from '@chakra-ui/react'
 import axios from 'axios'
-import ChakraDatePicker from './ChakraDatePicker'
+import ChakraDatePicker from '@components/shared/ChakraDatePicker'
 
 const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransactionAdded }) => {
   const [date, setDate] = useState(new Date())

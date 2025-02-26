@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link as RouterLink } from 'react-router-dom'
 import axios from 'axios'
 import { Flex, useToast } from '@chakra-ui/react'
-import RegisterForm from './components/RegisterForm'
+import RegisterForm from '@features/auth/components/RegisterForm'
 
 const Register = () => {
   const [full_name, setFullName] = useState('')

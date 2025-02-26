@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import Layout from './components/Layout'
-import LedgerMain from './components/LedgerMain'
+import Layout from '@components/Layout'
+import LedgerMain from '@features/ledger/components/LedgerMain'
 
 const Ledger = () => {
   const navigate = useNavigate()

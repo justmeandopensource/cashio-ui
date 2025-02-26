@@ -1,11 +1,11 @@
 import React from 'react'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Login from './pages/Login'
-import Register from './pages/Register'
-import Home from './pages/Home'
-import Ledger from './pages/Ledger'
-import Account from './pages/Account'
-import Categories from './pages/Categories'
+import Login from '@features/auth/Login'
+import Register from '@features/auth/Register'
+import Home from '@features/home/Home'
+import Ledger from '@features/ledger/Ledger'
+import Account from '@features/account/Account'
+import Categories from '@features/categories/Categories'
 
 const App = () => {
 

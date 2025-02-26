@@ -1,6 +1,6 @@
 import React from 'react'
-import HomeLedgerCards from './HomeLedgerCards'
-import CreateLedgerModal from './CreateLedgerModal'
+import HomeLedgerCards from '@features/home/components/HomeLedgerCards'
+import CreateLedgerModal from '@components/modals/CreateLedgerModal'
 
 const HomeMain = ({
   ledgers,

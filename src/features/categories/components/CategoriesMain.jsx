@@ -17,7 +17,7 @@ import {
   Link as ChakraLink,
 } from '@chakra-ui/react'
 import { FiPlus } from 'react-icons/fi'
-import CreateCategoryModal from './CreateCategoryModal'
+import CreateCategoryModal from '@components/modals/CreateCategoryModal'
 
 const CategoriesMain = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()

@@ -3,7 +3,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link as RouterLink } from 'react-router-dom'
 import axios from 'axios'
 import { Flex, useToast } from '@chakra-ui/react'
-import LoginForm from './components/LoginForm'
+import LoginForm from '@features/auth/components/LoginForm'
 
 const Login = () => {
   const [username, setUsername] = useState('')

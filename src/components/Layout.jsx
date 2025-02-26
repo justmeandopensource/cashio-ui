@@ -1,5 +1,5 @@
 import { Flex, Box } from "@chakra-ui/react"
-import Sidebar from "./Sidebar"
+import Sidebar from "@components/Sidebar"
 
 const Layout = ({ 
   children, 

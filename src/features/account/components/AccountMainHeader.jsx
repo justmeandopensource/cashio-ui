@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Box, Heading, Text, Button, Flex, useColorModeValue } from '@chakra-ui/react'
 import { AddIcon, ArrowForwardIcon } from '@chakra-ui/icons'
-import CreateTransactionModal from './CreateTransactionModal'
+import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 
 const AccountMainHeader = ({ account, onAddTransaction }) => {
   // Determine the color for the balance based on its value
