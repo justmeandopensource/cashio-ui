@@ -1,9 +1,10 @@
 import React from 'react'
 import { Box, Heading, Text, Button, Flex, useColorModeValue, IconButton } from '@chakra-ui/react'
-import { AddIcon, ArrowForwardIcon, ArrowBackIcon } from '@chakra-ui/icons'
+import { AddIcon, ArrowForwardIcon, ArrowBackIcon, EditIcon } from '@chakra-ui/icons'
+import { FiEdit } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 
-const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds }) => {
+const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds, onUpdateAccount }) => {
   const navigate = useNavigate()
 
   // Determine the color for the balance based on its value
@@ -40,9 +41,19 @@ const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds }) => {
             _hover={{ bg: 'teal.50' }}
           />
           <Box>
-            <Heading as="h2" size="lg" color="teal.500" mb={2}>
-              {account.name}
-            </Heading>
+            <Flex alignItems="center">
+              <Heading as="h2" size="lg" color="teal.500" mb={2} mr={2}>
+                {account.name}
+              </Heading>
+              <IconButton
+                aria-label="Edit Account"
+                icon={<EditIcon boxSize={4} />}
+                variant="ghost"
+                color="teal.500"
+                size="sm"
+                onClick={onUpdateAccount}
+              />
+            </Flex>
             <Text fontSize="2xl" fontWeight="bold" color={balanceColor}>
               {account.net_balance.toFixed(2)}
             </Text>

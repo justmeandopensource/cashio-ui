@@ -6,6 +6,7 @@ import AccountMainHeader from "@features/account/components/AccountMainHeader"
 import AccountMainTransactions from "@features/account/components/AccountMainTransactions"
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 import TransferFundsModal from '@components/modals/TransferFundsModal'
+import UpdateAccountModal from '@components/modals/UpdateAccountModal'
 
 const AccountMain = () => {
   const { ledgerId, accountId } = useParams()
@@ -20,6 +21,7 @@ const AccountMain = () => {
   })
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
   const toast = useToast()
 
   // Fetch account details
@@ -87,8 +89,13 @@ const AccountMain = () => {
     fetchAccountAndTransactions()
   }, [accountId])
 
-  // Function to refresh account and transactions after a new transaction is added
-  const refreshData = async () => {
+  // Function to refresh account
+  const refreshAccountData = async () => {
+    await fetchAccount()
+  }
+
+  // Function to refresh account and transactions
+  const refreshAccountAndTransactionsData = async () => {
     await fetchAccount()
     await fetchTransactions(pagination.current_page)
   }
@@ -118,6 +125,7 @@ const AccountMain = () => {
         account={account}
         onAddTransaction={() => setIsCreateModalOpen(true)}
         onTransferFunds={() => setIsTransferModalOpen(true)}
+        onUpdateAccount={() => setIsUpdateModalOpen(true)}
       />
 
       {/* Transactions Section */}
@@ -135,7 +143,7 @@ const AccountMain = () => {
         onClose={() => setIsCreateModalOpen(false)}
         ledgerId={ledgerId}
         accountId={accountId}
-        onTransactionAdded={refreshData}
+        onTransactionAdded={refreshAccountAndTransactionsData}
       />
 
       {/* Transfer Funds Modal */}
@@ -144,7 +152,15 @@ const AccountMain = () => {
         onClose={() => setIsTransferModalOpen(false)}
         ledgerId={ledgerId}
         accountId={accountId}
-        onTransferCompleted={refreshData}
+        onTransferCompleted={refreshAccountAndTransactionsData}
+      />
+
+      {/* Update Account Modal */}
+      <UpdateAccountModal
+        isOpen={isUpdateModalOpen}
+        onClose={() => setIsUpdateModalOpen(false)}
+        account={account}
+        onUpdateCompleted={refreshAccountData}
       />
     </Box>
   )
