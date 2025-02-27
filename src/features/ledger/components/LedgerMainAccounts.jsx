@@ -15,7 +15,11 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
 
   // Helper function to format balance with currency symbol
   const formatBalance = (balance, currencySymbol) => {
-    return `${Number(balance).toLocaleString('en-GB')} ${currencySymbol}`
+    const formattedBalance = Number(balance).toLocaleString('en-GB', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+    return `${formattedBalance} ${currencySymbol}`
   }
 
   // Function to compute the balance for group accounts
