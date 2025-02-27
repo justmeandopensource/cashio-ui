@@ -18,6 +18,12 @@ import {
   HStack,
   useToast,
   Box,
+  Tag,
+  TagLabel,
+  TagCloseButton,
+  Flex,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react'
 import axios from 'axios'
 import ChakraDatePicker from '@components/shared/ChakraDatePicker'
@@ -32,6 +38,9 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
   const [splits, setSplits] = useState([])
   const [categories, setCategories] = useState([])
   const [accounts, setAccounts] = useState([])
+  const [tags, setTags] = useState([])
+  const [tagInput, setTagInput] = useState('')
+  const [tagSuggestions, setTagSuggestions] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
 
@@ -43,6 +52,72 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     setAmount('')
     setIsSplit(false)
     setSplits([])
+  }
+
+  // Fetch tag suggestions as the user types
+  useEffect(() => {
+    if (tagInput.length > 0) {
+      fetchTagSuggestions(tagInput)
+    } else {
+      setTagSuggestions([])
+    }
+  }, [tagInput])
+
+  // Fetch tag suggestions from the backend
+  const fetchTagSuggestions = async (query) => {
+    try {
+      const token = localStorage.getItem('access_token')
+      const response = await axios.get(`http://localhost:8000/tags/search?query=${query}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      setTagSuggestions(response.data)
+    } catch (error) {
+      console.error('Error fetching tag suggestions:', error)
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Failed to fetch tag suggestions.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
+  }
+
+  // Add a tag to the selected tags list
+  const addTag = (tag) => {
+    if (!tags.some((t) => t.tag_id === tag.tag_id)) {
+      setTags([...tags, tag])
+      setTagInput('')
+      setTagSuggestions([])
+    }
+  }
+
+  // Remove a tag from the selected tags list
+  const removeTag = (tagName) => {
+    setTags((prevTags) => prevTags.filter((tag) => tag.name !== tagName))
+  }
+
+  // Handle Enter key press in the tags input field
+  const handleTagInputKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      const newTagName = tagInput.trim()
+
+      if (newTagName) {
+        // Check if the tag already exists in the selected tags
+        const isTagAlreadyAdded = tags.some((tag) => tag.name.toLowerCase() === newTagName.toLowerCase())
+
+        if (!isTagAlreadyAdded) {
+          // Add the new tag to the selected tags
+          const newTag = { name: newTagName }
+          setTags((prevTags) => [...prevTags, newTag])
+          setTagInput('')
+          setTagSuggestions([])
+        }
+      }
+    }
   }
 
   // Fetch categories whenever the type changes
@@ -279,6 +354,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
           debit: type === 'expense' ? parseFloat(split.amount) || 0 : 0,
           category_id: parseInt(split.categoryId, 10)
         })) : [],
+        tags: tags.map((tag) => ({ name: tag.name })),
       }
 
       const endpoint = type === 'income' 
@@ -460,6 +536,53 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                 </Select>
               </FormControl>
             )}
+
+            {/* Tags Input */}
+            <FormControl>
+              <FormLabel>Tags</FormLabel>
+              <Box>
+                {/* Display selected tags as chips */}
+                <Wrap spacing={2} mb={2}>
+                  {tags.map((tag) => (
+                    <WrapItem key={tag.name}>
+                      <Tag size="md" borderRadius="full" variant="solid" colorScheme="teal">
+                        <TagLabel>{tag.name}</TagLabel>
+                        <TagCloseButton onClick={() => removeTag(tag.name)} />
+                      </Tag>
+                    </WrapItem>
+                  ))}
+                </Wrap>
+
+                {/* Tag input with suggestions */}
+                <Input
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagInputKeyDown} // Handle Enter key
+                  placeholder="Add tags (press Enter to add)"
+                />
+
+                {/* Display tag suggestions */}
+                {tagSuggestions.length > 0 && (
+                  <Box mt={2} borderWidth="1px" borderRadius="md" p={2} bg="gray.50">
+                    {tagSuggestions.map((tag) => (
+                      <Box
+                        key={tag.tag_id}
+                        p={1}
+                        cursor="pointer"
+                        _hover={{ bg: 'gray.100' }}
+                        onClick={() => {
+                          addTag(tag);
+                          setTagInput(''); // Clear input after adding a tag
+                          setTagSuggestions([]); // Clear suggestions
+                        }}
+                      >
+                        {tag.name}
+                      </Box>
+                    ))}
+                  </Box>
+                )}
+              </Box>
+            </FormControl>
           </VStack>
         </ModalBody>
         <ModalFooter>

@@ -3,8 +3,7 @@ import {
   Box,
   Text,
   Table,
-  Thead,
-  Tbody,
+  Thead, Tbody,
   Tr,
   Th,
   Td,
@@ -12,6 +11,10 @@ import {
   Flex,
   Icon,
   useDisclosure,
+  Tag,
+  TagLabel,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react'
 import { FiPlus, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
@@ -51,31 +54,46 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
           <Table variant="simple" size="sm">
             <Thead>
               <Tr>
-                <Th width="15%">Date</Th>
+                <Th width="10%">Date</Th>
                 <Th width="15%">Category</Th>
+                <Th width="15%">Tags</Th>
                 <Th>Notes</Th>
-                <Th  width="15%" isNumeric>Credit</Th>
-                <Th width="15%" isNumeric>Debit</Th>
+                <Th width="10%" isNumeric>
+                  Credit
+                </Th>
+                <Th width="10%" isNumeric>
+                  Debit
+                </Th>
               </Tr>
             </Thead>
             <Tbody>
               {transactions.map((transaction) => (
                 <Tr key={transaction.transaction_id}>
-                  <Td width="15%">
-                      {new Date(transaction.date).toISOString().split('T')[0].replace(/-/g, '/')}
-                  </Td>
+                  <Td width="10%">{new Date(transaction.date).toISOString().split('T')[0].replace(/-/g, '/')}</Td>
                   <Td width="15%">{transaction.category_name}</Td>
+                  {/* Tags Column */}
+                  <Td width="15%">
+                    <Wrap spacing={2}>
+                      {transaction.tags?.map((tag) => (
+                        <WrapItem key={tag.tag_id}>
+                          <Tag size="sm" borderRadius="md" variant="subtle" colorScheme="teal">
+                            <TagLabel>{tag.name}</TagLabel>
+                          </Tag>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  </Td>
                   <Td>{transaction.notes}</Td>
-                  <Td width="15%" isNumeric>
+                  <Td width="10%" isNumeric>
                     {transaction.credit !== 0 && (
                       <Text color="teal.500">{parseFloat(transaction.credit).toFixed(2)}</Text>
                     )}
                   </Td>
-                  <Td width="15%" isNumeric>
+                  <Td width="10%" isNumeric>
                     {transaction.debit !== 0 && (
                       <Text color="red.500">{parseFloat(transaction.debit).toFixed(2)}</Text>
                     )}
-                  </Td>                    
+                  </Td>
                 </Tr>
               ))}
             </Tbody>
