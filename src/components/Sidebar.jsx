@@ -7,6 +7,7 @@ import {
   Icon,
   Text,
   useColorModeValue,
+  Center,
 } from "@chakra-ui/react"
 
 import {
@@ -16,6 +17,7 @@ import {
 } from 'react-icons/fi'
 
 import { useNavigate } from 'react-router-dom'
+import { VERSION } from "../version"
 
 const Sidebar = ({ handleLogout }) => {
 
@@ -40,9 +42,14 @@ const Sidebar = ({ handleLogout }) => {
         flexShrink={0}
       >
         <VStack align="flex-start" spacing={3}>
-          <Heading as="h1" size="lg" mb={6}>
-            Cashio
-          </Heading>
+          <Flex align="baseline">
+            <Heading as="h1" size="lg" mb={6} mr={2}>
+              Cashio
+            </Heading>
+            <Text fontSize="sm" color={sidebarColor} opacity={0.8}>
+                v{VERSION}
+            </Text>
+          </Flex>
           <ChakraLink display="flex" alignItems="center" onClick={() => {navigate('/')}}>
             <Icon as={FiHome} mr={2} />
             Home
