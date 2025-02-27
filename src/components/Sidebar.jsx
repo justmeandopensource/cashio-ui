@@ -32,6 +32,12 @@ const Sidebar = ({ handleLogout }) => {
         display="flex"
         flexDirection="column"
         justifyContent="space-between"
+        height="100vh"
+        position="sticky"
+        top={0}
+        left={0}
+        overflowY="auto"
+        flexShrink={0}
       >
         <VStack align="flex-start" spacing={3}>
           <Heading as="h1" size="lg" mb={6}>

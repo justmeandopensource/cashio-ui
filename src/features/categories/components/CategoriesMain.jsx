@@ -64,7 +64,7 @@ const CategoriesMain = () => {
             bg={category.is_group ? 'teal.50' : 'transparent'}
             _hover={!category.is_group ? { bg: 'gray.50' } : undefined} // No hover for group categories
           >
-            <Td pl={`${level * 4 + 4}px`}>
+            <Td pl={`${level * 24 + 8}px`}>
               {!category.is_group ? (
                 <Text
                   fontWeight="normal"
