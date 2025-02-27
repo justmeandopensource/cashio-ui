@@ -56,7 +56,7 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
               bg={account.is_group ? 'teal.50' : 'transparent'}
               _hover={!account.is_group ? { bg: 'gray.50' } : undefined} // No hover for group accounts
             >
-              <Td pl={`${level * 4 + 4}px`}>
+              <Td pl={`${level * 24 + 8}px`}>
                 {!account.is_group ? (
                   <ChakraLink as={RouterLink} to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`} _hover={{ textDecoration: 'none' }}>
                     <Text
