@@ -54,9 +54,9 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
           <Table variant="simple" size="sm">
             <Thead>
               <Tr>
-                <Th width="10%">Date</Th>
+                <Th width="8%">Date</Th>
                 <Th width="15%">Category</Th>
-                <Th width="15%">Tags</Th>
+                <Th width="20%">Tags</Th>
                 <Th>Notes</Th>
                 <Th width="10%" isNumeric>
                   Credit
@@ -68,11 +68,14 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
             </Thead>
             <Tbody>
               {transactions.map((transaction) => (
-                <Tr key={transaction.transaction_id}>
-                  <Td width="10%">{new Date(transaction.date).toISOString().split('T')[0].replace(/-/g, '/')}</Td>
+                <Tr
+                    key={transaction.transaction_id}
+                    _hover={{ bg: 'gray.100' }}
+                  >
+                  <Td width="8%">{new Date(transaction.date).toISOString().split('T')[0].replace(/-/g, '/')}</Td>
                   <Td width="15%">{transaction.category_name}</Td>
                   {/* Tags Column */}
-                  <Td width="15%">
+                  <Td width="20%">
                     <Wrap spacing={2}>
                       {transaction.tags?.map((tag) => (
                         <WrapItem key={tag.tag_id}>
