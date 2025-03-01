@@ -22,6 +22,24 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
     return `${formattedBalance} ${currencySymbol}`
   }
 
+  // Helper function to determine text color based on account type, balance, and whether it's a group account
+  const getBalanceColor = (balance, accountType, isGroup) => {
+    if (accountType === 'asset') {
+      if (isGroup && balance >= 0) {
+        return 'teal.600' // Group account with non-negative balance in Assets table
+      } else if (balance < 0) {
+        return 'red.500' // Negative balance in Assets table
+      }
+    } else if (accountType === 'liability') {
+      if (isGroup && balance < 0) {
+        return 'teal.600' // Group account with negative balance in Liabilities table
+      } else if (balance > 0) {
+        return 'red.500' // Positive balance in Liabilities table
+      }
+    }
+    return 'gray.700' // Default color
+  }
+
   // Function to compute the balance for group accounts
   const computeGroupBalance = (accountId) => {
     let totalBalance = 0
@@ -49,6 +67,7 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
       .filter((account) => account.parent_account_id === parentId)
       .map((account) => {
         const balance = account.is_group ? computeGroupBalance(account.account_id) : account.net_balance
+        const balanceColor = getBalanceColor(balance, account.type, account.is_group)
         return (
           <React.Fragment key={account.account_id}>
             {/* Row for the current account */}
@@ -81,7 +100,7 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
               <Td isNumeric>
                 <Text
                   fontWeight={account.is_group ? 'bold' : 'normal'}
-                  color={account.is_group ? 'teal.600' : 'gray.700'}
+                  color={balanceColor}
                   fontSize={account.is_group ? 'md' : 'sm'}
                 >
                   {formatBalance(balance, ledger.currency_symbol)} {/* Format balance */}
