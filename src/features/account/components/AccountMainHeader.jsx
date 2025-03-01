@@ -8,7 +8,14 @@ const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds, onUpdat
   const navigate = useNavigate()
 
   // Determine the color for the balance based on its value
-  const balanceColor = account.net_balance >= 0 ? 'gray.600' : 'red.500'
+  const balanceColor =
+    account.type === 'asset'
+      ? account.net_balance >= 0
+        ? 'gray.600'
+        : 'red.400'
+      : account.net_balance >= 0
+      ? 'red.400'
+      : 'gray.600'
 
   // Use Chakra's color mode for consistent styling
   const bgColor = useColorModeValue('white', 'gray.700')

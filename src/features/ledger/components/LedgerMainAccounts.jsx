@@ -28,13 +28,13 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
       if (isGroup && balance >= 0) {
         return 'teal.600' // Group account with non-negative balance in Assets table
       } else if (balance < 0) {
-        return 'red.500' // Negative balance in Assets table
+        return 'red.400' // Negative balance in Assets table
       }
     } else if (accountType === 'liability') {
       if (isGroup && balance < 0) {
         return 'teal.600' // Group account with negative balance in Liabilities table
       } else if (balance > 0) {
-        return 'red.500' // Positive balance in Liabilities table
+        return 'red.400' // Positive balance in Liabilities table
       }
     }
     return 'gray.700' // Default color
