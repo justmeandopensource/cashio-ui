@@ -1,7 +1,6 @@
 import React from 'react'
 import { Box, Heading, Text, Button, Flex, useColorModeValue, IconButton } from '@chakra-ui/react'
 import { AddIcon, ArrowForwardIcon, ArrowBackIcon, EditIcon } from '@chakra-ui/icons'
-import { FiEdit } from 'react-icons/fi'
 import { useNavigate } from 'react-router-dom'
 
 const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds, onUpdateAccount }) => {

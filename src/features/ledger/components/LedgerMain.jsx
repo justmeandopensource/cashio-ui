@@ -92,7 +92,7 @@ const LedgerMain = () => {
   return (
     <Box>
       {/* Ledger Details Section */}
-      <LedgerMainHeader ledger={ledger} />
+      <LedgerMainHeader ledger={ledger} hasAccounts={accounts.length > 0} />
 
       {/* Accounts Section */}
       <LedgerMainAccounts accounts={accounts} ledger={ledger} fetchAccounts={fetchAccounts} />
