@@ -3,7 +3,7 @@ import { Box, Heading, Text, Button, Flex, useColorModeValue, IconButton } from 
 import { AddIcon, ArrowForwardIcon, ArrowBackIcon, EditIcon } from '@chakra-ui/icons'
 import { useNavigate } from 'react-router-dom'
 
-const LedgerMainHeader = ({ ledger, hasAccounts }) => {
+const LedgerMainHeader = ({ ledger, onAddTransaction, onTransferFunds, hasAccounts }) => {
   const navigate = useNavigate()
 
   // Use Chakra's color mode for consistent styling
@@ -57,6 +57,7 @@ const LedgerMainHeader = ({ ledger, hasAccounts }) => {
               colorScheme={buttonColorScheme}
               variant="solid"
               mr={4}
+              onClick={onAddTransaction}
             >
               Add Transaction
             </Button>
@@ -66,6 +67,7 @@ const LedgerMainHeader = ({ ledger, hasAccounts }) => {
               rightIcon={<ArrowForwardIcon />}
               colorScheme={buttonColorScheme}
               variant="outline"
+              onClick={onTransferFunds}
             >
               Transfer Funds
             </Button>

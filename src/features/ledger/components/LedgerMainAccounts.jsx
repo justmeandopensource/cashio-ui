@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { Box, Table, Thead, Tbody, Tr, Th, Td, Text, Button, Icon, useDisclosure, SimpleGrid, Link as ChakraLink } from '@chakra-ui/react'
+import { Flex, Box, Table, Thead, Tbody, Tr, Th, Td, Text, Button, Icon, useDisclosure, SimpleGrid, Link as ChakraLink } from '@chakra-ui/react'
 import { Link as RouterLink } from 'react-router-dom'
-import { FiPlus } from 'react-icons/fi'
+import { FiPlus, FiRepeat } from 'react-icons/fi'
 import CreateAccountModal from '@components/modals/CreateAccountModal'
 
-const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
+const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFunds, fetchAccounts }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [accountType, setAccountType] = useState(null)
   const [parentAccountId, setParentAccountId] = useState(null)
@@ -73,7 +73,13 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
             {/* Row for the current account */}
             <Tr
               bg={account.is_group ? 'teal.50' : 'transparent'}
-              _hover={!account.is_group ? { bg: 'gray.50' } : undefined} // No hover for group accounts
+              _hover={{ bg: 'gray.50' }}
+              position="relative"
+              sx={!account.is_group ? {
+                '&:hover .action-icons': {
+                  opacity: 1
+                }
+              } : {}}
             >
               <Td pl={`${level * 24 + 8}px`}>
                 {!account.is_group ? (
@@ -114,10 +120,23 @@ const LedgerMainAccounts = ({ accounts, ledger, fetchAccounts }) => {
                       <Icon as={FiPlus} boxSize={4} color="teal.500" _hover={{ color: 'teal.600' }} />
                     </ChakraLink>
                   )}
+                  {/* Icons for non-group accounts (shown on hover) */}
+                  {!account.is_group && (
+                    <Flex gap={2} opacity={0} transition="opacity 0.2s" className='action-icons'>
+                      {/* Add Transaction Icon */}
+                      <ChakraLink onClick={() => onAddTransaction(account.account_id)} _hover={{ textDecoration: 'none' }}>
+                        <Icon as={FiPlus} boxSize={4} color="teal.500" _hover={{ color: 'teal.600' }} />
+                      </ChakraLink>
+
+                      {/* Transfer Funds Icon */}
+                      <ChakraLink onClick={() => onTransferFunds(account.account_id)} _hover={{ textDecoration: 'none' }}>
+                        <Icon as={FiRepeat} boxSize={4} color="teal.500" _hover={{ color: 'teal.600' }} />
+                      </ChakraLink>
+                    </Flex>
+                  )}
                 </Box>
               </Td>
             </Tr>
-
             {/* Recursively render child accounts */}
             {renderAccountsTable(accounts, account.account_id, level + 1)}
           </React.Fragment>

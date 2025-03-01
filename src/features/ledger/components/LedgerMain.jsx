@@ -4,13 +4,20 @@ import axios from 'axios'
 import { Box, Spinner, useToast } from '@chakra-ui/react'
 import LedgerMainHeader from '@features/ledger/components/LedgerMainHeader'
 import LedgerMainAccounts from '@features/ledger/components/LedgerMainAccounts'
+import CreateTransactionModal from '@components/modals/CreateTransactionModal'
+import TransferFundsModal from '@components/modals/TransferFundsModal'
 
 const LedgerMain = () => {
   const { ledgerId } = useParams()
   const [ledger, setLedger] = useState(null)
   const [accounts, setAccounts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
   const toast = useToast()
+
+  // Add a state to store the selected accountId
+  const [selectedAccountId, setSelectedAccountId] = useState(null)
 
   // Function to fetch accounts
   const fetchAccounts = async () => {
@@ -89,13 +96,53 @@ const LedgerMain = () => {
     )
   }
 
+  const handleAddTransaction = (accountId = null) => {
+    setSelectedAccountId(accountId)
+    setIsCreateModalOpen(true)
+  }
+
+  const handleTransferFunds = (accountId = null) => {
+    setSelectedAccountId(accountId)
+    setIsTransferModalOpen(true)
+  }
+
   return (
     <Box>
       {/* Ledger Details Section */}
-      <LedgerMainHeader ledger={ledger} hasAccounts={accounts.length > 0} />
+      <LedgerMainHeader
+        ledger={ledger}
+        onAddTransaction={() => handleAddTransaction(null)}
+        onTransferFunds={() => handleTransferFunds(null)}
+        hasAccounts={accounts.length > 0}
+      />
 
       {/* Accounts Section */}
-      <LedgerMainAccounts accounts={accounts} ledger={ledger} fetchAccounts={fetchAccounts} />
+      <LedgerMainAccounts
+        accounts={accounts}
+        ledger={ledger}
+        onAddTransaction={handleAddTransaction}
+        onTransferFunds={handleTransferFunds}
+        fetchAccounts={fetchAccounts}
+      />
+
+      {/* Create Transaction Modal */}
+      <CreateTransactionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        ledgerId={ledgerId}
+        accountId={selectedAccountId}
+        onTransactionAdded={fetchAccounts}
+      />
+
+      {/* Transfer Funds Modal */}
+      <TransferFundsModal
+        isOpen={isTransferModalOpen}
+        onClose={() => setIsTransferModalOpen(false)}
+        ledgerId={ledgerId}
+        accountId={selectedAccountId}
+        onTransferCompleted={fetchAccounts}
+      />
+
     </Box>
   )
 }
