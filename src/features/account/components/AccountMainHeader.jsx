@@ -80,16 +80,14 @@ const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds, onUpdat
           </Button>
 
           {/* Button to Transfer Funds */}
-          {account.net_balance > 0 && (
-            <Button
-              rightIcon={<ArrowForwardIcon />}
-              colorScheme={buttonColorScheme}
-              variant="outline"
-              onClick={onTransferFunds}
-            >
-              Transfer Funds
-            </Button>
-          )}
+          <Button
+            rightIcon={<ArrowForwardIcon />}
+            colorScheme={buttonColorScheme}
+            variant="outline"
+            onClick={onTransferFunds}
+          >
+            Transfer Funds
+          </Button>
         </Flex>
       </Flex>
     </Box>
