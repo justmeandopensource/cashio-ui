@@ -120,14 +120,6 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     }
   }
 
-  // Fetch categories whenever the type changes
-  useEffect(() => {
-    if (isOpen) {
-      setCategoryId('')
-      fetchCategories()
-    }
-  }, [type, isOpen])
-
   // Fetch categories when modal is opened
   // Fetch accounts if no accountId is provided
   useEffect(() => {
@@ -163,7 +155,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     try {
       const token = localStorage.getItem('access_token')
       const response = await axios.get(
-        `http://localhost:8000/category/list?type=${type}&ignore_group=true`,
+        `http://localhost:8000/category/list?ignore_group=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -490,11 +482,27 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                           }}
                         >
                           <option value="">Select a category</option>
-                          {categories.map((category) => (
-                            <option key={category.category_id} value={category.category_id}>
-                              {category.name}
-                            </option>
-                          ))}
+                          {/* Group for Income Categories */}
+                          <optgroup label="Income">
+                            {categories
+                              .filter((category) => category.type === 'income')
+                              .map((category) => (
+                                <option key={category.category_id} value={category.category_id}>
+                                  {category.name}
+                                </option>
+                              ))}
+                          </optgroup>
+
+                          {/* Group for Expense Categories */}
+                          <optgroup label="Expense">
+                            {categories
+                              .filter((category) => category.type === 'expense')
+                              .map((category) => (
+                                <option key={category.category_id} value={category.category_id}>
+                                  {category.name}
+                                </option>
+                              ))}
+                          </optgroup>
                         </Select>
                       </FormControl>
                     </HStack>
@@ -528,11 +536,27 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                   isDisabled={isSplit} // Disable if split is enabled
                 >
                   <option value="">Select a category</option>
-                  {categories.map((category) => (
-                    <option key={category.category_id} value={category.category_id}>
-                      {category.name}
-                    </option>
-                  ))}
+                    {/* Group for Income Categories */}
+                    <optgroup label="Income">
+                      {categories
+                        .filter((category) => category.type === 'income')
+                        .map((category) => (
+                          <option key={category.category_id} value={category.category_id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </optgroup>
+
+                    {/* Group for Expense Categories */}
+                    <optgroup label="Expense">
+                      {categories
+                        .filter((category) => category.type === 'expense')
+                        .map((category) => (
+                          <option key={category.category_id} value={category.category_id}>
+                            {category.name}
+                          </option>
+                        ))}
+                    </optgroup>
                 </Select>
               </FormControl>
             )}
