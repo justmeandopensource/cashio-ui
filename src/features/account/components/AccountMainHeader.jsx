@@ -12,7 +12,7 @@ const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds, onUpdat
       ? account.net_balance >= 0
         ? 'gray.600'
         : 'red.400'
-      : account.net_balance >= 0
+      : account.net_balance > 0
       ? 'red.400'
       : 'gray.600'
 
