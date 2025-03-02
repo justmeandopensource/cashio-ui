@@ -84,11 +84,14 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
   const fetchAccounts = async () => {
     try {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get(`http://localhost:8000/ledger/${ledgerId}/accounts?ignore_group=true`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
+      const response = await axios.get(
+        `http://localhost:8000/ledger/${ledgerId}/accounts?ignore_group=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
       setAccounts(response.data)
     } catch (error) {
       console.error('Error fetching accounts:', error)

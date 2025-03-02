@@ -180,7 +180,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     try {
       const token = localStorage.getItem('access_token')
       const response = await axios.get(
-        `http://localhost:8000/ledger/${ledgerId}/accounts`,
+        `http://localhost:8000/ledger/${ledgerId}/accounts?ignore_group=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
