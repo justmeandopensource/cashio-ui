@@ -408,11 +408,27 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
               <FormControl>
                 <FormLabel>Account</FormLabel>
                 <Select>
-                  {accounts.map((account) => (
-                    <option key={account.account_id} value={account.account_id}>
-                      {account.name}
-                    </option>
-                  ))}
+                  <option value="">Select an account</option>
+                  {/* Group for Asset Accounts */}
+                  <optgroup label="Asset Accounts">
+                    {accounts
+                      .filter((account) => account.type === 'asset')
+                      .map((account) => (
+                        <option key={account.account_id} value={account.account_id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                  {/* Group for Liability Accounts */}
+                  <optgroup label="Liability Accounts">
+                    {accounts
+                      .filter((account) => account.type === 'liability')
+                      .map((account) => (
+                        <option key={account.account_id} value={account.account_id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
                 </Select>
               </FormControl>
             )}
@@ -483,7 +499,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                         >
                           <option value="">Select a category</option>
                           {/* Group for Income Categories */}
-                          <optgroup label="Income">
+                          <optgroup label="Income Categories">
                             {categories
                               .filter((category) => category.type === 'income')
                               .map((category) => (
@@ -494,7 +510,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                           </optgroup>
 
                           {/* Group for Expense Categories */}
-                          <optgroup label="Expense">
+                          <optgroup label="Expense Categories">
                             {categories
                               .filter((category) => category.type === 'expense')
                               .map((category) => (
@@ -537,7 +553,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                 >
                   <option value="">Select a category</option>
                     {/* Group for Income Categories */}
-                    <optgroup label="Income">
+                    <optgroup label="Income Categories">
                       {categories
                         .filter((category) => category.type === 'income')
                         .map((category) => (
@@ -548,7 +564,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                     </optgroup>
 
                     {/* Group for Expense Categories */}
-                    <optgroup label="Expense">
+                    <optgroup label="Expense Categories">
                       {categories
                         .filter((category) => category.type === 'expense')
                         .map((category) => (

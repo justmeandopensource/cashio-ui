@@ -208,11 +208,26 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
                   onChange={(e) => setFromAccountId(e.target.value)}
                 >
                   <option value="">Select an account</option>
-                  {accounts.map((account) => (
-                    <option key={account.account_id} value={account.account_id}>
-                      {account.name}
-                    </option>
-                  ))}
+                  {/* Group for Asset Accounts */}
+                  <optgroup label="Asset Accounts">
+                    {accounts
+                      .filter((account) => account.type === 'asset')
+                      .map((account) => (
+                        <option key={account.account_id} value={account.account_id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                  {/* Group for Liability Accounts */}
+                  <optgroup label="Liability Accounts">
+                    {accounts
+                      .filter((account) => account.type === 'liability')
+                      .map((account) => (
+                        <option key={account.account_id} value={account.account_id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
                 </Select>
               </FormControl>
             )}
@@ -249,11 +264,26 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
                 onChange={(e) => setToAccountId(e.target.value)}
               >
                 <option value="">Select an account</option>
-                {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts, fromAccountId).map((account) => (
-                  <option key={account.account_id} value={account.account_id}>
-                    {account.name}
-                  </option>
-                ))}
+                  {/* Group for Asset Accounts */}
+                  <optgroup label="Asset Accounts">
+                    {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts, fromAccountId)
+                      .filter((account) => account.type === 'asset')
+                      .map((account) => (
+                        <option key={account.account_id} value={account.account_id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                  {/* Group for Liability Accounts */}
+                  <optgroup label="Liability Accounts">
+                    {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts, fromAccountId)
+                      .filter((account) => account.type === 'liability')
+                      .map((account) => (
+                        <option key={account.account_id} value={account.account_id}>
+                          {account.name}
+                        </option>
+                      ))}
+                  </optgroup>
               </Select>
             </FormControl>
 
