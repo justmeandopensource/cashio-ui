@@ -8,6 +8,8 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [accountType, setAccountType] = useState(null)
   const [parentAccountId, setParentAccountId] = useState(null)
+  const [showZeroBalanceAssets, setShowZeroBalanceAssets] = useState(false)
+  const [showZeroBalanceLiabilities, setShowZeroBalanceLiabilities] = useState(false)
 
   // Separate accounts into Assets and Liabilities
   const assetAccounts = accounts.filter((account) => account.type === 'asset')
@@ -62,9 +64,10 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
   }
 
   // Function to render accounts in a nested table format
-  const renderAccountsTable = (accounts, parentId = null, level = 0) => {
+  const renderAccountsTable = (accounts, parentId = null, level = 0, showZeroBalance) => {
     return accounts
       .filter((account) => account.parent_account_id === parentId)
+      .filter((account) => showZeroBalance || (account.is_group ? computeGroupBalance(account.account_id) !== 0 : account.net_balance !== 0))
       .map((account) => {
         const balance = account.is_group ? computeGroupBalance(account.account_id) : account.net_balance
         const balanceColor = getBalanceColor(balance, account.type, account.is_group)
@@ -138,7 +141,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
               </Td>
             </Tr>
             {/* Recursively render child accounts */}
-            {renderAccountsTable(accounts, account.account_id, level + 1)}
+            {renderAccountsTable(accounts, account.account_id, level + 1, showZeroBalance)}
           </React.Fragment>
         )
 
@@ -165,9 +168,20 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
           _hover={{ boxShadow: 'md', transition: 'all 0.2s' }} // Hover effect
         >
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-            <Text fontSize="xl" fontWeight="bold" color="teal.500">
-              Assets
-            </Text>
+            <Flex align="center" gap={4}>
+              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+                Assets
+              </Text>
+              <ChakraLink
+                onClick={() => setShowZeroBalanceAssets(!showZeroBalanceAssets)}
+                _hover={{ textDecoration: 'none', color: 'teal.600' }}
+                color="teal.500"
+                fontSize="sm"
+                fontWeight="medium"
+              >
+                {showZeroBalanceAssets ? 'Hide zero balance accounts' : 'Show zero balance accounts'}
+              </ChakraLink>
+            </Flex>
             <ChakraLink onClick={() => handleCreateAccountClick('asset')} _hover={{ textDecoration: 'none' }}>
               <Icon as={FiPlus} boxSize={5} color="teal.500" _hover={{ color: 'teal.600' }} />
             </ChakraLink>
@@ -187,7 +201,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
           ) : (
             <Table variant="simple" size="sm">
               <Tbody>
-                {renderAccountsTable(assetAccounts)}
+                {renderAccountsTable(assetAccounts, null, 0, showZeroBalanceAssets)}
               </Tbody>
             </Table>
           )}
@@ -202,9 +216,20 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
           _hover={{ boxShadow: 'md', transition: 'all 0.2s' }} // Hover effect
         >
           <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
-            <Text fontSize="xl" fontWeight="bold" color="teal.500">
-              Liabilities
-            </Text>
+            <Flex align="center" gap={4}>
+              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+                Liabilities
+              </Text>
+              <ChakraLink
+                onClick={() => setShowZeroBalanceLiabilities(!showZeroBalanceLiabilities)}
+                _hover={{ textDecoration: 'none', color: 'teal.600' }}
+                color="teal.500"
+                fontSize="sm"
+                fontWeight="medium"
+              >
+                {showZeroBalanceLiabilities ? 'Hide zero balance accounts' : 'Show zero balance accounts'}
+              </ChakraLink>
+            </Flex>
             <ChakraLink onClick={() => handleCreateAccountClick('liability')} _hover={{ textDecoration: 'none' }}>
               <Icon as={FiPlus} boxSize={5} color="teal.500" _hover={{ color: 'teal.600' }} />
             </ChakraLink>
@@ -224,7 +249,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
           ) : (
             <Table variant="simple" size="sm">
               <Tbody>
-                {renderAccountsTable(liabilityAccounts)}
+                {renderAccountsTable(liabilityAccounts, null, 0, showZeroBalanceLiabilities)}
               </Tbody>
             </Table>
           )}
