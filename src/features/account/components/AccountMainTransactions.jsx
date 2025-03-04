@@ -11,16 +11,33 @@ import {
   Flex,
   Icon,
   useDisclosure,
+  useToast,
   Tag,
   TagLabel,
   Wrap,
   WrapItem,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverHeader,
+  PopoverBody,
+  PopoverArrow,
+  Spinner,
 } from '@chakra-ui/react'
-import { FiPlus, FiChevronLeft, FiChevronRight } from 'react-icons/fi'
+import {
+  FiPlus,
+  FiChevronLeft,
+  FiChevronRight,
+} from 'react-icons/fi'
+import { Square } from '@chakra-ui/react'
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
+import axios from 'axios'
 
 const AccountMainTransactions = ({ transactions, account, fetchTransactions, pagination, onAddTransaction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [splitTransactions, setSplitTransactions] = useState([])
+  const [isLoading, setIsLoading] = useState(false)
+  const toast = useToast()
 
   // Destructure pagination data
   const { total_transactions, total_pages, current_page, per_page } = pagination
@@ -28,6 +45,34 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
   // Function to handle page change
   const handlePageChange = (page) => {
     fetchTransactions(page)
+  }
+
+  // Function to fetch split transactions
+  const fetchSplitTransactions = async (transactionId) => {
+    setIsLoading(true)
+    try {
+      const token = localStorage.getItem('access_token')
+      const response = await axios.get(
+        `http://localhost:8000/ledger/${account.ledger_id}/transaction/${transactionId}/splits`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      setSplitTransactions(response.data)
+    } catch (error) {
+      console.error('Error fetching split transactions:', error)
+      toast({
+        title: 'Error',
+        description: error.response?.data?.detail || 'Failed to fetch split transactions.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -57,6 +102,7 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
                 <Th width="8%">Date</Th>
                 <Th width="15%">Category</Th>
                 <Th width="20%">Tags</Th>
+                <Th width="3%">Type</Th>
                 <Th>Notes</Th>
                 <Th width="10%" isNumeric>
                   Credit
@@ -85,6 +131,63 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
                         </WrapItem>
                       ))}
                     </Wrap>
+                  </Td>
+                  {/* Type Column */}
+                  <Td width="3%">
+                  {transaction.is_split && (
+                    <Popover onOpen={() => fetchSplitTransactions(transaction.transaction_id)}>
+                      <PopoverTrigger>
+                        <Box display="inline-block" p={1}>
+                          <Square size="10px" bg="purple.400" cursor="pointer" borderRadius="md" /> {/* Filled circle for split */}
+                        </Box>
+                      </PopoverTrigger>
+                      <PopoverContent bg="teal.100" color="white">
+                        <PopoverArrow bg="teal.100" />
+                        <PopoverBody>
+                          {isLoading ? (
+                            <Flex justify="center" align="center" minH="100px">
+                              <Spinner />
+                            </Flex>
+                          ) : (
+                            <Table variant="simple" size="sm">
+                              <Thead>
+                                <Tr bg="teal.300">
+                                  <Th color="white">Category</Th>
+                                  <Th color="white" isNumeric>Debit</Th>
+                                  <Th color="white">Notes</Th>
+                                </Tr>
+                              </Thead>
+                              <Tbody>
+                                {splitTransactions.map((split) => (
+                                  <Tr key={split.split_id} _hover={{ bg: 'teal.50' }}>
+                                    <Td color="teal.900">{split.category_name}</Td>
+                                    <Td color="teal.900" isNumeric>{split.debit.toFixed(2)}</Td>
+                                    <Td color="teal.900">{split.notes}</Td>
+                                  </Tr>
+                                ))}
+                              </Tbody>
+                            </Table>
+                          )}
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
+                  )}
+                  {transaction.is_transfer && (
+                    <Popover>
+                      <PopoverTrigger>
+                        <Box display="inline-block" p={1}>
+                          <Square size="10px" bg="blue.400" cursor="pointer" borderRadius="md" /> {/* Filled squircle for transfer */}
+                        </Box>
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <PopoverArrow />
+                        <PopoverHeader>Transfer Transaction Details</PopoverHeader>
+                        <PopoverBody>
+                          <Text>This is a transfer transaction.</Text>
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
+                  )}
                   </Td>
                   <Td>{transaction.notes}</Td>
                   <Td width="10%" isNumeric>
