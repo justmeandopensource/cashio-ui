@@ -204,56 +204,62 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
                     </Popover>
                   )}
                   {transaction.is_transfer && (
-                  <Popover onOpen={() => fetchTransferDetails(transaction.transfer_id)}>
-                    <PopoverTrigger>
-                      <Box display="inline-block" p={1}>
-                        <Square size="10px" bg="blue.400" cursor="pointer" borderRadius="md" />
-                      </Box>
-                    </PopoverTrigger>
-                    <PopoverContent bg="teal.100" color="white"> {/* Set a maximum width for the popover */}
-                      <PopoverArrow bg="teal.100" />
-                      <PopoverHeader
-                        bgGradient="linear(to-r, teal.400, teal.600)"
-                        color="white"
-                        borderTopRadius="md"
-                        py={3}
-                        px={4}
-                      >
-                        <Flex align="center">
-                          <Icon as={FiCreditCard} mr={2} />
-                          <Text fontWeight="bold">Funds transferred to</Text>
-                        </Flex>
-                      </PopoverHeader>
-                      <PopoverBody>
-                        {isLoading ? (
-                          <Flex justify="center" align="center" minH="100px">
-                            <Spinner />
+                    <Popover onOpen={() => fetchTransferDetails(transaction.transfer_id)}>
+                      <PopoverTrigger>
+                        <Box display="inline-block" p={1}>
+                          <Square size="10px" bg="blue.400" cursor="pointer" borderRadius="md" />
+                        </Box>
+                      </PopoverTrigger>
+                      <PopoverContent bg="teal.100" color="white" maxW="300px">
+                        <PopoverArrow bg="teal.100" />
+                        <PopoverHeader
+                          bgGradient="linear(to-r, teal.400, teal.600)"
+                          color="white"
+                          borderTopRadius="md"
+                          py={3}
+                          px={4}
+                        >
+                          <Flex align="center">
+                            <Icon as={FiCreditCard} mr={2} />
+                            <Text fontWeight="bold">
+                              {transaction.debit > 0 ? "Funds transferred to" : "Funds transferred from"}
+                            </Text>
                           </Flex>
-                        ) : transferDetails ? (
-                          <Stack spacing={4} py={2}>
-                            {/* Destination Account and Ledger */}
-                            <Box
-                              p={4}
-                              borderWidth="1px"
-                              borderRadius="md"
-                              bg="teal.50"
-                              boxShadow="sm"
-                              textAlign="center"
-                            >
-                              <Text fontSize="lg" fontWeight="bold" color="teal.900" mb={2}>
-                                {transferDetails.destination_account_name || 'N/A'}
-                              </Text>
-                              <Text fontSize="sm" color="teal.700">
-                                {transferDetails.destination_ledger_name || 'N/A'}
-                              </Text>
-                            </Box>
-                          </Stack>
-                        ) : (
-                          <Text color="teal.900">No transfer details available.</Text>
-                        )}
-                      </PopoverBody>
-                    </PopoverContent>
-                  </Popover>
+                        </PopoverHeader>
+                        <PopoverBody>
+                          {isLoading ? (
+                            <Flex justify="center" align="center" minH="100px">
+                              <Spinner />
+                            </Flex>
+                          ) : transferDetails ? (
+                            <Stack spacing={4} py={2}>
+                              {/* Dynamic Account and Ledger Details */}
+                              <Box
+                                p={4}
+                                borderWidth="1px"
+                                borderRadius="md"
+                                bg="teal.50"
+                                boxShadow="sm"
+                                textAlign="center"
+                              >
+                                <Text fontSize="lg" fontWeight="bold" color="teal.900" mb={2}>
+                                  {transaction.debit > 0
+                                    ? transferDetails.destination_account_name || 'N/A'
+                                    : transferDetails.source_account_name || 'N/A'}
+                                </Text>
+                                <Text fontSize="sm" color="teal.700">
+                                  {transaction.debit > 0
+                                    ? transferDetails.destination_ledger_name || 'N/A'
+                                    : transferDetails.source_ledger_name || 'N/A'}
+                                </Text>
+                              </Box>
+                            </Stack>
+                          ) : (
+                            <Text color="teal.900">No transfer details available.</Text>
+                          )}
+                        </PopoverBody>
+                      </PopoverContent>
+                    </Popover>
                   )}
                   </Td>
                   <Td>{transaction.notes}</Td>
