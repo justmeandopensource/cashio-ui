@@ -12,7 +12,7 @@ import {
 } from '@chakra-ui/react'
 import { FiFileText, FiPlus } from 'react-icons/fi'
 
-const HomeLedgerCards= ({ ledgers, onOpen }) => {
+const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
   const navigate = useNavigate()
 
   const handleLedgerClick = (ledgerId) => {

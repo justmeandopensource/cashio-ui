@@ -1,65 +1,68 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import {
   Flex,
   Spinner,
   useDisclosure,
   useToast,
+  Text,
 } from '@chakra-ui/react'
 import Layout from '@components/Layout'
 import HomeMain from '@features/home/components/HomeMain'
 
 const Home = () => {
   const navigate = useNavigate()
-  const [isLoading, setIsLoading] = useState(true)
-  const [isFetchingLedgers, setIsFetchingLedgers] = useState(true)
-  const [ledgers, setLedgers] = useState([])
-  const [newLedgerName, setNewLedgerName] = useState('')
-  const [newLedgerCurrency, setNewLedgerCurrency] = useState('')
-  const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
-
-  const ledgerNameInputRef = useRef(null)
+  const queryClient = useQueryClient()
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   // token verification
-  useEffect(() => {
-    const verifyToken = async () => {
+  const { isLoading: isTokenVerifying, isError: isTokenError } = useQuery({
+    queryKey: ['verifyToken'],
+    queryFn: async () => {
       const token = localStorage.getItem('access_token')
-
       if (!token) {
-        navigate('/login')
-        return
+        throw new Error('No token found')
       }
 
-      try {
-        const response = await fetch("http://localhost:8000/user/verify-token", {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          }
-        })
+      const response = await fetch('http://localhost:8000/user/verify-token', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
 
-        if (!response.ok) {
-          throw new Error('Token verification failed')
-        }
-        const data = await response.json()
-        console.log('token verified:', data)
-      } catch (error) {
-        console.error('Token verification error:', error)
-        localStorage.removeItem('access_token')
-        navigate('/login')
-      } finally {
-        setIsLoading(false)
+      if (!response.ok) {
+        throw new Error('Token verification failed')
       }
+
+      return response.json()
+    },
+    onError: () => {
+      localStorage.removeItem('access_token')
+      navigate('/login')
+    },
+    retry: false, // Disable retries to avoid infinite loops
+  })
+
+  // Redirect to login if token verification fails
+  useEffect(() => {
+    if (isTokenError) {
+      localStorage.removeItem('access_token')
+      navigate('/login')
     }
+  }, [isTokenError, navigate])
 
-    verifyToken()
-  }, [navigate])
-
-  // fetch ledgers
-  const fetchLedgers = async () => {
-    try {
+  // Fetch ledgers
+  const {
+    data: ledgers,
+    isLoading: isFetchingLedgers,
+    isError: isLedgersError,
+  } = useQuery({
+    queryKey: ['ledgers'],
+    queryFn: async () => {
       const token = localStorage.getItem('access_token')
       const response = await fetch('http://localhost:8000/ledger/list', {
         method: 'GET',
@@ -68,20 +71,64 @@ const Home = () => {
           'Content-Type': 'application/json',
         },
       })
+
       if (!response.ok) {
         throw new Error('Failed to fetch ledgers')
       }
-      const data = await response.json()
-      setLedgers(data)
-    } catch (error) {
-      console.error('Error fetching ledgers')
-    } finally {
-      setIsFetchingLedgers(false)
-    }
-  }
+
+      return response.json()
+    },
+    enabled: !isTokenVerifying && !isTokenError, // Only fetch ledgers after token verification
+  })
+
+  // Create ledger mutation
+  const createLedgerMutation = useMutation({
+    mutationFn: async ({ name, currency_symbol }) => {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch('http://localhost:8000/ledger/create', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, currency_symbol }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.detail || 'Ledger creation failed')
+      }
+
+      return response.json()
+    },
+    onSuccess: (data) => {
+      // Update the cached ledgers list with the new ledger
+      queryClient.setQueryData(['ledgers'], (oldData) => [...oldData, data])
+      onClose()
+      toast({
+        title: 'Success',
+        description: 'Ledger created successfully',
+        status: 'success',
+        duration: 2000,
+        position: 'top-right',
+        isClosable: true,
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        status: 'error',
+        duration: 3000,
+        position: 'top-right',
+        isClosable: true,
+      })
+      ledgerNameInputRef.current?.focus()
+    },
+  })
 
   // handle ledger creation
-  const handleCreateLedger = async () => {
+  const handleCreateLedger = async (newLedgerName, newLedgerCurrency) => {
     if (!newLedgerName || !newLedgerCurrency) {
       toast({
         title: 'Error',
@@ -94,60 +141,11 @@ const Home = () => {
       ledgerNameInputRef.current?.focus()
       return
     }
-    try {
-      const token = localStorage.getItem('access_token')
-      const response = await fetch('http://localhost:8000/ledger/create', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: newLedgerName,
-          currency_symbol: newLedgerCurrency,
-        }),
-      })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        const errorMessage = errorData.detail || 'Ledger creation failed'
-        toast({
-          title: 'Error',
-          description: errorMessage,
-          status: 'error',
-          duration: 3000,
-          position: 'top-right',
-          isClosable: true,
-        })
-        ledgerNameInputRef.current?.focus()
-        return
-      }
-
-      const data = await response.json()
-      setLedgers([...ledgers, data])
-      onClose()
-      toast({
-        title: 'Success',
-        description: 'Ledger created successfully',
-        status: 'success',
-        duration: 2000,
-        position: 'top-right',
-        isClosable: true,
-      })
-    } catch (error) {
-      console.error('Error creating ledger:', error)
-      toast({
-        title: 'Error',
-        description: error.response?.data?.detail || error.message,
-        status: 'error',
-        duration: 3000,
-        position: 'top-right',
-        isClosable: true,
-      })
-    } finally {
-      setNewLedgerName('')
-      setNewLedgerCurrency('')
-    }
+    createLedgerMutation.mutate({
+      name: newLedgerName,
+      currency_symbol: newLedgerCurrency,
+    })
   }
 
   // handle logout
@@ -156,16 +154,34 @@ const Home = () => {
     navigate('/login')
   }
 
-  // Fetch ledgers after token verification
-  useEffect(() => {
-    if (!isLoading) {
-      fetchLedgers()
-    }
-  }, [isLoading])
+  if (isTokenVerifying) {
+    return (
+      <Flex justify="center" align="center" minH="100vh">
+        <Spinner size="xl" />
+      </Flex>
+    )
+  }
 
-  if (isLoading || isFetchingLedgers) {
+  if (isTokenError) {
+    return null
+  }
+
+  if (isFetchingLedgers) {
     return (
       <Layout handleLogout={handleLogout}>
+        <Flex justify="center" align="center" minH="100vh">
+          <Spinner size="xl" />
+        </Flex>
+      </Layout>
+    )
+  }
+
+  if (isLedgersError) {
+    return (
+      <Layout handleLogout={handleLogout}>
+        <Flex justify="center" align="center" minH="100vh">
+          <Text>Error fetching ledgers. Please try again.</Text>
+        </Flex>
       </Layout>
     )
   }
@@ -173,16 +189,11 @@ const Home = () => {
   return (
     <Layout handleLogout={handleLogout}>
       <HomeMain
-        ledgers={ledgers}
+        ledgers={ledgers || []}
         onOpen={onOpen}
         isOpen={isOpen}
         onClose={onClose}
-        newLedgerName={newLedgerName}
-        setNewLedgerName={setNewLedgerName}
-        newLedgerCurrency={newLedgerCurrency}
-        setNewLedgerCurrency={setNewLedgerCurrency}
         handleCreateLedger={handleCreateLedger}
-        ledgerNameInputRef={ledgerNameInputRef}
       />
     </Layout>
   )

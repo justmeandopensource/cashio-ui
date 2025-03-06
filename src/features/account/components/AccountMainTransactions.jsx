@@ -3,7 +3,8 @@ import {
   Box,
   Text,
   Table,
-  Thead, Tbody,
+  Thead,
+  Tbody,
   Tr,
   Th,
   Td,
@@ -25,37 +26,38 @@ import {
   Spinner,
   Stack,
 } from '@chakra-ui/react'
-import {
-  FiPlus,
-  FiChevronLeft,
-  FiChevronRight,
-  FiCreditCard,
-} from 'react-icons/fi'
+import { FiPlus, FiChevronLeft, FiChevronRight, FiCreditCard } from 'react-icons/fi'
 import { Square } from '@chakra-ui/react'
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
-import axios from 'axios'
+import { useQueryClient } from '@tanstack/react-query'
 
 const AccountMainTransactions = ({ transactions, account, fetchTransactions, pagination, onAddTransaction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const [splitTransactions, setSplitTransactions] = useState([])
-  const [transferDetails, setTransferDetails] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
+  const queryClient = useQueryClient()
+
+  // State to store split transactions and transfer details
+  const [splitTransactions, setSplitTransactions] = useState([])
+  const [transferDetails, setTransferDetails] = useState(null)
+
+  // Loading states
+  const [isSplitLoading, setIsSplitLoading] = useState(false)
+  const [isTransferLoading, setIsTransferLoading] = useState(false)
 
   // Destructure pagination data
-  const { total_transactions, total_pages, current_page, per_page } = pagination
+  const { total_transactions, total_pages, current_page } = pagination
 
   // Function to handle page change
   const handlePageChange = (page) => {
     fetchTransactions(page)
   }
 
-  // Function to fetch split transactions
+  // Fetch split transactions using fetch
   const fetchSplitTransactions = async (transactionId) => {
-    setIsLoading(true)
+    setIsSplitLoading(true)
     try {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get(
+      const response = await fetch(
         `http://localhost:8000/ledger/${account.ledger_id}/transaction/${transactionId}/splits`,
         {
           headers: {
@@ -63,53 +65,62 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
           },
         }
       )
-      setSplitTransactions(response.data)
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch split transactions')
+      }
+
+      const data = await response.json()
+      setSplitTransactions(data); // Update state with fetched data
     } catch (error) {
       console.error('Error fetching split transactions:', error)
       toast({
         title: 'Error',
-        description: error.response?.data?.detail || 'Failed to fetch split transactions.',
+        description: error.message || 'Failed to fetch split transactions.',
         status: 'error',
         duration: 3000,
         isClosable: true,
       })
     } finally {
-      setIsLoading(false)
+      setIsSplitLoading(false)
     }
   }
 
-  // Function to fetch transfer transactions
+  // Fetch transfer details using fetch
   const fetchTransferDetails = async (transferId) => {
-    setIsLoading(true);
+    setIsTransferLoading(true)
     try {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get(
-        `http://localhost:8000/ledger/transfer/${transferId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      setTransferDetails(response.data)
+      const response = await fetch(`http://localhost:8000/ledger/transfer/${transferId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch transfer details')
+      }
+
+      const data = await response.json()
+      setTransferDetails(data); // Update state with fetched data
     } catch (error) {
-      console.error('Error fetching transfer transactions:', error)
+      console.error('Error fetching transfer details:', error)
       toast({
         title: 'Error',
-        description: error.response?.data?.detail || 'Failed to fetch transfer transactions.',
+        description: error.message || 'Failed to fetch transfer details.',
         status: 'error',
         duration: 3000,
         isClosable: true,
       })
     } finally {
-      setIsLoading(false)
+      setIsTransferLoading(false)
     }
   }
 
   return (
     <Box bg="gray.50" p={6} borderRadius="lg">
       {/* No Transactions State */}
-      {total_transactions === 0 ? (
+      {(!transactions || transactions.length === 0) ? (
         <Box textAlign="center" py={10} px={6}>
           <Text fontSize="xl" fontWeight="bold" mb={2}>
             No Transactions Found
@@ -145,10 +156,7 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
             </Thead>
             <Tbody>
               {transactions.map((transaction) => (
-                <Tr
-                    key={transaction.transaction_id}
-                    _hover={{ bg: 'gray.100' }}
-                  >
+                <Tr key={transaction.transaction_id} _hover={{ bg: 'gray.100' }}>
                   <Td width="8%">{new Date(transaction.date).toISOString().split('T')[0].replace(/-/g, '/')}</Td>
                   <Td width="15%">{transaction.category_name}</Td>
                   {/* Tags Column */}
@@ -165,102 +173,105 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
                   </Td>
                   {/* Type Column */}
                   <Td width="3%">
-                  {transaction.is_split && (
-                    <Popover onOpen={() => fetchSplitTransactions(transaction.transaction_id)}>
-                      <PopoverTrigger>
-                        <Box display="inline-block" p={1}>
-                          <Square size="10px" bg="purple.400" cursor="pointer" borderRadius="md" /> {/* Filled circle for split */}
-                        </Box>
-                      </PopoverTrigger>
-                      <PopoverContent bg="teal.100" color="white">
-                        <PopoverArrow bg="teal.100" />
-                        <PopoverBody>
-                          {isLoading ? (
-                            <Flex justify="center" align="center" minH="100px">
-                              <Spinner />
-                            </Flex>
-                          ) : (
-                            <Table variant="simple" size="sm">
-                              <Thead>
-                                <Tr bgGradient="linear(to-r, teal.400, teal.600)">
-                                  <Th color="white">Category</Th>
-                                  <Th color="white" isNumeric>Debit</Th>
-                                  <Th color="white">Notes</Th>
-                                </Tr>
-                              </Thead>
-                              <Tbody>
-                                {splitTransactions.map((split) => (
-                                  <Tr key={split.split_id} _hover={{ bg: 'teal.50' }}>
-                                    <Td color="teal.900">{split.category_name}</Td>
-                                    <Td color="teal.900" isNumeric>{split.debit.toFixed(2)}</Td>
-                                    <Td color="teal.900">{split.notes}</Td>
+                    {transaction.is_split && (
+                      <Popover onOpen={() => fetchSplitTransactions(transaction.transaction_id)}>
+                        <PopoverTrigger>
+                          <Box display="inline-block" p={1}>
+                            <Square size="10px" bg="purple.400" cursor="pointer" borderRadius="md" />
+                          </Box>
+                        </PopoverTrigger>
+                        <PopoverContent bg="teal.100" color="white">
+                          <PopoverArrow bg="teal.100" />
+                          <PopoverBody>
+                            {isSplitLoading ? (
+                              <Flex justify="center" align="center" minH="100px">
+                                <Spinner />
+                              </Flex>
+                            ) : (
+                              <Table variant="simple" size="sm">
+                                <Thead>
+                                  <Tr bgGradient="linear(to-r, teal.400, teal.600)">
+                                    <Th color="white">Category</Th>
+                                    <Th color="white" isNumeric>
+                                      Debit
+                                    </Th>
+                                    <Th color="white">Notes</Th>
                                   </Tr>
-                                ))}
-                              </Tbody>
-                            </Table>
-                          )}
-                        </PopoverBody>
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                  {transaction.is_transfer && (
-                    <Popover onOpen={() => fetchTransferDetails(transaction.transfer_id)}>
-                      <PopoverTrigger>
-                        <Box display="inline-block" p={1}>
-                          <Square size="10px" bg="blue.400" cursor="pointer" borderRadius="md" />
-                        </Box>
-                      </PopoverTrigger>
-                      <PopoverContent bg="teal.100" color="white" maxW="300px">
-                        <PopoverArrow bg="teal.100" />
-                        <PopoverHeader
-                          bgGradient="linear(to-r, teal.400, teal.600)"
-                          color="white"
-                          borderTopRadius="md"
-                          py={3}
-                          px={4}
-                        >
-                          <Flex align="center">
-                            <Icon as={FiCreditCard} mr={2} />
-                            <Text fontWeight="bold">
-                              {transaction.debit > 0 ? "Funds transferred to" : "Funds transferred from"}
-                            </Text>
-                          </Flex>
-                        </PopoverHeader>
-                        <PopoverBody>
-                          {isLoading ? (
-                            <Flex justify="center" align="center" minH="100px">
-                              <Spinner />
+                                </Thead>
+                                <Tbody>
+                                  {splitTransactions.map((split) => (
+                                    <Tr key={split.split_id} _hover={{ bg: 'teal.50' }}>
+                                      <Td color="teal.900">{split.category_name}</Td>
+                                      <Td color="teal.900" isNumeric>
+                                        {split.debit.toFixed(2)}
+                                      </Td>
+                                      <Td color="teal.900">{split.notes}</Td>
+                                    </Tr>
+                                  ))}
+                                </Tbody>
+                              </Table>
+                            )}
+                          </PopoverBody>
+                        </PopoverContent>
+                      </Popover>
+                    )}
+                    {transaction.is_transfer && (
+                      <Popover onOpen={() => fetchTransferDetails(transaction.transfer_id)}>
+                        <PopoverTrigger>
+                          <Box display="inline-block" p={1}>
+                            <Square size="10px" bg="blue.400" cursor="pointer" borderRadius="md" />
+                          </Box>
+                        </PopoverTrigger>
+                        <PopoverContent bg="teal.100" color="white" maxW="300px">
+                          <PopoverArrow bg="teal.100" />
+                          <PopoverHeader
+                            bgGradient="linear(to-r, teal.400, teal.600)"
+                            color="white"
+                            borderTopRadius="md"
+                            py={3}
+                            px={4}
+                          >
+                            <Flex align="center">
+                              <Icon as={FiCreditCard} mr={2} />
+                              <Text fontWeight="bold">
+                                {transaction.debit > 0 ? 'Funds transferred to' : 'Funds transferred from'}
+                              </Text>
                             </Flex>
-                          ) : transferDetails ? (
-                            <Stack spacing={4} py={2}>
-                              {/* Dynamic Account and Ledger Details */}
-                              <Box
-                                p={4}
-                                borderWidth="1px"
-                                borderRadius="md"
-                                bg="teal.50"
-                                boxShadow="sm"
-                                textAlign="center"
-                              >
-                                <Text fontSize="lg" fontWeight="bold" color="teal.900" mb={2}>
-                                  {transaction.debit > 0
-                                    ? transferDetails.destination_account_name || 'N/A'
-                                    : transferDetails.source_account_name || 'N/A'}
-                                </Text>
-                                <Text fontSize="sm" color="teal.700">
-                                  {transaction.debit > 0
-                                    ? transferDetails.destination_ledger_name || 'N/A'
-                                    : transferDetails.source_ledger_name || 'N/A'}
-                                </Text>
-                              </Box>
-                            </Stack>
-                          ) : (
-                            <Text color="teal.900">No transfer details available.</Text>
-                          )}
-                        </PopoverBody>
-                      </PopoverContent>
-                    </Popover>
-                  )}
+                          </PopoverHeader>
+                          <PopoverBody>
+                            {isTransferLoading ? (
+                              <Flex justify="center" align="center" minH="100px">
+                                <Spinner />
+                              </Flex>
+                            ) : transferDetails ? (
+                              <Stack spacing={4} py={2}>
+                                <Box
+                                  p={4}
+                                  borderWidth="1px"
+                                  borderRadius="md"
+                                  bg="teal.50"
+                                  boxShadow="sm"
+                                  textAlign="center"
+                                >
+                                  <Text fontSize="lg" fontWeight="bold" color="teal.900" mb={2}>
+                                    {transaction.debit > 0
+                                      ? transferDetails.destination_account_name || 'N/A'
+                                      : transferDetails.source_account_name || 'N/A'}
+                                  </Text>
+                                  <Text fontSize="sm" color="teal.700">
+                                    {transaction.debit > 0
+                                      ? transferDetails.destination_ledger_name || 'N/A'
+                                      : transferDetails.source_ledger_name || 'N/A'}
+                                  </Text>
+                                </Box>
+                              </Stack>
+                            ) : (
+                              <Text color="teal.900">No transfer details available.</Text>
+                            )}
+                          </PopoverBody>
+                        </PopoverContent>
+                      </Popover>
+                    )}
                   </Td>
                   <Td>{transaction.notes}</Td>
                   <Td width="10%" isNumeric>

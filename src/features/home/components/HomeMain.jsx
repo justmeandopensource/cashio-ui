@@ -3,16 +3,11 @@ import HomeLedgerCards from '@features/home/components/HomeLedgerCards'
 import CreateLedgerModal from '@components/modals/CreateLedgerModal'
 
 const HomeMain = ({
-  ledgers,
+  ledgers = [],
   onOpen,
   isOpen,
   onClose,
-  newLedgerName,
-  setNewLedgerName,
-  newLedgerCurrency,
-  setNewLedgerCurrency,
   handleCreateLedger,
-  ledgerNameInputRef,
 }) => {
   return (
     <>
@@ -20,12 +15,7 @@ const HomeMain = ({
       <CreateLedgerModal
         isOpen={isOpen}
         onClose={onClose}
-        newLedgerName={newLedgerName}
-        setNewLedgerName={setNewLedgerName}
-        newLedgerCurrency={newLedgerCurrency}
-        setNewLedgerCurrency={setNewLedgerCurrency}
         handleCreateLedger={handleCreateLedger}
-        ledgerNameInputRef={ledgerNameInputRef}
       />
     </>
   )

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
-import { Box, Spinner, useToast } from '@chakra-ui/react'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Box, Spinner, useToast, Text } from '@chakra-ui/react'
 import AccountMainHeader from "@features/account/components/AccountMainHeader"
 import AccountMainTransactions from "@features/account/components/AccountMainTransactions"
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
@@ -10,32 +10,64 @@ import UpdateAccountModal from '@components/modals/UpdateAccountModal'
 
 const AccountMain = () => {
   const { ledgerId, accountId } = useParams()
-  const [account, setAccount] = useState(null)
-  const [transactions, setTransactions] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
+  const toast = useToast()
+  const queryClient = useQueryClient()
+
+  // Pagination state
   const [pagination, setPagination] = useState({
     total_transactions: 0,
     total_pages: 0,
     current_page: 1,
     per_page: 25,
   })
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false)
-  const toast = useToast()
 
-  // Fetch account details
+  // Fetch account
   const fetchAccount = async () => {
-    try {
-      const token = localStorage.getItem('access_token')
-      const response = await axios.get(`http://localhost:8000/ledger/${ledgerId}/account/${accountId}`, {
+    const token = localStorage.getItem('access_token')
+    const response = await fetch(`http://localhost:8000/ledger/${ledgerId}/account/${accountId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch account details')
+    }
+
+    return response.json()
+  }
+
+  // Fetch transactions
+  const fetchTransactions = async (page = 1) => {
+    const token = localStorage.getItem('access_token')
+    const response = await fetch(
+      `http://localhost:8000/ledger/${ledgerId}/account/${accountId}/transactions?page=${page}`,
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      setAccount(response.data)
-    } catch (error) {
-      console.error('Error fetching account:', error)
+      }
+    )
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch transactions')
+    }
+
+    return response.json()
+  }
+
+  // Fetch account
+  const {
+    data: account,
+    isLoading: isAccountLoading,
+    isError: isAccountError,
+  } = useQuery({
+    queryKey: ['account', accountId],
+    queryFn: fetchAccount,
+    onError: (error) => {
       toast({
         title: 'Error',
         description: 'Failed to fetch account details.',
@@ -43,30 +75,18 @@ const AccountMain = () => {
         duration: 3000,
         isClosable: true,
       })
-    }
-  }
+    },
+  })
 
   // Fetch transactions
-  const fetchTransactions = async (page) => {
-    try {
-      const token = localStorage.getItem('access_token')
-      const response = await axios.get(
-        `http://localhost:8000/ledger/${ledgerId}/account/${accountId}/transactions?page=${page}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-      setTransactions(response.data.transactions)
-      setPagination({
-        total_transactions: response.data.total_transactions,
-        total_pages: response.data.total_pages,
-        current_page: response.data.current_page,
-        per_page: response.data.per_page,
-      })
-    } catch (error) {
-      console.error('Error fetching transactions:', error)
+  const {
+    data: transactionsData,
+    isLoading: isTransactionsLoading,
+    isError: isTransactionsError,
+  } = useQuery({
+    queryKey: ['transactions', accountId, pagination.current_page],
+    queryFn: () => fetchTransactions(pagination.current_page),
+    onError: (error) => {
       toast({
         title: 'Error',
         description: 'Failed to fetch account transactions.',
@@ -74,33 +94,39 @@ const AccountMain = () => {
         duration: 3000,
         isClosable: true,
       })
-    }
-  }
+    },
+  })
 
-  // Fetch account details and transactions when the component mounts or accountId changes
+  // Update pagination when transactions data is fetched
   useEffect(() => {
-    const fetchAccountAndTransactions = async () => {
-      setIsLoading(true)
-      await fetchAccount()
-      await fetchTransactions(pagination.current_page)
-      setIsLoading(false)
+    if (transactionsData) {
+      setPagination({
+        total_transactions: transactionsData.total_transactions,
+        total_pages: transactionsData.total_pages,
+        current_page: transactionsData.current_page,
+        per_page: transactionsData.per_page,
+      })
     }
+  }, [transactionsData])
 
-    fetchAccountAndTransactions()
-  }, [accountId])
-
-  // Function to refresh account
-  const refreshAccountData = async () => {
-    await fetchAccount()
+  // Function to handle page change
+  const handlePageChange = (page) => {
+    setPagination((prev) => ({ ...prev, current_page: page }))
   }
 
-  // Function to refresh account and transactions
+  // Function to refresh account and transactions data
   const refreshAccountAndTransactionsData = async () => {
-    await fetchAccount()
-    await fetchTransactions(pagination.current_page)
+    await queryClient.invalidateQueries(['account', accountId])
+    await queryClient.invalidateQueries(['transactions', accountId, pagination.current_page])
   }
 
-  if (isLoading) {
+  // Function to refresh account data
+  const refreshAccountData = async () => {
+    await queryClient.invalidateQueries(['account', accountId])
+  }
+
+  // Show loading spinner while data is being fetched
+  if (isAccountLoading || isTransactionsLoading || !transactionsData) {
     return (
       <Box textAlign="center" py={10}>
         <Spinner size="xl" color="teal.500" />
@@ -108,11 +134,12 @@ const AccountMain = () => {
     )
   }
 
-  if (!account) {
+  // Show error message if account or transactions fetch fails
+  if (isAccountError || isTransactionsError) {
     return (
       <Box textAlign="center" py={10} px={6}>
         <Text fontSize="xl" fontWeight="bold" mb={2}>
-          Account not found
+          Failed to load account data.
         </Text>
       </Box>
     )
@@ -130,9 +157,9 @@ const AccountMain = () => {
 
       {/* Transactions Section */}
       <AccountMainTransactions
-        transactions={transactions}
+        transactions={transactionsData?.transactions || []}
         account={account}
-        fetchTransactions={fetchTransactions}
+        fetchTransactions={handlePageChange}
         pagination={pagination}
         onAddTransaction={() => setIsCreateModalOpen(true)}
       />

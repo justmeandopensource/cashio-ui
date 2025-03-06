@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import {
+  Flex,
+  Spinner,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -15,16 +17,15 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react'
-import axios from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
-const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAccountId, fetchAccounts }) => {
+const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAccountId, onCreateAccount }) => {
   const toast = useToast()
+  const queryClient = useQueryClient()
   const [accountName, setAccountName] = useState('')
   const [isGroupAccount, setIsGroupAccount] = useState(false)
   const [parentAccount, setParentAccount] = useState(parentAccountId || '')
   const [openingBalance, setOpeningBalance] = useState('')
-  const [groupAccounts, setGroupAccounts] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
 
   // Update parentAccount state when parentAccountId prop changes
   useEffect(() => {
@@ -32,17 +33,15 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
   }, [parentAccountId])
 
   // Fetch group accounts when the modal is opened
-  useEffect(() => {
-    if (isOpen && !parentAccountId) {
-      fetchGroupAccounts()
-    }
-  }, [isOpen, accountType, parentAccountId])
-
-  // Fetch group accounts for the selected account type
-  const fetchGroupAccounts = async () => {
-    try {
+  const {
+    data: groupAccounts,
+    isLoading: isGroupAccountsLoading,
+    isError: isGroupAccountsError,
+  } = useQuery({
+    queryKey: ['groupAccounts', ledgerId, accountType],
+    queryFn: async () => {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get(
+      const response = await fetch(
         `http://localhost:8000/ledger/${ledgerId}/accounts/group?account_type=${accountType}`,
         {
           headers: {
@@ -50,18 +49,15 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
           },
         }
       )
-      setGroupAccounts(response.data)
-    } catch (error) {
-      console.error('Error fetching group accounts:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch group accounts.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })
-    }
-  }
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch group accounts')
+      }
+
+      return response.json()
+    },
+    enabled: isOpen && !parentAccountId, // Only fetch group accounts when the modal is open and no parentAccountId is provided
+  })
 
   // Reset form fields
   const resetForm = () => {
@@ -71,8 +67,50 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
     setOpeningBalance('')
   }
 
+  // Mutation for creating a new account
+  const createAccountMutation = useMutation({
+    mutationFn: async (payload) => {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`http://localhost:8000/ledger/${ledgerId}/account/create`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create account')
+      }
+
+      return response.json()
+    },
+    onSuccess: () => {
+      toast({
+        title: 'Success',
+        description: 'Account created successfully.',
+        status: 'success',
+        duration: 2000,
+        isClosable: true,
+      })
+      resetForm()
+      onClose()
+      queryClient.invalidateQueries(['accounts', ledgerId]); // Refetch accounts list
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create account.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    },
+  })
+
   // Handle form submission
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (!accountName) {
       toast({
         title: 'Error',
@@ -84,54 +122,19 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
       return
     }
 
-    setIsLoading(true)
-    try {
-      const token = localStorage.getItem('access_token')
-      const payload = {
-          name: accountName,
-          is_group: isGroupAccount,
-          parent_account_id: parentAccount || null,
-          type: accountType,
-        }
-
-      // Add opening_balance only if it's provided and the account is not a group account
-      if (!isGroupAccount && openingBalance) {
-        payload.opening_balance = parseFloat(openingBalance)
-      }
-
-      const response = await axios.post(
-        `http://localhost:8000/ledger/${ledgerId}/account/create`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
-
-      toast({
-        title: 'Success',
-        description: 'Account created successfully.',
-        status: 'success',
-        duration: 2000,
-        isClosable: true,
-      })
-
-      fetchAccounts()
-      resetForm()
-      onClose()
-    } catch (error) {
-      console.error('Error creating account:', error)
-      toast({
-        title: 'Error',
-        description: error.response?.data?.detail || 'Failed to create account.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })
-    } finally {
-      setIsLoading(false)
+    const payload = {
+      name: accountName,
+      is_group: isGroupAccount,
+      parent_account_id: parentAccount || null,
+      type: accountType,
     }
+
+    // Add opening_balance only if it's provided and the account is not a group account
+    if (!isGroupAccount && openingBalance) {
+      payload.opening_balance = parseFloat(openingBalance)
+    }
+
+    createAccountMutation.mutate(payload)
   }
 
   return (
@@ -171,7 +174,13 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
             </FormControl>
           )}
 
-          {!parentAccountId && groupAccounts.length > 0 && (
+          {/* Show loading spinner while fetching group accounts */}
+          {isGroupAccountsLoading && (
+            <Flex justify="center" align="center" my={4}>
+              <Spinner size="sm" />
+            </Flex>
+          )}
+          {!parentAccountId && groupAccounts && groupAccounts.length > 0 && (
             <FormControl mb={4}>
               <FormLabel>Parent Account</FormLabel>
               <Select
@@ -187,10 +196,16 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
               </Select>
             </FormControl>
           )}
+          {/* Show error message if fetching group accounts fails */}
+          {isGroupAccountsError && (
+            <Text color="red.500" fontSize="sm" mb={4}>
+              Failed to load group accounts. Please try again.
+            </Text>
+          )}
         </ModalBody>
 
         <ModalFooter>
-          <Button onClick={handleSubmit} isLoading={isLoading}>
+          <Button onClick={handleSubmit} isLoading={createAccountMutation.isLoading}>
             Create Account
           </Button>
           <Button variant="ghost" onClick={onClose} ml={3}>

@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useParams } from 'react-router-dom'
-import axios from 'axios'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Box, Spinner, useToast } from '@chakra-ui/react'
 import LedgerMainHeader from '@features/ledger/components/LedgerMainHeader'
 import LedgerMainAccounts from '@features/ledger/components/LedgerMainAccounts'
@@ -9,92 +9,59 @@ import TransferFundsModal from '@components/modals/TransferFundsModal'
 
 const LedgerMain = () => {
   const { ledgerId } = useParams()
-  const [ledger, setLedger] = useState(null)
-  const [accounts, setAccounts] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
+  const toast = useToast()
+  const queryClient = useQueryClient()
+
+  // State for modals and selected account
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
-  const toast = useToast()
-
-  // Add a state to store the selected accountId
   const [selectedAccountId, setSelectedAccountId] = useState(null)
 
-  // Function to fetch accounts
-  const fetchAccounts = async () => {
-    const token = localStorage.getItem('access_token')
-    try {
-      const accountsResponse = await axios.get(`http://localhost:8000/ledger/${ledgerId}/accounts`, {
+  // Fetch ledger details
+  const {
+    data: ledger,
+    isLoading: isLedgerLoading,
+    isError: isLedgerError,
+  } = useQuery({
+    queryKey: ['ledger', ledgerId],
+    queryFn: async () => {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`http://localhost:8000/ledger/${ledgerId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
-      setAccounts(accountsResponse.data)
-    } catch (error) {
-      console.error('Error fetching accounts:', error)
-      toast({
-        title: 'Error',
-        description: 'Failed to fetch account details.',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      })
-    }
-  }
 
-  // Fetch ledger details and accounts
-  useEffect(() => {
-    const fetchLedgerAndAccounts = async () => {
-      const token = localStorage.getItem('access_token')
-      try {
-        // Fetch ledger details
-        const ledgerResponse = await axios.get(`http://localhost:8000/ledger/${ledgerId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        setLedger(ledgerResponse.data)
-
-        // Fetch accounts for the ledger
-        const accountsResponse = await axios.get(`http://localhost:8000/ledger/${ledgerId}/accounts`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
-        setAccounts(accountsResponse.data)
-      } catch (error) {
-        console.error('Error fetching ledger or accounts:', error)
-        toast({
-          title: 'Error',
-          description: 'Failed to fetch ledger or account details.',
-          status: 'error',
-          duration: 3000,
-          isClosable: true,
-        })
-      } finally {
-        setIsLoading(false)
+      if (!response.ok) {
+        throw new Error('Failed to fetch ledger details')
       }
-    }
 
-    fetchLedgerAndAccounts()
-  }, [ledgerId, toast])
+      return response.json()
+    },
+  })
 
-  if (isLoading) {
-    return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" color="teal.500" />
-      </Box>
-    )
-  }
+  // Fetch accounts for the ledger
+  const {
+    data: accounts,
+    isLoading: isAccountsLoading,
+    isError: isAccountsError,
+  } = useQuery({
+    queryKey: ['accounts', ledgerId],
+    queryFn: async () => {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`http://localhost:8000/ledger/${ledgerId}/accounts`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
 
-  if (!ledger) {
-    return (
-      <Box textAlign="center" py={10} px={6}>
-        <Text fontSize="xl" fontWeight="bold" mb={2}>
-          Ledger not found
-        </Text>
-      </Box>
-    )
-  }
+      if (!response.ok) {
+        throw new Error('Failed to fetch accounts')
+      }
+
+      return response.json()
+    },
+  })
 
   const handleAddTransaction = (accountId = null) => {
     setSelectedAccountId(accountId)
@@ -104,6 +71,25 @@ const LedgerMain = () => {
   const handleTransferFunds = (accountId = null) => {
     setSelectedAccountId(accountId)
     setIsTransferModalOpen(true)
+  }
+
+  if (isLedgerLoading || isAccountsLoading) {
+    return (
+      <Box textAlign="center" py={10}>
+        <Spinner size="xl" color="teal.500" />
+      </Box>
+    )
+  }
+
+  if (isLedgerError || isAccountsError) {
+    toast({
+      title: 'Error',
+      description: 'Failed to fetch ledger or account details.',
+      status: 'error',
+      duration: 3000,
+      isClosable: true,
+    })
+    return null
   }
 
   return (
@@ -118,11 +104,10 @@ const LedgerMain = () => {
 
       {/* Accounts Section */}
       <LedgerMainAccounts
-        accounts={accounts}
+        accounts={accounts || []}
         ledger={ledger}
         onAddTransaction={handleAddTransaction}
         onTransferFunds={handleTransferFunds}
-        fetchAccounts={fetchAccounts}
       />
 
       {/* Create Transaction Modal */}
@@ -131,7 +116,7 @@ const LedgerMain = () => {
         onClose={() => setIsCreateModalOpen(false)}
         ledgerId={ledgerId}
         accountId={selectedAccountId}
-        onTransactionAdded={fetchAccounts}
+        onTransactionAdded={() => queryClient.invalidateQueries(['accounts', ledgerId])}
       />
 
       {/* Transfer Funds Modal */}
@@ -140,7 +125,7 @@ const LedgerMain = () => {
         onClose={() => setIsTransferModalOpen(false)}
         ledgerId={ledgerId}
         accountId={selectedAccountId}
-        onTransferCompleted={fetchAccounts}
+        onTransferCompleted={() => queryClient.invalidateQueries(['accounts', ledgerId])}
       />
 
     </Box>

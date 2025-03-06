@@ -1,5 +1,22 @@
 import React, { useState } from 'react'
-import { Flex, Box, Table, Thead, Tbody, Tr, Th, Td, Text, Button, Icon, useDisclosure, SimpleGrid, Link as ChakraLink } from '@chakra-ui/react'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import {
+  Flex,
+  Box,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Text,
+  Button,
+  Icon,
+  useDisclosure,
+  useToast,
+  SimpleGrid,
+  Link as ChakraLink,
+} from '@chakra-ui/react'
 import { Link as RouterLink } from 'react-router-dom'
 import { FiPlus, FiRepeat } from 'react-icons/fi'
 import CreateAccountModal from '@components/modals/CreateAccountModal'
@@ -10,6 +27,50 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
   const [parentAccountId, setParentAccountId] = useState(null)
   const [showZeroBalanceAssets, setShowZeroBalanceAssets] = useState(false)
   const [showZeroBalanceLiabilities, setShowZeroBalanceLiabilities] = useState(false)
+  const queryClient = useQueryClient()
+  const toast = useToast()
+
+  // Mutation for creating a new account
+  const createAccountMutation = useMutation({
+    mutationFn: async ({ name, type, parentAccountId }) => {
+      const token = localStorage.getItem('access_token')
+      const response = await fetch(`http://localhost:8000/ledger/${ledger.ledger_id}/accounts`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, type, parent_account_id: parentAccountId }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to create account')
+      }
+
+      return response.json()
+    },
+    onSuccess: () => {
+      // Invalidate the accounts query to refetch the data
+      queryClient.invalidateQueries(['accounts', ledger.ledger_id])
+      onClose()
+      toast({
+        title: 'Success',
+        description: 'Account created successfully.',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      })
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error',
+        description: error.message,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    },
+  })
 
   // Separate accounts into Assets and Liabilities
   const assetAccounts = accounts.filter((account) => account.type === 'asset')
@@ -262,7 +323,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
         ledgerId={ledger.ledger_id}
         accountType={accountType}
         parentAccountId={parentAccountId}
-        fetchAccounts={fetchAccounts}
+        onCreateAccount={createAccountMutation.mutate}
       />
     </Box>
   )

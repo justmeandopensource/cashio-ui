@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { useNavigate, Link as RouterLink } from 'react-router-dom'
+import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import { Flex, useToast } from '@chakra-ui/react'
 import RegisterForm from '@features/auth/components/RegisterForm'
@@ -15,8 +16,37 @@ const Register = () => {
   const fullNameRef = useRef(null)
 
   useEffect(() => {
-    fullNameRef.current?.focus()
+    fullNameRef.current?.focus();
   }, [])
+
+  const registerMutation = useMutation({
+    mutationFn: (formDetails) =>
+      axios.post('http://localhost:8000/user/create', formDetails),
+    onSuccess: () => {
+      toast({
+        title: 'Account created',
+        description: 'Your account has been created successfully!',
+        status: 'success',
+        position: 'top-right',
+        duration: 3000,
+      })
+      navigate('/login')
+    },
+    onError: (error) => {
+      toast({
+        title: 'Account creation failed',
+        description: error.response?.data?.detail || error.message,
+        status: 'error',
+        position: 'top-right',
+        duration: 3000,
+      })
+      setFullName('')
+      setUsername('')
+      setEmail('')
+      setPassword('')
+      fullNameRef.current?.focus()
+    },
+  })
 
   const handleSubmit = async (event) => {
     event.preventDefault()
@@ -32,40 +62,14 @@ const Register = () => {
       return
     }
 
-  const formDetails = {
-    full_name,
-    username,
-    email,
-    password,
-  }
-
-    try {
-      const response = await axios.post("http://localhost:8000/user/create", formDetails)
-
-      if (response.status == 200) {
-        toast({
-          title: 'Account created',
-          description: 'Your account has been created successfully!',
-          status: 'success',
-          position: 'top-right',
-          duration: 3000,
-        })
-        navigate('/login')
-      } 
-    } catch (error) {
-      toast({
-        title: 'Account creation failed',
-        description: error.response?.data?.detail || error.message,
-        status: 'error',
-        position: 'top-right',
-        duration: 3000,
-      })
-      setFullName('') 
-      setUsername('')
-      setEmail('')
-      setPassword('')
-      fullNameRef.current?.focus()
+    const formDetails = {
+      full_name,
+      username,
+      email,
+      password,
     }
+
+    registerMutation.mutate(formDetails)
   }
 
   return (

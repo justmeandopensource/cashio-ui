@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Modal,
   ModalOverlay,
@@ -13,18 +13,40 @@ import {
   useToast,
 } from '@chakra-ui/react'
 
-const CreateLedgerModal = ({
-  isOpen,
-  onClose,
-  newLedgerName,
-  setNewLedgerName,
-  newLedgerCurrency,
-  setNewLedgerCurrency,
-  handleCreateLedger,
-  ledgerNameInputRef,
-}) => {
+const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
+
+  const [newLedgerName, setNewLedgerName] = useState('')
+  const [newLedgerCurrency, setNewLedgerCurrency] = useState('')
+  const ledgerNameInputRef = useRef(null)
+  const toast = useToast()
+
+  const handleSubmit = () => {
+    if (!newLedgerName || !newLedgerCurrency) {
+      toast({
+        title: 'Error',
+        description: 'All fields are required.',
+        status: 'error',
+        duration: 2000,
+        position: 'top-right',
+        isClosable: true,
+      })
+      ledgerNameInputRef.current?.focus()
+      return
+    }
+
+    // Call the handleCreateLedger function passed from the parent
+    handleCreateLedger(newLedgerName, newLedgerCurrency)
+
+    // Reset the form fields
+    setNewLedgerName('')
+    setNewLedgerCurrency('')
+
+    // Close the modal
+    onClose()
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} initialFocusRef={ledgerNameInputRef}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>Create New Ledger</ModalHeader>
@@ -46,7 +68,7 @@ const CreateLedgerModal = ({
           </VStack>
         </ModalBody>
         <ModalFooter>
-          <Button mr={3} onClick={handleCreateLedger}>
+          <Button mr={3} onClick={handleSubmit}>
             Create
           </Button>
           <Button variant="ghost" onClick={onClose}>
