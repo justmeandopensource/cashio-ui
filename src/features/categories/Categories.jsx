@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import Layout from '@components/Layout'
 import CategoriesMain from '@features/categories/components/CategoriesMain'
+import config from '@/config'
 
 const Categories = () => {
 
@@ -18,7 +19,7 @@ const Categories = () => {
       }
 
       try {
-        const response = await fetch('http://localhost:8000/user/verify-token', {
+        const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,

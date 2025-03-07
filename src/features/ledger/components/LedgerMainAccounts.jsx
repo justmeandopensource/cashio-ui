@@ -20,6 +20,7 @@ import {
 import { Link as RouterLink } from 'react-router-dom'
 import { FiPlus, FiRepeat } from 'react-icons/fi'
 import CreateAccountModal from '@components/modals/CreateAccountModal'
+import config from '@/config'
 
 const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFunds, fetchAccounts }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -34,7 +35,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
   const createAccountMutation = useMutation({
     mutationFn: async ({ name, type, parentAccountId }) => {
       const token = localStorage.getItem('access_token')
-      const response = await fetch(`http://localhost:8000/ledger/${ledger.ledger_id}/accounts`, {
+      const response = await fetch(`${config.apiBaseUrl}/ledger/${ledger.ledger_id}/accounts`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Box, Spinner } from '@chakra-ui/react'
 import Layout from '@components/Layout'
 import LedgerMain from '@features/ledger/components/LedgerMain'
+import config from '@/config'
 
 const Ledger = () => {
   const navigate = useNavigate()
@@ -18,7 +19,7 @@ const Ledger = () => {
         return
       }
 
-      const response = await fetch('http://localhost:8000/user/verify-token', {
+      const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

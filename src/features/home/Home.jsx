@@ -10,6 +10,7 @@ import {
 } from '@chakra-ui/react'
 import Layout from '@components/Layout'
 import HomeMain from '@features/home/components/HomeMain'
+import config from '@/config'
 
 const Home = () => {
   const navigate = useNavigate()
@@ -26,7 +27,7 @@ const Home = () => {
         throw new Error('No token found')
       }
 
-      const response = await fetch('http://localhost:8000/user/verify-token', {
+      const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -64,7 +65,7 @@ const Home = () => {
     queryKey: ['ledgers'],
     queryFn: async () => {
       const token = localStorage.getItem('access_token')
-      const response = await fetch('http://localhost:8000/ledger/list', {
+      const response = await fetch(`${config.apiBaseUrl}/ledger/list`, {
         method: 'GET',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -85,7 +86,7 @@ const Home = () => {
   const createLedgerMutation = useMutation({
     mutationFn: async ({ name, currency_symbol }) => {
       const token = localStorage.getItem('access_token')
-      const response = await fetch('http://localhost:8000/ledger/create', {
+      const response = await fetch(`${config.apiBaseUrl}/ledger/create`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

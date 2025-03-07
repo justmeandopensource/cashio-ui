@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import { Flex, useToast } from '@chakra-ui/react'
 import LoginForm from '@features/auth/components/LoginForm'
+import config from '@/config'
 
 const Login = () => {
   const [username, setUsername] = useState('')
@@ -19,7 +20,7 @@ const Login = () => {
 
   const loginMutation = useMutation({
     mutationFn: (formDetails) =>
-      axios.post('http://localhost:8000/user/login', formDetails, {
+      axios.post(`${config.apiBaseUrl}/user/login`, formDetails, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },

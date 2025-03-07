@@ -30,6 +30,7 @@ import { FiPlus, FiChevronLeft, FiChevronRight, FiCreditCard } from 'react-icons
 import { Square } from '@chakra-ui/react'
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 import { useQueryClient } from '@tanstack/react-query'
+import config from '@/config'
 
 const AccountMainTransactions = ({ transactions, account, fetchTransactions, pagination, onAddTransaction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -58,7 +59,7 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
     try {
       const token = localStorage.getItem('access_token')
       const response = await fetch(
-        `http://localhost:8000/ledger/${account.ledger_id}/transaction/${transactionId}/splits`,
+        `${config.apiBaseUrl}/ledger/${account.ledger_id}/transaction/${transactionId}/splits`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -91,7 +92,7 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
     setIsTransferLoading(true)
     try {
       const token = localStorage.getItem('access_token')
-      const response = await fetch(`http://localhost:8000/ledger/transfer/${transferId}`, {
+      const response = await fetch(`${config.apiBaseUrl}/ledger/transfer/${transferId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

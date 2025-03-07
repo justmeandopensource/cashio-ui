@@ -26,6 +26,7 @@ import {
   WrapItem,
 } from '@chakra-ui/react'
 import axios from 'axios'
+import config from '@/config'
 import ChakraDatePicker from '@components/shared/ChakraDatePicker'
 
 const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransactionAdded }) => {
@@ -67,7 +68,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
   const fetchTagSuggestions = async (query) => {
     try {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get(`http://localhost:8000/tags/search?query=${query}`, {
+      const response = await axios.get(`${config.apiBaseUrl}/tags/search?query=${query}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -155,7 +156,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     try {
       const token = localStorage.getItem('access_token')
       const response = await axios.get(
-        `http://localhost:8000/category/list?ignore_group=true`,
+        `${config.apiBaseUrl}/category/list?ignore_group=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -180,7 +181,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     try {
       const token = localStorage.getItem('access_token')
       const response = await axios.get(
-        `http://localhost:8000/ledger/${ledgerId}/accounts?ignore_group=true`,
+        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -350,8 +351,8 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
       }
 
       const endpoint = type === 'income' 
-        ? `http://localhost:8000/ledger/${ledgerId}/transaction/income`
-        : `http://localhost:8000/ledger/${ledgerId}/transaction/expense`
+        ? `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/income`
+        : `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/expense`
 
       await axios.post(endpoint, payload, {
         headers: {

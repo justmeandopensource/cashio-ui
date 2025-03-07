@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react'
 import axios from 'axios'
 import ChakraDatePicker from '@components/shared/ChakraDatePicker'
+import config from '@/config'
 
 const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCompleted }) => {
   const [date, setDate] = useState(new Date())
@@ -63,7 +64,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
   const fetchLedgers = async () => {
     try {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get('http://localhost:8000/ledger/list', {
+      const response = await axios.get(`${config.apiBaseUrl}/ledger/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -85,7 +86,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
     try {
       const token = localStorage.getItem('access_token')
       const response = await axios.get(
-        `http://localhost:8000/ledger/${ledgerId}/accounts?ignore_group=true`,
+        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,7 +109,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
   const fetchDestinationAccounts = async (ledgerId) => {
     try {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get(`http://localhost:8000/ledger/${ledgerId}/accounts?ignore_group=true`, {
+      const response = await axios.get(`${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -160,7 +161,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
         destination_amount: destinationAmount ? parseFloat(destinationAmount) : null,
       }
 
-      await axios.post(`http://localhost:8000/ledger/${ledgerId}/transaction/transfer`, payload, {
+      await axios.post(`${config.apiBaseUrl}/ledger/${ledgerId}/transaction/transfer`, payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

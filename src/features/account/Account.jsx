@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Box, Spinner } from '@chakra-ui/react'
 import Layout from '@components/Layout'
 import AccountMain from '@features/account/components/AccountMain'
+import config from '@/config'
 
 const Account = () => {
   const navigate = useNavigate()
@@ -17,7 +18,7 @@ const Account = () => {
       return
     }
 
-    const response = await fetch('http://localhost:8000/user/verify-token', {
+    const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

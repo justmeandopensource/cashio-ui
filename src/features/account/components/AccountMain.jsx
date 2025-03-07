@@ -7,6 +7,7 @@ import AccountMainTransactions from "@features/account/components/AccountMainTra
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 import TransferFundsModal from '@components/modals/TransferFundsModal'
 import UpdateAccountModal from '@components/modals/UpdateAccountModal'
+import config from '@/config'
 
 const AccountMain = () => {
   const { ledgerId, accountId } = useParams()
@@ -27,7 +28,7 @@ const AccountMain = () => {
   // Fetch account
   const fetchAccount = async () => {
     const token = localStorage.getItem('access_token')
-    const response = await fetch(`http://localhost:8000/ledger/${ledgerId}/account/${accountId}`, {
+    const response = await fetch(`${config.apiBaseUrl}/ledger/${ledgerId}/account/${accountId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -44,7 +45,7 @@ const AccountMain = () => {
   const fetchTransactions = async (page = 1) => {
     const token = localStorage.getItem('access_token')
     const response = await fetch(
-      `http://localhost:8000/ledger/${ledgerId}/account/${accountId}/transactions?page=${page}`,
+      `${config.apiBaseUrl}/ledger/${ledgerId}/account/${accountId}/transactions?page=${page}`,
       {
         headers: {
           Authorization: `Bearer ${token}`,

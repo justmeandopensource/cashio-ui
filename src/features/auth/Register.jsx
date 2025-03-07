@@ -4,6 +4,7 @@ import { useMutation } from '@tanstack/react-query'
 import axios from 'axios'
 import { Flex, useToast } from '@chakra-ui/react'
 import RegisterForm from '@features/auth/components/RegisterForm'
+import config from '@/config'
 
 const Register = () => {
   const [full_name, setFullName] = useState('')
@@ -21,7 +22,7 @@ const Register = () => {
 
   const registerMutation = useMutation({
     mutationFn: (formDetails) =>
-      axios.post('http://localhost:8000/user/create', formDetails),
+      axios.post(`${config.apiBaseUrl}/user/create`, formDetails),
     onSuccess: () => {
       toast({
         title: 'Account created',

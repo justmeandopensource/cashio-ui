@@ -18,6 +18,7 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import config from '@/config'
 
 const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAccountId, onCreateAccount }) => {
   const toast = useToast()
@@ -42,7 +43,7 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
     queryFn: async () => {
       const token = localStorage.getItem('access_token')
       const response = await fetch(
-        `http://localhost:8000/ledger/${ledgerId}/accounts/group?account_type=${accountType}`,
+        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts/group?account_type=${accountType}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -71,7 +72,7 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
   const createAccountMutation = useMutation({
     mutationFn: async (payload) => {
       const token = localStorage.getItem('access_token')
-      const response = await fetch(`http://localhost:8000/ledger/${ledgerId}/account/create`, {
+      const response = await fetch(`${config.apiBaseUrl}/ledger/${ledgerId}/account/create`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`,

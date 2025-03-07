@@ -16,6 +16,7 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import axios from 'axios'
+import config from '@/config'
 
 const CreateCategoryModal = ({ isOpen, onClose, categoryType, parentCategoryId, fetchCategories }) => {
   const toast = useToast()
@@ -42,7 +43,7 @@ const CreateCategoryModal = ({ isOpen, onClose, categoryType, parentCategoryId, 
     try {
       const token = localStorage.getItem('access_token')
       const response = await axios.get(
-        `http://localhost:8000/category/group?category_type=${categoryType}`,
+        `${config.apiBaseUrl}/category/group?category_type=${categoryType}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -92,7 +93,7 @@ const CreateCategoryModal = ({ isOpen, onClose, categoryType, parentCategoryId, 
       }
 
       const response = await axios.post(
-        `http://localhost:8000/category/create`,
+        `${config.apiBaseUrl}/category/create`,
         payload,
         {
           headers: {

@@ -18,6 +18,7 @@ import {
 } from '@chakra-ui/react'
 import { FiPlus } from 'react-icons/fi'
 import CreateCategoryModal from '@components/modals/CreateCategoryModal'
+import config from '@/config'
 
 const CategoriesMain = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -31,7 +32,7 @@ const CategoriesMain = () => {
     setIsLoading(true)
     try {
       const token = localStorage.getItem('access_token')
-      const response = await axios.get(`http://localhost:8000/category/list`, {
+      const response = await axios.get(`${config.apiBaseUrl}/category/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

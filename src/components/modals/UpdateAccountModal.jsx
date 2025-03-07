@@ -15,6 +15,7 @@ import {
   useToast,
 } from '@chakra-ui/react'
 import axios from 'axios'
+import config from '@/config'
 
 const UpdateAccountModal = ({ isOpen, onClose, account, onUpdateCompleted }) => {
   const [name, setName] = useState(account.name)
@@ -29,7 +30,7 @@ const UpdateAccountModal = ({ isOpen, onClose, account, onUpdateCompleted }) => 
       try {
         const token = localStorage.getItem('access_token')
         const response = await axios.get(
-          `http://localhost:8000/ledger/${account.ledger_id}/accounts/group?account_type=${account.type}`,
+          `${config.apiBaseUrl}/ledger/${account.ledger_id}/accounts/group?account_type=${account.type}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -76,7 +77,7 @@ const UpdateAccountModal = ({ isOpen, onClose, account, onUpdateCompleted }) => 
     try {
       const token = localStorage.getItem('access_token')
       await axios.put(
-        `http://localhost:8000/ledger/${account.ledger_id}/account/${account.account_id}/update`,
+        `${config.apiBaseUrl}/ledger/${account.ledger_id}/account/${account.account_id}/update`,
         payload,
         {
           headers: {
