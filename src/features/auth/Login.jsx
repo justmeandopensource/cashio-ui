@@ -44,7 +44,6 @@ const Login = () => {
   })
 
   const handleSubmit = async (event) => {
-    console.log(config.apiBaseUrl)
     event.preventDefault()
 
     if (!username || !password) {
