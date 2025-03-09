@@ -36,14 +36,14 @@ const RegisterForm = ({
   return (
     <Box
       bg="white"
-      p={8}
+      p={{ base: 4, md: 8 }}
       borderRadius="lg"
       boxShadow="lg"
       maxW="md"
       w="full"
     >
-      <VStack as="form" spacing={6} onSubmit={handleSubmit}>
-        <Text fontSize="2xl" fontWeight="bold" color="teal.500">
+      <VStack as="form" spacing={{ base: 4, md: 6 }} onSubmit={handleSubmit}>
+        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="teal.500">
           Create an Account
         </Text>
 
@@ -52,7 +52,7 @@ const RegisterForm = ({
             ref={fullNameRef}
             type="text"
             placeholder="Name"
-            size="lg"
+            size={{ base: "md", md: "lg" }}
             value={full_name}
             onChange={(e) => setFullName(e.target.value)}
           />
@@ -62,7 +62,7 @@ const RegisterForm = ({
           <Input
             type="text"
             placeholder="Username"
-            size="lg"
+            size={{ base: "md", md: "lg" }}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -72,7 +72,7 @@ const RegisterForm = ({
           <Input
             type="email"
             placeholder="Email"
-            size="lg"
+            size={{ base: "md", md: "lg" }}
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -83,11 +83,11 @@ const RegisterForm = ({
             <Input
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
-              size="lg"
+              size={{ base: "md", md: "lg" }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <InputRightElement h="full">
+            <InputRightElement h="full" pr={2}>
               <Button
                 variant="ghost"
                 onClick={() => setShowPassword(!showPassword)}
@@ -101,7 +101,7 @@ const RegisterForm = ({
 
         <Button
           type="submit"
-          size="lg"
+          size={{ base: "md", md: "lg" }}
           w="full"
         >
           Create Account

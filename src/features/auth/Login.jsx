@@ -65,7 +65,7 @@ const Login = () => {
   }
 
   return (
-    <Flex align="center" justify="center" minH="100vh" bg="gray.50">
+    <Flex align="center" justify="center" minH="100vh" bg="gray.50" px={{ base: 4, md: 0 }}>
       <LoginForm
         onSubmit={handleSubmit}
         username={username}
@@ -73,6 +73,8 @@ const Login = () => {
         password={password}
         setPassword={setPassword}
         usernameInputRef={usernameInputRef}
+        maxW="400px"
+        w="100%"
       />
     </Flex>
   )

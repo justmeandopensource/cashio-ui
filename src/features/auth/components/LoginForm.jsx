@@ -30,14 +30,14 @@ const LoginForm = ({
   return (
     <Box
       bg="white"
-      p={8}
+      p={{ base: 4, md: 8 }}
       borderRadius="lg"
       boxShadow="lg"
       maxW="md"
       w="full"
     >
-      <VStack as="form" spacing={6} onSubmit={handleSubmit}>
-        <Text fontSize="2xl" fontWeight="bold" color="teal.500">
+      <VStack as="form" spacing={{ base: 4, md: 6 }} onSubmit={handleSubmit}>
+        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="teal.500">
           Welcome Back
         </Text>
 
@@ -46,7 +46,7 @@ const LoginForm = ({
             ref={usernameInputRef}
             type="text"
             placeholder="Username"
-            size="lg"
+            size={{ base: "md", md: "lg" }}
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
@@ -57,11 +57,11 @@ const LoginForm = ({
             <Input
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
-              size="lg"
+              size={{ base: "md", md: "lg" }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <InputRightElement h="full">
+            <InputRightElement h="full" pr={2}>
               <Button
                 variant="ghost"
                 onClick={() => setShowPassword(!showPassword)}
@@ -75,7 +75,7 @@ const LoginForm = ({
 
         <Button
           type="submit"
-          size="lg"
+          size={{ base: "md", md: "lg" }}
           w="full"
         >
           Log In

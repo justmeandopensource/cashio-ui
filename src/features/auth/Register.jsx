@@ -74,7 +74,7 @@ const Register = () => {
   }
 
   return (
-    <Flex align="center" justify="center" minH="100vh" bg="gray.50">
+    <Flex align="center" justify="center" minH="100vh" bg="gray.50" px={{ base: 4, md: 0 }}>
       <RegisterForm
         onSubmit={handleSubmit}
         full_name={full_name}
