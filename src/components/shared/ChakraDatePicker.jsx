@@ -6,7 +6,6 @@ import { Input, FormControl, FormLabel } from '@chakra-ui/react'
 const ChakraDatePicker = ({ selected, onChange }) => {
   return (
     <FormControl>
-      <FormLabel>Date</FormLabel>
       <Input
         as={DatePicker}
         selected={selected}
