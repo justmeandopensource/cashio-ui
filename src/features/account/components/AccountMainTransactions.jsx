@@ -143,8 +143,10 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
     
     if (expandedTransaction === transactionId) {
       setExpandedTransaction(null)
+      setTransferDetails(null)
     } else {
       setExpandedTransaction(transactionId)
+      setTransferDetails(null)
     }
   }
 
