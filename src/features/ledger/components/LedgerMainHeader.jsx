@@ -1,6 +1,19 @@
 import React from 'react'
-import { Box, Heading, Text, Button, Flex, useColorModeValue, IconButton } from '@chakra-ui/react'
-import { AddIcon, ArrowForwardIcon, ArrowBackIcon, EditIcon } from '@chakra-ui/icons'
+import {
+  Box,
+  Heading,
+  Text,
+  Button,
+  Flex,
+  useColorModeValue,
+  IconButton
+} from '@chakra-ui/react'
+import {
+  AddIcon,
+  ArrowForwardIcon,
+  ArrowBackIcon,
+  EditIcon
+} from '@chakra-ui/icons'
 import { useNavigate } from 'react-router-dom'
 
 const LedgerMainHeader = ({ ledger, onAddTransaction, onTransferFunds, hasAccounts }) => {
@@ -13,51 +26,59 @@ const LedgerMainHeader = ({ ledger, onAddTransaction, onTransferFunds, hasAccoun
   return (
     <Box
       bg={bgColor}
-      p={6}
+      p={{ base: 4, md: 5, lg: 6 }}
       borderRadius="lg"
       boxShadow="md"
       mb={8}
     >
-      <Flex justifyContent="space-between" alignItems="flex-start" mb={4}>
+      <Flex
+        justifyContent="space-between"
+        alignItems="flex-start"
+        flexDirection={{ base: 'column', md: 'column', lg: 'row' }}
+        gap={{ base: 4, md: 4, lg: 0 }}
+      >
         {/* Left Section: Back Icon and Ledger Name */}
-        <Box display="flex" alignItems="flex-start">
-          {/* Back to Home Icon with Light Teal Hover Effect */}
+        <Flex alignItems="center" gap={3}>
+          {/* Back to Home Icon */}
           <IconButton
             aria-label="Back to Home"
             icon={<ArrowBackIcon boxSize={6} />}
             variant="ghost"
             color="teal.500"
             size="lg"
-            mr={3}
             onClick={() => navigate('/')}
             _hover={{ bg: 'teal.50' }}
           />
-          <Box>
-            <Flex alignItems="center">
-              <Heading as="h2" size="lg" color="teal.500" mb={2} mr={2}>
-                {ledger.name}
-              </Heading>
-              <IconButton
-                aria-label="Edit Account"
-                icon={<EditIcon boxSize={4} />}
-                variant="ghost"
-                color="teal.500"
-                size="sm"
-              />
-            </Flex>
-          </Box>
-        </Box>
+
+          {/* Ledger Name and Edit Icon */}
+          <Flex alignItems="center" gap={2}>
+            <Heading as="h2" size="lg" color="teal.500">
+              {ledger.name}
+            </Heading>
+            <IconButton
+              aria-label="Edit Account"
+              icon={<EditIcon boxSize={4} />}
+              variant="ghost"
+              color="teal.500"
+              size="sm"
+            />
+          </Flex>
+        </Flex>
 
         {/* Right Section: Add Transaction and Transfer Funds Buttons */}
         {hasAccounts && (
-          <Flex>
+          <Flex
+            gap={3}
+            flexDirection={{ base: 'column', md: 'column', lg: 'row' }}
+            w={{ base: '100%', md: '100%', lg: 'auto' }}
+          >
             {/* Button to Add a New Transaction */}
             <Button
               leftIcon={<AddIcon />}
               colorScheme={buttonColorScheme}
               variant="solid"
-              mr={4}
               onClick={onAddTransaction}
+              w={{ base: '100%', md: '100%', lg: 'auto' }}
             >
               Add Transaction
             </Button>
@@ -68,6 +89,7 @@ const LedgerMainHeader = ({ ledger, onAddTransaction, onTransferFunds, hasAccoun
               colorScheme={buttonColorScheme}
               variant="outline"
               onClick={onTransferFunds}
+              w={{ base: '100%', md: '100%', lg: 'auto' }}
             >
               Transfer Funds
             </Button>
