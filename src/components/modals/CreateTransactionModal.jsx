@@ -24,7 +24,24 @@ import {
   Flex,
   Wrap,
   WrapItem,
+  Tabs,
+  TabList,
+  TabPanels,
+  Tab,
+  TabPanel,
+  useColorModeValue,
+  IconButton,
+  Divider,
+  Heading,
+  Badge,
+  useBreakpointValue,
+  InputGroup,
+  InputLeftAddon,
+  InputRightAddon,
+  Stack,
+  Spinner,
 } from '@chakra-ui/react'
+import { AddIcon, MinusIcon } from '@chakra-ui/icons'
 import axios from 'axios'
 import config from '@/config'
 import ChakraDatePicker from '@components/shared/ChakraDatePicker'
@@ -45,6 +62,18 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
 
+  // Responsive design helpers
+  const modalSize = useBreakpointValue({ base: "full", md: "md" })
+  const stackDirection = useBreakpointValue({ base: "column", md: "row" })
+  const buttonSize = useBreakpointValue({ base: "md", md: "md" })
+  const splitLayoutDirection = useBreakpointValue({ base: "column", md: "row" })
+
+  // Theme colors
+  const buttonColorScheme = "teal"
+  const bgColor = useColorModeValue("white", "gray.800")
+  const borderColor = useColorModeValue("gray.200", "gray.600")
+  const highlightColor = useColorModeValue("teal.50", "teal.900")
+
   const resetForm = () => {
     setDate(new Date())
     setType('expense')
@@ -53,6 +82,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     setAmount('')
     setIsSplit(false)
     setSplits([])
+    setTags([])
   }
 
   // Fetch tag suggestions as the user types
@@ -272,6 +302,37 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     setSplits(newSplits)
   }
 
+  // Add a new split
+  const addSplit = () => {
+    const remaining = calculateRemainingAmount()
+    if (remaining <= 0) {
+      // If no remaining amount, add a zero split
+      setSplits([...splits, { amount: 0, categoryId: '' }])
+    } else {
+      // Otherwise, add a split with the remaining amount
+      setSplits([...splits, { amount: remaining, categoryId: '' }])
+    }
+  }
+
+  // Remove a split
+  const removeSplit = (index) => {
+    if (splits.length <= 1) {
+      return; // Keep at least one split
+    }
+    
+    const newSplits = [...splits];
+    const removedAmount = parseFloat(newSplits[index].amount) || 0;
+    newSplits.splice(index, 1);
+    
+    // Distribute the removed amount to the last split
+    if (newSplits.length > 0 && removedAmount > 0) {
+      const lastIndex = newSplits.length - 1;
+      newSplits[lastIndex].amount = (parseFloat(newSplits[lastIndex].amount) || 0) + removedAmount;
+    }
+    
+    setSplits(newSplits);
+  }
+
   // Calculate remaining amount
   const calculateRemainingAmount = () => {
     const totalAmount = parseFloat(amount) || 0
@@ -297,7 +358,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
 
     // Validate all splits have categories if split is enabled
     if (isSplit) {
-      const invalidSplits = splits.filter(split => !split.categoryId)
+      const invalidSplits = splits.filter(split => !split.categoryId && parseFloat(split.amount) > 0)
       if (invalidSplits.length > 0) {
         toast({
           title: 'Error',
@@ -342,7 +403,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
         transfer_id: null,
         transfer_type: null,
         is_split: isSplit,
-        splits: isSplit ? splits.map(split => ({
+        splits: isSplit ? splits.filter(split => parseFloat(split.amount) > 0).map(split => ({
           credit: type === 'income' ? parseFloat(split.amount) || 0 : 0,
           debit: type === 'expense' ? parseFloat(split.amount) || 0 : 0,
           category_id: parseInt(split.categoryId, 10)
@@ -384,209 +445,336 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
     }
   }
 
+  // Format transaction type as a more friendly label
+  const getTypeLabel = (type) => {
+    switch(type) {
+      case 'income':
+        return { label: 'Income', color: 'green', icon: <AddIcon boxSize={3} /> }
+      case 'expense':
+        return { label: 'Expense', color: 'red', icon: <MinusIcon boxSize={3} /> }
+      default:
+        return { label: type, color: 'gray', icon: null }
+    }
+  }
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Add Transaction</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <VStack spacing={4} align="stretch">
-            {/* Date Picker */}
-            <ChakraDatePicker selected={date} onChange={(date) => setDate(date)} />
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose}
+      size={modalSize}
+      motionPreset="slideInBottom"
+    >
+      <ModalOverlay backdropFilter="blur(2px)" />
+      <ModalContent 
+        borderRadius={{ base: 0, sm: "md" }}
+        mx={{ base: 0, sm: 4 }}
+        my={{ base: 0, sm: "auto" }}
+        h={{ base: "100vh", sm: "auto" }}
+      >
+        <Box 
+          pt={{ base: 10, sm: 4 }}
+          pb={{ base: 2, sm: 0 }}
+          px={{ base: 4, sm: 0 }}
+          bg={{ base: buttonColorScheme + ".500", sm: "transparent" }}
+          color={{ base: "white", sm: "inherit" }}
+          borderTopRadius={{ base: 0, sm: "md" }}
+        >
+          <ModalHeader 
+            fontSize={{ base: "xl", sm: "lg" }}
+            p={{ base: 0, sm: 6 }}
+            pb={{ base: 4, sm: 2 }}
+          >
+            Add Transaction
+          </ModalHeader>
+          <ModalCloseButton 
+            color={{ base: "white", sm: "gray.500" }}
+            top={{ base: 10, sm: 4 }}
+            right={{ base: 4, sm: 4 }}
+          />
+        </Box>
+        
+        <ModalBody 
+          px={{ base: 4, sm: 6 }} 
+          py={{ base: 4, sm: 4 }}
+          flex="1"
+          display="flex"
+          flexDirection="column"
+          justifyContent={{ base: "space-between", sm: "flex-start" }}
+          overflowY="auto"
+        >
+          <VStack spacing={6} align="stretch" w="100%">
+            {/* Basic Info - First Section */}
+            <Box>
+              <Tabs isFitted variant="enclosed" colorScheme={buttonColorScheme} mb={4}>
+                <TabList>
+                  <Tab
+                    _selected={{ 
+                      color: `${buttonColorScheme}.500`, 
+                      borderBottomColor: `${buttonColorScheme}.500`,
+                      fontWeight: "semibold"
+                    }}
+                    onClick={() => setType('expense')}
+                    isSelected={type === 'expense'}
+                  >
+                    Expense
+                  </Tab>
+                  <Tab
+                    _selected={{ 
+                      color: `${buttonColorScheme}.500`, 
+                      borderBottomColor: `${buttonColorScheme}.500`,
+                      fontWeight: "semibold"
+                    }}
+                    onClick={() => setType('income')}
+                    isSelected={type === 'income'}
+                  >
+                    Income
+                  </Tab>
+                </TabList>
+              </Tabs>
 
-            {/* Transaction Type */}
-            <FormControl>
-              <FormLabel>Type</FormLabel>
-              <Select value={type} onChange={(e) => setType(e.target.value)}>
-                <option value="income">Income</option>
-                <option value="expense">Expense</option>
-              </Select>
-            </FormControl>
+              <Stack direction={stackDirection} spacing={4} mb={4}>
+                {/* Date Picker */}
+                <FormControl flex="1">
+                  <FormLabel fontSize="sm" fontWeight="medium">Date</FormLabel>
+                  <ChakraDatePicker 
+                    selected={date} 
+                    onChange={(date) => setDate(date)} 
+                    borderColor={borderColor}
+                    size="md"
+                  />
+                </FormControl>
 
-            {/* Account Dropdown (only shown if no accountId is provided) */}
-            {!accountId && accounts.length > 0 && (
-              <FormControl>
-                <FormLabel>Account</FormLabel>
-                <Select>
-                  <option value="">Select an account</option>
-                  {/* Group for Asset Accounts */}
-                  <optgroup label="Asset Accounts">
-                    {accounts
-                      .filter((account) => account.type === 'asset')
-                      .map((account) => (
-                        <option key={account.account_id} value={account.account_id}>
-                          {account.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                  {/* Group for Liability Accounts */}
-                  <optgroup label="Liability Accounts">
-                    {accounts
-                      .filter((account) => account.type === 'liability')
-                      .map((account) => (
-                        <option key={account.account_id} value={account.account_id}>
-                          {account.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                </Select>
-              </FormControl>
-            )}
+                {/* Amount Input */}
+                <FormControl flex="1">
+                  <FormLabel fontSize="sm" fontWeight="medium">Amount</FormLabel>
+                  <InputGroup>
+                    <InputLeftAddon>$</InputLeftAddon>
+                    <Input
+                      type="number"
+                      value={amount}
+                      onChange={(e) => {
+                        const value = e.target.value
+                        setAmount(value)
+                      }}
+                      placeholder='0.00'
+                      borderColor={borderColor}
+                    />
+                  </InputGroup>
+                </FormControl>
+              </Stack>
 
-            {/* Notes */}
-            <FormControl>
-              <FormLabel>Notes</FormLabel>
-              <Input 
-                value={notes} 
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder='Notes (optional)'
-              />
-            </FormControl>
+              {/* Account Dropdown (only shown if no accountId is provided) */}
+              {!accountId && accounts.length > 0 && (
+                <FormControl mb={4}>
+                  <FormLabel fontSize="sm" fontWeight="medium">Account</FormLabel>
+                  <Select
+                    borderColor={borderColor}
+                    placeholder="Select an account"
+                    onChange={(e) => setSelectedAccountId(e.target.value)}
+                  >
+                    {/* Group for Asset Accounts */}
+                    <optgroup label="Asset Accounts">
+                      {accounts
+                        .filter((account) => account.type === 'asset')
+                        .map((account) => (
+                          <option key={account.account_id} value={account.account_id}>
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                    {/* Group for Liability Accounts */}
+                    <optgroup label="Liability Accounts">
+                      {accounts
+                        .filter((account) => account.type === 'liability')
+                        .map((account) => (
+                          <option key={account.account_id} value={account.account_id}>
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </Select>
+                </FormControl>
+              )}
 
-            {/* Amount and Split Toggle */}
-            <HStack spacing={4} width="100%" align="flex-start">
-              <FormControl flex="1">
-                <FormLabel>Amount</FormLabel>
-                <Input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => {
-                    const value = e.target.value
-                    setAmount(value)
-                  }}
-                  placeholder='0.00'
+              {/* Notes */}
+              <FormControl mb={4}>
+                <FormLabel fontSize="sm" fontWeight="medium">Notes</FormLabel>
+                <Input 
+                  value={notes} 
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder='Description (optional)'
+                  borderColor={borderColor}
                 />
               </FormControl>
+            </Box>
 
-              <FormControl flex="1">
-                <FormLabel>Split Transaction</FormLabel>
+            {/* Split Toggle */}
+            <Box
+              p={3}
+              borderRadius="md"
+              borderWidth="1px"
+              borderColor={borderColor}
+              bg={useColorModeValue("gray.50", "gray.700")}
+            >
+              <HStack justifyContent="space-between">
+                <Text fontSize="sm" fontWeight="medium">Split Transaction</Text>
                 <Switch
+                  colorScheme={buttonColorScheme}
                   isChecked={isSplit}
                   onChange={(e) => handleSplitToggle(e.target.checked)}
                   isDisabled={!amount} // Disable if amount is not entered
                 />
-              </FormControl>
-            </HStack>
+              </HStack>
+            </Box>
 
-            {/* Split Transaction Fields */}
-            {isSplit && splits.length > 0 && (
-              <Box borderWidth="1px" borderRadius="md" p={3} bg="gray.50">
-                <VStack spacing={3} align="stretch">
-                  <Text fontWeight="medium">Split Details</Text>
+            {/* Category or Split Transaction Section */}
+            {isSplit ? (
+              <Box
+                borderWidth="1px"
+                borderRadius="md"
+                borderColor={borderColor}
+                p={4}
+                bg={highlightColor}
+              >
+                <VStack spacing={4} align="stretch">
+                  <Flex justifyContent="space-between" alignItems="center">
+                    <Text fontWeight="medium">Split Details</Text>
+                    <Text fontSize="sm">
+                      Remaining: {calculateRemainingAmount().toFixed(2)}
+                    </Text>
+                  </Flex>
+                  
+                  <Divider />
                   
                   {splits.map((split, index) => (
-                    <HStack key={index} spacing={4}>
-                      <FormControl flex="1">
-                        <FormLabel fontSize="sm">Split {index + 1} Amount</FormLabel>
-                        <Input
-                          type="number"
-                          value={split.amount || ''}
-                          onChange={(e) => {
-                            handleSplitAmountChange(index, e.target.value)
-                          }}
-                          placeholder="0.00"
-                        />
-                      </FormControl>
-                      <FormControl flex="1">
-                        <FormLabel fontSize="sm">Split {index + 1} Category</FormLabel>
-                        <Select
-                          value={split.categoryId}
-                          onChange={(e) => {
-                            const newSplits = [...splits]
-                            newSplits[index].categoryId = e.target.value
-                            setSplits(newSplits)
-                          }}
-                        >
-                          <option value="">Select a category</option>
-                          {/* Group for Income Categories */}
-                          <optgroup label="Income Categories">
-                            {categories
-                              .filter((category) => category.type === 'income')
-                              .map((category) => (
-                                <option key={category.category_id} value={category.category_id}>
-                                  {category.name}
-                                </option>
-                              ))}
-                          </optgroup>
-
-                          {/* Group for Expense Categories */}
-                          <optgroup label="Expense Categories">
-                            {categories
-                              .filter((category) => category.type === 'expense')
-                              .map((category) => (
-                                <option key={category.category_id} value={category.category_id}>
-                                  {category.name}
-                                </option>
-                              ))}
-                          </optgroup>
-                        </Select>
-                      </FormControl>
-                    </HStack>
+                    <Box 
+                      key={index} 
+                      p={3} 
+                      borderWidth="1px" 
+                      borderRadius="md" 
+                      borderColor={borderColor}
+                      bg={bgColor}
+                    >
+                      <Stack direction={splitLayoutDirection} spacing={3}>
+                        <FormControl flex="1">
+                          <FormLabel fontSize="sm">Amount</FormLabel>
+                          <InputGroup size="sm">
+                            <InputLeftAddon>$</InputLeftAddon>
+                            <Input
+                              type="number"
+                              value={split.amount || ''}
+                              onChange={(e) => {
+                                handleSplitAmountChange(index, e.target.value)
+                              }}
+                              placeholder="0.00"
+                              borderColor={borderColor}
+                            />
+                          </InputGroup>
+                        </FormControl>
+                        <FormControl flex="1">
+                          <FormLabel fontSize="sm">Category</FormLabel>
+                          <HStack spacing={1}>
+                            <Select
+                              size="sm"
+                              value={split.categoryId}
+                              onChange={(e) => {
+                                const newSplits = [...splits]
+                                newSplits[index].categoryId = e.target.value
+                                setSplits(newSplits)
+                              }}
+                              borderColor={borderColor}
+                            >
+                              <option value="">Select category</option>
+                              {/* Filter categories based on transaction type */}
+                              <optgroup label={type === 'income' ? "Income Categories" : "Expense Categories"}>
+                                {categories
+                                  .filter((category) => category.type === type)
+                                  .map((category) => (
+                                    <option key={category.category_id} value={category.category_id}>
+                                      {category.name}
+                                    </option>
+                                  ))}
+                              </optgroup>
+                            </Select>
+                            
+                            <IconButton
+                              aria-label="Remove split"
+                              icon={<MinusIcon />}
+                              size="sm"
+                              variant="ghost"
+                              colorScheme="red"
+                              isDisabled={splits.length <= 1}
+                              onClick={() => removeSplit(index)}
+                            />
+                          </HStack>
+                        </FormControl>
+                      </Stack>
+                    </Box>
                   ))}
+                  
+                  {/* Add Split Button */}
+                  <Button 
+                    leftIcon={<AddIcon />} 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={addSplit}
+                    alignSelf="flex-start"
+                    colorScheme={buttonColorScheme}
+                    isDisabled={calculateRemainingAmount() <= 0 && splits.some(split => parseFloat(split.amount) === 0)}
+                  >
+                    Add Split
+                  </Button>
                   
                   {/* Display total allocated and remaining amount */}
                   <HStack justifyContent="space-between" pt={2}>
                     <Text fontSize="sm">
-                      Total Amount: {parseFloat(amount) || 0}
+                      Total: ${parseFloat(amount) || 0}
                     </Text>
-                    {calculateRemainingAmount() < 0 && (
+                    {calculateRemainingAmount() !== 0 && (
                       <Text 
                         fontSize="sm" 
-                        color="red.500"
+                        color={calculateRemainingAmount() < 0 ? "red.500" : "orange.500"}
+                        fontWeight="medium"
                       >
-                        Over-allocated by {Math.abs(calculateRemainingAmount()).toFixed(2)}
+                        {calculateRemainingAmount() < 0 
+                          ? `Over-allocated by $${Math.abs(calculateRemainingAmount()).toFixed(2)}` 
+                          : `$${calculateRemainingAmount().toFixed(2)} unallocated`}
                       </Text>
                     )}
                   </HStack>
                 </VStack>
               </Box>
-            )}
-
-            {/* Category Dropdown */}
-            {!isSplit && (
+            ) : (
+              /* Category Dropdown (when not split) */
               <FormControl>
-                <FormLabel>Category</FormLabel>
+                <FormLabel fontSize="sm" fontWeight="medium">Category</FormLabel>
                 <Select
                   value={categoryId}
                   onChange={(e) => setCategoryId(e.target.value)}
-                  isDisabled={isSplit} // Disable if split is enabled
+                  borderColor={borderColor}
+                  placeholder="Select a category"
                 >
-                  <option value="">Select a category</option>
-                    {/* Group for Income Categories */}
-                    <optgroup label="Income Categories">
-                      {categories
-                        .filter((category) => category.type === 'income')
-                        .map((category) => (
-                          <option key={category.category_id} value={category.category_id}>
-                            {category.name}
-                          </option>
-                        ))}
-                    </optgroup>
-
-                    {/* Group for Expense Categories */}
-                    <optgroup label="Expense Categories">
-                      {categories
-                        .filter((category) => category.type === 'expense')
-                        .map((category) => (
-                          <option key={category.category_id} value={category.category_id}>
-                            {category.name}
-                          </option>
-                        ))}
-                    </optgroup>
+                  {/* Filter categories based on transaction type */}
+                  {categories
+                    .filter((category) => category.type === type)
+                    .map((category) => (
+                      <option key={category.category_id} value={category.category_id}>
+                        {category.name}
+                      </option>
+                    ))}
                 </Select>
               </FormControl>
             )}
 
             {/* Tags Input */}
             <FormControl>
-              <FormLabel>Tags</FormLabel>
+              <FormLabel fontSize="sm" fontWeight="medium">Tags</FormLabel>
               <Box>
                 {/* Display selected tags as chips */}
                 <Wrap spacing={2} mb={2}>
                   {tags.map((tag) => (
                     <WrapItem key={tag.name}>
-                      <Tag size="md" borderRadius="full" variant="solid" colorScheme="teal">
+                      <Tag size="sm" borderRadius="full" variant="solid" colorScheme={buttonColorScheme}>
                         <TagLabel>{tag.name}</TagLabel>
                         <TagCloseButton onClick={() => removeTag(tag.name)} />
                       </Tag>
@@ -598,23 +786,37 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                 <Input
                   value={tagInput}
                   onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagInputKeyDown} // Handle Enter key
-                  placeholder="Add tags (press Enter to add)"
+                  onKeyDown={handleTagInputKeyDown}
+                  placeholder="Add tags (press Enter)"
+                  borderColor={borderColor}
+                  size="md"
                 />
 
                 {/* Display tag suggestions */}
                 {tagSuggestions.length > 0 && (
-                  <Box mt={2} borderWidth="1px" borderRadius="md" p={2} bg="gray.50">
+                  <Box 
+                    mt={2} 
+                    borderWidth="1px" 
+                    borderRadius="md" 
+                    borderColor={borderColor}
+                    p={2} 
+                    bg={useColorModeValue("gray.50", "gray.700")}
+                    maxH="150px"
+                    overflowY="auto"
+                    position="relative"
+                    zIndex={10}
+                  >
                     {tagSuggestions.map((tag) => (
                       <Box
                         key={tag.tag_id}
-                        p={1}
+                        p={2}
                         cursor="pointer"
-                        _hover={{ bg: 'gray.100' }}
+                        borderRadius="md"
+                        _hover={{ bg: useColorModeValue("gray.100", "gray.600") }}
                         onClick={() => {
                           addTag(tag);
-                          setTagInput(''); // Clear input after adding a tag
-                          setTagSuggestions([]); // Clear suggestions
+                          setTagInput('');
+                          setTagSuggestions([]);
                         }}
                       >
                         {tag.name}
@@ -626,18 +828,36 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
             </FormControl>
           </VStack>
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="teal" onClick={handleSubmit} isLoading={isLoading}
+
+        <ModalFooter 
+          flexDirection={{ base: "column", sm: "row" }}
+          p={4}
+          gap={2}
+          borderTopWidth="1px"
+          borderColor={borderColor}
+          bg={useColorModeValue("gray.50", "gray.700")}
+        >
+          <Button 
+            colorScheme={buttonColorScheme} 
+            size={buttonSize}
+            w={{ base: "full", sm: "auto" }}
+            onClick={handleSubmit} 
+            isLoading={isLoading}
             isDisabled={
-              (isSplit && splits.length === 0) || 
+              (isSplit && splits.some(split => parseFloat(split.amount) > 0 && !split.categoryId)) || 
               (!isSplit && !categoryId) || 
               !amount ||
               (isSplit && calculateRemainingAmount() !== 0)
             }
           >
-            Save
+            Save Transaction
           </Button>
-          <Button variant="ghost" onClick={onClose}>
+          <Button 
+            variant="outline" 
+            size={buttonSize}
+            w={{ base: "full", sm: "auto" }}
+            onClick={onClose}
+          >
             Cancel
           </Button>
         </ModalFooter>

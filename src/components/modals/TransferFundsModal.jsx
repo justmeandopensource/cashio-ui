@@ -15,8 +15,20 @@ import {
   Switch,
   Text,
   VStack,
+  HStack,
   useToast,
+  Box,
+  Heading,
+  Badge,
+  Divider,
+  useColorModeValue,
+  useBreakpointValue,
+  InputGroup,
+  InputLeftAddon,
+  Stack,
+  Flex,
 } from '@chakra-ui/react'
+import { ArrowDownIcon, ArrowUpIcon, RepeatIcon } from '@chakra-ui/icons'
 import axios from 'axios'
 import ChakraDatePicker from '@components/shared/ChakraDatePicker'
 import config from '@/config'
@@ -35,6 +47,17 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
   const [destinationAccounts, setDestinationAccounts] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const toast = useToast()
+  
+  // Responsive design helpers
+  const modalSize = useBreakpointValue({ base: "full", md: "lg" })
+  const stackDirection = useBreakpointValue({ base: "column", md: "row" })
+  const buttonSize = useBreakpointValue({ base: "md", md: "md" })
+  
+  // Theme colors
+  const buttonColorScheme = "teal"
+  const bgColor = useColorModeValue("white", "gray.800")
+  const borderColor = useColorModeValue("gray.200", "gray.600")
+  const highlightColor = useColorModeValue("teal.50", "teal.900")
 
   const resetForm = () => {
     setDate(new Date())
@@ -192,139 +215,274 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
   }
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} size="lg">
-      <ModalOverlay />
-      <ModalContent>
-        <ModalHeader>Transfer Funds</ModalHeader>
-        <ModalCloseButton />
-        <ModalBody>
-          <VStack spacing={4} align="stretch">
-            <ChakraDatePicker selected={date} onChange={(date) => setDate(date)} />
-
-            {!accountId && (
-              <FormControl>
-                <FormLabel>From Account</FormLabel>
-                <Select
-                  value={fromAccountId}
-                  onChange={(e) => setFromAccountId(e.target.value)}
-                >
-                  <option value="">Select an account</option>
-                  {/* Group for Asset Accounts */}
-                  <optgroup label="Asset Accounts">
-                    {accounts
-                      .filter((account) => account.type === 'asset')
-                      .map((account) => (
-                        <option key={account.account_id} value={account.account_id}>
-                          {account.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                  {/* Group for Liability Accounts */}
-                  <optgroup label="Liability Accounts">
-                    {accounts
-                      .filter((account) => account.type === 'liability')
-                      .map((account) => (
-                        <option key={account.account_id} value={account.account_id}>
-                          {account.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                </Select>
-              </FormControl>
-            )}
-
-            <FormControl>
-              <FormLabel>Transfer to Different Ledger</FormLabel>
-              <Switch
-                isChecked={isDifferentLedger}
-                onChange={(e) => setIsDifferentLedger(e.target.checked)}
-              />
-            </FormControl>
-
-            {isDifferentLedger && (
-              <FormControl>
-                <FormLabel>Destination Ledger</FormLabel>
-                <Select
-                  value={destinationLedgerId}
-                  onChange={(e) => setDestinationLedgerId(e.target.value)}
-                >
-                  <option value="">Select a ledger</option>
-                  {getFilteredLedgers(ledgers).map((ledger) => (
-                    <option key={ledger.ledger_id} value={ledger.ledger_id}>
-                      {ledger.name}
-                    </option>
-                  ))}
-                </Select>
-              </FormControl>
-            )}
-
-            <FormControl>
-              <FormLabel>To Account</FormLabel>
-              <Select
-                value={toAccountId}
-                onChange={(e) => setToAccountId(e.target.value)}
-              >
-                <option value="">Select an account</option>
-                  {/* Group for Asset Accounts */}
-                  <optgroup label="Asset Accounts">
-                    {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts, fromAccountId)
-                      .filter((account) => account.type === 'asset')
-                      .map((account) => (
-                        <option key={account.account_id} value={account.account_id}>
-                          {account.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                  {/* Group for Liability Accounts */}
-                  <optgroup label="Liability Accounts">
-                    {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts, fromAccountId)
-                      .filter((account) => account.type === 'liability')
-                      .map((account) => (
-                        <option key={account.account_id} value={account.account_id}>
-                          {account.name}
-                        </option>
-                      ))}
-                  </optgroup>
-              </Select>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel>Amount</FormLabel>
-              <Input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="0.00"
-              />
-            </FormControl>
-
-            {isDifferentLedger && (
-              <FormControl>
-                <FormLabel>Destination Amount</FormLabel>
-                <Input
-                  type="number"
-                  value={destinationAmount}
-                  onChange={(e) => setDestinationAmount(e.target.value)}
-                  placeholder="0.00"
+    <Modal 
+      isOpen={isOpen} 
+      onClose={onClose} 
+      size={modalSize}
+      motionPreset="slideInBottom"
+    >
+      <ModalOverlay backdropFilter="blur(2px)" />
+      <ModalContent 
+        borderRadius={{ base: 0, sm: "md" }}
+        mx={{ base: 0, sm: 4 }}
+        my={{ base: 0, sm: "auto" }}
+        h={{ base: "100vh", sm: "auto" }}
+        display="flex"
+        flexDirection="column"
+      >
+        <Box 
+          pt={{ base: 10, sm: 4 }}
+          pb={{ base: 2, sm: 0 }}
+          px={{ base: 4, sm: 0 }}
+          bg={{ base: buttonColorScheme + ".500", sm: "transparent" }}
+          color={{ base: "white", sm: "inherit" }}
+          borderTopRadius={{ base: 0, sm: "md" }}
+          flexShrink={0}
+        >
+          <ModalHeader 
+            fontSize={{ base: "xl", sm: "lg" }}
+            p={{ base: 0, sm: 6 }}
+            pb={{ base: 4, sm: 2 }}
+          >
+            Transfer Funds
+          </ModalHeader>
+          <ModalCloseButton 
+            color={{ base: "white", sm: "gray.500" }}
+            top={{ base: 10, sm: 4 }}
+            right={{ base: 4, sm: 4 }}
+          />
+        </Box>
+        
+        <ModalBody 
+          px={{ base: 4, sm: 6 }} 
+          py={{ base: 4, sm: 4 }}
+          flex="1"
+          overflowY="auto"
+        >
+          <VStack spacing={6} align="stretch" w="100%">
+            {/* Basic Info Section */}
+            <Stack direction={stackDirection} spacing={4} mb={4}>
+              {/* Date Picker */}
+              <FormControl flex="1">
+                <FormLabel fontSize="sm" fontWeight="medium">Date</FormLabel>
+                <ChakraDatePicker 
+                  selected={date} 
+                  onChange={(date) => setDate(date)} 
+                  borderColor={borderColor}
+                  shouldCloseOnSelect={true}
+                  size="md"
                 />
               </FormControl>
+
+              {/* Amount Input */}
+              <FormControl flex="1">
+                <FormLabel fontSize="sm" fontWeight="medium">Amount</FormLabel>
+                <InputGroup>
+                  <InputLeftAddon>$</InputLeftAddon>
+                  <Input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="0.00"
+                    borderColor={borderColor}
+                  />
+                </InputGroup>
+              </FormControl>
+            </Stack>
+
+            {/* From Account Selection */}
+            {!accountId && (
+              <Box 
+                p={4} 
+                borderWidth="1px" 
+                borderRadius="md" 
+                borderColor={borderColor}
+                bg={useColorModeValue("gray.50", "gray.700")}
+                mb={4}
+              >
+                <FormControl>
+                  <HStack alignItems="center" mb={2}>
+                    <ArrowUpIcon color="red.500" />
+                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>From Account</FormLabel>
+                  </HStack>
+                  <Select
+                    value={fromAccountId}
+                    onChange={(e) => setFromAccountId(e.target.value)}
+                    borderColor={borderColor}
+                  >
+                    <option value="">Select an account</option>
+                    {/* Group for Asset Accounts */}
+                    <optgroup label="Asset Accounts">
+                      {accounts
+                        .filter((account) => account.type === 'asset')
+                        .map((account) => (
+                          <option key={account.account_id} value={account.account_id}>
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                    {/* Group for Liability Accounts */}
+                    <optgroup label="Liability Accounts">
+                      {accounts
+                        .filter((account) => account.type === 'liability')
+                        .map((account) => (
+                          <option key={account.account_id} value={account.account_id}>
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </Select>
+                </FormControl>
+              </Box>
             )}
 
+            {/* Different Ledger Toggle */}
+            <Box
+              p={3}
+              borderRadius="md"
+              borderWidth="1px"
+              borderColor={borderColor}
+              bg={useColorModeValue("gray.50", "gray.700")}
+              mb={4}
+            >
+              <HStack justifyContent="space-between">
+                <Text fontSize="sm" fontWeight="medium">Transfer to Different Ledger</Text>
+                <Switch
+                  colorScheme={buttonColorScheme}
+                  isChecked={isDifferentLedger}
+                  onChange={(e) => setIsDifferentLedger(e.target.checked)}
+                />
+              </HStack>
+            </Box>
+
+            {/* Destination Section */}
+            <Box 
+              p={4} 
+              borderWidth="1px" 
+              borderRadius="md" 
+              borderColor={borderColor}
+              bg={highlightColor}
+              mb={4}
+            >
+              <VStack spacing={4} align="stretch">
+                {/* Destination Ledger (if different ledger) */}
+                {isDifferentLedger && (
+                  <FormControl>
+                    <FormLabel fontSize="sm" fontWeight="medium">Destination Ledger</FormLabel>
+                    <Select
+                      value={destinationLedgerId}
+                      onChange={(e) => setDestinationLedgerId(e.target.value)}
+                      borderColor={borderColor}
+                      bg={bgColor}
+                    >
+                      <option value="">Select a ledger</option>
+                      {getFilteredLedgers(ledgers).map((ledger) => (
+                        <option key={ledger.ledger_id} value={ledger.ledger_id}>
+                          {ledger.name}
+                        </option>
+                      ))}
+                    </Select>
+                  </FormControl>
+                )}
+
+                {/* To Account Selection */}
+                <FormControl>
+                  <HStack alignItems="center" mb={2}>
+                    <ArrowDownIcon color="green.500" />
+                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>To Account</FormLabel>
+                  </HStack>
+                  <Select
+                    value={toAccountId}
+                    onChange={(e) => setToAccountId(e.target.value)}
+                    borderColor={borderColor}
+                    bg={bgColor}
+                  >
+                    <option value="">Select an account</option>
+                    {/* Group for Asset Accounts */}
+                    <optgroup label="Asset Accounts">
+                      {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts)
+                        .filter((account) => account.type === 'asset')
+                        .map((account) => (
+                          <option key={account.account_id} value={account.account_id}>
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                    {/* Group for Liability Accounts */}
+                    <optgroup label="Liability Accounts">
+                      {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts)
+                        .filter((account) => account.type === 'liability')
+                        .map((account) => (
+                          <option key={account.account_id} value={account.account_id}>
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </Select>
+                </FormControl>
+
+                {/* Destination Amount (if different ledger) */}
+                {isDifferentLedger && (
+                  <FormControl>
+                    <FormLabel fontSize="sm" fontWeight="medium">Destination Amount</FormLabel>
+                    <InputGroup>
+                      <InputLeftAddon>$</InputLeftAddon>
+                      <Input
+                        type="number"
+                        value={destinationAmount}
+                        onChange={(e) => setDestinationAmount(e.target.value)}
+                        placeholder="0.00"
+                        borderColor={borderColor}
+                        bg={bgColor}
+                      />
+                    </InputGroup>
+                    <Text fontSize="xs" mt={1} color="gray.500">
+                      Leave empty to use the same amount as source
+                    </Text>
+                  </FormControl>
+                )}
+              </VStack>
+            </Box>
+
+            {/* Notes */}
             <FormControl>
-              <FormLabel>Notes</FormLabel>
+              <FormLabel fontSize="sm" fontWeight="medium">Notes</FormLabel>
               <Input
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Notes (optional)"
+                placeholder="Description (optional)"
+                borderColor={borderColor}
               />
             </FormControl>
           </VStack>
         </ModalBody>
-        <ModalFooter>
-          <Button colorScheme="teal" onClick={handleSubmit} isLoading={isLoading}>
-            Transfer
+
+        <ModalFooter 
+          flexDirection={{ base: "column", sm: "row" }}
+          p={4}
+          gap={2}
+          borderTopWidth="1px"
+          borderColor={borderColor}
+          bg={useColorModeValue("gray.50", "gray.700")}
+          flexShrink={0}
+        >
+          <Button 
+            colorScheme={buttonColorScheme} 
+            size={buttonSize}
+            w={{ base: "full", sm: "auto" }}
+            onClick={handleSubmit} 
+            isLoading={isLoading}
+            isDisabled={!fromAccountId || !toAccountId || !amount || (isDifferentLedger && !destinationLedgerId)}
+            leftIcon={<RepeatIcon />}
+          >
+            Complete Transfer
           </Button>
-          <Button variant="ghost" onClick={onClose}>
+          <Button 
+            variant="outline" 
+            size={buttonSize}
+            w={{ base: "full", sm: "auto" }}
+            onClick={onClose}
+          >
             Cancel
           </Button>
         </ModalFooter>
