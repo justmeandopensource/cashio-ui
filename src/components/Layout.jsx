@@ -8,13 +8,13 @@ const Layout = ({
 
   return (
 
-    <Flex minH="100vh">
+    <Flex minH="100vh" direction={{ base: "column", md: "row" }}>
 
       {/* Sidebar */}
       <Sidebar handleLogout={handleLogout} />
 
       {/* Main Content */}
-      <Box flex={1} p={8}>
+      <Box flex={1} p={{ base: 4, md: 8 }}>
         {children}
       </Box>
 

@@ -33,6 +33,8 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
           <Button
             onClick={onOpen}
             leftIcon={<FiPlus />}
+            colorScheme="teal"
+            size="lg"
           >
             Create Ledger
           </Button>
@@ -42,7 +44,7 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
           <Heading as="h2" size="lg" mb={4} color="teal.500">
             Ledgers
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 5 }} spacing={6}>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} spacing={6}>
             {ledgers.map((ledger) => (
               <Card 
                   key={ledger.ledger_id}
@@ -51,7 +53,7 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
                   cursor="pointer"
                   onClick={() => handleLedgerClick(ledger.ledger_id)}
               >
-                <CardBody display="flex" alignItems="center">
+                <CardBody display="flex" alignItems="center" p={6}>
                   <Box
                     bg="teal.100"
                     p={3}
@@ -62,7 +64,7 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
                   >
                     {ledger.currency_symbol}
                   </Box>
-                  <Text fontSize="lg">{ledger.name}</Text>
+                  <Text fontSize="lg" fontWeight="semibold">{ledger.name}</Text>
                 </CardBody>
               </Card>
             ))}
@@ -72,7 +74,12 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
               cursor="pointer"
               onClick={onOpen}
             >
-              <CardBody display="flex" alignItems="center" justifyContent="center">
+              <CardBody
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  p={6}
+              >
                 <Icon as={FiPlus} boxSize={6} color="teal.500" />
               </CardBody>
             </Card>
