@@ -1,5 +1,5 @@
 import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { Box, Spinner } from '@chakra-ui/react'
 import Layout from '@components/Layout'
@@ -8,6 +8,8 @@ import config from '@/config'
 
 const Account = () => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const { currencySymbol } = location.state || {}
 
   // Function to verify the token
   const verifyToken = async () => {
@@ -68,7 +70,7 @@ const Account = () => {
 
   return (
     <Layout handleLogout={handleLogout}>
-      <AccountMain />
+      <AccountMain currencySymbol={currencySymbol} />
     </Layout>
   )
 }

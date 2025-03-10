@@ -9,7 +9,7 @@ import TransferFundsModal from '@components/modals/TransferFundsModal'
 import UpdateAccountModal from '@components/modals/UpdateAccountModal'
 import config from '@/config'
 
-const AccountMain = () => {
+const AccountMain = ({ currencySymbol }) => {
   const { ledgerId, accountId } = useParams()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
@@ -151,6 +151,7 @@ const AccountMain = () => {
       {/* Account Details Section */}
       <AccountMainHeader
         account={account}
+        currencySymbol={currencySymbol}
         onAddTransaction={() => setIsCreateModalOpen(true)}
         onTransferFunds={() => setIsTransferModalOpen(true)}
         onUpdateAccount={() => setIsUpdateModalOpen(true)}
@@ -160,6 +161,7 @@ const AccountMain = () => {
       <AccountMainTransactions
         transactions={transactionsData?.transactions || []}
         account={account}
+        currencySymbol={currencySymbol}
         fetchTransactions={handlePageChange}
         pagination={pagination}
         onAddTransaction={() => setIsCreateModalOpen(true)}

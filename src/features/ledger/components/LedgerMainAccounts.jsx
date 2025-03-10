@@ -34,6 +34,7 @@ import {
 import { Link as RouterLink } from 'react-router-dom'
 import { FiPlus, FiRepeat, FiChevronsRight } from 'react-icons/fi'
 import CreateAccountModal from '@components/modals/CreateAccountModal'
+import { currencySymbols, formatNumberAsCurrency } from '@components/shared/currencyUtils'
 import config from '@/config'
 
 const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFunds, fetchAccounts }) => {
@@ -113,15 +114,6 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
     }))
   }
 
-  // Helper function to format balance with currency symbol
-  const formatBalance = (balance, currencySymbol) => {
-    const formattedBalance = Number(balance).toLocaleString('en-GB', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
-    return `${formattedBalance} ${currencySymbol}`
-  }
-
   // Helper function to determine text color based on account type, balance, and whether it's a group account
   const getBalanceColor = (balance, accountType, isGroup) => {
     if (accountType === 'asset') {
@@ -191,7 +183,12 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
             >
               <Td pl={`${level * 24 + 8}px`}>
                 {!account.is_group ? (
-                  <ChakraLink as={RouterLink} to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`} _hover={{ textDecoration: 'none' }}>
+                  <ChakraLink
+                    as={RouterLink}
+                    to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`}
+                    state={{ currencySymbol: ledger.currency_symbol }}
+                    hover={{ textDecoration: 'none' }}
+                  >
                     <Text
                       fontWeight="normal"
                       color="gray.700"
@@ -217,7 +214,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
                   color={balanceColor}
                   fontSize={account.is_group ? 'md' : 'sm'}
                 >
-                  {formatBalance(balance, ledger.currency_symbol)}
+                  {formatNumberAsCurrency(balance, ledger.currency_symbol)}
                 </Text>
               </Td>
               <Td>
@@ -291,6 +288,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
                         <ChakraLink 
                           as={RouterLink} 
                           to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`}
+                          state={{ currencySymbol: ledger.currency_symbol }}
                           _hover={{ textDecoration: 'none' }}
                         >
                           <Text
@@ -314,7 +312,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
                       fontWeight={account.is_group ? "medium" : "normal"}
                       color={balanceColor}
                     >
-                      {formatBalance(balance, ledger.currency_symbol)}
+                      {formatNumberAsCurrency(balance, ledger.currency_symbol)}
                     </Text>
                   </Flex>
                   

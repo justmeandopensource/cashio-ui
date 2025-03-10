@@ -16,8 +16,9 @@ import {
   EditIcon
 } from '@chakra-ui/icons'
 import { useNavigate } from 'react-router-dom'
+import { formatNumberAsCurrency } from '@components/shared/currencyUtils'
 
-const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds, onUpdateAccount }) => {
+const AccountMainHeader = ({ account, currencySymbol, onAddTransaction, onTransferFunds, onUpdateAccount }) => {
   const navigate = useNavigate()
   
   // Determine the color for the balance based on its value
@@ -84,7 +85,7 @@ const AccountMainHeader = ({ account, onAddTransaction, onTransferFunds, onUpdat
             
             {/* Balance moved below account name */}
             <Text fontSize="2xl" fontWeight="bold" color={balanceColor}>
-              {account.net_balance.toFixed(2)}
+              {formatNumberAsCurrency(account.net_balance, currencySymbol)}
             </Text>
           </VStack>
         </Flex>

@@ -54,10 +54,11 @@ import {
 } from 'react-icons/fi'
 import { Square } from '@chakra-ui/react'
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
+import { formatNumberAsCurrency } from '@components/shared/currencyUtils'
 import { useQueryClient } from '@tanstack/react-query'
 import config from '@/config'
 
-const AccountMainTransactions = ({ transactions, account, fetchTransactions, pagination, onAddTransaction }) => {
+const AccountMainTransactions = ({ transactions, account, currencySymbol, fetchTransactions, pagination, onAddTransaction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
   const queryClient = useQueryClient()
@@ -124,10 +125,12 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
 
   // Format amount with proper sign and color
   const formatAmount = (credit, debit) => {
+    const amount = credit > 0 ? credit : debit
+    const formattedAmount = formatNumberAsCurrency(amount, currencySymbol)
     if (credit > 0) {
-      return { value: parseFloat(credit).toFixed(2), color: 'teal.500', prefix: '+' }
+      return { value: formattedAmount, color: 'teal.500', prefix: '+' }
     } else {
-      return { value: parseFloat(debit).toFixed(2), color: 'red.500', prefix: '-' }
+      return { value: formattedAmount, color: 'red.500', prefix: '-' }
     }
   }
 
@@ -557,12 +560,12 @@ const AccountMainTransactions = ({ transactions, account, fetchTransactions, pag
                       <Td>{transaction.notes}</Td>
                       <Td width="10%" isNumeric>
                         {transaction.credit !== 0 && (
-                          <Text color="teal.500">{parseFloat(transaction.credit).toFixed(2)}</Text>
+                          <Text color="teal.500">{formatNumberAsCurrency(transaction.credit, currencySymbol)}</Text>
                         )}
                       </Td>
                       <Td width="10%" isNumeric>
                         {transaction.debit !== 0 && (
-                          <Text color="red.500">{parseFloat(transaction.debit).toFixed(2)}</Text>
+                          <Text color="red.500">{formatNumberAsCurrency(transaction.debit, currencySymbol)}</Text>
                         )}
                       </Td>
                     </Tr>
