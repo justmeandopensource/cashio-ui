@@ -7,9 +7,10 @@ import AccountMainTransactions from "@features/account/components/AccountMainTra
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 import TransferFundsModal from '@components/modals/TransferFundsModal'
 import UpdateAccountModal from '@components/modals/UpdateAccountModal'
+import { currencySymbols } from '@components/shared/currencyUtils'
 import config from '@/config'
 
-const AccountMain = ({ currencySymbol }) => {
+const AccountMain = ({ currencySymbolCode }) => {
   const { ledgerId, accountId } = useParams()
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false)
@@ -151,7 +152,7 @@ const AccountMain = ({ currencySymbol }) => {
       {/* Account Details Section */}
       <AccountMainHeader
         account={account}
-        currencySymbol={currencySymbol}
+        currencySymbolCode={currencySymbolCode}
         onAddTransaction={() => setIsCreateModalOpen(true)}
         onTransferFunds={() => setIsTransferModalOpen(true)}
         onUpdateAccount={() => setIsUpdateModalOpen(true)}
@@ -161,7 +162,7 @@ const AccountMain = ({ currencySymbol }) => {
       <AccountMainTransactions
         transactions={transactionsData?.transactions || []}
         account={account}
-        currencySymbol={currencySymbol}
+        currencySymbolCode={currencySymbolCode}
         fetchTransactions={handlePageChange}
         pagination={pagination}
         onAddTransaction={() => setIsCreateModalOpen(true)}
@@ -173,6 +174,7 @@ const AccountMain = ({ currencySymbol }) => {
         onClose={() => setIsCreateModalOpen(false)}
         ledgerId={ledgerId}
         accountId={accountId}
+        currencySymbol={currencySymbols[currencySymbolCode]}
         onTransactionAdded={refreshAccountAndTransactionsData}
       />
 
@@ -182,6 +184,7 @@ const AccountMain = ({ currencySymbol }) => {
         onClose={() => setIsTransferModalOpen(false)}
         ledgerId={ledgerId}
         accountId={accountId}
+        currencySymbol={currencySymbols[currencySymbolCode]}
         onTransferCompleted={refreshAccountAndTransactionsData}
       />
 
@@ -190,6 +193,7 @@ const AccountMain = ({ currencySymbol }) => {
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
         account={account}
+        currencySymbol={currencySymbols[currencySymbolCode]}
         onUpdateCompleted={refreshAccountData}
       />
     </Box>

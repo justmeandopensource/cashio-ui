@@ -58,7 +58,7 @@ import { formatNumberAsCurrency } from '@components/shared/currencyUtils'
 import { useQueryClient } from '@tanstack/react-query'
 import config from '@/config'
 
-const AccountMainTransactions = ({ transactions, account, currencySymbol, fetchTransactions, pagination, onAddTransaction }) => {
+const AccountMainTransactions = ({ transactions, account, currencySymbolCode, fetchTransactions, pagination, onAddTransaction }) => {
   const { isOpen, onOpen, onClose } = useDisclosure()
   const toast = useToast()
   const queryClient = useQueryClient()
@@ -126,7 +126,7 @@ const AccountMainTransactions = ({ transactions, account, currencySymbol, fetchT
   // Format amount with proper sign and color
   const formatAmount = (credit, debit) => {
     const amount = credit > 0 ? credit : debit
-    const formattedAmount = formatNumberAsCurrency(amount, currencySymbol)
+    const formattedAmount = formatNumberAsCurrency(amount, currencySymbolCode)
     if (credit > 0) {
       return { value: formattedAmount, color: 'teal.500', prefix: '+' }
     } else {
@@ -343,7 +343,7 @@ const AccountMainTransactions = ({ transactions, account, currencySymbol, fetchT
                       >
                         <Text fontSize="sm" fontWeight="medium">{split.category_name}</Text>
                         <Text fontSize="sm" fontWeight="bold">
-                          ${split.debit.toFixed(2)}
+                          {formatNumberAsCurrency(split.debit, currencySymbolCode)}
                         </Text>
                       </Flex>
                     ))}
@@ -487,7 +487,7 @@ const AccountMainTransactions = ({ transactions, account, currencySymbol, fetchT
                                         <Tr key={split.split_id} _hover={{ bg: 'teal.50' }}>
                                           <Td color="teal.900">{split.category_name}</Td>
                                           <Td color="teal.900" isNumeric>
-                                            {split.debit.toFixed(2)}
+                                            {formatNumberAsCurrency(split.debit, currencySymbolCode)}
                                           </Td>
                                           <Td color="teal.900">{split.notes}</Td>
                                         </Tr>
@@ -560,12 +560,12 @@ const AccountMainTransactions = ({ transactions, account, currencySymbol, fetchT
                       <Td>{transaction.notes}</Td>
                       <Td width="10%" isNumeric>
                         {transaction.credit !== 0 && (
-                          <Text color="teal.500">{formatNumberAsCurrency(transaction.credit, currencySymbol)}</Text>
+                          <Text color="teal.500">{formatNumberAsCurrency(transaction.credit, currencySymbolCode)}</Text>
                         )}
                       </Td>
                       <Td width="10%" isNumeric>
                         {transaction.debit !== 0 && (
-                          <Text color="red.500">{formatNumberAsCurrency(transaction.debit, currencySymbol)}</Text>
+                          <Text color="red.500">{formatNumberAsCurrency(transaction.debit, currencySymbolCode)}</Text>
                         )}
                       </Td>
                     </Tr>
@@ -577,7 +577,7 @@ const AccountMainTransactions = ({ transactions, account, currencySymbol, fetchT
 
           {/* Card View (Mobile & Tablet Portrait) */}
           {useCardView && (
-            <VStack spacing={3} align="stretch">
+            <VStack spacing={1} align="stretch">
               {transactions.map((transaction) => (
                 <TransactionCard 
                   key={transaction.transaction_id} 

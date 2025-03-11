@@ -9,7 +9,7 @@ import config from '@/config'
 const Account = () => {
   const navigate = useNavigate()
   const location = useLocation()
-  const { currencySymbol } = location.state || {}
+  const { currencySymbolCode } = location.state || {}
 
   // Function to verify the token
   const verifyToken = async () => {
@@ -70,7 +70,7 @@ const Account = () => {
 
   return (
     <Layout handleLogout={handleLogout}>
-      <AccountMain currencySymbol={currencySymbol} />
+      <AccountMain currencySymbolCode={currencySymbolCode} />
     </Layout>
   )
 }

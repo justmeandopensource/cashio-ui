@@ -6,6 +6,7 @@ import LedgerMainHeader from '@features/ledger/components/LedgerMainHeader'
 import LedgerMainAccounts from '@features/ledger/components/LedgerMainAccounts'
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 import TransferFundsModal from '@components/modals/TransferFundsModal'
+import { currencySymbols } from '@components/shared/currencyUtils'
 import config from '@/config'
 
 const LedgerMain = () => {
@@ -117,6 +118,7 @@ const LedgerMain = () => {
         onClose={() => setIsCreateModalOpen(false)}
         ledgerId={ledgerId}
         accountId={selectedAccountId}
+        currencySymbol={currencySymbols[ledger.currency_symbol]}
         onTransactionAdded={() => queryClient.invalidateQueries(['accounts', ledgerId])}
       />
 
@@ -126,6 +128,7 @@ const LedgerMain = () => {
         onClose={() => setIsTransferModalOpen(false)}
         ledgerId={ledgerId}
         accountId={selectedAccountId}
+        currencySymbol={currencySymbols[ledger.currency_symbol]}
         onTransferCompleted={() => queryClient.invalidateQueries(['accounts', ledgerId])}
       />
 

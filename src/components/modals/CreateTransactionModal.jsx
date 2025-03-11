@@ -46,7 +46,7 @@ import axios from 'axios'
 import config from '@/config'
 import ChakraDatePicker from '@components/shared/ChakraDatePicker'
 
-const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransactionAdded }) => {
+const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, currencySymbol, onTransactionAdded }) => {
   const [date, setDate] = useState(new Date())
   const [type, setType] = useState('expense')
   const [categoryId, setCategoryId] = useState('')
@@ -548,7 +548,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                 <FormControl flex="1">
                   <FormLabel fontSize="sm" fontWeight="medium">Amount</FormLabel>
                   <InputGroup>
-                    <InputLeftAddon>$</InputLeftAddon>
+                    <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                     <Input
                       type="number"
                       value={amount}
@@ -659,7 +659,7 @@ const CreateTransactionModal = ({ isOpen, onClose, accountId, ledgerId, onTransa
                         <FormControl flex="1">
                           <FormLabel fontSize="sm">Amount</FormLabel>
                           <InputGroup size="sm">
-                            <InputLeftAddon>$</InputLeftAddon>
+                            <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                             <Input
                               type="number"
                               value={split.amount || ''}

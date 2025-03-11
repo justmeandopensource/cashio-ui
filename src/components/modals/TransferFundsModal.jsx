@@ -31,9 +31,10 @@ import {
 import { ArrowDownIcon, ArrowUpIcon, RepeatIcon } from '@chakra-ui/icons'
 import axios from 'axios'
 import ChakraDatePicker from '@components/shared/ChakraDatePicker'
+import { currencySymbols } from '@components/shared/currencyUtils'
 import config from '@/config'
 
-const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCompleted }) => {
+const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymbol, onTransferCompleted }) => {
   const [date, setDate] = useState(new Date())
   const [fromAccountId, setFromAccountId] = useState(accountId || '')
   const [toAccountId, setToAccountId] = useState('')
@@ -41,6 +42,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
   const [notes, setNotes] = useState('')
   const [isDifferentLedger, setIsDifferentLedger] = useState(false)
   const [destinationLedgerId, setDestinationLedgerId] = useState('')
+  const [destinationCurrencySymbolCode, setDestinationCurrencySymbolCode] = useState('USD')
   const [destinationAmount, setDestinationAmount] = useState('')
   const [ledgers, setLedgers] = useState([])
   const [accounts, setAccounts] = useState([])
@@ -278,7 +280,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
               <FormControl flex="1">
                 <FormLabel fontSize="sm" fontWeight="medium">Amount</FormLabel>
                 <InputGroup>
-                  <InputLeftAddon>$</InputLeftAddon>
+                  <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                   <Input
                     type="number"
                     value={amount}
@@ -371,7 +373,11 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
                     <FormLabel fontSize="sm" fontWeight="medium">Destination Ledger</FormLabel>
                     <Select
                       value={destinationLedgerId}
-                      onChange={(e) => setDestinationLedgerId(e.target.value)}
+                        onChange={(e) => {
+                          const selectedLedger = ledgers.find(ledger => ledger.ledger_id === parseInt(e.target.value, 10))
+                          setDestinationLedgerId(e.target.value)
+                          setDestinationCurrencySymbolCode(selectedLedger ? selectedLedger.currency_symbol : 'USD')
+                        }}
                       borderColor={borderColor}
                       bg={bgColor}
                     >
@@ -426,7 +432,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, onTransferCo
                   <FormControl>
                     <FormLabel fontSize="sm" fontWeight="medium">Destination Amount</FormLabel>
                     <InputGroup>
-                      <InputLeftAddon>$</InputLeftAddon>
+                      <InputLeftAddon>{currencySymbols[destinationCurrencySymbolCode]}</InputLeftAddon>
                       <Input
                         type="number"
                         value={destinationAmount}

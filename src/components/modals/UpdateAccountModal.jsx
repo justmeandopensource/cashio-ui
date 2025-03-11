@@ -26,7 +26,7 @@ import {
 import axios from 'axios'
 import config from '@/config'
 
-const UpdateAccountModal = ({ isOpen, onClose, account, onUpdateCompleted }) => {
+const UpdateAccountModal = ({ isOpen, onClose, account, currencySymbol, onUpdateCompleted }) => {
   const [name, setName] = useState(account.name)
   const [openingBalance, setOpeningBalance] = useState(account.opening_balance)
   const [parentAccountId, setParentAccountId] = useState(account.parent_account_id)
@@ -230,7 +230,7 @@ const UpdateAccountModal = ({ isOpen, onClose, account, onUpdateCompleted }) => 
             <FormControl>
               <FormLabel fontWeight="medium">Opening Balance</FormLabel>
               <InputGroup>
-                <InputLeftAddon children="$" />
+                <InputLeftAddon children={currencySymbol} />
                 <Input
                   type="number"
                   value={openingBalance}

@@ -186,7 +186,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
                   <ChakraLink
                     as={RouterLink}
                     to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`}
-                    state={{ currencySymbol: ledger.currency_symbol }}
+                    state={{ currencySymbolCode: ledger.currency_symbol }}
                     hover={{ textDecoration: 'none' }}
                   >
                     <Text
@@ -288,7 +288,7 @@ const LedgerMainAccounts = ({ accounts, ledger, onAddTransaction, onTransferFund
                         <ChakraLink 
                           as={RouterLink} 
                           to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`}
-                          state={{ currencySymbol: ledger.currency_symbol }}
+                          state={{ currencySymbolCode: ledger.currency_symbol }}
                           _hover={{ textDecoration: 'none' }}
                         >
                           <Text
