@@ -42,7 +42,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
   const [notes, setNotes] = useState('')
   const [isDifferentLedger, setIsDifferentLedger] = useState(false)
   const [destinationLedgerId, setDestinationLedgerId] = useState('')
-  const [destinationCurrencySymbolCode, setDestinationCurrencySymbolCode] = useState('USD')
+  const [destinationCurrencySymbolCode, setDestinationCurrencySymbolCode] = useState('')
   const [destinationAmount, setDestinationAmount] = useState('')
   const [ledgers, setLedgers] = useState([])
   const [accounts, setAccounts] = useState([])
@@ -376,7 +376,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                         onChange={(e) => {
                           const selectedLedger = ledgers.find(ledger => ledger.ledger_id === parseInt(e.target.value, 10))
                           setDestinationLedgerId(e.target.value)
-                          setDestinationCurrencySymbolCode(selectedLedger ? selectedLedger.currency_symbol : 'USD')
+                          setDestinationCurrencySymbolCode(selectedLedger.currency_symbol)
                         }}
                       borderColor={borderColor}
                       bg={bgColor}
@@ -432,7 +432,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                   <FormControl>
                     <FormLabel fontSize="sm" fontWeight="medium">Destination Amount</FormLabel>
                     <InputGroup>
-                      <InputLeftAddon>{currencySymbols[destinationCurrencySymbolCode]}</InputLeftAddon>
+                      <InputLeftAddon>{destinationCurrencySymbolCode ? currencySymbols[destinationCurrencySymbolCode] : currencySymbol}</InputLeftAddon>
                       <Input
                         type="number"
                         value={destinationAmount}
