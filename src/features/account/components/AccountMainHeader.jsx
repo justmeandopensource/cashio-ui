@@ -16,7 +16,7 @@ import {
   EditIcon
 } from '@chakra-ui/icons'
 import { useNavigate } from 'react-router-dom'
-import { formatNumberAsCurrency } from '@components/shared/currencyUtils'
+import { formatNumberAsCurrency } from '@components/shared/utils'
 
 const AccountMainHeader = ({ account, currencySymbolCode, onAddTransaction, onTransferFunds, onUpdateAccount }) => {
   const navigate = useNavigate()

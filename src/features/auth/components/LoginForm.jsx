@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Link as RouterLink } from 'react-router-dom'
+import { useState } from "react";
+import { Link as RouterLink } from "react-router-dom";
 import {
   Box,
   Button,
@@ -17,38 +17,40 @@ import {
   FormErrorMessage,
   InputLeftElement,
   useColorModeValue,
-} from '@chakra-ui/react'
-import { ViewIcon, ViewOffIcon, EmailIcon, LockIcon } from '@chakra-ui/icons'
+} from "@chakra-ui/react";
+import { ViewIcon, ViewOffIcon, EmailIcon, LockIcon } from "@chakra-ui/icons";
 
 const LoginForm = ({
   onSubmit,
-  username, setUsername,
-  password, setPassword,
+  username,
+  setUsername,
+  password,
+  setPassword,
   usernameInputRef,
-  isLoading
+  isLoading,
 }) => {
-  const [showPassword, setShowPassword] = useState(false)
-  const [touched, setTouched] = useState({ username: false, password: false })
-  
+  const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({ username: false, password: false });
+
   // Derived validation states
-  const usernameError = touched.username && !username
-  const passwordError = touched.password && !password
-  
+  const usernameError = touched.username && !username;
+  const passwordError = touched.password && !password;
+
   // Color modes for better theming
-  const bgColor = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.700')
-  const primaryColor = 'teal.500'
-  
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const primaryColor = "teal.500";
+
   const handleSubmit = (event) => {
-    event.preventDefault()
+    event.preventDefault();
     // Mark all fields as touched to show validation errors
-    setTouched({ username: true, password: true })
-    
+    setTouched({ username: true, password: true });
+
     // Only submit if there are no errors
     if (username && password) {
-      onSubmit(event)
+      onSubmit(event);
     }
-  }
+  };
 
   return (
     <ScaleFade in={true} initialScale={0.95}>
@@ -65,22 +67,24 @@ const LoginForm = ({
         <VStack as="form" spacing={{ base: 5, md: 6 }} onSubmit={handleSubmit}>
           {/* Logo/Brand */}
           <Flex justify="center" mb={2}>
-            <Image 
-              src="/cashio.svg" 
+            <Image
+              src="/cashio.svg"
               alt="Cashio Logo"
               boxSize="60px"
               objectFit="contain"
             />
           </Flex>
-          
+
           <Heading fontSize={{ base: "xl", md: "2xl" }} color={primaryColor}>
             Welcome Back
           </Heading>
-          
+
           <FormControl isInvalid={usernameError} isRequired>
-            <FormLabel fontSize="sm" fontWeight="medium">Username</FormLabel>
+            <FormLabel fontSize="sm" fontWeight="medium">
+              Username
+            </FormLabel>
             <InputGroup>
-              <InputLeftElement 
+              <InputLeftElement
                 pointerEvents="none"
                 height="100%"
                 display="flex"
@@ -96,7 +100,10 @@ const LoginForm = ({
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 borderRadius="md"
-                _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
+                _focus={{
+                  borderColor: primaryColor,
+                  boxShadow: `0 0 0 1px ${primaryColor}`,
+                }}
                 autoComplete="username"
               />
             </InputGroup>
@@ -106,9 +113,11 @@ const LoginForm = ({
           </FormControl>
 
           <FormControl isInvalid={passwordError} isRequired>
-            <FormLabel fontSize="sm" fontWeight="medium">Password</FormLabel>
+            <FormLabel fontSize="sm" fontWeight="medium">
+              Password
+            </FormLabel>
             <InputGroup size="lg">
-              <InputLeftElement 
+              <InputLeftElement
                 pointerEvents="none"
                 height="100%"
                 display="flex"
@@ -117,19 +126,22 @@ const LoginForm = ({
                 <LockIcon color="gray.400" />
               </InputLeftElement>
               <Input
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 borderRadius="md"
-                _focus={{ borderColor: primaryColor, boxShadow: `0 0 0 1px ${primaryColor}` }}
+                _focus={{
+                  borderColor: primaryColor,
+                  boxShadow: `0 0 0 1px ${primaryColor}`,
+                }}
                 autoComplete="current-password"
               />
               <InputRightElement>
                 <Button
                   variant="ghost"
                   onClick={() => setShowPassword(!showPassword)}
-                  _hover={{ bg: 'transparent' }}
+                  _hover={{ bg: "transparent" }}
                   size="sm"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
@@ -152,15 +164,15 @@ const LoginForm = ({
             loadingText="Logging in"
             borderRadius="md"
             boxShadow="md"
-            _hover={{ boxShadow: 'lg', transform: 'translateY(-2px)' }}
-            _active={{ boxShadow: 'md', transform: 'translateY(0)' }}
+            _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
+            _active={{ boxShadow: "md", transform: "translateY(0)" }}
             transition="all 0.2s"
           >
             Log In
           </Button>
 
           <Text textAlign="center" fontSize="sm" color="gray.600" mt={2}>
-            New user?{' '}
+            New user?{" "}
             <RouterLink to="/register">
               <Text as="span" color={primaryColor} fontWeight="semibold">
                 Create an account
@@ -170,7 +182,7 @@ const LoginForm = ({
         </VStack>
       </Box>
     </ScaleFade>
-  )
-}
+  );
+};
 
-export default LoginForm
+export default LoginForm;

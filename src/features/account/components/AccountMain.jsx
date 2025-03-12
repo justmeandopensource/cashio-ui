@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Box, Spinner, useToast, Text } from '@chakra-ui/react'
 import AccountMainHeader from "@features/account/components/AccountMainHeader"
-import AccountMainTransactions from "@features/account/components/AccountMainTransactions"
+import AccountMainTransactions from "@features/account/components/AccountMainTransactions/AccountMainTransactions"
 import CreateTransactionModal from '@components/modals/CreateTransactionModal'
 import TransferFundsModal from '@components/modals/TransferFundsModal'
 import UpdateAccountModal from '@components/modals/UpdateAccountModal'
-import { currencySymbols } from '@components/shared/currencyUtils'
+import { currencySymbols } from '@components/shared/utils'
 import config from '@/config'
 
 const AccountMain = ({ currencySymbolCode }) => {

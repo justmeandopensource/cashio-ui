@@ -1,6 +1,5 @@
-import React from 'react'
-import HomeLedgerCards from '@features/home/components/HomeLedgerCards'
-import CreateLedgerModal from '@components/modals/CreateLedgerModal'
+import HomeLedgerCards from "@features/home/components/HomeLedgerCards";
+import CreateLedgerModal from "@components/modals/CreateLedgerModal";
 
 const HomeMain = ({
   ledgers = [],
@@ -18,7 +17,7 @@ const HomeMain = ({
         handleCreateLedger={handleCreateLedger}
       />
     </>
-  )
-}
+  );
+};
 
-export default HomeMain
+export default HomeMain;

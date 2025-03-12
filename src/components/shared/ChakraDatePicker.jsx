@@ -1,7 +1,6 @@
-import React from 'react'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import { Input, FormControl, FormLabel } from '@chakra-ui/react'
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import { Input, FormControl } from "@chakra-ui/react";
 
 const ChakraDatePicker = ({ selected, onChange }) => {
   return (
@@ -17,17 +16,17 @@ const ChakraDatePicker = ({ selected, onChange }) => {
         popperModifiers={{
           offset: {
             enabled: true,
-            offset: '5px, 10px',
+            offset: "5px, 10px",
           },
           preventOverflow: {
             enabled: true,
             escapeWithReference: false,
-            boundariesElement: 'viewport',
+            boundariesElement: "viewport",
           },
         }}
       />
     </FormControl>
-  )
-}
+  );
+};
 
-export default ChakraDatePicker
+export default ChakraDatePicker;

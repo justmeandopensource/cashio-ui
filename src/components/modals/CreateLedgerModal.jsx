@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react'
+import { useState, useRef } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -15,84 +15,82 @@ import {
   FormLabel,
   FormHelperText,
   Select,
-  InputGroup,
-  InputLeftElement,
-  Text,
   useColorModeValue,
   Box,
-  Flex,
-} from '@chakra-ui/react'
+} from "@chakra-ui/react";
 
 const currencies = [
-  { symbol: '$', code: 'USD', name: 'US Dollar' },
-  { symbol: '€', code: 'EUR', name: 'Euro' },
-  { symbol: '£', code: 'GBP', name: 'British Pound' },
-  { symbol: '₹', code: 'INR', name: 'Indian Rupee' },
+  { symbol: "$", code: "USD", name: "US Dollar" },
+  { symbol: "€", code: "EUR", name: "Euro" },
+  { symbol: "£", code: "GBP", name: "British Pound" },
+  { symbol: "₹", code: "INR", name: "Indian Rupee" },
   // Add more common currencies as needed
-]
+];
 
 const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
-  const [newLedgerName, setNewLedgerName] = useState('')
-  const [selectedCurrency, setSelectedCurrency] = useState('')
-  const ledgerNameInputRef = useRef(null)
-  const toast = useToast()
-  
+  const [newLedgerName, setNewLedgerName] = useState("");
+  const [selectedCurrency, setSelectedCurrency] = useState("");
+  const ledgerNameInputRef = useRef(null);
+  const toast = useToast();
+
   // Color variables for consistent theming
-  const buttonColorScheme = "teal"
-  const bgColor = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
-  
+  const buttonColorScheme = "teal";
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+
   const handleSubmit = () => {
     if (!newLedgerName || !selectedCurrency) {
       toast({
-        title: 'Required Fields',
-        description: 'Please enter both ledger name and select a currency.',
-        status: 'warning',
+        title: "Required Fields",
+        description: "Please enter both ledger name and select a currency.",
+        status: "warning",
         duration: 3000,
-        position: 'top',
+        position: "top",
         isClosable: true,
-      })
-      if (!newLedgerName) ledgerNameInputRef.current?.focus()
-      return
+      });
+      if (!newLedgerName) ledgerNameInputRef.current?.focus();
+      return;
     }
-    
+
     // Get currency symbol from selection
-    const currencySymbol = currencies.find(c => c.code === selectedCurrency)?.symbol || selectedCurrency
-    
+    const currencySymbol =
+      currencies.find((c) => c.code === selectedCurrency)?.symbol ||
+      selectedCurrency;
+
     // Call the handleCreateLedger function passed from the parent
-    handleCreateLedger(newLedgerName, currencySymbol)
-    
+    handleCreateLedger(newLedgerName, currencySymbol);
+
     // Reset the form fields
-    setNewLedgerName('')
-    setSelectedCurrency('')
-    
+    setNewLedgerName("");
+    setSelectedCurrency("");
+
     // Close the modal
-    onClose()
-  }
-  
+    onClose();
+  };
+
   // Handle Enter key press
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSubmit()
+    if (e.key === "Enter") {
+      handleSubmit();
     }
-  }
-  
+  };
+
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose} 
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
       initialFocusRef={ledgerNameInputRef}
       size={{ base: "full", sm: "md" }}
       motionPreset="slideInBottom"
     >
       <ModalOverlay backdropFilter="blur(2px)" />
-      <ModalContent 
+      <ModalContent
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
         h={{ base: "100vh", sm: "auto" }}
       >
-        <Box 
+        <Box
           pt={{ base: 10, sm: 4 }}
           pb={{ base: 2, sm: 0 }}
           px={{ base: 4, sm: 0 }}
@@ -100,22 +98,22 @@ const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
           color={{ base: "white", sm: "inherit" }}
           borderTopRadius={{ base: 0, sm: "md" }}
         >
-          <ModalHeader 
+          <ModalHeader
             fontSize={{ base: "xl", sm: "lg" }}
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
             Create New Ledger
           </ModalHeader>
-          <ModalCloseButton 
+          <ModalCloseButton
             color={{ base: "white", sm: "gray.500" }}
             top={{ base: 10, sm: 4 }}
             right={{ base: 4, sm: 4 }}
           />
         </Box>
-        
-        <ModalBody 
-          px={{ base: 4, sm: 6 }} 
+
+        <ModalBody
+          px={{ base: 4, sm: 6 }}
           py={{ base: 4, sm: 4 }}
           flex="1"
           display="flex"
@@ -138,13 +136,16 @@ const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
                 size="md"
                 borderRadius="md"
                 _hover={{ borderColor: buttonColorScheme + ".300" }}
-                _focus={{ borderColor: buttonColorScheme + ".500", boxShadow: "0 0 0 1px " + buttonColorScheme + ".500" }}
+                _focus={{
+                  borderColor: buttonColorScheme + ".500",
+                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                }}
               />
               <FormHelperText>
                 Choose a descriptive name for your financial records
               </FormHelperText>
             </FormControl>
-            
+
             <FormControl isRequired>
               <FormLabel fontWeight="medium">Currency</FormLabel>
               <Select
@@ -157,7 +158,10 @@ const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
                 size="md"
                 borderRadius="md"
                 _hover={{ borderColor: buttonColorScheme + ".300" }}
-                _focus={{ borderColor: buttonColorScheme + ".500", boxShadow: "0 0 0 1px " + buttonColorScheme + ".500" }}
+                _focus={{
+                  borderColor: buttonColorScheme + ".500",
+                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                }}
               >
                 {currencies.map((currency) => (
                   <option key={currency.code} value={currency.code}>
@@ -170,10 +174,10 @@ const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
               </FormHelperText>
             </FormControl>
           </VStack>
-          
+
           {/* Mobile-only action buttons that stay at bottom */}
-          <Box display={{ base: 'block', sm: 'none' }} mt={6}>
-            <Button 
+          <Box display={{ base: "block", sm: "none" }} mt={6}>
+            <Button
               onClick={handleSubmit}
               colorScheme={buttonColorScheme}
               size="lg"
@@ -182,22 +186,17 @@ const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
             >
               Create Ledger
             </Button>
-            <Button 
-              variant="outline" 
-              onClick={onClose}
-              width="100%"
-              size="lg"
-            >
+            <Button variant="outline" onClick={onClose} width="100%" size="lg">
               Cancel
             </Button>
           </Box>
         </ModalBody>
-        
+
         {/* Desktop-only footer */}
-        <ModalFooter display={{ base: 'none', sm: 'flex' }}>
-          <Button 
-            colorScheme={buttonColorScheme} 
-            mr={3} 
+        <ModalFooter display={{ base: "none", sm: "flex" }}>
+          <Button
+            colorScheme={buttonColorScheme}
+            mr={3}
             onClick={handleSubmit}
             px={6}
           >
@@ -209,7 +208,7 @@ const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};
 
-export default CreateLedgerModal
+export default CreateLedgerModal;

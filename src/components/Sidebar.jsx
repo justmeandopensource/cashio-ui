@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import {
   Box,
   Flex,
@@ -12,35 +11,27 @@ import {
   Drawer,
   DrawerOverlay,
   DrawerContent,
-  DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
   Button,
-} from "@chakra-ui/react"
+} from "@chakra-ui/react";
 
-import {
-  FiHome,
-  FiBookmark,
-  FiLogOut,
-  FiMenu,
-} from 'react-icons/fi'
+import { FiHome, FiBookmark, FiLogOut, FiMenu } from "react-icons/fi";
 
-import { useNavigate } from 'react-router-dom'
-import { VERSION } from "../version"
+import { useNavigate } from "react-router-dom";
+import { VERSION } from "../version";
 
 const Sidebar = ({ handleLogout }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false) 
-
-  const sidebarBg = useColorModeValue('teal.500', 'teal.700')
-  const sidebarColor = useColorModeValue('white', 'gray.200')
-  const navigate = useNavigate()
+  const sidebarBg = useColorModeValue("teal.500", "teal.700");
+  const sidebarColor = useColorModeValue("white", "gray.200");
+  const navigate = useNavigate();
 
   return (
     <>
       {/* Mobile Hamburger Menu */}
-      <Box display={{ base: 'block', md: 'none' }} p={4}>
+      <Box display={{ base: "block", md: "none" }} p={4}>
         <Button onClick={onOpen} variant="ghost" color="teal.400">
           <Icon as={FiMenu} />
         </Button>
@@ -48,11 +39,11 @@ const Sidebar = ({ handleLogout }) => {
 
       {/* Desktop Sidebar */}
       <Box
-        w={{ base: 'full', md: '250px' }}
+        w={{ base: "full", md: "250px" }}
         bg={sidebarBg}
         color={sidebarColor}
         p={4}
-        display={{ base: 'none', md: 'flex' }}
+        display={{ base: "none", md: "flex" }}
         flexDirection="column"
         justifyContent="space-between"
         height="100vh"
@@ -71,11 +62,19 @@ const Sidebar = ({ handleLogout }) => {
               v{VERSION}
             </Text>
           </Flex>
-          <ChakraLink display="flex" alignItems="center" onClick={() => navigate('/')}>
+          <ChakraLink
+            display="flex"
+            alignItems="center"
+            onClick={() => navigate("/")}
+          >
             <Icon as={FiHome} mr={2} />
             Home
           </ChakraLink>
-          <ChakraLink display="flex" alignItems="center" onClick={() => navigate('/categories')}>
+          <ChakraLink
+            display="flex"
+            alignItems="center"
+            onClick={() => navigate("/categories")}
+          >
             <Icon as={FiBookmark} mr={2} />
             Manage Categories
           </ChakraLink>
@@ -102,15 +101,33 @@ const Sidebar = ({ handleLogout }) => {
           </DrawerHeader>
           <DrawerBody>
             <VStack align="flex-start" spacing={3}>
-              <ChakraLink display="flex" alignItems="center" onClick={() => { navigate('/'); onClose() }}>
+              <ChakraLink
+                display="flex"
+                alignItems="center"
+                onClick={() => {
+                  navigate("/");
+                  onClose();
+                }}
+              >
                 <Icon as={FiHome} mr={2} />
                 Home
               </ChakraLink>
-              <ChakraLink display="flex" alignItems="center" onClick={() => { navigate('/categories'); onClose() }}>
+              <ChakraLink
+                display="flex"
+                alignItems="center"
+                onClick={() => {
+                  navigate("/categories");
+                  onClose();
+                }}
+              >
                 <Icon as={FiBookmark} mr={2} />
                 Manage Categories
               </ChakraLink>
-              <ChakraLink display="flex" alignItems="center" onClick={handleLogout}>
+              <ChakraLink
+                display="flex"
+                alignItems="center"
+                onClick={handleLogout}
+              >
                 <Icon as={FiLogOut} mr={2} />
                 Log Out
               </ChakraLink>
@@ -119,7 +136,7 @@ const Sidebar = ({ handleLogout }) => {
         </DrawerContent>
       </Drawer>
     </>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;

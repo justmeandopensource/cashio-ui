@@ -1,5 +1,4 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   Heading,
@@ -9,15 +8,15 @@ import {
   Text,
   Button,
   Icon,
-} from '@chakra-ui/react'
-import { FiFileText, FiPlus } from 'react-icons/fi'
+} from "@chakra-ui/react";
+import { FiFileText, FiPlus } from "react-icons/fi";
 
-const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
-  const navigate = useNavigate()
+const HomeLedgerCards = ({ ledgers = [], onOpen }) => {
+  const navigate = useNavigate();
 
   const handleLedgerClick = (ledgerId) => {
-    navigate(`/ledger/${ledgerId}`)
-  }
+    navigate(`/ledger/${ledgerId}`);
+  };
 
   return (
     <Box mb={8}>
@@ -28,7 +27,7 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
             No Ledgers Found
           </Text>
           <Text color="gray.600" mb={6}>
-            You don't have any ledgers yet. Create one to get started.
+            You do not have any ledgers yet. Create one to get started.
           </Text>
           <Button
             onClick={onOpen}
@@ -46,12 +45,15 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
           </Heading>
           <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} spacing={6}>
             {ledgers.map((ledger) => (
-              <Card 
-                  key={ledger.ledger_id}
-                  bg="teal.50"
-                  _hover={{ transform: 'scale(1.04)', transition: 'transform 0.2s' }}
-                  cursor="pointer"
-                  onClick={() => handleLedgerClick(ledger.ledger_id)}
+              <Card
+                key={ledger.ledger_id}
+                bg="teal.50"
+                _hover={{
+                  transform: "scale(1.04)",
+                  transition: "transform 0.2s",
+                }}
+                cursor="pointer"
+                onClick={() => handleLedgerClick(ledger.ledger_id)}
               >
                 <CardBody display="flex" alignItems="center" p={6}>
                   <Box
@@ -64,21 +66,26 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
                   >
                     {ledger.currency_symbol}
                   </Box>
-                  <Text fontSize="lg" fontWeight="semibold">{ledger.name}</Text>
+                  <Text fontSize="lg" fontWeight="semibold">
+                    {ledger.name}
+                  </Text>
                 </CardBody>
               </Card>
             ))}
             <Card
               bg="teal.50"
-              _hover={{ transform: 'scale(1.05)', transition: 'transform 0.2s' }}
+              _hover={{
+                transform: "scale(1.05)",
+                transition: "transform 0.2s",
+              }}
               cursor="pointer"
               onClick={onOpen}
             >
               <CardBody
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  p={6}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                p={6}
               >
                 <Icon as={FiPlus} boxSize={6} color="teal.500" />
               </CardBody>
@@ -87,7 +94,7 @@ const HomeLedgerCards= ({ ledgers = [], onOpen }) => {
         </Box>
       )}
     </Box>
-  )
-}
+  );
+};
 
-export default HomeLedgerCards
+export default HomeLedgerCards;

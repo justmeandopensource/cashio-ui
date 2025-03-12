@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef } from "react";
 import {
   Flex,
   Spinner,
@@ -21,37 +21,44 @@ import {
   VStack,
   useColorModeValue,
   Text,
-} from '@chakra-ui/react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import config from '@/config'
+} from "@chakra-ui/react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import config from "@/config";
 
-const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAccountId, onCreateAccount }) => {
-  const toast = useToast()
-  const queryClient = useQueryClient()
-  const [accountName, setAccountName] = useState('')
-  const [isGroupAccount, setIsGroupAccount] = useState(false)
-  const [parentAccount, setParentAccount] = useState(parentAccountId || '')
-  const [openingBalance, setOpeningBalance] = useState('')
-  const accountNameInputRef = useRef(null)
-  
+const CreateAccountModal = ({
+  isOpen,
+  onClose,
+  ledgerId,
+  accountType,
+  parentAccountId,
+  onCreateAccount,
+}) => {
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const [accountName, setAccountName] = useState("");
+  const [isGroupAccount, setIsGroupAccount] = useState(false);
+  const [parentAccount, setParentAccount] = useState(parentAccountId || "");
+  const [openingBalance, setOpeningBalance] = useState("");
+  const accountNameInputRef = useRef(null);
+
   // Color variables for consistent theming
-  const buttonColorScheme = "teal"
-  const bgColor = useColorModeValue('white', 'gray.800')
-  const borderColor = useColorModeValue('gray.200', 'gray.600')
+  const buttonColorScheme = "teal";
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
 
   // Update parentAccount state when parentAccountId prop changes
   useEffect(() => {
-    setParentAccount(parentAccountId || '')
-  }, [parentAccountId])
-  
+    setParentAccount(parentAccountId || "");
+  }, [parentAccountId]);
+
   // Auto-focus on account name input when modal opens
   useEffect(() => {
     if (isOpen && accountNameInputRef.current) {
       setTimeout(() => {
-        accountNameInputRef.current.focus()
-      }, 100)
+        accountNameInputRef.current.focus();
+      }, 100);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   // Fetch group accounts when the modal is opened
   const {
@@ -59,100 +66,103 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
     isLoading: isGroupAccountsLoading,
     isError: isGroupAccountsError,
   } = useQuery({
-    queryKey: ['groupAccounts', ledgerId, accountType],
+    queryKey: ["groupAccounts", ledgerId, accountType],
     queryFn: async () => {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
       const response = await fetch(
         `${config.apiBaseUrl}/ledger/${ledgerId}/accounts/group?account_type=${accountType}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      )
+        },
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch group accounts')
+        throw new Error("Failed to fetch group accounts");
       }
 
-      return response.json()
+      return response.json();
     },
     enabled: isOpen && !parentAccountId, // Only fetch group accounts when the modal is open and no parentAccountId is provided
-  })
+  });
 
   // Reset form fields
   const resetForm = () => {
-    setAccountName('')
-    setIsGroupAccount(false)
-    setParentAccount(parentAccountId || '')
-    setOpeningBalance('')
-  }
-  
+    setAccountName("");
+    setIsGroupAccount(false);
+    setParentAccount(parentAccountId || "");
+    setOpeningBalance("");
+  };
+
   // Handle Enter key press
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSubmit()
+    if (e.key === "Enter") {
+      handleSubmit();
     }
-  }
+  };
 
   // Mutation for creating a new account
   const createAccountMutation = useMutation({
     mutationFn: async (payload) => {
-      const token = localStorage.getItem('access_token')
-      const response = await fetch(`${config.apiBaseUrl}/ledger/${ledgerId}/account/create`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(
+        `${config.apiBaseUrl}/ledger/${ledgerId}/account/create`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
         },
-        body: JSON.stringify(payload),
-      })
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to create account')
+        throw new Error("Failed to create account");
       }
 
-      return response.json()
+      return response.json();
     },
     onSuccess: () => {
       toast({
-        title: 'Success',
-        description: 'Account created successfully.',
-        status: 'success',
+        title: "Success",
+        description: "Account created successfully.",
+        status: "success",
         duration: 2000,
-        position: 'top',
+        position: "top",
         isClosable: true,
-      })
-      resetForm()
-      onClose()
-      queryClient.invalidateQueries(['accounts', ledgerId]); // Refetch accounts list
+      });
+      resetForm();
+      onClose();
+      queryClient.invalidateQueries(["accounts", ledgerId]); // Refetch accounts list
       if (onCreateAccount) onCreateAccount();
     },
     onError: (error) => {
       toast({
-        title: 'Error',
-        description: error.message || 'Failed to create account.',
-        status: 'error',
+        title: "Error",
+        description: error.message || "Failed to create account.",
+        status: "error",
         duration: 3000,
-        position: 'top',
+        position: "top",
         isClosable: true,
-      })
+      });
     },
-  })
+  });
 
   // Handle form submission
   const handleSubmit = () => {
     if (!accountName) {
       toast({
-        title: 'Required Field',
-        description: 'Please enter an account name.',
-        status: 'warning',
+        title: "Required Field",
+        description: "Please enter an account name.",
+        status: "warning",
         duration: 3000,
-        position: 'top',
+        position: "top",
         isClosable: true,
-      })
-      accountNameInputRef.current?.focus()
-      return
+      });
+      accountNameInputRef.current?.focus();
+      return;
     }
 
     const payload = {
@@ -160,32 +170,32 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
       is_group: isGroupAccount,
       parent_account_id: parentAccount || null,
       type: accountType,
-    }
+    };
 
     // Add opening_balance only if it's provided and the account is not a group account
     if (!isGroupAccount && openingBalance) {
-      payload.opening_balance = parseFloat(openingBalance)
+      payload.opening_balance = parseFloat(openingBalance);
     }
 
-    createAccountMutation.mutate(payload)
-  }
+    createAccountMutation.mutate(payload);
+  };
 
   return (
-    <Modal 
-      isOpen={isOpen} 
+    <Modal
+      isOpen={isOpen}
       onClose={onClose}
       initialFocusRef={accountNameInputRef}
       size={{ base: "full", sm: "md" }}
       motionPreset="slideInBottom"
     >
       <ModalOverlay backdropFilter="blur(2px)" />
-      <ModalContent 
+      <ModalContent
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
         h={{ base: "100vh", sm: "auto" }}
       >
-        <Box 
+        <Box
           pt={{ base: 10, sm: 4 }}
           pb={{ base: 2, sm: 0 }}
           px={{ base: 4, sm: 0 }}
@@ -193,22 +203,22 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
           color={{ base: "white", sm: "inherit" }}
           borderTopRadius={{ base: 0, sm: "md" }}
         >
-          <ModalHeader 
+          <ModalHeader
             fontSize={{ base: "xl", sm: "lg" }}
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Create {accountType === 'asset' ? 'Asset' : 'Liability'} Account
+            Create {accountType === "asset" ? "Asset" : "Liability"} Account
           </ModalHeader>
-          <ModalCloseButton 
+          <ModalCloseButton
             color={{ base: "white", sm: "gray.500" }}
             top={{ base: 10, sm: 4 }}
             right={{ base: 4, sm: 4 }}
           />
         </Box>
-        
-        <ModalBody 
-          px={{ base: 4, sm: 6 }} 
+
+        <ModalBody
+          px={{ base: 4, sm: 6 }}
           py={{ base: 4, sm: 4 }}
           flex="1"
           display="flex"
@@ -219,7 +229,7 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
             <FormControl isRequired>
               <FormLabel fontWeight="medium">Account Name</FormLabel>
               <Input
-                placeholder={`e.g., ${accountType === 'asset' ? 'Cash, Bank Account' : 'Credit Card, Mortgage'}`}
+                placeholder={`e.g., ${accountType === "asset" ? "Cash, Bank Account" : "Credit Card, Mortgage"}`}
                 value={accountName}
                 onChange={(e) => setAccountName(e.target.value)}
                 ref={accountNameInputRef}
@@ -230,7 +240,10 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
                 size="md"
                 borderRadius="md"
                 _hover={{ borderColor: buttonColorScheme + ".300" }}
-                _focus={{ borderColor: buttonColorScheme + ".500", boxShadow: "0 0 0 1px " + buttonColorScheme + ".500" }}
+                _focus={{
+                  borderColor: buttonColorScheme + ".500",
+                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                }}
               />
               <FormHelperText>
                 Enter a descriptive name for your {accountType} account
@@ -238,8 +251,8 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
             </FormControl>
 
             <FormControl>
-              <Checkbox 
-                isChecked={isGroupAccount} 
+              <Checkbox
+                isChecked={isGroupAccount}
                 onChange={(e) => setIsGroupAccount(e.target.checked)}
                 colorScheme={buttonColorScheme}
                 size="md"
@@ -247,7 +260,8 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
                 <Text fontWeight="medium">Group Account</Text>
               </Checkbox>
               <FormHelperText ml="6">
-                Group accounts can contain other accounts but cannot hold transactions
+                Group accounts can contain other accounts but cannot hold
+                transactions
               </FormHelperText>
             </FormControl>
 
@@ -265,7 +279,10 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
                   size="md"
                   borderRadius="md"
                   _hover={{ borderColor: buttonColorScheme + ".300" }}
-                  _focus={{ borderColor: buttonColorScheme + ".500", boxShadow: "0 0 0 1px " + buttonColorScheme + ".500" }}
+                  _focus={{
+                    borderColor: buttonColorScheme + ".500",
+                    boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                  }}
                 />
                 <FormHelperText>
                   Starting balance for this account (optional)
@@ -279,10 +296,12 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
                 <Spinner size="sm" color={buttonColorScheme + ".500"} />
               </Flex>
             )}
-            
+
             {!parentAccountId && groupAccounts && groupAccounts.length > 0 && (
               <FormControl>
-                <FormLabel fontWeight="medium">Parent Account (Optional)</FormLabel>
+                <FormLabel fontWeight="medium">
+                  Parent Account (Optional)
+                </FormLabel>
                 <Select
                   value={parentAccount}
                   onChange={(e) => setParentAccount(e.target.value)}
@@ -293,7 +312,10 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
                   size="md"
                   borderRadius="md"
                   _hover={{ borderColor: buttonColorScheme + ".300" }}
-                  _focus={{ borderColor: buttonColorScheme + ".500", boxShadow: "0 0 0 1px " + buttonColorScheme + ".500" }}
+                  _focus={{
+                    borderColor: buttonColorScheme + ".500",
+                    boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                  }}
                 >
                   {groupAccounts.map((account) => (
                     <option key={account.account_id} value={account.account_id}>
@@ -306,7 +328,7 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
                 </FormHelperText>
               </FormControl>
             )}
-            
+
             {/* Show error message if fetching group accounts fails */}
             {isGroupAccountsError && (
               <Text color="red.500" fontSize="sm" mt={2}>
@@ -314,10 +336,10 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
               </Text>
             )}
           </VStack>
-          
+
           {/* Mobile-only action buttons that stay at bottom */}
-          <Box display={{ base: 'block', sm: 'none' }} mt={6}>
-            <Button 
+          <Box display={{ base: "block", sm: "none" }} mt={6}>
+            <Button
               onClick={handleSubmit}
               colorScheme={buttonColorScheme}
               size="lg"
@@ -328,8 +350,8 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
             >
               Create Account
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               onClick={onClose}
               width="100%"
               size="lg"
@@ -339,12 +361,12 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
             </Button>
           </Box>
         </ModalBody>
-        
+
         {/* Desktop-only footer */}
-        <ModalFooter display={{ base: 'none', sm: 'flex' }}>
-          <Button 
-            colorScheme={buttonColorScheme} 
-            mr={3} 
+        <ModalFooter display={{ base: "none", sm: "flex" }}>
+          <Button
+            colorScheme={buttonColorScheme}
+            mr={3}
             onClick={handleSubmit}
             px={6}
             isLoading={createAccountMutation.isLoading}
@@ -352,9 +374,9 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
           >
             Create
           </Button>
-          <Button 
-            variant="outline" 
-            onClick={onClose} 
+          <Button
+            variant="outline"
+            onClick={onClose}
             isDisabled={createAccountMutation.isLoading}
           >
             Cancel
@@ -362,7 +384,7 @@ const CreateAccountModal = ({ isOpen, onClose, ledgerId, accountType, parentAcco
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};
 
-export default CreateAccountModal
+export default CreateAccountModal;

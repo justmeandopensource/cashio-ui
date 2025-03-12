@@ -1,60 +1,54 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import {
-  Flex,
-  Spinner,
-  useDisclosure,
-  useToast,
-  Text,
-} from '@chakra-ui/react'
-import Layout from '@components/Layout'
-import HomeMain from '@features/home/components/HomeMain'
-import config from '@/config'
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Flex, Spinner, useDisclosure, useToast, Text } from "@chakra-ui/react";
+import Layout from "@components/Layout";
+import HomeMain from "@features/home/components/HomeMain";
+import config from "@/config";
 
 const Home = () => {
-  const navigate = useNavigate()
-  const toast = useToast()
-  const queryClient = useQueryClient()
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const navigate = useNavigate();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+  const { isOpen, onOpen, onClose } = useDisclosure();
 
   // token verification
   const { isLoading: isTokenVerifying, isError: isTokenError } = useQuery({
-    queryKey: ['verifyToken'],
+    queryKey: ["verifyToken"],
     queryFn: async () => {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
       if (!token) {
-        throw new Error('No token found')
+        throw new Error("No token found");
       }
 
       const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Token verification failed')
+        throw new Error("Token verification failed");
       }
 
-      return response.json()
+      return response.json();
     },
     onError: () => {
-      localStorage.removeItem('access_token')
-      navigate('/login')
+      localStorage.removeItem("access_token");
+      navigate("/login");
     },
     retry: false, // Disable retries to avoid infinite loops
-  })
+  });
 
   // Redirect to login if token verification fails
   useEffect(() => {
     if (isTokenError) {
-      localStorage.removeItem('access_token')
-      navigate('/login')
+      localStorage.removeItem("access_token");
+      navigate("/login");
     }
-  }, [isTokenError, navigate])
+  }, [isTokenError, navigate]);
 
   // Fetch ledgers
   const {
@@ -62,109 +56,107 @@ const Home = () => {
     isLoading: isFetchingLedgers,
     isError: isLedgersError,
   } = useQuery({
-    queryKey: ['ledgers'],
+    queryKey: ["ledgers"],
     queryFn: async () => {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${config.apiBaseUrl}/ledger/list`, {
-        method: 'GET',
+        method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-      })
+      });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch ledgers')
+        throw new Error("Failed to fetch ledgers");
       }
 
-      return response.json()
+      return response.json();
     },
     enabled: !isTokenVerifying && !isTokenError, // Only fetch ledgers after token verification
-  })
+  });
 
   // Create ledger mutation
   const createLedgerMutation = useMutation({
     mutationFn: async ({ name, currency_symbol }) => {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
       const response = await fetch(`${config.apiBaseUrl}/ledger/create`, {
-        method: 'POST',
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({ name, currency_symbol }),
-      })
+      });
 
       if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.detail || 'Ledger creation failed')
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Ledger creation failed");
       }
 
-      return response.json()
+      return response.json();
     },
     onSuccess: (data) => {
       // Update the cached ledgers list with the new ledger
-      queryClient.setQueryData(['ledgers'], (oldData) => [...oldData, data])
-      onClose()
+      queryClient.setQueryData(["ledgers"], (oldData) => [...oldData, data]);
+      onClose();
       toast({
-        title: 'Success',
-        description: 'Ledger created successfully',
-        status: 'success',
+        title: "Success",
+        description: "Ledger created successfully",
+        status: "success",
         duration: 2000,
-        position: 'top-right',
+        position: "top-right",
         isClosable: true,
-      })
+      });
     },
     onError: (error) => {
       toast({
-        title: 'Error',
+        title: "Error",
         description: error.message,
-        status: 'error',
+        status: "error",
         duration: 3000,
-        position: 'top-right',
+        position: "top-right",
         isClosable: true,
-      })
-      ledgerNameInputRef.current?.focus()
+      });
     },
-  })
+  });
 
   // handle ledger creation
   const handleCreateLedger = async (newLedgerName, newLedgerCurrency) => {
     if (!newLedgerName || !newLedgerCurrency) {
       toast({
-        title: 'Error',
-        description: 'All fields required.',
-        status: 'error',
+        title: "Error",
+        description: "All fields required.",
+        status: "error",
         duration: 2000,
-        position: 'top-right',
+        position: "top-right",
         isClosable: true,
-      })
-      ledgerNameInputRef.current?.focus()
-      return
+      });
+      return;
     }
 
     createLedgerMutation.mutate({
       name: newLedgerName,
       currency_symbol: newLedgerCurrency,
-    })
-  }
+    });
+  };
 
   // handle logout
   const handleLogout = () => {
-    localStorage.removeItem('access_token')
-    navigate('/login')
-  }
+    localStorage.removeItem("access_token");
+    navigate("/login");
+  };
 
   if (isTokenVerifying) {
     return (
       <Flex justify="center" align="center" minH="100vh">
         <Spinner size="xl" />
       </Flex>
-    )
+    );
   }
 
   if (isTokenError) {
-    return null
+    return null;
   }
 
   if (isFetchingLedgers) {
@@ -174,7 +166,7 @@ const Home = () => {
           <Spinner size="xl" />
         </Flex>
       </Layout>
-    )
+    );
   }
 
   if (isLedgersError) {
@@ -184,7 +176,7 @@ const Home = () => {
           <Text>Error fetching ledgers. Please try again.</Text>
         </Flex>
       </Layout>
-    )
+    );
   }
 
   return (
@@ -197,7 +189,7 @@ const Home = () => {
         handleCreateLedger={handleCreateLedger}
       />
     </Layout>
-  )
-}
+  );
+};
 
-export default Home
+export default Home;

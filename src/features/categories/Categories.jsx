@@ -1,59 +1,58 @@
-import React, { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import Layout from '@components/Layout'
-import CategoriesMain from '@features/categories/components/CategoriesMain'
-import config from '@/config'
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import Layout from "@components/Layout";
+import CategoriesMain from "@features/categories/components/CategoriesMain";
+import config from "@/config";
 
 const Categories = () => {
-
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   // Token verification
   useEffect(() => {
     const verifyToken = async () => {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
 
       if (!token) {
-        navigate('/login')
-        return
+        navigate("/login");
+        return;
       }
 
       try {
         const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
-          method: 'POST',
+          method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
-        })
+        });
 
         if (!response.ok) {
-          throw new Error('Token verification failed')
+          throw new Error("Token verification failed");
         }
 
-        const data = await response.json()
-        console.log('Token verified:', data)
+        const data = await response.json();
+        console.log("Token verified:", data);
       } catch (error) {
-        console.error('Token verification error:', error)
-        localStorage.removeItem('access_token')
-        navigate('/login')
+        console.error("Token verification error:", error);
+        localStorage.removeItem("access_token");
+        navigate("/login");
       }
-    }
+    };
 
-    verifyToken()
-  }, [navigate])
+    verifyToken();
+  }, [navigate]);
 
   // handle logout
   const handleLogout = () => {
-    localStorage.removeItem('access_token')
-    navigate('/login')
-  }
+    localStorage.removeItem("access_token");
+    navigate("/login");
+  };
 
   return (
     <Layout handleLogout={handleLogout}>
       <CategoriesMain />
     </Layout>
-  )
-}
+  );
+};
 
-export default Categories
+export default Categories;

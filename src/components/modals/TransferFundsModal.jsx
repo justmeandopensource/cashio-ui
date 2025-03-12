@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -18,213 +18,226 @@ import {
   HStack,
   useToast,
   Box,
-  Heading,
-  Badge,
-  Divider,
   useColorModeValue,
   useBreakpointValue,
   InputGroup,
   InputLeftAddon,
   Stack,
-  Flex,
-} from '@chakra-ui/react'
-import { ArrowDownIcon, ArrowUpIcon, RepeatIcon } from '@chakra-ui/icons'
-import axios from 'axios'
-import ChakraDatePicker from '@components/shared/ChakraDatePicker'
-import { currencySymbols } from '@components/shared/currencyUtils'
-import config from '@/config'
+} from "@chakra-ui/react";
+import { ArrowDownIcon, ArrowUpIcon, RepeatIcon } from "@chakra-ui/icons";
+import axios from "axios";
+import ChakraDatePicker from "@components/shared/ChakraDatePicker";
+import { currencySymbols } from "@components/shared/utils";
+import config from "@/config";
 
-const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymbol, onTransferCompleted }) => {
-  const [date, setDate] = useState(new Date())
-  const [fromAccountId, setFromAccountId] = useState(accountId || '')
-  const [toAccountId, setToAccountId] = useState('')
-  const [amount, setAmount] = useState('')
-  const [notes, setNotes] = useState('')
-  const [isDifferentLedger, setIsDifferentLedger] = useState(false)
-  const [destinationLedgerId, setDestinationLedgerId] = useState('')
-  const [destinationCurrencySymbolCode, setDestinationCurrencySymbolCode] = useState('')
-  const [destinationAmount, setDestinationAmount] = useState('')
-  const [ledgers, setLedgers] = useState([])
-  const [accounts, setAccounts] = useState([])
-  const [destinationAccounts, setDestinationAccounts] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const toast = useToast()
-  
+const TransferFundsModal = ({
+  isOpen,
+  onClose,
+  ledgerId,
+  accountId,
+  currencySymbol,
+  onTransferCompleted,
+}) => {
+  const [date, setDate] = useState(new Date());
+  const [fromAccountId, setFromAccountId] = useState(accountId || "");
+  const [toAccountId, setToAccountId] = useState("");
+  const [amount, setAmount] = useState("");
+  const [notes, setNotes] = useState("");
+  const [isDifferentLedger, setIsDifferentLedger] = useState(false);
+  const [destinationLedgerId, setDestinationLedgerId] = useState("");
+  const [destinationCurrencySymbolCode, setDestinationCurrencySymbolCode] =
+    useState("");
+  const [destinationAmount, setDestinationAmount] = useState("");
+  const [ledgers, setLedgers] = useState([]);
+  const [accounts, setAccounts] = useState([]);
+  const [destinationAccounts, setDestinationAccounts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const toast = useToast();
+
   // Responsive design helpers
-  const modalSize = useBreakpointValue({ base: "full", md: "lg" })
-  const stackDirection = useBreakpointValue({ base: "column", md: "row" })
-  const buttonSize = useBreakpointValue({ base: "md", md: "md" })
-  
+  const modalSize = useBreakpointValue({ base: "full", md: "lg" });
+  const stackDirection = useBreakpointValue({ base: "column", md: "row" });
+  const buttonSize = useBreakpointValue({ base: "md", md: "md" });
+
   // Theme colors
-  const buttonColorScheme = "teal"
-  const bgColor = useColorModeValue("white", "gray.800")
-  const borderColor = useColorModeValue("gray.200", "gray.600")
-  const highlightColor = useColorModeValue("teal.50", "teal.900")
+  const buttonColorScheme = "teal";
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const highlightColor = useColorModeValue("teal.50", "teal.900");
 
   const resetForm = () => {
-    setDate(new Date())
-    setFromAccountId(accountId || '')
-    setToAccountId('')
-    setAmount('')
-    setNotes('')
-    setIsDifferentLedger(false)
-    setDestinationLedgerId('')
-    setDestinationAmount('')
-  }
+    setDate(new Date());
+    setFromAccountId(accountId || "");
+    setToAccountId("");
+    setAmount("");
+    setNotes("");
+    setIsDifferentLedger(false);
+    setDestinationLedgerId("");
+    setDestinationAmount("");
+  };
 
   useEffect(() => {
     if (isOpen) {
-      resetForm()
-      fetchLedgers()
-      fetchAccounts()
+      resetForm();
+      fetchLedgers();
+      fetchAccounts();
     }
-  }, [isOpen])
+  }, [isOpen]);
 
   useEffect(() => {
     if (isDifferentLedger && destinationLedgerId) {
-      fetchDestinationAccounts(destinationLedgerId)
+      fetchDestinationAccounts(destinationLedgerId);
     }
-  }, [isDifferentLedger, destinationLedgerId])
+  }, [isDifferentLedger, destinationLedgerId]);
 
   const fetchLedgers = async () => {
     try {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
       const response = await axios.get(`${config.apiBaseUrl}/ledger/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
-      setLedgers(response.data)
+      });
+      setLedgers(response.data);
     } catch (error) {
-      console.error('Error fetching ledgers:', error)
+      console.error("Error fetching ledgers:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to fetch ledgers.',
-        status: 'error',
+        title: "Error",
+        description: "Failed to fetch ledgers.",
+        status: "error",
         duration: 3000,
         isClosable: true,
-      })
+      });
     }
-  }
+  };
 
   const fetchAccounts = async () => {
     try {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
       const response = await axios.get(
         `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
-      )
-      setAccounts(response.data)
+        },
+      );
+      setAccounts(response.data);
     } catch (error) {
-      console.error('Error fetching accounts:', error)
+      console.error("Error fetching accounts:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to fetch accounts.',
-        status: 'error',
+        title: "Error",
+        description: "Failed to fetch accounts.",
+        status: "error",
         duration: 3000,
         isClosable: true,
-      })
+      });
     }
-  }
+  };
 
   const fetchDestinationAccounts = async (ledgerId) => {
     try {
-      const token = localStorage.getItem('access_token')
-      const response = await axios.get(`${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const token = localStorage.getItem("access_token");
+      const response = await axios.get(
+        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      })
-      setDestinationAccounts(response.data)
+      );
+      setDestinationAccounts(response.data);
     } catch (error) {
-      console.error('Error fetching destination accounts:', error)
+      console.error("Error fetching destination accounts:", error);
       toast({
-        title: 'Error',
-        description: 'Failed to fetch destination accounts.',
-        status: 'error',
+        title: "Error",
+        description: "Failed to fetch destination accounts.",
+        status: "error",
         duration: 3000,
         isClosable: true,
-      })
+      });
     }
-  }
+  };
 
   // Filter out the current ledger from the "destination ledger" dropdown
   const getFilteredLedgers = (ledgers) => {
-    return ledgers.filter((ledger) => ledger.ledger_id != ledgerId)
-  }
+    return ledgers.filter((ledger) => ledger.ledger_id != ledgerId);
+  };
 
   // Filter out the current account from the "to account" dropdown
   const getFilteredAccounts = (accounts) => {
-    return accounts.filter((account) => account.account_id != fromAccountId)
-  }
+    return accounts.filter((account) => account.account_id != fromAccountId);
+  };
 
   const handleSubmit = async () => {
     if (!fromAccountId || !toAccountId || !amount) {
       toast({
-        title: 'Error',
-        description: 'Please fill all required fields.',
-        status: 'error',
+        title: "Error",
+        description: "Please fill all required fields.",
+        status: "error",
         duration: 3000,
         isClosable: true,
-      })
-      return
+      });
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const token = localStorage.getItem('access_token')
+      const token = localStorage.getItem("access_token");
       const payload = {
         source_account_id: parseInt(fromAccountId, 10),
         destination_account_id: parseInt(toAccountId, 10),
         date: date.toISOString(),
         source_amount: parseFloat(amount),
-        notes: notes || 'Fund Transfer',
-        destination_amount: destinationAmount ? parseFloat(destinationAmount) : null,
-      }
+        notes: notes || "Fund Transfer",
+        destination_amount: destinationAmount
+          ? parseFloat(destinationAmount)
+          : null,
+      };
 
-      await axios.post(`${config.apiBaseUrl}/ledger/${ledgerId}/transaction/transfer`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axios.post(
+        `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/transfer`,
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      })
+      );
 
       toast({
-        title: 'Success',
-        description: 'Transfer completed successfully.',
-        status: 'success',
+        title: "Success",
+        description: "Transfer completed successfully.",
+        status: "success",
         duration: 3000,
         isClosable: true,
-      })
+      });
 
-      onClose()
-      onTransferCompleted()
+      onClose();
+      onTransferCompleted();
     } catch (error) {
-      console.error('Error transferring funds:', error)
+      console.error("Error transferring funds:", error);
       toast({
-        title: 'Error',
-        description: error.response?.data?.detail || 'Transfer failed',
-        status: 'error',
+        title: "Error",
+        description: error.response?.data?.detail || "Transfer failed",
+        status: "error",
         duration: 3000,
         isClosable: true,
-      })
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <Modal 
-      isOpen={isOpen} 
-      onClose={onClose} 
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
       size={modalSize}
       motionPreset="slideInBottom"
     >
       <ModalOverlay backdropFilter="blur(2px)" />
-      <ModalContent 
+      <ModalContent
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
@@ -232,7 +245,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
         display="flex"
         flexDirection="column"
       >
-        <Box 
+        <Box
           pt={{ base: 10, sm: 4 }}
           pb={{ base: 2, sm: 0 }}
           px={{ base: 4, sm: 0 }}
@@ -241,22 +254,22 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
           borderTopRadius={{ base: 0, sm: "md" }}
           flexShrink={0}
         >
-          <ModalHeader 
+          <ModalHeader
             fontSize={{ base: "xl", sm: "lg" }}
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
             Transfer Funds
           </ModalHeader>
-          <ModalCloseButton 
+          <ModalCloseButton
             color={{ base: "white", sm: "gray.500" }}
             top={{ base: 10, sm: 4 }}
             right={{ base: 4, sm: 4 }}
           />
         </Box>
-        
-        <ModalBody 
-          px={{ base: 4, sm: 6 }} 
+
+        <ModalBody
+          px={{ base: 4, sm: 6 }}
           py={{ base: 4, sm: 4 }}
           flex="1"
           overflowY="auto"
@@ -266,10 +279,12 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
             <Stack direction={stackDirection} spacing={4} mb={4}>
               {/* Date Picker */}
               <FormControl flex="1">
-                <FormLabel fontSize="sm" fontWeight="medium">Date</FormLabel>
-                <ChakraDatePicker 
-                  selected={date} 
-                  onChange={(date) => setDate(date)} 
+                <FormLabel fontSize="sm" fontWeight="medium">
+                  Date
+                </FormLabel>
+                <ChakraDatePicker
+                  selected={date}
+                  onChange={(date) => setDate(date)}
                   borderColor={borderColor}
                   shouldCloseOnSelect={true}
                   size="md"
@@ -278,7 +293,9 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
 
               {/* Amount Input */}
               <FormControl flex="1">
-                <FormLabel fontSize="sm" fontWeight="medium">Amount</FormLabel>
+                <FormLabel fontSize="sm" fontWeight="medium">
+                  Amount
+                </FormLabel>
                 <InputGroup>
                   <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                   <Input
@@ -294,10 +311,10 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
 
             {/* From Account Selection */}
             {!accountId && (
-              <Box 
-                p={4} 
-                borderWidth="1px" 
-                borderRadius="md" 
+              <Box
+                p={4}
+                borderWidth="1px"
+                borderRadius="md"
                 borderColor={borderColor}
                 bg={useColorModeValue("gray.50", "gray.700")}
                 mb={4}
@@ -305,7 +322,9 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                 <FormControl>
                   <HStack alignItems="center" mb={2}>
                     <ArrowUpIcon color="red.500" />
-                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>From Account</FormLabel>
+                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>
+                      From Account
+                    </FormLabel>
                   </HStack>
                   <Select
                     value={fromAccountId}
@@ -316,9 +335,12 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                     {/* Group for Asset Accounts */}
                     <optgroup label="Asset Accounts">
                       {accounts
-                        .filter((account) => account.type === 'asset')
+                        .filter((account) => account.type === "asset")
                         .map((account) => (
-                          <option key={account.account_id} value={account.account_id}>
+                          <option
+                            key={account.account_id}
+                            value={account.account_id}
+                          >
                             {account.name}
                           </option>
                         ))}
@@ -326,9 +348,12 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                     {/* Group for Liability Accounts */}
                     <optgroup label="Liability Accounts">
                       {accounts
-                        .filter((account) => account.type === 'liability')
+                        .filter((account) => account.type === "liability")
                         .map((account) => (
-                          <option key={account.account_id} value={account.account_id}>
+                          <option
+                            key={account.account_id}
+                            value={account.account_id}
+                          >
                             {account.name}
                           </option>
                         ))}
@@ -348,7 +373,9 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
               mb={4}
             >
               <HStack justifyContent="space-between">
-                <Text fontSize="sm" fontWeight="medium">Transfer to Different Ledger</Text>
+                <Text fontSize="sm" fontWeight="medium">
+                  Transfer to Different Ledger
+                </Text>
                 <Switch
                   colorScheme={buttonColorScheme}
                   isChecked={isDifferentLedger}
@@ -358,10 +385,10 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
             </Box>
 
             {/* Destination Section */}
-            <Box 
-              p={4} 
-              borderWidth="1px" 
-              borderRadius="md" 
+            <Box
+              p={4}
+              borderWidth="1px"
+              borderRadius="md"
               borderColor={borderColor}
               bg={highlightColor}
               mb={4}
@@ -370,14 +397,21 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                 {/* Destination Ledger (if different ledger) */}
                 {isDifferentLedger && (
                   <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="medium">Destination Ledger</FormLabel>
+                    <FormLabel fontSize="sm" fontWeight="medium">
+                      Destination Ledger
+                    </FormLabel>
                     <Select
                       value={destinationLedgerId}
-                        onChange={(e) => {
-                          const selectedLedger = ledgers.find(ledger => ledger.ledger_id === parseInt(e.target.value, 10))
-                          setDestinationLedgerId(e.target.value)
-                          setDestinationCurrencySymbolCode(selectedLedger.currency_symbol)
-                        }}
+                      onChange={(e) => {
+                        const selectedLedger = ledgers.find(
+                          (ledger) =>
+                            ledger.ledger_id === parseInt(e.target.value, 10),
+                        );
+                        setDestinationLedgerId(e.target.value);
+                        setDestinationCurrencySymbolCode(
+                          selectedLedger.currency_symbol,
+                        );
+                      }}
                       borderColor={borderColor}
                       bg={bgColor}
                     >
@@ -395,7 +429,9 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                 <FormControl>
                   <HStack alignItems="center" mb={2}>
                     <ArrowDownIcon color="green.500" />
-                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>To Account</FormLabel>
+                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>
+                      To Account
+                    </FormLabel>
                   </HStack>
                   <Select
                     value={toAccountId}
@@ -406,20 +442,30 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                     <option value="">Select an account</option>
                     {/* Group for Asset Accounts */}
                     <optgroup label="Asset Accounts">
-                      {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts)
-                        .filter((account) => account.type === 'asset')
+                      {getFilteredAccounts(
+                        isDifferentLedger ? destinationAccounts : accounts,
+                      )
+                        .filter((account) => account.type === "asset")
                         .map((account) => (
-                          <option key={account.account_id} value={account.account_id}>
+                          <option
+                            key={account.account_id}
+                            value={account.account_id}
+                          >
                             {account.name}
                           </option>
                         ))}
                     </optgroup>
                     {/* Group for Liability Accounts */}
                     <optgroup label="Liability Accounts">
-                      {getFilteredAccounts(isDifferentLedger ? destinationAccounts : accounts)
-                        .filter((account) => account.type === 'liability')
+                      {getFilteredAccounts(
+                        isDifferentLedger ? destinationAccounts : accounts,
+                      )
+                        .filter((account) => account.type === "liability")
                         .map((account) => (
-                          <option key={account.account_id} value={account.account_id}>
+                          <option
+                            key={account.account_id}
+                            value={account.account_id}
+                          >
                             {account.name}
                           </option>
                         ))}
@@ -430,9 +476,15 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
                 {/* Destination Amount (if different ledger) */}
                 {isDifferentLedger && (
                   <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="medium">Destination Amount</FormLabel>
+                    <FormLabel fontSize="sm" fontWeight="medium">
+                      Destination Amount
+                    </FormLabel>
                     <InputGroup>
-                      <InputLeftAddon>{destinationCurrencySymbolCode ? currencySymbols[destinationCurrencySymbolCode] : currencySymbol}</InputLeftAddon>
+                      <InputLeftAddon>
+                        {destinationCurrencySymbolCode
+                          ? currencySymbols[destinationCurrencySymbolCode]
+                          : currencySymbol}
+                      </InputLeftAddon>
                       <Input
                         type="number"
                         value={destinationAmount}
@@ -452,7 +504,9 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
 
             {/* Notes */}
             <FormControl>
-              <FormLabel fontSize="sm" fontWeight="medium">Notes</FormLabel>
+              <FormLabel fontSize="sm" fontWeight="medium">
+                Notes
+              </FormLabel>
               <Input
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -463,7 +517,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
           </VStack>
         </ModalBody>
 
-        <ModalFooter 
+        <ModalFooter
           flexDirection={{ base: "column", sm: "row" }}
           p={4}
           gap={2}
@@ -472,19 +526,24 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
           bg={useColorModeValue("gray.50", "gray.700")}
           flexShrink={0}
         >
-          <Button 
-            colorScheme={buttonColorScheme} 
+          <Button
+            colorScheme={buttonColorScheme}
             size={buttonSize}
             w={{ base: "full", sm: "auto" }}
-            onClick={handleSubmit} 
+            onClick={handleSubmit}
             isLoading={isLoading}
-            isDisabled={!fromAccountId || !toAccountId || !amount || (isDifferentLedger && !destinationLedgerId)}
+            isDisabled={
+              !fromAccountId ||
+              !toAccountId ||
+              !amount ||
+              (isDifferentLedger && !destinationLedgerId)
+            }
             leftIcon={<RepeatIcon />}
           >
             Complete Transfer
           </Button>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             size={buttonSize}
             w={{ base: "full", sm: "auto" }}
             onClick={onClose}
@@ -494,7 +553,7 @@ const TransferFundsModal = ({ isOpen, onClose, ledgerId, accountId, currencySymb
         </ModalFooter>
       </ModalContent>
     </Modal>
-  )
-}
+  );
+};
 
-export default TransferFundsModal
+export default TransferFundsModal;
