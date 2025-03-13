@@ -780,9 +780,6 @@ const CreateTransactionModal = ({
                 <VStack spacing={4} align="stretch">
                   <Flex justifyContent="space-between" alignItems="center">
                     <Text fontWeight="medium">Split Details</Text>
-                    <Text fontSize="sm">
-                      Remaining: {calculateRemainingAmount().toFixed(2)}
-                    </Text>
                   </Flex>
 
                   <Divider />
@@ -880,7 +877,10 @@ const CreateTransactionModal = ({
 
                   {/* Display total allocated and remaining amount */}
                   <HStack justifyContent="space-between" pt={2}>
-                    <Text fontSize="sm">Total: ${parseFloat(amount) || 0}</Text>
+                    <Text fontSize="sm">
+                      Total: {currencySymbol}
+                      {parseFloat(amount) || 0}
+                    </Text>
                     {calculateRemainingAmount() !== 0 && (
                       <Text
                         fontSize="sm"
@@ -892,8 +892,8 @@ const CreateTransactionModal = ({
                         fontWeight="medium"
                       >
                         {calculateRemainingAmount() < 0
-                          ? `Over-allocated by $${Math.abs(calculateRemainingAmount()).toFixed(2)}`
-                          : `$${calculateRemainingAmount().toFixed(2)} unallocated`}
+                          ? `Over-allocated by ${currencySymbol}${Math.abs(calculateRemainingAmount()).toFixed(2)}`
+                          : `${currencySymbol}${calculateRemainingAmount().toFixed(2)} unallocated`}
                       </Text>
                     )}
                   </HStack>
