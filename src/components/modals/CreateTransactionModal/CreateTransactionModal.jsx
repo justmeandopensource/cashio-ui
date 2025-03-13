@@ -59,7 +59,6 @@ const CreateTransactionModal = ({
   // Responsive design helpers
   const modalSize = useBreakpointValue({ base: "full", md: "md" });
   const stackDirection = useBreakpointValue({ base: "column", md: "row" });
-  const buttonSize = useBreakpointValue({ base: "md", md: "md" });
 
   // Theme colors
   const buttonColorScheme = "teal";
@@ -304,7 +303,6 @@ const CreateTransactionModal = ({
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        h={{ base: "100vh", sm: "auto" }}
       >
         <Box
           pt={{ base: 10, sm: 4 }}
@@ -335,7 +333,6 @@ const CreateTransactionModal = ({
           display="flex"
           flexDirection="column"
           justifyContent={{ base: "space-between", sm: "flex-start" }}
-          overflowY="auto"
         >
           <VStack spacing={6} align="stretch" w="100%">
             {/* Basic Info - First Section */}
@@ -529,20 +526,47 @@ const CreateTransactionModal = ({
               buttonColorScheme={buttonColorScheme}
             />
           </VStack>
+
+          {/* Mobile-only action buttons that stay at bottom */}
+          <Box display={{ base: "block", sm: "none" }} mt={6}>
+            <Button
+              onClick={handleSubmit}
+              colorScheme={buttonColorScheme}
+              size="lg"
+              width="100%"
+              mb={3}
+              isLoading={isLoading}
+              isDisabled={
+                (isSplit &&
+                  splits.some(
+                    (split) =>
+                      parseFloat(split.amount) > 0 && !split.categoryId,
+                  )) ||
+                (!isSplit && !categoryId) ||
+                !amount ||
+                (isSplit && calculateRemainingAmount() !== 0)
+              }
+            >
+              Save Transaction
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              size="lg"
+              width="100%"
+              isDisabled={isLoading}
+            >
+              Cancel
+            </Button>
+          </Box>
         </ModalBody>
 
-        <ModalFooter
-          flexDirection={{ base: "column", sm: "row" }}
-          p={4}
-          gap={2}
-          borderTopWidth="1px"
-          borderColor={borderColor}
-          bg={useColorModeValue("gray.50", "gray.700")}
-        >
+        {/* Desktop-only footer */}
+        <ModalFooter display={{ base: "none", sm: "flex" }}>
           <Button
             colorScheme={buttonColorScheme}
-            size={buttonSize}
-            w={{ base: "full", sm: "auto" }}
+            mr={3}
+            px={6}
             onClick={handleSubmit}
             isLoading={isLoading}
             isDisabled={
@@ -557,12 +581,7 @@ const CreateTransactionModal = ({
           >
             Save Transaction
           </Button>
-          <Button
-            variant="outline"
-            size={buttonSize}
-            w={{ base: "full", sm: "auto" }}
-            onClick={onClose}
-          >
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
         </ModalFooter>

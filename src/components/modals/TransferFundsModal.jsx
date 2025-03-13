@@ -24,7 +24,7 @@ import {
   InputLeftAddon,
   Stack,
 } from "@chakra-ui/react";
-import { ArrowDownIcon, ArrowUpIcon, RepeatIcon } from "@chakra-ui/icons";
+import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import axios from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import { currencySymbols } from "@components/shared/utils";
@@ -57,7 +57,6 @@ const TransferFundsModal = ({
   // Responsive design helpers
   const modalSize = useBreakpointValue({ base: "full", md: "lg" });
   const stackDirection = useBreakpointValue({ base: "column", md: "row" });
-  const buttonSize = useBreakpointValue({ base: "md", md: "md" });
 
   // Theme colors
   const buttonColorScheme = "teal";
@@ -241,9 +240,6 @@ const TransferFundsModal = ({
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        h={{ base: "100vh", sm: "auto" }}
-        display="flex"
-        flexDirection="column"
       >
         <Box
           pt={{ base: 10, sm: 4 }}
@@ -252,7 +248,6 @@ const TransferFundsModal = ({
           bg={{ base: buttonColorScheme + ".500", sm: "transparent" }}
           color={{ base: "white", sm: "inherit" }}
           borderTopRadius={{ base: 0, sm: "md" }}
-          flexShrink={0}
         >
           <ModalHeader
             fontSize={{ base: "xl", sm: "lg" }}
@@ -272,7 +267,9 @@ const TransferFundsModal = ({
           px={{ base: 4, sm: 6 }}
           py={{ base: 4, sm: 4 }}
           flex="1"
-          overflowY="auto"
+          display="flex"
+          flexDirection="column"
+          justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
           <VStack spacing={6} align="stretch" w="100%">
             {/* Basic Info Section */}
@@ -515,21 +512,43 @@ const TransferFundsModal = ({
               />
             </FormControl>
           </VStack>
+
+          {/* Mobile-only action buttons that stay at bottom */}
+          <Box display={{ base: "block", sm: "none" }} mt={6}>
+            <Button
+              onClick={handleSubmit}
+              colorScheme={buttonColorScheme}
+              size="lg"
+              width="100%"
+              mb={3}
+              isLoading={isLoading}
+              isDisabled={
+                !fromAccountId ||
+                !toAccountId ||
+                !amount ||
+                (isDifferentLedger && !destinationLedgerId)
+              }
+            >
+              Complete Transfer
+            </Button>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              size="lg"
+              width="100%"
+              isDisabled={isLoading}
+            >
+              Cancel
+            </Button>
+          </Box>
         </ModalBody>
 
-        <ModalFooter
-          flexDirection={{ base: "column", sm: "row" }}
-          p={4}
-          gap={2}
-          borderTopWidth="1px"
-          borderColor={borderColor}
-          bg={useColorModeValue("gray.50", "gray.700")}
-          flexShrink={0}
-        >
+        {/* Desktop-only footer */}
+        <ModalFooter display={{ base: "none", sm: "flex" }}>
           <Button
             colorScheme={buttonColorScheme}
-            size={buttonSize}
-            w={{ base: "full", sm: "auto" }}
+            mr={3}
+            px={6}
             onClick={handleSubmit}
             isLoading={isLoading}
             isDisabled={
@@ -538,16 +557,10 @@ const TransferFundsModal = ({
               !amount ||
               (isDifferentLedger && !destinationLedgerId)
             }
-            leftIcon={<RepeatIcon />}
           >
             Complete Transfer
           </Button>
-          <Button
-            variant="outline"
-            size={buttonSize}
-            w={{ base: "full", sm: "auto" }}
-            onClick={onClose}
-          >
+          <Button variant="outline" onClick={onClose}>
             Cancel
           </Button>
         </ModalFooter>
