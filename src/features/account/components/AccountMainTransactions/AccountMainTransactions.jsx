@@ -21,6 +21,7 @@ const AccountMainTransactions = ({
   fetchTransactions,
   pagination,
   onAddTransaction,
+  onTransactionDeleted,
 }) => {
   const toast = useToast();
 
@@ -172,6 +173,45 @@ const AccountMainTransactions = ({
     }
   };
 
+  // Function to delete a transaction
+  const handleDeleteTransaction = async (transactionId) => {
+    try {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(
+        `${config.apiBaseUrl}/ledger/${account.ledger_id}/transaction/${transactionId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to delete transaction");
+      }
+
+      // Refresh the transactions and account data
+      await onTransactionDeleted();
+
+      toast({
+        title: "Transaction deleted",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.error("Error deleting transaction:", error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to delete transaction.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   return (
     <Box bg="gray.50" p={useCardView ? 3 : 6} borderRadius="lg">
       {/* No Transactions State */}
@@ -214,6 +254,7 @@ const AccountMainTransactions = ({
               splitTransactions={splitTransactions}
               isTransferLoading={isTransferLoading}
               transferDetails={transferDetails}
+              onDeleteTransaction={handleDeleteTransaction}
             />
           )}
 
@@ -241,6 +282,7 @@ const AccountMainTransactions = ({
                   transferDetails={transferDetails}
                   isSplitLoading={isSplitLoading}
                   isTransferLoading={isTransferLoading}
+                  onDeleteTransaction={handleDeleteTransaction}
                 />
               ))}
             </VStack>
