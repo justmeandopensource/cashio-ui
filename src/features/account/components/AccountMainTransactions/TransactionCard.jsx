@@ -12,7 +12,6 @@ import {
   WrapItem,
   Tag,
   TagLabel,
-  Spinner,
   useDisclosure,
   Modal,
   ModalOverlay,
@@ -36,6 +35,7 @@ import {
   formatDate,
   formatNumberAsCurrency,
 } from "@/components/shared/utils";
+import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 
 const TransactionCard = ({
   transaction,
@@ -180,9 +180,7 @@ const TransactionCard = ({
                 </Button>
 
                 {isSplitLoading ? (
-                  <Flex justify="center" align="center" h="100px">
-                    <Spinner />
-                  </Flex>
+                  <SplitTransactionSkeleton />
                 ) : (
                   splitTransactions.length > 0 && (
                     <Box
@@ -238,9 +236,7 @@ const TransactionCard = ({
                 </Button>
 
                 {isTransferLoading ? (
-                  <Flex justify="center" align="center" h="100px">
-                    <Spinner />
-                  </Flex>
+                  <TransferDetailsSkeleton />
                 ) : (
                   transferDetails && (
                     <Box borderWidth="1px" borderRadius="md" p={3} bg="blue.50">

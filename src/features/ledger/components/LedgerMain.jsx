@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Box, Spinner, useToast } from "@chakra-ui/react";
+import { Box, useToast } from "@chakra-ui/react";
 import LedgerMainHeader from "@features/ledger/components/LedgerMainHeader";
+import LedgerMainHeaderSkeleton from "./LedgerMainHeaderSkeleton";
 import LedgerMainAccounts from "@features/ledger/components/LedgerMainAccounts";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
@@ -80,8 +81,8 @@ const LedgerMain = () => {
 
   if (isLedgerLoading || isAccountsLoading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" color="teal.500" />
+      <Box>
+        <LedgerMainHeaderSkeleton />
       </Box>
     );
   }

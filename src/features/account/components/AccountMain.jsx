@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Box, Spinner, useToast, Text } from "@chakra-ui/react";
-import AccountMainHeader from "@features/account/components/AccountMainHeader";
-import AccountMainTransactions from "@features/account/components/AccountMainTransactions/AccountMainTransactions";
+import { Box, useToast, Text } from "@chakra-ui/react";
+import AccountMainHeader from "./AccountMainHeader";
+import AccountMainHeaderSkeleton from "./AccountMainHeaderSkeleton";
+import AccountMainTransactions from "./AccountMainTransactions/AccountMainTransactions";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
@@ -134,15 +135,6 @@ const AccountMain = ({ currencySymbolCode }) => {
     await queryClient.invalidateQueries(["account", accountId]);
   };
 
-  // Show loading spinner while data is being fetched
-  if (isAccountLoading || isTransactionsLoading || !transactionsData) {
-    return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" color="teal.500" />
-      </Box>
-    );
-  }
-
   // Show error message if account or transactions fetch fails
   if (isAccountError || isTransactionsError) {
     return (
@@ -150,6 +142,14 @@ const AccountMain = ({ currencySymbolCode }) => {
         <Text fontSize="xl" fontWeight="bold" mb={2}>
           Failed to load account data.
         </Text>
+      </Box>
+    );
+  }
+
+  if (isAccountLoading || isTransactionsLoading || !transactionsData) {
+    return (
+      <Box>
+        <AccountMainHeaderSkeleton />
       </Box>
     );
   }

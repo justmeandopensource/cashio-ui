@@ -5,6 +5,7 @@ import { Flex, Spinner, useDisclosure, useToast, Text } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import HomeMain from "@features/home/components/HomeMain";
 import config from "@/config";
+import HomeLedgerCardsSkeleton from "./components/HomeLedgercardsSkeleton";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -162,9 +163,7 @@ const Home = () => {
   if (isFetchingLedgers) {
     return (
       <Layout handleLogout={handleLogout}>
-        <Flex justify="center" align="center" minH="100vh">
-          <Spinner size="xl" />
-        </Flex>
+        <HomeLedgerCardsSkeleton />
       </Layout>
     );
   }

@@ -21,7 +21,6 @@ import {
   Square,
   PopoverArrow,
   Flex,
-  Spinner,
   PopoverHeader,
   Icon,
   useDisclosure,
@@ -36,6 +35,7 @@ import {
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import { FiCreditCard, FiTrash2 } from "react-icons/fi";
+import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 
 const TransactionTable = ({
   transactions,
@@ -131,7 +131,7 @@ const TransactionTable = ({
                       <PopoverBody>
                         {isSplitLoading ? (
                           <Flex justify="center" align="center" minH="100px">
-                            <Spinner />
+                            <SplitTransactionSkeleton />
                           </Flex>
                         ) : (
                           <Table variant="simple" size="sm">
@@ -204,7 +204,7 @@ const TransactionTable = ({
                       <PopoverBody>
                         {isTransferLoading ? (
                           <Flex justify="center" align="center" minH="100px">
-                            <Spinner />
+                            <TransferDetailsSkeleton />
                           </Flex>
                         ) : transferDetails ? (
                           <Stack spacing={4} py={2}>
