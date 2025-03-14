@@ -19,7 +19,6 @@ import {
   Card,
   CardHeader,
   Stack,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { FiPlus, FiRepeat } from "react-icons/fi";
@@ -42,20 +41,6 @@ const LedgerMainAccounts = ({
   const [expandedGroups, setExpandedGroups] = useState({});
   const queryClient = useQueryClient();
   const toast = useToast();
-
-  // Determine display mode based on screen size
-  const displayMode = useBreakpointValue(
-    {
-      base: "card",
-      md: "card",
-      lg: "card",
-      xl: "table",
-    },
-    {
-      ssr: true,
-      fallback: "card",
-    },
-  );
 
   // Mutation for creating a new account
   const createAccountMutation = useMutation({
@@ -547,24 +532,32 @@ const LedgerMainAccounts = ({
               buttonText="Create Asset Account"
               onClick={() => handleCreateAccountClick("asset")}
             />
-          ) : displayMode === "table" ? (
-            <Table variant="simple" size="sm">
-              <Tbody>
-                {renderAccountsTable(
+          ) : (
+            <>
+              {/* Render the table layout for larger screens (xl and above) */}
+              <Box display={{ base: "none", xl: "block" }}>
+                <Table variant="simple" size="sm">
+                  <Tbody>
+                    {renderAccountsTable(
+                      assetAccounts,
+                      null,
+                      0,
+                      showZeroBalanceAssets,
+                    )}
+                  </Tbody>
+                </Table>
+              </Box>
+
+              {/* Render the card layout for smaller screens (below xl) */}
+              <Box display={{ base: "block", xl: "none" }}>
+                {renderAccountsAccordion(
                   assetAccounts,
                   null,
                   0,
                   showZeroBalanceAssets,
                 )}
-              </Tbody>
-            </Table>
-          ) : (
-            renderAccountsAccordion(
-              assetAccounts,
-              null,
-              0,
-              showZeroBalanceAssets,
-            )
+              </Box>
+            </>
           )}
         </Box>
 
@@ -620,24 +613,32 @@ const LedgerMainAccounts = ({
               buttonText="Create Liability Account"
               onClick={() => handleCreateAccountClick("liability")}
             />
-          ) : displayMode === "table" ? (
-            <Table variant="simple" size="sm">
-              <Tbody>
-                {renderAccountsTable(
+          ) : (
+            <>
+              {/* Render the table layout for larger screens (xl and above) */}
+              <Box display={{ base: "none", xl: "block" }}>
+                <Table variant="simple" size="sm">
+                  <Tbody>
+                    {renderAccountsTable(
+                      liabilityAccounts,
+                      null,
+                      0,
+                      showZeroBalanceLiabilities,
+                    )}
+                  </Tbody>
+                </Table>
+              </Box>
+
+              {/* Render the card layout for smaller screens (below xl) */}
+              <Box display={{ base: "block", xl: "none" }}>
+                {renderAccountsAccordion(
                   liabilityAccounts,
                   null,
                   0,
                   showZeroBalanceLiabilities,
                 )}
-              </Tbody>
-            </Table>
-          ) : (
-            renderAccountsAccordion(
-              liabilityAccounts,
-              null,
-              0,
-              showZeroBalanceLiabilities,
-            )
+              </Box>
+            </>
           )}
         </Box>
       </SimpleGrid>

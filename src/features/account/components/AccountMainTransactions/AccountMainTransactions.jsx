@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Box,
   Text,
   Button,
   Flex,
   useToast,
-  useBreakpointValue,
   VStack,
   IconButton,
 } from "@chakra-ui/react";
@@ -36,46 +35,6 @@ const AccountMainTransactions = ({
 
   // Destructure pagination data
   const { total_pages, current_page } = pagination;
-
-  // Responsive layout switch - updated to account for iPad portrait/landscape
-  const viewMode = useBreakpointValue({
-    base: "mobile",
-    sm: "mobile",
-    md: "tablet",
-    lg: "desktop",
-    xl: "desktop",
-  });
-
-  // Detect portrait/landscape orientation for tablets
-  const [isPortrait, setIsPortrait] = useState(
-    typeof window !== "undefined"
-      ? window.innerHeight > window.innerWidth
-      : true,
-  );
-
-  // Effect to listen for orientation changes
-  useEffect(() => {
-    const handleResize = () => {
-      if (typeof window !== "undefined") {
-        setIsPortrait(window.innerHeight > window.innerWidth);
-      }
-    };
-
-    if (typeof window !== "undefined") {
-      window.addEventListener("resize", handleResize);
-
-      // Initial check
-      handleResize();
-
-      return () => {
-        window.removeEventListener("resize", handleResize);
-      };
-    }
-  }, []);
-
-  // Determine if we should use card view based on device and orientation
-  const useCardView =
-    viewMode === "mobile" || (viewMode === "tablet" && isPortrait);
 
   // Function to handle page change
   const handlePageChange = (page) => {
@@ -213,13 +172,13 @@ const AccountMainTransactions = ({
   };
 
   return (
-    <Box bg="gray.50" p={useCardView ? 3 : 6} borderRadius="lg">
+    <Box bg="gray.50" p={{ base: 3, lg: 6 }} borderRadius="lg">
       {/* No Transactions State */}
       {!transactions || transactions.length === 0 ? (
         <Box
           textAlign="center"
-          py={useCardView ? 6 : 10}
-          px={useCardView ? 3 : 6}
+          py={{ base: 6, lg: 10 }}
+          px={{ base: 3, lg: 6 }}
         >
           <Text fontSize="xl" fontWeight="bold" mb={2}>
             No Transactions Found
@@ -238,13 +197,13 @@ const AccountMainTransactions = ({
       ) : (
         <>
           <Flex justify="space-between" align="center" mb={4}>
-            <Text fontSize={useCardView ? "lg" : "xl"} fontWeight="bold">
+            <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold">
               Transactions
             </Text>
           </Flex>
 
-          {/* Table View (Desktop & Tablet Landscape) */}
-          {!useCardView && (
+          {/* Table View (Desktop) */}
+          <Box display={{ base: "none", lg: "block" }}>
             <TransactionTable
               transactions={transactions}
               currencySymbolCode={currencySymbolCode}
@@ -256,10 +215,10 @@ const AccountMainTransactions = ({
               transferDetails={transferDetails}
               onDeleteTransaction={handleDeleteTransaction}
             />
-          )}
+          </Box>
 
           {/* Card View (Mobile & Tablet Portrait) */}
-          {useCardView && (
+          <Box display={{ base: "block", lg: "none" }}>
             <VStack spacing={1} align="stretch">
               {transactions.map((transaction) => (
                 <TransactionCard
@@ -286,7 +245,7 @@ const AccountMainTransactions = ({
                 />
               ))}
             </VStack>
-          )}
+          </Box>
 
           {/* Pagination Controls */}
           {total_pages > 1 && (
@@ -296,10 +255,10 @@ const AccountMainTransactions = ({
                 isDisabled={current_page === 1}
                 onClick={() => handlePageChange(current_page - 1)}
                 variant="ghost"
-                size={useCardView ? "sm" : "md"}
+                size={{ base: "sm", lg: "md" }}
                 aria-label="Previous page"
               />
-              <Text mx={4} fontSize={useCardView ? "sm" : "md"}>
+              <Text mx={4} fontSize={{ base: "sm", lg: "md" }}>
                 {current_page} / {total_pages}
               </Text>
               <IconButton
@@ -307,7 +266,7 @@ const AccountMainTransactions = ({
                 isDisabled={current_page === total_pages}
                 onClick={() => handlePageChange(current_page + 1)}
                 variant="ghost"
-                size={useCardView ? "sm" : "md"}
+                size={{ base: "sm", lg: "md" }}
                 aria-label="Next page"
               />
             </Flex>
