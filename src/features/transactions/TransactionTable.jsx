@@ -47,6 +47,7 @@ const TransactionTable = ({
   isTransferLoading,
   transferDetails,
   onDeleteTransaction,
+  showAccountName = false,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);
@@ -68,6 +69,7 @@ const TransactionTable = ({
           <Tr>
             <Th width="8%">Date</Th>
             <Th width="15%">Category</Th>
+            {showAccountName && <Th width="12%">Account</Th>}
             <Th width="20%">Tags</Th>
             <Th width="3%">Type</Th>
             <Th>Notes</Th>
@@ -93,6 +95,13 @@ const TransactionTable = ({
             >
               <Td width="8%">{formatDate(transaction.date)}</Td>
               <Td width="15%">{transaction.category_name}</Td>
+              {showAccountName && (
+                <Td width="12%">
+                  {transaction.account_name && (
+                    <Text color="blue.500">{transaction.account_name}</Text>
+                  )}
+                </Td>
+              )}
               <Td width="20%">
                 <Wrap spacing={2}>
                   {transaction.tags?.map((tag) => (

@@ -295,6 +295,7 @@ const Transactions = ({
               isTransferLoading={isTransferLoading}
               transferDetails={transferDetails}
               onDeleteTransaction={handleDeleteTransaction}
+              showAccountName={!accountId}
             />
           </Box>
 
@@ -323,6 +324,7 @@ const Transactions = ({
                   isSplitLoading={isSplitLoading}
                   isTransferLoading={isTransferLoading}
                   onDeleteTransaction={handleDeleteTransaction}
+                  showAccountName={!accountId}
                 />
               ))}
             </VStack>

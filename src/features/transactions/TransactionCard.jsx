@@ -49,6 +49,7 @@ const TransactionCard = ({
   isSplitLoading,
   isTransferLoading,
   onDeleteTransaction,
+  showAccountName = false,
 }) => {
   const amount = formatAmount(
     transaction.credit,
@@ -120,6 +121,13 @@ const TransactionCard = ({
             {transaction.notes && (
               <Text fontSize="sm" color="gray.600" mt={1} noOfLines={2}>
                 {transaction.notes}
+              </Text>
+            )}
+
+            {/* Account name - displayed when showAccountName is true */}
+            {showAccountName && transaction.account_name && (
+              <Text fontSize="sm" color="blue.500" mt={1}>
+                {transaction.account_name}
               </Text>
             )}
           </VStack>
