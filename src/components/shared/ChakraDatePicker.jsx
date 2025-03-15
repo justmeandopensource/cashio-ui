@@ -2,7 +2,13 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Input, FormControl } from "@chakra-ui/react";
 
-const ChakraDatePicker = ({ selected, onChange }) => {
+const ChakraDatePicker = ({
+  selected,
+  onChange,
+  placeholderText,
+  minDate = null,
+  shouldCloseOnSelect = false,
+}) => {
   return (
     <FormControl>
       <Input
@@ -24,6 +30,9 @@ const ChakraDatePicker = ({ selected, onChange }) => {
             boundariesElement: "viewport",
           },
         }}
+        placeholderText={placeholderText}
+        minDate={minDate}
+        shouldCloseOnSelect={shouldCloseOnSelect}
       />
     </FormControl>
   );

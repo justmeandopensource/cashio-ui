@@ -6,7 +6,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   VStack,
   Input,
   Button,
@@ -105,11 +104,6 @@ const CreateLedgerModal = ({ isOpen, onClose, handleCreateLedger }) => {
           >
             Create New Ledger
           </ModalHeader>
-          <ModalCloseButton
-            color={{ base: "white", sm: "gray.500" }}
-            top={{ base: 10, sm: 4 }}
-            right={{ base: 4, sm: 4 }}
-          />
         </Box>
 
         <ModalBody

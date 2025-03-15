@@ -8,7 +8,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   FormControl,
   FormLabel,
   FormHelperText,
@@ -210,11 +209,6 @@ const CreateAccountModal = ({
           >
             Create {accountType === "asset" ? "Asset" : "Liability"} Account
           </ModalHeader>
-          <ModalCloseButton
-            color={{ base: "white", sm: "gray.500" }}
-            top={{ base: 10, sm: 4 }}
-            right={{ base: 4, sm: 4 }}
-          />
         </Box>
 
         <ModalBody

@@ -6,7 +6,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   FormControl,
   FormLabel,
   FormHelperText,
@@ -190,11 +189,6 @@ const CreateCategoryModal = ({
           >
             Create {categoryType === "income" ? "Income" : "Expense"} Category
           </ModalHeader>
-          <ModalCloseButton
-            color={{ base: "white", sm: "gray.500" }}
-            top={{ base: 10, sm: 4 }}
-            right={{ base: 4, sm: 4 }}
-          />
         </Box>
 
         <ModalBody

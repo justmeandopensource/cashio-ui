@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query"; // Add TanStack Query
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
   Text,
@@ -14,6 +14,7 @@ import { FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import config from "@/config";
 import TransactionCard from "./TransactionCard";
 import TransactionTable from "./TransactionTable";
+import TransactionFilter from "./TransactionFilter";
 
 const Transactions = ({
   ledgerId,
@@ -21,7 +22,6 @@ const Transactions = ({
   currencySymbolCode,
   onAddTransaction,
   onTransactionDeleted,
-  queryParams = {},
   shouldFetch = true,
 }) => {
   const toast = useToast();
@@ -36,6 +36,23 @@ const Transactions = ({
   const [isSplitLoading, setIsSplitLoading] = useState(false);
   const [isTransferLoading, setIsTransferLoading] = useState(false);
 
+  // Filter state
+  const [filters, setFilters] = useState({});
+
+  // Function to apply filters
+  const handleApplyFilters = (newFilters) => {
+    setFilters(newFilters);
+    // Reset pagination when filters change
+    setPagination((prev) => ({ ...prev, current_page: 1 }));
+  };
+
+  // Function to reset filters
+  const handleResetFilters = () => {
+    setFilters({});
+    // Reset pagination when filters are cleared
+    setPagination((prev) => ({ ...prev, current_page: 1 }));
+  };
+
   // Pagination state
   const [pagination, setPagination] = useState({
     total_pages: 1,
@@ -43,62 +60,74 @@ const Transactions = ({
   });
 
   // Fetch transactions using TanStack Query
-  const {
-    data: transactionsData,
-    isLoading: isTransactionsLoading,
-    isError: isTransactionsError,
-  } = useQuery({
-    queryKey: [
-      "transactions",
-      ledgerId,
-      accountId,
-      pagination.current_page,
-      queryParams,
-    ], // Include queryParams in the query key
-    queryFn: async () => {
-      const token = localStorage.getItem("access_token");
+  const { data: transactionsData, isLoading: isTransactionsLoading } = useQuery(
+    {
+      queryKey: [
+        "transactions",
+        ledgerId,
+        accountId,
+        pagination.current_page,
+        { ...filters },
+      ],
+      queryFn: async () => {
+        const token = localStorage.getItem("access_token");
 
-      // Construct query parameters
-      const params = new URLSearchParams({
-        page: pagination.current_page,
-        ...queryParams, // Spread additional query parameters
-      });
+        // Construct query parameters
+        const params = new URLSearchParams();
 
-      // Add account_id only if it is provided
-      if (accountId) {
-        params.append("account_id", accountId);
-      }
+        // Add pagination
+        params.append("page", pagination.current_page);
 
-      const url = `${config.apiBaseUrl}/ledger/${ledgerId}/transactions?${params.toString()}`;
+        // Add account_id if provided
+        if (accountId) {
+          params.append("account_id", accountId);
+        }
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+        // Add all other filters
+        Object.entries(filters).forEach(([key, value]) => {
+          // Special handling for tags, which should be sent as multiple parameters
+          if (key === "tags" && Array.isArray(value)) {
+            value.forEach((tag) => {
+              params.append("tags", tag);
+            });
+          }
+          // Handle all other parameters
+          else if (value !== null && value !== undefined && value !== "") {
+            params.append(key, value);
+          }
+        });
 
-      if (!response.ok) {
-        throw new Error("Failed to fetch transactions");
-      }
+        const url = `${config.apiBaseUrl}/ledger/${ledgerId}/transactions?${params.toString()}`;
 
-      const data = await response.json();
-      setPagination({
-        total_pages: data.total_pages,
-        current_page: data.current_page,
-      });
-      return data.transactions;
+        const response = await fetch(url, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch transactions");
+        }
+
+        const data = await response.json();
+        setPagination({
+          total_pages: data.total_pages,
+          current_page: data.current_page,
+        });
+        return data.transactions;
+      },
+      enabled: shouldFetch,
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message || "Failed to fetch transactions.",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
     },
-    enabled: shouldFetch,
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message || "Failed to fetch transactions.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    },
-  });
+  );
 
   // Function to handle page change
   const handlePageChange = (page) => {
@@ -223,7 +252,7 @@ const Transactions = ({
         ledgerId,
         accountId,
         pagination.current_page,
-        queryParams,
+        { ...filters },
       ]);
 
       toast({
@@ -281,6 +310,14 @@ const Transactions = ({
             <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold">
               Transactions
             </Text>
+            <TransactionFilter
+              ledgerId={ledgerId}
+              accountId={accountId}
+              initialFilters={filters}
+              onApplyFilters={handleApplyFilters}
+              currentFilters={filters}
+              onResetFilters={handleResetFilters}
+            />
           </Flex>
 
           {/* Table View (Desktop) */}

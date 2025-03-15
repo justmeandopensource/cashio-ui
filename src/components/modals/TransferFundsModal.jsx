@@ -6,7 +6,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   Button,
   FormControl,
   FormLabel,
@@ -256,11 +255,6 @@ const TransferFundsModal = ({
           >
             Transfer Funds
           </ModalHeader>
-          <ModalCloseButton
-            color={{ base: "white", sm: "gray.500" }}
-            top={{ base: 10, sm: 4 }}
-            right={{ base: 4, sm: 4 }}
-          />
         </Box>
 
         <ModalBody

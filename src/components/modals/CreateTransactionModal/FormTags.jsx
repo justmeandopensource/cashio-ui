@@ -55,10 +55,23 @@ const FormTags = ({ tags, setTags, borderColor, buttonColorScheme }) => {
     }
   };
 
+  // Ensure all tags have a valid name property
+  const normalizedTags =
+    tags?.map((tag) => {
+      if (typeof tag === "string") {
+        return { name: tag };
+      }
+      return tag;
+    }) || [];
+
   // Add a tag to the selected tags list
   const addTag = (tag) => {
-    if (!tags.some((t) => t.tag_id === tag.tag_id)) {
-      setTags([...tags, tag]);
+    if (
+      !normalizedTags.some(
+        (t) => t.tag_id === tag.tag_id && t.name === tag.name,
+      )
+    ) {
+      setTags([...normalizedTags, tag]);
       setTagInput("");
       setTagSuggestions([]);
     }
@@ -77,14 +90,14 @@ const FormTags = ({ tags, setTags, borderColor, buttonColorScheme }) => {
 
       if (newTagName) {
         // Check if the tag already exists in the selected tags
-        const isTagAlreadyAdded = tags.some(
+        const isTagAlreadyAdded = normalizedTags.some(
           (tag) => tag.name.toLowerCase() === newTagName.toLowerCase(),
         );
 
         if (!isTagAlreadyAdded) {
           // Add the new tag to the selected tags
           const newTag = { name: newTagName };
-          setTags((prevTags) => [...prevTags, newTag]);
+          setTags([...normalizedTags, newTag]);
           setTagInput("");
           setTagSuggestions([]);
         }
@@ -100,8 +113,8 @@ const FormTags = ({ tags, setTags, borderColor, buttonColorScheme }) => {
       <Box>
         {/* Display selected tags as chips */}
         <Wrap spacing={2} mb={2}>
-          {tags.map((tag) => (
-            <WrapItem key={tag.name}>
+          {normalizedTags.map((tag, index) => (
+            <WrapItem key={tag.tag_id || `tag-${index}`}>
               <Tag
                 size="sm"
                 borderRadius="full"
