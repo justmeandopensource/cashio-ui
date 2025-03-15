@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query"; // Add TanStack Query
 import {
   Box,
   Text,
@@ -7,22 +8,24 @@ import {
   useToast,
   VStack,
   IconButton,
+  Spinner,
 } from "@chakra-ui/react";
 import { FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
 import config from "@/config";
 import TransactionCard from "./TransactionCard";
 import TransactionTable from "./TransactionTable";
 
-const AccountMainTransactions = ({
-  transactions,
-  account,
+const Transactions = ({
+  ledgerId,
+  accountId,
   currencySymbolCode,
-  fetchTransactions,
-  pagination,
   onAddTransaction,
   onTransactionDeleted,
+  queryParams = {},
+  shouldFetch = true,
 }) => {
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   // State to store split transactions and transfer details
   const [splitTransactions, setSplitTransactions] = useState([]);
@@ -33,17 +36,77 @@ const AccountMainTransactions = ({
   const [isSplitLoading, setIsSplitLoading] = useState(false);
   const [isTransferLoading, setIsTransferLoading] = useState(false);
 
-  // Destructure pagination data
-  const { total_pages, current_page } = pagination;
+  // Pagination state
+  const [pagination, setPagination] = useState({
+    total_pages: 1,
+    current_page: 1,
+  });
+
+  // Fetch transactions using TanStack Query
+  const {
+    data: transactionsData,
+    isLoading: isTransactionsLoading,
+    isError: isTransactionsError,
+  } = useQuery({
+    queryKey: [
+      "transactions",
+      ledgerId,
+      accountId,
+      pagination.current_page,
+      queryParams,
+    ], // Include queryParams in the query key
+    queryFn: async () => {
+      const token = localStorage.getItem("access_token");
+
+      // Construct query parameters
+      const params = new URLSearchParams({
+        page: pagination.current_page,
+        ...queryParams, // Spread additional query parameters
+      });
+
+      // Add account_id only if it is provided
+      if (accountId) {
+        params.append("account_id", accountId);
+      }
+
+      const url = `${config.apiBaseUrl}/ledger/${ledgerId}/transactions?${params.toString()}`;
+
+      const response = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch transactions");
+      }
+
+      const data = await response.json();
+      setPagination({
+        total_pages: data.total_pages,
+        current_page: data.current_page,
+      });
+      return data.transactions;
+    },
+    enabled: shouldFetch,
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to fetch transactions.",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    },
+  });
 
   // Function to handle page change
   const handlePageChange = (page) => {
-    fetchTransactions(page);
+    setPagination((prev) => ({ ...prev, current_page: page }));
   };
 
   // Toggle expanded transaction on tap
   const toggleExpand = (transactionId, e) => {
-    // Don't toggle if clicking on buttons inside the card
     if (
       e.target.tagName === "BUTTON" ||
       e.target.closest("button") ||
@@ -64,13 +127,13 @@ const AccountMainTransactions = ({
     }
   };
 
-  // Fetch split transactions using fetch
+  // Fetch split transactions
   const fetchSplitTransactions = async (transactionId) => {
     setIsSplitLoading(true);
     try {
       const token = localStorage.getItem("access_token");
       const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${account.ledger_id}/transaction/${transactionId}/splits`,
+        `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/${transactionId}/splits`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -98,7 +161,7 @@ const AccountMainTransactions = ({
     }
   };
 
-  // Fetch transfer details using fetch
+  // Fetch transfer details
   const fetchTransferDetails = async (transferId) => {
     setIsTransferLoading(true);
     try {
@@ -137,7 +200,7 @@ const AccountMainTransactions = ({
     try {
       const token = localStorage.getItem("access_token");
       const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${account.ledger_id}/transaction/${transactionId}`,
+        `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/${transactionId}`,
         {
           method: "DELETE",
           headers: {
@@ -150,8 +213,18 @@ const AccountMainTransactions = ({
         throw new Error("Failed to delete transaction");
       }
 
-      // Refresh the transactions and account data
-      await onTransactionDeleted();
+      if (onTransactionDeleted) {
+        await onTransactionDeleted();
+      }
+
+      // Invalidate the transactions query to refetch data
+      queryClient.invalidateQueries([
+        "transactions",
+        ledgerId,
+        accountId,
+        pagination.current_page,
+        queryParams,
+      ]);
 
       toast({
         title: "Transaction deleted",
@@ -171,10 +244,18 @@ const AccountMainTransactions = ({
     }
   };
 
+  if (shouldFetch && isTransactionsLoading) {
+    return (
+      <Box textAlign="center" py={10}>
+        <Spinner size="xl" color="teal.500" />
+      </Box>
+    );
+  }
+
   return (
     <Box bg="gray.50" p={{ base: 3, lg: 6 }} borderRadius="lg">
       {/* No Transactions State */}
-      {!transactions || transactions.length === 0 ? (
+      {!shouldFetch || !transactionsData || transactionsData.length === 0 ? (
         <Box
           textAlign="center"
           py={{ base: 6, lg: 10 }}
@@ -205,7 +286,7 @@ const AccountMainTransactions = ({
           {/* Table View (Desktop) */}
           <Box display={{ base: "none", lg: "block" }}>
             <TransactionTable
-              transactions={transactions}
+              transactions={transactionsData}
               currencySymbolCode={currencySymbolCode}
               fetchSplitTransactions={fetchSplitTransactions}
               fetchTransferDetails={fetchTransferDetails}
@@ -220,7 +301,7 @@ const AccountMainTransactions = ({
           {/* Card View (Mobile & Tablet Portrait) */}
           <Box display={{ base: "block", lg: "none" }}>
             <VStack spacing={1} align="stretch">
-              {transactions.map((transaction) => (
+              {transactionsData.map((transaction) => (
                 <TransactionCard
                   key={transaction.transaction_id}
                   transaction={transaction}
@@ -248,23 +329,23 @@ const AccountMainTransactions = ({
           </Box>
 
           {/* Pagination Controls */}
-          {total_pages > 1 && (
+          {pagination.total_pages > 1 && (
             <Flex justifyContent="center" mt={6} alignItems="center">
               <IconButton
                 icon={<FiChevronLeft />}
-                isDisabled={current_page === 1}
-                onClick={() => handlePageChange(current_page - 1)}
+                isDisabled={pagination.current_page === 1}
+                onClick={() => handlePageChange(pagination.current_page - 1)}
                 variant="ghost"
                 size={{ base: "sm", lg: "md" }}
                 aria-label="Previous page"
               />
               <Text mx={4} fontSize={{ base: "sm", lg: "md" }}>
-                {current_page} / {total_pages}
+                {pagination.current_page} / {pagination.total_pages}
               </Text>
               <IconButton
                 icon={<FiChevronRight />}
-                isDisabled={current_page === total_pages}
-                onClick={() => handlePageChange(current_page + 1)}
+                isDisabled={pagination.current_page === pagination.total_pages}
+                onClick={() => handlePageChange(pagination.current_page + 1)}
                 variant="ghost"
                 size={{ base: "sm", lg: "md" }}
                 aria-label="Next page"
@@ -277,4 +358,4 @@ const AccountMainTransactions = ({
   );
 };
 
-export default AccountMainTransactions;
+export default Transactions;

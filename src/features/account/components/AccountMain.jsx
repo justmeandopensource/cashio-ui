@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Box, useToast, Text } from "@chakra-ui/react";
 import AccountMainHeader from "./AccountMainHeader";
 import AccountMainHeaderSkeleton from "./AccountMainHeaderSkeleton";
-import AccountMainTransactions from "./AccountMainTransactions/AccountMainTransactions";
+import AccountMainTransactions from "./AccountMainTransactions";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
@@ -18,14 +18,6 @@ const AccountMain = ({ currencySymbolCode }) => {
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const toast = useToast();
   const queryClient = useQueryClient();
-
-  // Pagination state
-  const [pagination, setPagination] = useState({
-    total_transactions: 0,
-    total_pages: 0,
-    current_page: 1,
-    per_page: 25,
-  });
 
   // Fetch account
   const fetchAccount = async () => {
@@ -41,25 +33,6 @@ const AccountMain = ({ currencySymbolCode }) => {
 
     if (!response.ok) {
       throw new Error("Failed to fetch account details");
-    }
-
-    return response.json();
-  };
-
-  // Fetch transactions
-  const fetchTransactions = async (page = 1) => {
-    const token = localStorage.getItem("access_token");
-    const response = await fetch(
-      `${config.apiBaseUrl}/ledger/${ledgerId}/account/${accountId}/transactions?page=${page}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error("Failed to fetch transactions");
     }
 
     return response.json();
@@ -84,59 +57,13 @@ const AccountMain = ({ currencySymbolCode }) => {
     },
   });
 
-  // Fetch transactions
-  const {
-    data: transactionsData,
-    isLoading: isTransactionsLoading,
-    isError: isTransactionsError,
-  } = useQuery({
-    queryKey: ["transactions", accountId, pagination.current_page],
-    queryFn: () => fetchTransactions(pagination.current_page),
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: "Failed to fetch account transactions.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    },
-  });
-
-  // Update pagination when transactions data is fetched
-  useEffect(() => {
-    if (transactionsData) {
-      setPagination({
-        total_transactions: transactionsData.total_transactions,
-        total_pages: transactionsData.total_pages,
-        current_page: transactionsData.current_page,
-        per_page: transactionsData.per_page,
-      });
-    }
-  }, [transactionsData]);
-
-  // Function to handle page change
-  const handlePageChange = (page) => {
-    setPagination((prev) => ({ ...prev, current_page: page }));
-  };
-
-  // Function to refresh account and transactions data
-  const refreshAccountAndTransactionsData = async () => {
-    await queryClient.invalidateQueries(["account", accountId]);
-    await queryClient.invalidateQueries([
-      "transactions",
-      accountId,
-      pagination.current_page,
-    ]);
-  };
-
   // Function to refresh account data
   const refreshAccountData = async () => {
     await queryClient.invalidateQueries(["account", accountId]);
   };
 
   // Show error message if account or transactions fetch fails
-  if (isAccountError || isTransactionsError) {
+  if (isAccountError) {
     return (
       <Box textAlign="center" py={10} px={6}>
         <Text fontSize="xl" fontWeight="bold" mb={2}>
@@ -146,7 +73,7 @@ const AccountMain = ({ currencySymbolCode }) => {
     );
   }
 
-  if (isAccountLoading || isTransactionsLoading || !transactionsData) {
+  if (isAccountLoading) {
     return (
       <Box>
         <AccountMainHeaderSkeleton />
@@ -167,13 +94,10 @@ const AccountMain = ({ currencySymbolCode }) => {
 
       {/* Transactions Section */}
       <AccountMainTransactions
-        transactions={transactionsData?.transactions || []}
         account={account}
         currencySymbolCode={currencySymbolCode}
-        fetchTransactions={handlePageChange}
-        pagination={pagination}
         onAddTransaction={() => setIsCreateModalOpen(true)}
-        onTransactionDeleted={refreshAccountAndTransactionsData}
+        onTransactionDeleted={refreshAccountData}
       />
 
       {/* Create Transaction Modal */}
@@ -183,7 +107,7 @@ const AccountMain = ({ currencySymbolCode }) => {
         ledgerId={ledgerId}
         accountId={accountId}
         currencySymbol={currencySymbols[currencySymbolCode]}
-        onTransactionAdded={refreshAccountAndTransactionsData}
+        onTransactionAdded={refreshAccountData}
       />
 
       {/* Transfer Funds Modal */}
@@ -193,7 +117,7 @@ const AccountMain = ({ currencySymbolCode }) => {
         ledgerId={ledgerId}
         accountId={accountId}
         currencySymbol={currencySymbols[currencySymbolCode]}
-        onTransferCompleted={refreshAccountAndTransactionsData}
+        onTransferCompleted={refreshAccountData}
       />
 
       {/* Update Account Modal */}
