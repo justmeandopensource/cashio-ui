@@ -56,6 +56,47 @@ const TransactionFilter = ({
   // Track if filters have changed from current applied filters
   const [hasChanged, setHasChanged] = useState(false);
 
+  // Initialize filters when modal opens with current filters
+  useEffect(() => {
+    if (isOpen) {
+      // Normalize tags structure
+      let normalizedTags = [];
+      if (currentFilters.tags) {
+        normalizedTags = Array.isArray(currentFilters.tags)
+          ? currentFilters.tags
+              .map((tag) => {
+                // Handle both string tags and object tags
+                if (typeof tag === "string") {
+                  return { name: tag };
+                } else if (tag && typeof tag === "object" && tag.name) {
+                  return { ...tag };
+                }
+                return null;
+              })
+              .filter(Boolean)
+          : [];
+      }
+
+      // Properly normalize dates and tags from currentFilters
+      const normalizedFilters = {
+        account_id: currentFilters.account_id || "",
+        category_id: currentFilters.category_id || "",
+        tags: normalizedTags,
+        tags_match: currentFilters.tags_match || "any",
+        search_text: currentFilters.search_text || "",
+        transaction_type: currentFilters.transaction_type || "",
+        from_date: currentFilters.from_date
+          ? new Date(currentFilters.from_date)
+          : null,
+        to_date: currentFilters.to_date
+          ? new Date(currentFilters.to_date)
+          : null,
+      };
+
+      setFilters(normalizedFilters);
+    }
+  }, [isOpen, currentFilters]);
+
   // Fetch accounts for the current ledger
   const { data: accounts = [] } = useQuery({
     queryKey: ["accounts", ledgerId],
@@ -102,28 +143,12 @@ const TransactionFilter = ({
 
   // Check if filters have changed when the form is opened or filters change
   useEffect(() => {
-    // Compare filters with currentFilters
     const checkIfChanged = () => {
       // Check account_id
       if (filters.account_id !== (currentFilters.account_id || "")) return true;
 
       // Check category_id
       if (filters.category_id !== (currentFilters.category_id || ""))
-        return true;
-
-      // Check tags (simple length check first)
-      const currentTags = currentFilters.tags || [];
-      if (filters.tags.length !== currentTags.length) return true;
-
-      // Check tags (deep comparison)
-      const tagNames = filters.tags.map((t) => t.name).sort();
-      const currentTagNames = currentTags.map((t) => t.name).sort();
-      for (let i = 0; i < tagNames.length; i++) {
-        if (tagNames[i] !== currentTagNames[i]) return true;
-      }
-
-      // Check tags_match
-      if (filters.tags_match !== (currentFilters.tags_match || "any"))
         return true;
 
       // Check search_text
@@ -134,44 +159,53 @@ const TransactionFilter = ({
       if (filters.transaction_type !== (currentFilters.transaction_type || ""))
         return true;
 
-      // Check dates (need to handle null, undefined, and date objects)
-      const currentFromDate = currentFilters.from_date
-        ? new Date(currentFilters.from_date)
-        : null;
-      const currentToDate = currentFilters.to_date
-        ? new Date(currentFilters.to_date)
-        : null;
-
-      if (
-        (filters.from_date && !currentFromDate) ||
-        (!filters.from_date && currentFromDate)
-      )
-        return true;
-      if (
-        (filters.to_date && !currentToDate) ||
-        (!filters.to_date && currentToDate)
-      )
+      // Check tags_match
+      if (filters.tags_match !== (currentFilters.tags_match || "any"))
         return true;
 
-      // Use a safe comparison for dates
-      if (filters.from_date && currentFromDate) {
-        const filtersFromDate =
-          filters.from_date instanceof Date
-            ? filters.from_date.toDateString()
-            : new Date(filters.from_date).toDateString();
-        const currentFromDateStr = currentFromDate.toDateString();
-        if (filtersFromDate !== currentFromDateStr) return true;
+      // Check tags (simple length check first)
+      const currentTags = currentFilters.tags || [];
+      if (filters.tags.length !== currentTags.length) return true;
+
+      // Check tags (deep comparison)
+      // Sort both arrays to ensure consistent comparison
+      const tagNames = [...filters.tags].map((t) => t.name).sort();
+      const currentTagNames = [...currentTags].map((t) => t.name).sort();
+      for (let i = 0; i < tagNames.length; i++) {
+        if (tagNames[i] !== currentTagNames[i]) return true;
       }
 
-      if (filters.to_date && currentToDate) {
-        const filtersToDate =
-          filters.to_date instanceof Date
-            ? filters.to_date.toDateString()
-            : new Date(filters.to_date).toDateString();
-        const currentToDateStr = currentToDate.toDateString();
-        if (filtersToDate !== currentToDateStr) return true;
+      // Handle dates with more robust comparison
+      // From date
+      if (
+        (filters.from_date && !currentFilters.from_date) ||
+        (!filters.from_date && currentFilters.from_date)
+      ) {
+        return true;
       }
-      return true;
+
+      // To date
+      if (
+        (filters.to_date && !currentFilters.to_date) ||
+        (!filters.to_date && currentFilters.to_date)
+      ) {
+        return true;
+      }
+
+      // Compare dates if both exist
+      if (filters.from_date && currentFilters.from_date) {
+        const filterDate = new Date(filters.from_date);
+        const currentDate = new Date(currentFilters.from_date);
+        if (filterDate.toDateString() !== currentDate.toDateString())
+          return true;
+      }
+
+      if (filters.to_date && currentFilters.to_date) {
+        const filterDate = new Date(filters.to_date);
+        const currentDate = new Date(currentFilters.to_date);
+        if (filterDate.toDateString() !== currentDate.toDateString())
+          return true;
+      }
 
       return false;
     };
@@ -210,15 +244,18 @@ const TransactionFilter = ({
       // Handle dates
       if (key === "from_date" || key === "to_date") {
         if (value) {
+          // Ensure value is a Date object before formatting
+          const dateValue = value instanceof Date ? value : new Date(value);
           // Format date to YYYY-MM-DD format for API
-          cleanedFilters[key] = value.toISOString().split("T")[0];
+          cleanedFilters[key] = dateValue.toISOString().split("T")[0];
         }
         return;
       }
 
       // Handle tags - extract just the tag names for the API
       if (key === "tags" && value.length > 0) {
-        cleanedFilters[key] = value.map((tag) => tag.name);
+        // Create a deep copy to avoid modifying the filters state
+        cleanedFilters[key] = [...value].map((tag) => tag.name);
         return;
       }
 
