@@ -42,10 +42,6 @@ const Home = () => {
 
       return response.json();
     },
-    onError: () => {
-      localStorage.removeItem("access_token");
-      navigate("/login");
-    },
     retry: false, // Disable retries to avoid infinite loops
   });
 

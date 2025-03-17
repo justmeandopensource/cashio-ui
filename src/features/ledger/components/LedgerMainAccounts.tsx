@@ -40,7 +40,9 @@ interface Ledger {
 interface LedgerMainAccountsProps {
   accounts: Account[];
   ledger: Ledger;
+  // eslint-disable-next-line no-unused-vars
   onAddTransaction: (accountId: string) => void;
+  // eslint-disable-next-line no-unused-vars
   onTransferFunds: (accountId: string) => void;
 }
 

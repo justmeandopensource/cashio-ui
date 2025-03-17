@@ -21,10 +21,13 @@ import {
 import { ViewIcon, ViewOffIcon, EmailIcon, LockIcon } from "@chakra-ui/icons";
 
 interface LoginFormProps {
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   username: string;
+  // eslint-disable-next-line no-unused-vars
   setUsername: (value: string) => void;
   password: string;
+  // eslint-disable-next-line no-unused-vars
   setPassword: (value: string) => void;
   usernameInputRef: React.RefObject<HTMLInputElement>;
   isLoading?: boolean;
@@ -99,7 +102,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             Welcome Back
           </Heading>
 
-          <FormControl isInvalid={usernameError} isRequired>
+          <FormControl isInvalid={usernameError}>
             <FormLabel fontSize="sm" fontWeight="medium">
               Username
             </FormLabel>
@@ -134,7 +137,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             )}
           </FormControl>
 
-          <FormControl isInvalid={passwordError} isRequired>
+          <FormControl isInvalid={passwordError}>
             <FormLabel fontSize="sm" fontWeight="medium">
               Password
             </FormLabel>

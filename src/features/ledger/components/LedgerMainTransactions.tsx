@@ -19,7 +19,7 @@ const LedgerMainTransactions: React.FC<LedgerMainTransactionsProps> = ({
   return (
     <Transactions
       ledgerId={ledgerId}
-      accountId={null}
+      accountId={undefined}
       currencySymbolCode={currencySymbolCode}
       onAddTransaction={onAddTransaction}
       onTransactionDeleted={onTransactionDeleted}

@@ -29,14 +29,19 @@ import {
 } from "@chakra-ui/icons";
 
 interface RegisterFormProps {
+  // eslint-disable-next-line no-unused-vars
   onSubmit: (event: React.FormEvent) => void;
   full_name: string;
+  // eslint-disable-next-line no-unused-vars
   setFullName: (name: string) => void;
   username: string;
+  // eslint-disable-next-line no-unused-vars
   setUsername: (username: string) => void;
   email: string;
+  // eslint-disable-next-line no-unused-vars
   setEmail: (email: string) => void;
   password: string;
+  // eslint-disable-next-line no-unused-vars
   setPassword: (password: string) => void;
   fullNameRef: RefObject<HTMLInputElement>;
 }

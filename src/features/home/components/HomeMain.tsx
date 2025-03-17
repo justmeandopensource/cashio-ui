@@ -6,6 +6,7 @@ interface HomeMainProps {
   onOpen: () => void;
   isOpen: boolean;
   onClose: () => void;
+  // eslint-disable-next-line no-unused-vars
   handleCreateLedger: (name: string, currency: string) => void;
 }
 
