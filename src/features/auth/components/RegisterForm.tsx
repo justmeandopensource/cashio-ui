@@ -160,7 +160,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             Create Account
           </Heading>
 
-          <FormControl isInvalid={nameError} isRequired>
+          <FormControl isInvalid={nameError}>
             <FormLabel fontSize="sm" fontWeight="medium">
               Full Name
             </FormLabel>
@@ -193,7 +193,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             )}
           </FormControl>
 
-          <FormControl isInvalid={usernameError} isRequired>
+          <FormControl isInvalid={usernameError}>
             <FormLabel fontSize="sm" fontWeight="medium">
               Username
             </FormLabel>
@@ -225,7 +225,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             )}
           </FormControl>
 
-          <FormControl isInvalid={emailError} isRequired>
+          <FormControl isInvalid={emailError}>
             <FormLabel fontSize="sm" fontWeight="medium">
               Email Address
             </FormLabel>
@@ -257,7 +257,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             )}
           </FormControl>
 
-          <FormControl isInvalid={passwordError} isRequired>
+          <FormControl isInvalid={passwordError}>
             <FormLabel fontSize="sm" fontWeight="medium">
               Password
             </FormLabel>

@@ -85,6 +85,7 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
               }}
               cursor="pointer"
               onClick={onOpen}
+              data-testid="create-ledger-card-with-plus-icon"
             >
               <CardBody
                 display="flex"
