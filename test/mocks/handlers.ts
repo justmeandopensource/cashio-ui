@@ -1,5 +1,6 @@
 import { http, HttpResponse } from "msw";
 import config from "@/config";
+import { mockAccounts, mockLedgers } from "./testData";
 
 export const authHandlers = {
   // Login verification for valid credentials
@@ -59,13 +60,7 @@ export const ledgerHandlers = {
 
   // Get ledger list with data
   getLedgersWithData: http.get(`${config.apiBaseUrl}/ledger/list`, () => {
-    return HttpResponse.json(
-      [
-        { ledger_id: "1", name: "UK", currency_symbol: "GBP", user_id: 1 },
-        { ledger_id: "2", name: "India", currency_symbol: "INR", user_id: 1 },
-      ],
-      { status: 200 },
-    );
+    return HttpResponse.json(mockLedgers, { status: 200 });
   }),
 
   // Get ledger list with error
@@ -75,6 +70,52 @@ export const ledgerHandlers = {
       { status: 500 },
     );
   }),
+
+  // Get empty accounts for a ledger
+  getAccountsEmpty: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
+    () => {
+      return HttpResponse.json([], { status: 200 });
+    },
+  ),
+
+  // Get accounts for a ledger
+  getAccountsWithData: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
+    () => {
+      return HttpResponse.json(mockAccounts, { status: 200 });
+    },
+  ),
+
+  // Get accounts for a ledger by type
+  getAccountsWithDataByType: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
+    ({ request }) => {
+      // Get the URL from the request
+      const url = new URL(request.url);
+
+      // Extract the account_type from query parameters
+      const accountType = url.searchParams.get("account_type");
+
+      // Filter mockAccounts based on the account_type
+      const filteredAccounts = mockAccounts.filter(
+        (account) => account.type === accountType,
+      );
+
+      return HttpResponse.json(filteredAccounts, { status: 200 });
+    },
+  ),
+
+  // Get accounts with error
+  getAccountsError: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch accounts" },
+        { status: 500 },
+      );
+    },
+  ),
 };
 
 // Combine all handlers
