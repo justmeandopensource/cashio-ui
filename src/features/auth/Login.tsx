@@ -58,17 +58,6 @@ const Login: React.FC = () => {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!username || !password) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields.",
-        status: "error",
-        position: "top-right",
-        duration: 2000,
-      });
-      return;
-    }
-
     const formDetails = new URLSearchParams();
     formDetails.append("username", username);
     formDetails.append("password", password);

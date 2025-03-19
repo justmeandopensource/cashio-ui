@@ -214,6 +214,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         )
                       }
                       _hover={{ textDecoration: "none" }}
+                      data-testid={`ledgermainaccounts-group-account-plus-icon-${account.account_id}`}
                     >
                       <Icon
                         as={FiPlus}
@@ -483,6 +484,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                 colorScheme="teal"
                 variant="ghost"
                 aria-label="Add Asset Account"
+                data-testid="ledgermainaccounts-add-asset-account-plus-icon"
                 onClick={() => handleCreateAccountClick("asset")}
               />
             </Flex>
@@ -497,7 +499,11 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
           ) : (
             <>
               <Box display={{ base: "none", xl: "block" }}>
-                <Table variant="simple" size="sm">
+                <Table
+                  variant="simple"
+                  size="sm"
+                  data-testid="ledgermainaccounts-asset-accounts-table"
+                >
                   <Tbody>
                     {renderAccountsTable(
                       assetAccounts,
@@ -555,6 +561,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                 colorScheme="teal"
                 variant="ghost"
                 aria-label="Add Liability Account"
+                data-testid="ledgermainaccounts-add-liability-account-plus-icon"
                 onClick={() => handleCreateAccountClick("liability")}
               />
             </Flex>
@@ -569,7 +576,11 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
           ) : (
             <>
               <Box display={{ base: "none", xl: "block" }}>
-                <Table variant="simple" size="sm">
+                <Table
+                  variant="simple"
+                  size="sm"
+                  data-testid="ledgermainaccounts-liability-accounts-table"
+                >
                   <Tbody>
                     {renderAccountsTable(
                       liabilityAccounts,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Flex,
   Spinner,
@@ -60,7 +60,6 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
     parentAccountId || "",
   );
   const [openingBalance, setOpeningBalance] = useState<string>("");
-  const accountNameInputRef = useRef<HTMLInputElement>(null as any);
 
   // Color variables for consistent theming
   const buttonColorScheme = "teal";
@@ -71,15 +70,6 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   useEffect(() => {
     setParentAccount(parentAccountId || "");
   }, [parentAccountId]);
-
-  // Auto-focus on account name input when modal opens
-  useEffect(() => {
-    if (isOpen && accountNameInputRef.current) {
-      setTimeout(() => {
-        accountNameInputRef.current.focus();
-      }, 100);
-    }
-  }, [isOpen]);
 
   // Fetch group accounts when the modal is opened
   const {
@@ -183,7 +173,6 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
         position: "top",
         isClosable: true,
       });
-      accountNameInputRef.current?.focus();
       return;
     }
 
@@ -206,7 +195,6 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      initialFocusRef={accountNameInputRef}
       size={{ base: "full", sm: "md" }}
       motionPreset="slideInBottom"
     >
@@ -249,7 +237,6 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                 placeholder={`e.g., ${accountType === "asset" ? "Cash, Bank Account" : "Credit Card, Mortgage"}`}
                 value={accountName}
                 onChange={(e) => setAccountName(e.target.value)}
-                ref={accountNameInputRef}
                 onKeyPress={handleKeyPress}
                 borderWidth="1px"
                 borderColor={borderColor}

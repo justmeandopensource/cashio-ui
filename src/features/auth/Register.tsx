@@ -67,17 +67,6 @@ const Register: React.FC = () => {
   const handleSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault();
 
-    if (!full_name || !username || !email || !password) {
-      toast({
-        title: "Error",
-        description: "Please fill in all fields.",
-        status: "error",
-        position: "top-right",
-        duration: 3000,
-      });
-      return;
-    }
-
     const formDetails: RegisterFormData = {
       full_name,
       username,

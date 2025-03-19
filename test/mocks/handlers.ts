@@ -1,6 +1,6 @@
 import { http, HttpResponse } from "msw";
 import config from "@/config";
-import { mockAccounts, mockLedgers } from "./testData";
+import { mockAccounts, mockCategories, mockLedgers } from "./testData";
 
 export const authHandlers = {
   // Login verification for valid credentials
@@ -71,6 +71,22 @@ export const ledgerHandlers = {
     );
   }),
 
+  // Get a specific ledger by ledgerId
+  getLedgerWithData: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId`,
+    ({ params }) => {
+      const ledgerId = params.ledgerId;
+
+      const ledger = mockLedgers.find(
+        (ledger) => ledger.ledger_id === ledgerId,
+      );
+
+      return HttpResponse.json(ledger, { status: 200 });
+    },
+  ),
+};
+
+export const accountHandlers = {
   // Get empty accounts for a ledger
   getAccountsEmpty: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
@@ -82,24 +98,27 @@ export const ledgerHandlers = {
   // Get accounts for a ledger
   getAccountsWithData: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
-    () => {
-      return HttpResponse.json(mockAccounts, { status: 200 });
+    ({ params }) => {
+      const ledgerId = Number(params.ledgerId);
+      const filteredAccounts = mockAccounts.filter(
+        (account) => account.ledger_id === ledgerId,
+      );
+      return HttpResponse.json(filteredAccounts, { status: 200 });
     },
   ),
 
   // Get accounts for a ledger by type
   getAccountsWithDataByType: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
-    ({ request }) => {
-      // Get the URL from the request
+    ({ params, request }) => {
+      const ledgerId = Number(params.ledgerId);
       const url = new URL(request.url);
 
-      // Extract the account_type from query parameters
       const accountType = url.searchParams.get("account_type");
 
-      // Filter mockAccounts based on the account_type
       const filteredAccounts = mockAccounts.filter(
-        (account) => account.type === accountType,
+        (account) =>
+          account.ledger_id === ledgerId && account.type === accountType,
       );
 
       return HttpResponse.json(filteredAccounts, { status: 200 });
@@ -118,8 +137,48 @@ export const ledgerHandlers = {
   ),
 };
 
+export const categoryHandlers = {
+  // Get empty categories
+  getCategoriesEmpty: http.get(`${config.apiBaseUrl}/category/list`, () => {
+    return HttpResponse.json([], { status: 200 });
+  }),
+
+  // Get categories
+  getCategoriesWithData: http.get(
+    `${config.apiBaseUrl}/categories/list`,
+    () => {
+      return HttpResponse.json(mockCategories, { status: 200 });
+    },
+  ),
+
+  // Get categories by type
+  getCategoriesWithDataByType: http.get(
+    `${config.apiBaseUrl}/categories/group`,
+    ({ request }) => {
+      const url = new URL(request.url);
+      const categoryType = url.searchParams.get("category_type");
+
+      const filteredCategories = mockCategories.filter(
+        (category) => category.type === categoryType,
+      );
+
+      return HttpResponse.json(filteredCategories, { status: 200 });
+    },
+  ),
+
+  // Get categories with error
+  getCategoriesError: http.get(`${config.apiBaseUrl}/categories/list`, () => {
+    return HttpResponse.json(
+      { error: "Failed to fetch categories" },
+      { status: 500 },
+    );
+  }),
+};
+
 // Combine all handlers
 export const handlers = [
   ...Object.values(authHandlers),
   ...Object.values(ledgerHandlers),
+  ...Object.values(accountHandlers),
+  ...Object.values(categoryHandlers),
 ];

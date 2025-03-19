@@ -95,6 +95,7 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
               variant="solid"
               onClick={onAddTransaction}
               w={{ base: "100%", md: "100%", lg: "auto" }}
+              data-testid="ledgermainheader-add-transaction-btn"
             >
               Add Transaction
             </Button>
@@ -106,6 +107,7 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
               variant="outline"
               onClick={onTransferFunds}
               w={{ base: "100%", md: "100%", lg: "auto" }}
+              data-testid="ledgermainheader-transfer-funds-btn"
             >
               Transfer Funds
             </Button>

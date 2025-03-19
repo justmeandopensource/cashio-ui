@@ -81,3 +81,38 @@ export const mockAccounts = [
     parent_account_id: 4,
   },
 ];
+
+export const mockCategories = [
+  {
+    category_id: 1,
+    user_id: 1,
+    name: "Utilities",
+    type: "expense",
+    is_group: true,
+    parent_category_id: null,
+  },
+  {
+    category_id: 2,
+    user_id: 1,
+    name: "Water",
+    type: "expense",
+    is_group: false,
+    parent_category_id: 1,
+  },
+  {
+    category_id: 3,
+    user_id: 1,
+    name: "Salary",
+    type: "income",
+    is_group: true,
+    parent_category_id: null,
+  },
+  {
+    category_id: 4,
+    user_id: 1,
+    name: "Test Company",
+    type: "income",
+    is_group: false,
+    parent_category_id: 3,
+  },
+];
