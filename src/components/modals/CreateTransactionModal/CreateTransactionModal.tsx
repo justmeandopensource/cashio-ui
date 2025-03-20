@@ -30,8 +30,8 @@ import axios, { AxiosError } from "axios";
 import config from "@/config";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import FormSplits from "./FormSplits";
-import FormNotes from "./FormNotes";
-import FormTags from "./FormTags";
+import FormNotes from "@/components/shared/FormNotes";
+import FormTags from "@/components/shared/FormTags";
 
 // Define interfaces for the props and state
 interface CreateTransactionModalProps {

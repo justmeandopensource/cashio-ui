@@ -26,7 +26,7 @@ import {
   Box,
 } from "@chakra-ui/react";
 import { FiFilter, FiX } from "react-icons/fi";
-import FormTags from "@/components/modals/CreateTransactionModal/FormTags";
+import FormTags from "@/components/shared/FormTags";
 import config from "@/config";
 import ChakraDatePicker from "@/components/shared/ChakraDatePicker";
 

@@ -28,6 +28,7 @@ import axios, { AxiosError } from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import { currencySymbols, CurrencyCode } from "@components/shared/utils";
 import config from "@/config";
+import FormNotes from "../shared/FormNotes";
 
 interface Ledger {
   ledger_id: string;
@@ -531,17 +532,13 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
             </Box>
 
             {/* Notes */}
-            <FormControl>
-              <FormLabel fontSize="sm" fontWeight="medium">
-                Notes
-              </FormLabel>
-              <Input
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Description (optional)"
-                borderColor={borderColor}
-              />
-            </FormControl>
+            <FormNotes
+              ledgerId={ledgerId}
+              notes={notes}
+              setNotes={setNotes}
+              isOpen={isOpen}
+              borderColor={borderColor}
+            />
           </VStack>
 
           {/* Mobile-only action buttons that stay at bottom */}
