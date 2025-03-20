@@ -73,6 +73,13 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
     await queryClient.invalidateQueries({ queryKey: ["account", accountId] });
   };
 
+  // Function to refresh transactions data
+  const refreshTransactionsData = async (): Promise<void> => {
+    await queryClient.invalidateQueries({
+      queryKey: ["transactions"],
+    });
+  };
+
   // Show error message if account or transactions fetch fails
   if (isAccountError) {
     return (
@@ -118,7 +125,10 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
         ledgerId={ledgerId as string}
         accountId={accountId as string}
         currencySymbol={currencySymbols[currencySymbolCode as CurrencyCode]}
-        onTransactionAdded={refreshAccountData}
+        onTransactionAdded={() => {
+          refreshAccountData();
+          refreshTransactionsData();
+        }}
       />
 
       {/* Transfer Funds Modal */}
@@ -128,7 +138,10 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
         ledgerId={ledgerId as string}
         accountId={accountId as string}
         currencySymbol={currencySymbols[currencySymbolCode as CurrencyCode]}
-        onTransferCompleted={refreshAccountData}
+        onTransferCompleted={() => {
+          refreshAccountData();
+          refreshTransactionsData();
+        }}
       />
 
       {/* Update Account Modal */}
