@@ -21,7 +21,11 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { FiPlus, FiRepeat } from "react-icons/fi";
 import CreateAccountModal from "@components/modals/CreateAccountModal";
-import { formatNumberAsCurrency } from "@components/shared/utils";
+import {
+  CurrencyCode,
+  currencySymbols,
+  formatNumberAsCurrency,
+} from "@components/shared/utils";
 
 interface Account {
   account_id: string;
@@ -609,6 +613,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
         ledgerId={ledger.ledger_id}
         accountType={accountType === "asset" ? "asset" : "liability"}
         parentAccountId={parentAccountId}
+        currencySymbol={currencySymbols[ledger.currency_symbol as CurrencyCode]}
       />
     </Box>
   );

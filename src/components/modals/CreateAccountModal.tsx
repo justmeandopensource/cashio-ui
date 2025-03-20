@@ -20,6 +20,8 @@ import {
   VStack,
   useColorModeValue,
   Text,
+  InputGroup,
+  InputLeftAddon,
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import config from "@/config";
@@ -35,6 +37,7 @@ interface CreateAccountModalProps {
   ledgerId: string;
   accountType: "asset" | "liability";
   parentAccountId?: string | null;
+  currencySymbol: string;
 }
 
 interface CreateAccountPayload {
@@ -51,6 +54,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   ledgerId,
   accountType,
   parentAccountId,
+  currencySymbol,
 }) => {
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -272,22 +276,25 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
             {!isGroupAccount && (
               <FormControl>
                 <FormLabel fontWeight="medium">Opening Balance</FormLabel>
-                <Input
-                  type="number"
-                  value={openingBalance}
-                  onChange={(e) => setOpeningBalance(e.target.value)}
-                  placeholder="0.00"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  bg={bgColor}
-                  size="md"
-                  borderRadius="md"
-                  _hover={{ borderColor: buttonColorScheme + ".300" }}
-                  _focus={{
-                    borderColor: buttonColorScheme + ".500",
-                    boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
-                  }}
-                />
+                <InputGroup>
+                  <InputLeftAddon>{currencySymbol}</InputLeftAddon>
+                  <Input
+                    type="number"
+                    value={openingBalance}
+                    onChange={(e) => setOpeningBalance(e.target.value)}
+                    placeholder="0.00"
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    bg={bgColor}
+                    size="md"
+                    borderRadius="md"
+                    _hover={{ borderColor: buttonColorScheme + ".300" }}
+                    _focus={{
+                      borderColor: buttonColorScheme + ".500",
+                      boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                    }}
+                  />
+                </InputGroup>
                 <FormHelperText>
                   Starting balance for this account (optional)
                 </FormHelperText>
