@@ -21,7 +21,6 @@ import {
   TabList,
   Tab,
   useColorModeValue,
-  useBreakpointValue,
   InputGroup,
   InputLeftAddon,
   Stack,
@@ -86,9 +85,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const [tags, setTags] = useState<Tag[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
-
-  // Responsive design helpers
-  const modalSize = useBreakpointValue({ base: "full", md: "md" });
 
   // Theme colors
   const buttonColorScheme = "teal";
@@ -324,7 +320,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size={modalSize}
+      size={{ base: "full", sm: "md" }}
       motionPreset="slideInBottom"
     >
       <ModalOverlay backdropFilter="blur(2px)" />
@@ -361,6 +357,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
           flexDirection="column"
           overflow="auto"
           maxHeight={{ md: "calc(80vh - 140px)" }}
+          justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
           <VStack spacing={6} align="stretch" w="100%">
             {/* Basic Info - First Section */}

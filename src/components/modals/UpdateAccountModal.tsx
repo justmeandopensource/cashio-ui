@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Flex,
   Spinner,
@@ -70,22 +70,12 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   >(account.parent_account_id);
   const [groupAccounts, setGroupAccounts] = useState<GroupAccount[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const nameInputRef = useRef<HTMLInputElement>(null as any);
   const toast = useToast();
 
   // Color variables for consistent theming
   const buttonColorScheme = "teal";
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-
-  // Auto-focus on account name input when modal opens
-  useEffect(() => {
-    if (isOpen && nameInputRef.current) {
-      setTimeout(() => {
-        nameInputRef.current.focus();
-      }, 100);
-    }
-  }, [isOpen]);
 
   // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -141,7 +131,6 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
         position: "top",
         isClosable: true,
       });
-      nameInputRef.current?.focus();
       return;
     }
 
@@ -210,7 +199,6 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      initialFocusRef={nameInputRef}
       size={{ base: "full", sm: "md" }}
       motionPreset="slideInBottom"
     >
@@ -219,7 +207,9 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        h={{ base: "100vh", sm: "auto" }}
+        maxHeight={{ base: "100%", md: "80vh" }}
+        display="flex"
+        flexDirection="column"
       >
         <Box
           pt={{ base: 10, sm: 4 }}
@@ -236,11 +226,6 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
           >
             Update {account.type === "asset" ? "Asset" : "Liability"} Account
           </ModalHeader>
-          <ModalCloseButton
-            color={{ base: "white", sm: "gray.500" }}
-            top={{ base: 10, sm: 4 }}
-            right={{ base: 4, sm: 4 }}
-          />
         </Box>
 
         <ModalBody
@@ -249,6 +234,8 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
           flex="1"
           display="flex"
           flexDirection="column"
+          overflow="auto"
+          maxHeight={{ md: "calc(80vh - 140px)" }}
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
           <VStack spacing={6} align="stretch" w="100%">
@@ -258,7 +245,6 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                 placeholder={`e.g., ${account.type === "asset" ? "Cash, Bank Account" : "Credit Card, Mortgage"}`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                ref={nameInputRef}
                 onKeyPress={handleKeyPress}
                 borderWidth="1px"
                 borderColor={borderColor}

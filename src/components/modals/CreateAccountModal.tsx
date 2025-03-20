@@ -207,7 +207,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        h={{ base: "100vh", sm: "auto" }}
+        maxHeight={{ base: "100%", md: "80vh" }}
+        display="flex"
+        flexDirection="column"
       >
         <Box
           pt={{ base: 10, sm: 4 }}
@@ -232,6 +234,8 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
           flex="1"
           display="flex"
           flexDirection="column"
+          overflow="auto"
+          maxHeight={{ md: "calc(80vh - 140px)" }}
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
           <VStack spacing={6} align="stretch" w="100%">

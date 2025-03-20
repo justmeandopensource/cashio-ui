@@ -1,7 +1,6 @@
 import React, {
   useState,
   useEffect,
-  useRef,
   KeyboardEvent,
   ChangeEvent,
   useCallback,
@@ -64,7 +63,6 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   );
   const [groupCategories, setGroupCategories] = useState<GroupCategory[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const categoryNameInputRef = useRef<HTMLInputElement>(null as any);
 
   // Color variables for consistent theming
   const buttonColorScheme = "teal";
@@ -111,14 +109,6 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     if (isOpen && !parentCategoryId) {
       fetchGroupCategories();
     }
-
-    // Auto-focus on category name input when modal opens
-    if (isOpen && categoryNameInputRef.current) {
-      setTimeout(() => {
-        // Using optional chaining to safely access the focus method
-        categoryNameInputRef.current?.focus();
-      }, 100);
-    }
   }, [isOpen, categoryType, parentCategoryId, fetchGroupCategories]);
 
   // Reset form fields
@@ -145,7 +135,6 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
         position: "top",
         isClosable: true,
       });
-      categoryNameInputRef.current?.focus();
       return;
     }
 
@@ -202,7 +191,6 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      initialFocusRef={categoryNameInputRef}
       size={{ base: "full", sm: "md" }}
       motionPreset="slideInBottom"
     >
@@ -211,7 +199,9 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        h={{ base: "100vh", sm: "auto" }}
+        maxHeight={{ base: "100%", md: "80vh" }}
+        display="flex"
+        flexDirection="column"
       >
         <Box
           pt={{ base: 10, sm: 4 }}
@@ -236,6 +226,8 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
           flex="1"
           display="flex"
           flexDirection="column"
+          overflow="auto"
+          maxHeight={{ md: "calc(80vh - 140px)" }}
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
           <VStack spacing={6} align="stretch" w="100%">
@@ -247,7 +239,6 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                 onChange={(e: ChangeEvent<HTMLInputElement>) =>
                   setCategoryName(e.target.value)
                 }
-                ref={categoryNameInputRef}
                 onKeyPress={handleKeyPress}
                 borderWidth="1px"
                 borderColor={borderColor}

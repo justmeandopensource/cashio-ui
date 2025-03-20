@@ -1,4 +1,4 @@
-import React, { useState, useRef, KeyboardEvent, ChangeEvent } from "react";
+import React, { useState, KeyboardEvent, ChangeEvent } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -46,7 +46,6 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
 }) => {
   const [newLedgerName, setNewLedgerName] = useState<string>("");
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
-  const ledgerNameInputRef = useRef<HTMLInputElement>(null as any);
   const toast = useToast();
 
   // Color variables for consistent theming
@@ -64,7 +63,6 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
         position: "top",
         isClosable: true,
       });
-      if (!newLedgerName) ledgerNameInputRef.current?.focus();
       return;
     }
 
@@ -95,7 +93,6 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      initialFocusRef={ledgerNameInputRef}
       size={{ base: "full", sm: "md" }}
       motionPreset="slideInBottom"
     >
@@ -104,7 +101,9 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        h={{ base: "100vh", sm: "auto" }}
+        maxHeight={{ base: "100%", md: "80vh" }}
+        display="flex"
+        flexDirection="column"
       >
         <Box
           pt={{ base: 10, sm: 4 }}
@@ -129,6 +128,8 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
           flex="1"
           display="flex"
           flexDirection="column"
+          overflow="auto"
+          maxHeight={{ md: "calc(80vh - 140px)" }}
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
           <VStack spacing={6} align="stretch" w="100%">
@@ -141,7 +142,6 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                   setNewLedgerName(e.target.value)
                 }
                 autoFocus
-                ref={ledgerNameInputRef}
                 onKeyPress={handleKeyPress}
                 borderWidth="1px"
                 borderColor={borderColor}
