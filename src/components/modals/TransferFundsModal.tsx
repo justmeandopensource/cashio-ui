@@ -328,6 +328,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                     onChange={(e) => setAmount(e.target.value)}
                     placeholder="0.00"
                     borderColor={borderColor}
+                    autoFocus
                   />
                 </InputGroup>
               </FormControl>

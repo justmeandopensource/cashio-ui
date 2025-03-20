@@ -436,6 +436,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                       }}
                       placeholder="0.00"
                       borderColor={borderColor}
+                      autoFocus
                     />
                   </InputGroup>
                 </FormControl>
