@@ -96,10 +96,9 @@ const FormNotes: React.FC<FormNotesProps> = ({
         setNoteSuggestions([]);
       }
     },
-    [ledgerId, toast, setNoteSuggestions], // Added setNoteSuggestions as a dependency
+    [ledgerId, toast, setNoteSuggestions],
   );
 
-  // Create the debounced version of the function outside useCallback
   const debouncedFetchNoteSuggestions = useMemo(
     () => debounce(fetchNoteSuggestions, 500),
     [fetchNoteSuggestions],

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   Box,
   FormControl,
@@ -49,45 +49,63 @@ const FormTags: React.FC<FormTagsProps> = ({
   );
   const [tagInput, setTagInput] = useState<string>("");
 
+  // eslint-disable-next-line no-unused-vars
+  const debounce = <F extends (...args: any[]) => any>(
+    func: F,
+    delay: number,
+  ) => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    return function (this: any, ...args: Parameters<F>) {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(() => {
+        func.apply(this, args);
+      }, delay);
+    };
+  };
+
   // Fetch tag suggestions from the backend
   const fetchTagSuggestions = useCallback(
     async (query: string): Promise<void> => {
-      try {
-        const token = localStorage.getItem("access_token");
-        const response = await axios.get(
-          `${config.apiBaseUrl}/tags/search?query=${query}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
+      if (query.length >= 3) {
+        try {
+          const token = localStorage.getItem("access_token");
+          const response = await axios.get(
+            `${config.apiBaseUrl}/tags/search?query=${query}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
             },
-          },
-        );
-        setTagSuggestions(response.data);
-      } catch (error) {
-        console.error("Error fetching tag suggestions:", error);
-        const apiError = error as AxiosError<ApiErrorResponse>;
-        toast({
-          title: "Error",
-          description:
-            apiError.response?.data?.detail ||
-            "Failed to fetch tag suggestions.",
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+          );
+          setTagSuggestions(response.data);
+        } catch (error) {
+          console.error("Error fetching tag suggestions:", error);
+          const apiError = error as AxiosError<ApiErrorResponse>;
+          toast({
+            title: "Error",
+            description:
+              apiError.response?.data?.detail ||
+              "Failed to fetch tag suggestions.",
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        }
+      } else {
+        setTagSuggestions([]);
       }
     },
-    [toast],
+    [toast, setTagSuggestions],
   );
 
-  // Fetch tag suggestions as the user types
-  useEffect(() => {
-    if (tagInput.length > 0) {
-      fetchTagSuggestions(tagInput);
-    } else {
-      setTagSuggestions([]);
-    }
-  }, [tagInput, fetchTagSuggestions]);
+  const debouncedFetchTagSuggestions = useMemo(
+    () => debounce(fetchTagSuggestions, 500),
+    [fetchTagSuggestions],
+  );
 
   // Ensure all tags have a valid name property
   const normalizedTags: TagItem[] =
@@ -167,9 +185,10 @@ const FormTags: React.FC<FormTagsProps> = ({
         {/* Tag input with suggestions */}
         <Input
           value={tagInput}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setTagInput(e.target.value)
-          }
+          onChange={(e) => {
+            setTagInput(e.target.value);
+            debouncedFetchTagSuggestions(e.target.value);
+          }}
           onKeyDown={handleTagInputKeyDown}
           placeholder="Add tags (press Enter)"
           borderColor={borderColor}
