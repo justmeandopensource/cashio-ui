@@ -64,6 +64,10 @@ interface Tag {
   name: string;
 }
 
+const roundToTwoDecimals = (value: number): number => {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+};
+
 const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   isOpen,
   onClose,
@@ -195,11 +199,13 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
   // Calculate remaining amount
   const calculateRemainingAmount = () => {
-    const allocatedAmount = splits.reduce((sum, split) => {
-      return sum + split.amount;
-    }, 0);
+    const allocatedAmount = roundToTwoDecimals(
+      splits.reduce((sum, split) => {
+        return roundToTwoDecimals(sum + roundToTwoDecimals(split.amount));
+      }, 0)
+    );
 
-    return (amount || 0) - allocatedAmount;
+    return roundToTwoDecimals((amount || 0) - allocatedAmount);
   };
 
   // Handle form submission

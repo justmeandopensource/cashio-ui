@@ -37,12 +37,17 @@ interface FormSplitsProps {
   type: "income" | "expense";
   categories: Category[];
   // eslint-disable-next-line no-unused-vars
-  setSplits: (slits: Split[]) => void;
+  setSplits: (splits: Split[]) => void;
   borderColor: string;
   bgColor: string;
   highlightColor: string;
   buttonColorScheme: string;
 }
+
+// Helper function to round to 2 decimal places for financial calculations
+const roundToTwoDecimals = (value: number): number => {
+  return Math.round((value + Number.EPSILON) * 100) / 100;
+};
 
 const FormSplits: React.FC<FormSplitsProps> = ({
   splits,
@@ -62,8 +67,11 @@ const FormSplits: React.FC<FormSplitsProps> = ({
     const currentAmount =
       typeof amount === "string" ? parseFloat(amount) : amount || 0;
 
+    // Round to ensure we have a clean 2-decimal value
+    const roundedAmount = roundToTwoDecimals(currentAmount);
+
     if (splits.length === 0) {
-      setSplits([{ amount: currentAmount, categoryId: "" }]);
+      setSplits([{ amount: roundedAmount, categoryId: "" }]);
       return;
     }
   }, [amount, splits, setSplits]);
@@ -81,24 +89,31 @@ const FormSplits: React.FC<FormSplitsProps> = ({
     const newSplits: Split[] = [...splits];
 
     const value = inputValue === "" ? 0 : parseFloat(inputValue);
+    // Round the input value to 2 decimal places
+    const roundedValue = roundToTwoDecimals(value);
 
     newSplits[index] = {
       ...newSplits[index],
-      amount: value,
+      amount: roundedValue,
     };
 
-    const totalAllocated = newSplits.reduce((sum, split, i) => {
-      return (
-        sum +
-        (i !== newSplits.length - 1 || i === index
-          ? parseFloat(split.amount.toString()) || 0
-          : 0)
-      );
-    }, 0);
+    const totalAllocated = roundToTwoDecimals(
+      newSplits.reduce((sum, split, i) => {
+        return roundToTwoDecimals(
+          sum +
+            (i !== newSplits.length - 1 || i === index
+              ? roundToTwoDecimals(parseFloat(split.amount.toString()) || 0)
+              : 0),
+        );
+      }, 0),
+    );
 
-    const totalAmount =
-      typeof amount === "string" ? parseFloat(amount) : amount || 0;
-    const remaining = totalAmount - totalAllocated;
+    const totalAmount = roundToTwoDecimals(
+      typeof amount === "string" ? parseFloat(amount) : amount || 0,
+    );
+
+    // Calculate remaining amount with proper rounding
+    const remaining = roundToTwoDecimals(totalAmount - totalAllocated);
 
     if (index < newSplits.length - 1) {
       if (newSplits.length > 1) {
@@ -111,7 +126,8 @@ const FormSplits: React.FC<FormSplitsProps> = ({
     let i = newSplits.length - 1;
     while (
       i > 0 &&
-      (parseFloat(newSplits[i].amount.toString()) || 0) === 0 &&
+      roundToTwoDecimals(parseFloat(newSplits[i].amount.toString()) || 0) ===
+        0 &&
       i !== index
     ) {
       newSplits.pop();
@@ -123,7 +139,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
 
   // Add a new split
   const addSplit = (): void => {
-    const remaining = calculateRemainingAmount();
+    const remaining = roundToTwoDecimals(calculateRemainingAmount());
     if (remaining <= 0) {
       // If no remaining amount, add a zero split
       setSplits([...splits, { amount: 0, categoryId: "", notes: "" }]);
@@ -140,18 +156,36 @@ const FormSplits: React.FC<FormSplitsProps> = ({
     }
 
     const newSplits = [...splits];
-    const removedAmount = parseFloat(newSplits[index].amount.toString()) || 0;
+    const removedAmount = roundToTwoDecimals(
+      parseFloat(newSplits[index].amount.toString()) || 0,
+    );
     newSplits.splice(index, 1);
 
     // Distribute the removed amount to the last split
     if (newSplits.length > 0 && removedAmount > 0) {
       const lastIndex = newSplits.length - 1;
-      newSplits[lastIndex].amount =
-        (parseFloat(newSplits[lastIndex].amount.toString()) || 0) +
-        removedAmount;
+      const currentLastAmount = roundToTwoDecimals(
+        parseFloat(newSplits[lastIndex].amount.toString()) || 0,
+      );
+      newSplits[lastIndex].amount = roundToTwoDecimals(
+        currentLastAmount + removedAmount,
+      );
     }
 
     setSplits(newSplits);
+  };
+
+  // Function to check if we're within a very small tolerance for display purposes
+  const isEffectivelyEqual = (a: number, b: number): boolean => {
+    return Math.abs(a - b) < 0.01;
+  };
+
+  // Modified calculation function for UI display
+  const displayRemainingAmount = (): number => {
+    const rawRemaining = calculateRemainingAmount();
+    return isEffectivelyEqual(rawRemaining, 0)
+      ? 0
+      : roundToTwoDecimals(rawRemaining);
   };
 
   return (
@@ -191,6 +225,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
                     }}
                     placeholder="0.00"
                     borderColor={borderColor}
+                    step="0.01"
                   />
                 </InputGroup>
               </FormControl>
@@ -266,8 +301,11 @@ const FormSplits: React.FC<FormSplitsProps> = ({
           alignSelf="flex-start"
           colorScheme={buttonColorScheme}
           isDisabled={
-            calculateRemainingAmount() <= 0 &&
-            splits.some((split) => parseFloat(split.amount.toString()) === 0)
+            displayRemainingAmount() <= 0 &&
+            splits.some(
+              (split) =>
+                roundToTwoDecimals(parseFloat(split.amount.toString())) === 0,
+            )
           }
         >
           Add Split
@@ -277,17 +315,21 @@ const FormSplits: React.FC<FormSplitsProps> = ({
         <HStack justifyContent="space-between" pt={2}>
           <Text fontSize="sm">
             Total: {currencySymbol}
-            {typeof amount === "string" ? parseFloat(amount) || 0 : amount || 0}
+            {roundToTwoDecimals(
+              typeof amount === "string"
+                ? parseFloat(amount) || 0
+                : amount || 0,
+            ).toFixed(2)}
           </Text>
-          {calculateRemainingAmount() !== 0 && (
+          {!isEffectivelyEqual(calculateRemainingAmount(), 0) && (
             <Text
               fontSize="sm"
               color={calculateRemainingAmount() < 0 ? "red.500" : "orange.500"}
               fontWeight="medium"
             >
               {calculateRemainingAmount() < 0
-                ? `Over-allocated by ${currencySymbol}${Math.abs(calculateRemainingAmount()).toFixed(2)}`
-                : `${currencySymbol}${calculateRemainingAmount().toFixed(2)} unallocated`}
+                ? `Over-allocated by ${currencySymbol}${Math.abs(roundToTwoDecimals(calculateRemainingAmount())).toFixed(2)}`
+                : `${currencySymbol}${roundToTwoDecimals(calculateRemainingAmount()).toFixed(2)} unallocated`}
             </Text>
           )}
         </HStack>
