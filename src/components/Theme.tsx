@@ -1,6 +1,13 @@
 import { extendTheme, ThemeConfig } from "@chakra-ui/react";
 
 const Theme: ThemeConfig = extendTheme({
+  styles: {
+    global: {
+      "*": {
+        WebkitTapHighlightColor: "transparent",
+      },
+    },
+  },
   components: {
     Input: {
       defaultProps: {
