@@ -29,6 +29,7 @@ import {
   FiInfo,
   FiCreditCard,
   FiTrash2,
+  FiMessageSquare,
 } from "react-icons/fi";
 import {
   formatAmount,
@@ -46,6 +47,7 @@ interface SplitTransaction {
   split_id: string;
   category_name: string;
   debit: number;
+  notes?: string; // Added notes field to SplitTransaction
 }
 
 interface TransferDetails {
@@ -249,9 +251,8 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                       bg="purple.50"
                     >
                       {splitTransactions.map((split) => (
-                        <Flex
+                        <Box
                           key={split.split_id}
-                          justify="space-between"
                           p={2}
                           borderBottomWidth={
                             splitTransactions.indexOf(split) !==
@@ -260,16 +261,38 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                               : "0"
                           }
                         >
-                          <Text fontSize="sm" fontWeight="medium">
-                            {split.category_name}
-                          </Text>
-                          <Text fontSize="sm" fontWeight="bold">
-                            {formatNumberAsCurrency(
-                              split.debit,
-                              currencySymbolCode,
-                            )}
-                          </Text>
-                        </Flex>
+                          {/* Split main row with category and amount */}
+                          <Flex justify="space-between">
+                            <Text fontSize="sm" fontWeight="medium">
+                              {split.category_name}
+                            </Text>
+                            <Text fontSize="sm" fontWeight="bold">
+                              {formatNumberAsCurrency(
+                                split.debit,
+                                currencySymbolCode,
+                              )}
+                            </Text>
+                          </Flex>
+
+                          {/* Split notes row - only displayed if notes exist */}
+                          {split.notes && (
+                            <Flex align="center" mt={1}>
+                              <Icon
+                                as={FiMessageSquare}
+                                color="gray.500"
+                                mr={1}
+                                fontSize="xs"
+                              />
+                              <Text
+                                fontSize="xs"
+                                color="gray.600"
+                                noOfLines={2}
+                              >
+                                {split.notes}
+                              </Text>
+                            </Flex>
+                          )}
+                        </Box>
                       ))}
                     </Box>
                   )

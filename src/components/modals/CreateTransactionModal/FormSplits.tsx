@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect } from "react";
-import { AddIcon, MinusIcon } from "@chakra-ui/icons";
+import { AddIcon } from "@chakra-ui/icons";
 import {
   Box,
   Divider,
   Flex,
   VStack,
   Text,
-  Stack,
   FormControl,
   FormLabel,
   InputGroup,
@@ -14,7 +13,6 @@ import {
   Input,
   HStack,
   Select,
-  IconButton,
   Button,
 } from "@chakra-ui/react";
 
@@ -28,6 +26,7 @@ interface Category {
 interface Split {
   amount: number;
   categoryId: string;
+  notes?: string;
 }
 
 interface FormSplitsProps {
@@ -127,10 +126,10 @@ const FormSplits: React.FC<FormSplitsProps> = ({
     const remaining = calculateRemainingAmount();
     if (remaining <= 0) {
       // If no remaining amount, add a zero split
-      setSplits([...splits, { amount: 0, categoryId: "" }]);
+      setSplits([...splits, { amount: 0, categoryId: "", notes: "" }]);
     } else {
       // Otherwise, add a split with the remaining amount
-      setSplits([...splits, { amount: remaining, categoryId: "" }]);
+      setSplits([...splits, { amount: remaining, categoryId: "", notes: "" }]);
     }
   };
 
@@ -179,7 +178,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
             borderColor={borderColor}
             bg={bgColor}
           >
-            <Stack direction={{ base: "column", md: "row" }} spacing={3}>
+            <VStack spacing={3} align="stretch">
               <FormControl flex="1">
                 <FormLabel fontSize="sm">Amount</FormLabel>
                 <InputGroup size="sm">
@@ -197,51 +196,64 @@ const FormSplits: React.FC<FormSplitsProps> = ({
               </FormControl>
               <FormControl flex="1">
                 <FormLabel fontSize="sm">Category</FormLabel>
-                <HStack spacing={1}>
-                  <Select
-                    size="sm"
-                    value={split.categoryId}
-                    onChange={(e) => {
-                      const newSplits = [...splits];
-                      newSplits[index].categoryId = e.target.value;
-                      setSplits(newSplits);
-                    }}
-                    borderColor={borderColor}
+                <Select
+                  size="sm"
+                  value={split.categoryId}
+                  onChange={(e) => {
+                    const newSplits = [...splits];
+                    newSplits[index].categoryId = e.target.value;
+                    setSplits(newSplits);
+                  }}
+                  borderColor={borderColor}
+                >
+                  <option value="">Select category</option>
+                  {/* Filter categories based on transaction type */}
+                  <optgroup
+                    label={
+                      type === "income"
+                        ? "Income Categories"
+                        : "Expense Categories"
+                    }
                   >
-                    <option value="">Select category</option>
-                    {/* Filter categories based on transaction type */}
-                    <optgroup
-                      label={
-                        type === "income"
-                          ? "Income Categories"
-                          : "Expense Categories"
-                      }
-                    >
-                      {categories
-                        .filter((category) => category.type === type)
-                        .map((category) => (
-                          <option
-                            key={category.category_id}
-                            value={category.category_id}
-                          >
-                            {category.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  </Select>
-
-                  <IconButton
-                    aria-label="Remove split"
-                    icon={<MinusIcon />}
-                    size="sm"
-                    variant="ghost"
-                    colorScheme="red"
-                    isDisabled={splits.length <= 1}
-                    onClick={() => removeSplit(index)}
-                  />
-                </HStack>
+                    {categories
+                      .filter((category) => category.type === type)
+                      .map((category) => (
+                        <option
+                          key={category.category_id}
+                          value={category.category_id}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                </Select>
               </FormControl>
-            </Stack>
+              <FormControl flex="1">
+                <FormLabel fontSize="sm">Notes</FormLabel>
+                <Input
+                  type="text"
+                  value={split.notes || ""}
+                  onChange={(e) => {
+                    const newSplits = [...splits];
+                    newSplits[index].notes = e.target.value;
+                    setSplits(newSplits);
+                  }}
+                  placeholder="Optional notes"
+                  borderColor={borderColor}
+                />
+              </FormControl>
+              {splits.length > 1 && (
+                <Text
+                  fontSize="sm"
+                  color="red.500"
+                  cursor="pointer"
+                  onClick={() => removeSplit(index)}
+                  textDecoration="underline"
+                >
+                  Remove Split
+                </Text>
+              )}
+            </VStack>
           </Box>
         ))}
 

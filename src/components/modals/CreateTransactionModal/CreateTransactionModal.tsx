@@ -56,8 +56,9 @@ interface Account {
 }
 
 interface Split {
-  amount: string;
+  amount: number;
   categoryId: string;
+  notes?: string;
 }
 
 interface Tag {
@@ -76,7 +77,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const [type, setType] = useState<"expense" | "income">("expense");
   const [categoryId, setCategoryId] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
-  const [amount, setAmount] = useState<string>("");
+  const [amount, setAmount] = useState<number | null>(null);
   const [selectedAccountId, setSelectedAccountId] = useState<string>("");
   const [isSplit, setIsSplit] = useState<boolean>(false);
   const [splits, setSplits] = useState<Split[]>([]);
@@ -100,7 +101,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     setType("expense");
     setCategoryId("");
     setNotes("");
-    setAmount("");
+    setAmount(null);
     setIsSplit(false);
     setSplits([]);
     setTags([]);
@@ -174,9 +175,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
   // Handle split transaction toggle
   const handleSplitToggle = (isChecked: boolean) => {
-    const currentAmount = parseFloat(amount) || 0;
-
-    if (currentAmount <= 0) {
+    if (!amount || amount <= 0) {
       toast({
         title: "Error",
         description: "Amount required before enabling split transactions.",
@@ -191,7 +190,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
     if (isChecked) {
       // Initialize with the total amount
-      setSplits([{ amount: currentAmount.toString(), categoryId: "" }]);
+      setSplits([{ amount: amount, categoryId: "" }]);
     } else {
       // Clear splits when toggle is turned off
       setSplits([]);
@@ -200,12 +199,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
   // Calculate remaining amount
   const calculateRemainingAmount = () => {
-    const totalAmount = parseFloat(amount) || 0;
     const allocatedAmount = splits.reduce((sum, split) => {
-      return sum + (parseFloat(split.amount) || 0);
+      return sum + split.amount;
     }, 0);
 
-    return totalAmount - allocatedAmount;
+    return (amount || 0) - allocatedAmount;
   };
 
   // Handle form submission
@@ -224,7 +222,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     // Validate all splits have categories if split is enabled
     if (isSplit) {
       const invalidSplits = splits.filter(
-        (split) => !split.categoryId && parseFloat(split.amount) > 0,
+        (split) => !split.categoryId && split.amount > 0,
       );
       if (invalidSplits.length > 0) {
         toast({
@@ -239,12 +237,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
       // Check if the total split amount matches the transaction amount
       const totalSplitAmount = splits.reduce(
-        (sum, split) => sum + (parseFloat(split.amount) || 0),
+        (sum, split) => sum + split.amount,
         0,
       );
-      const totalAmount = parseFloat(amount) || 0;
 
-      if (Math.abs(totalSplitAmount - totalAmount) > 0.01) {
+      if (Math.abs(totalSplitAmount - (amount || 0)) > 0.01) {
         // Allow for small rounding differences
         toast({
           title: "Error",
@@ -261,7 +258,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     setIsLoading(true);
     try {
       const token = localStorage.getItem("access_token");
-      const parsedAmount = parseFloat(amount) || 0;
 
       const payload = {
         account_id: parseInt(accountId || selectedAccountId, 10),
@@ -269,19 +265,20 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         type: type,
         date: date.toISOString(),
         notes: notes,
-        credit: type === "income" ? parsedAmount : 0,
-        debit: type === "expense" ? parsedAmount : 0,
+        credit: type === "income" ? amount || 0 : 0,
+        debit: type === "expense" ? amount || 0 : 0,
         is_transfer: false,
         transfer_id: null,
         transfer_type: null,
         is_split: isSplit,
         splits: isSplit
           ? splits
-              .filter((split) => parseFloat(split.amount) > 0)
+              .filter((split) => split.amount > 0)
               .map((split) => ({
-                credit: type === "income" ? parseFloat(split.amount) || 0 : 0,
-                debit: type === "expense" ? parseFloat(split.amount) || 0 : 0,
+                credit: type === "income" ? split.amount : 0,
+                debit: type === "expense" ? split.amount : 0,
                 category_id: parseInt(split.categoryId, 10),
+                notes: split.notes,
               }))
           : [],
         tags: tags.map((tag) => ({ name: tag.name })),
@@ -335,6 +332,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         borderRadius={{ base: 0, sm: "md" }}
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
+        maxHeight={{ base: "100%", md: "80vh" }}
+        display="flex"
+        flexDirection="column"
       >
         <Box
           pt={{ base: 10, sm: 4 }}
@@ -359,7 +359,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
           flex="1"
           display="flex"
           flexDirection="column"
-          justifyContent={{ base: "space-between", sm: "flex-start" }}
+          overflow="auto"
+          maxHeight={{ md: "calc(80vh - 140px)" }}
         >
           <VStack spacing={6} align="stretch" w="100%">
             {/* Basic Info - First Section */}
@@ -425,9 +426,12 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                     <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                     <Input
                       type="number"
-                      value={amount}
+                      value={amount !== null ? amount.toString() : ""}
                       onChange={(e) => {
-                        const value = e.target.value;
+                        const value =
+                          e.target.value === ""
+                            ? null
+                            : parseFloat(e.target.value) || 0;
                         setAmount(value);
                       }}
                       placeholder="0.00"
@@ -515,7 +519,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                 splits={splits}
                 calculateRemainingAmount={calculateRemainingAmount}
                 currencySymbol={currencySymbol}
-                amount={amount}
+                amount={amount || 0}
                 type={type}
                 categories={categories}
                 setSplits={setSplits}
@@ -572,8 +576,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               isDisabled={
                 (isSplit &&
                   splits.some(
-                    (split) =>
-                      parseFloat(split.amount) > 0 && !split.categoryId,
+                    (split) => split.amount > 0 && !split.categoryId,
                   )) ||
                 (!isSplit && !categoryId) ||
                 !amount ||
@@ -605,7 +608,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             isDisabled={
               (isSplit &&
                 splits.some(
-                  (split) => parseFloat(split.amount) > 0 && !split.categoryId,
+                  (split) => split.amount > 0 && !split.categoryId,
                 )) ||
               (!isSplit && !categoryId) ||
               !amount ||

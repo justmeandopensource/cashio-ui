@@ -176,6 +176,9 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     onOpen={() =>
                       fetchSplitTransactions(transaction.transaction_id)
                     }
+                    strategy="fixed"
+                    placement="right"
+                    gutter={10}
                   >
                     <PopoverTrigger>
                       <Box display="inline-block" p={1}>
@@ -187,44 +190,70 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         />
                       </Box>
                     </PopoverTrigger>
-                    <PopoverContent bg="teal.100" color="white">
+                    <PopoverContent
+                      bg="teal.100"
+                      color="white"
+                      minW="400px"
+                      maxW="800px"
+                      width="auto"
+                      overflow="hidden"
+                    >
                       <PopoverArrow bg="teal.100" />
-                      <PopoverBody>
+                      <PopoverBody p={0}>
                         {isSplitLoading ? (
                           <Flex justify="center" align="center" minH="100px">
                             <SplitTransactionSkeleton />
                           </Flex>
                         ) : (
-                          <Table variant="simple" size="sm">
-                            <Thead>
-                              <Tr bgGradient="linear(to-r, teal.400, teal.600)">
-                                <Th color="white">Category</Th>
-                                <Th color="white" isNumeric>
-                                  Debit
-                                </Th>
-                                <Th color="white">Notes</Th>
-                              </Tr>
-                            </Thead>
-                            <Tbody>
-                              {splitTransactions.map((split) => (
-                                <Tr
-                                  key={split.split_id}
-                                  _hover={{ bg: "teal.50" }}
+                          <Box>
+                            <Flex
+                              bgGradient="linear(to-r, teal.400, teal.600)"
+                              p={2}
+                              fontWeight="bold"
+                            >
+                              <Box flex="2" color="white">
+                                Category
+                              </Box>
+                              <Box flex="1" textAlign="right" color="white">
+                                Amount
+                              </Box>
+                              <Box flex="3" ml={4} color="white">
+                                Notes
+                              </Box>
+                            </Flex>
+                            {splitTransactions.map((split) => (
+                              <Flex
+                                key={split.split_id}
+                                p={3}
+                                borderBottomWidth="1px"
+                                borderColor="teal.200"
+                                _hover={{ bg: "teal.50" }}
+                                align="center"
+                              >
+                                <Box
+                                  flex="2"
+                                  color="teal.900"
+                                  fontWeight="medium"
                                 >
-                                  <Td color="teal.900">
-                                    {split.category_name}
-                                  </Td>
-                                  <Td color="teal.900" isNumeric>
-                                    {formatNumberAsCurrency(
-                                      split.debit,
-                                      currencySymbolCode,
-                                    )}
-                                  </Td>
-                                  <Td color="teal.900">{split.notes}</Td>
-                                </Tr>
-                              ))}
-                            </Tbody>
-                          </Table>
+                                  {split.category_name}
+                                </Box>
+                                <Box
+                                  flex="1"
+                                  textAlign="right"
+                                  color="teal.900"
+                                  fontWeight="bold"
+                                >
+                                  {formatNumberAsCurrency(
+                                    split.debit,
+                                    currencySymbolCode,
+                                  )}
+                                </Box>
+                                <Box flex="3" ml={4} color="teal.900">
+                                  {split.notes || "-"}
+                                </Box>
+                              </Flex>
+                            ))}
+                          </Box>
                         )}
                       </PopoverBody>
                     </PopoverContent>
