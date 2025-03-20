@@ -10,7 +10,12 @@ import {
   IconButton,
   Spinner,
 } from "@chakra-ui/react";
-import { FiPlus, FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import {
+  FiPlus,
+  FiChevronLeft,
+  FiChevronRight,
+  FiFilter,
+} from "react-icons/fi";
 import config from "@/config";
 import TransactionCard from "./TransactionCard";
 import TransactionTable from "./TransactionTable";
@@ -87,6 +92,9 @@ const Transactions: React.FC<TransactionsProps> = ({
     total_pages: 1,
     current_page: 1,
   });
+
+  // Add state to track if filters are active
+  const hasActiveFilters = Object.keys(filters).length > 0;
 
   const handleApplyFilters = (newFilters: Filters) => {
     setFilters(newFilters);
@@ -315,18 +323,35 @@ const Transactions: React.FC<TransactionsProps> = ({
           px={{ base: 3, lg: 6 }}
         >
           <Text fontSize="xl" fontWeight="bold" mb={2}>
-            No Transactions Found
+            {hasActiveFilters
+              ? "No Matching Transactions"
+              : "No Transactions Found"}
           </Text>
           <Text color="gray.600" mb={6}>
-            You do not have any transactions for this account yet.
+            {hasActiveFilters
+              ? "No transactions match your filter criteria."
+              : "You do not have any transactions for this account yet."}
           </Text>
-          <Button
-            leftIcon={<FiPlus />}
-            colorScheme="teal"
-            onClick={onAddTransaction}
-          >
-            Add Transaction
-          </Button>
+
+          {/* Show different actions based on whether filters are active */}
+          {hasActiveFilters ? (
+            <Button
+              leftIcon={<FiFilter />}
+              colorScheme="teal"
+              onClick={handleResetFilters}
+              mr={3}
+            >
+              Reset Filters
+            </Button>
+          ) : (
+            <Button
+              leftIcon={<FiPlus />}
+              colorScheme="teal"
+              onClick={onAddTransaction}
+            >
+              Add Transaction
+            </Button>
+          )}
         </Box>
       ) : (
         <>
