@@ -139,7 +139,7 @@ describe("LedgerMain Component", () => {
       expect(screen.getByText("UK")).toBeInTheDocument();
     });
 
-    const badge = screen.getByText("4");
+    const badge = screen.getByText("5");
     expect(badge).toBeInTheDocument();
     expect(badge).toHaveClass("chakra-badge");
   });

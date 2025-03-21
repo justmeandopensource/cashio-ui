@@ -108,7 +108,7 @@ export const accountHandlers = {
   ),
 
   // Get accounts for a ledger by type
-  getAccountsWithDataByType: http.get(
+  getGroupAccountsByType: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
     ({ params, request }) => {
       const ledgerId = Number(params.ledgerId);
@@ -118,10 +118,31 @@ export const accountHandlers = {
 
       const filteredAccounts = mockAccounts.filter(
         (account) =>
-          account.ledger_id === ledgerId && account.type === accountType,
+          account.ledger_id === ledgerId &&
+          account.type === accountType &&
+          account.is_group,
       );
 
       return HttpResponse.json(filteredAccounts, { status: 200 });
+    },
+  ),
+
+  // Get accounts for a ledger by type - return empty list
+  getGroupAccountsEmptyByType: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
+    () => {
+      return HttpResponse.json([], { status: 200 });
+    },
+  ),
+
+  // Get accounts with error
+  getGroupAccountsError: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch group accounts" },
+        { status: 500 },
+      );
     },
   ),
 
@@ -131,6 +152,50 @@ export const accountHandlers = {
     () => {
       return HttpResponse.json(
         { error: "Failed to fetch accounts" },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Create account successfully
+  createAccountSuccess: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/account/create`,
+    () => {
+      return HttpResponse.json(
+        { message: "Account created successfully" },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Create account with error
+  createAccountError: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/account/create`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to create account" },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Update account successfully
+  updateAccountSuccess: http.put(
+    `${config.apiBaseUrl}/ledger/:ledgerId/account/:accountId/update`,
+    () => {
+      return HttpResponse.json(
+        { message: "Account updated successfully" },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Update account with error
+  updateAccountError: http.put(
+    `${config.apiBaseUrl}/ledger/:ledgerId/account/:accountId/update`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to update account" },
         { status: 500 },
       );
     },

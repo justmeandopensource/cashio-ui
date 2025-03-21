@@ -8,7 +8,6 @@ import {
   ModalHeader,
   ModalFooter,
   ModalBody,
-  ModalCloseButton,
   FormControl,
   FormLabel,
   FormHelperText,
@@ -62,8 +61,8 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   onUpdateCompleted,
 }) => {
   const [name, setName] = useState<string>(account.name);
-  const [openingBalance, setOpeningBalance] = useState<number>(
-    account.opening_balance,
+  const [openingBalance, setOpeningBalance] = useState<string>(
+    account.opening_balance.toString(),
   );
   const [parentAccountId, setParentAccountId] = useState<
     string | number | null
@@ -138,8 +137,8 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
 
     // Add only the fields that have changed
     if (name !== account.name) payload.name = name;
-    if (openingBalance !== account.opening_balance)
-      payload.opening_balance = parseFloat(openingBalance.toString());
+    if (parseFloat(openingBalance) !== account.opening_balance)
+      payload.opening_balance = parseFloat(openingBalance) || 0;
     if (parentAccountId !== account.parent_account_id)
       payload.parent_account_id = parentAccountId;
 
@@ -269,9 +268,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                 <Input
                   type="number"
                   value={openingBalance}
-                  onChange={(e) =>
-                    setOpeningBalance(parseFloat(e.target.value))
-                  }
+                  onChange={(e) => setOpeningBalance(e.target.value)}
                   placeholder="0.00"
                   borderWidth="1px"
                   borderColor={borderColor}
@@ -319,8 +316,8 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                     borderColor: buttonColorScheme + ".500",
                     boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
                   }}
+                  data-testid="updateaccountmodal-parent-account-dropdown"
                 >
-                  <option value="">None</option>
                   {groupAccounts.map((group) => (
                     <option
                       key={group.account_id.toString()}
@@ -347,6 +344,12 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
               mb={3}
               isLoading={isLoading}
               loadingText="Updating..."
+              isDisabled={
+                !name ||
+                (name === account.name &&
+                  openingBalance === account.opening_balance.toString() &&
+                  parentAccountId === account.parent_account_id)
+              }
             >
               Update Account
             </Button>
@@ -371,6 +374,12 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
             px={6}
             isLoading={isLoading}
             loadingText="Updating..."
+            isDisabled={
+              !name ||
+              (name === account.name &&
+                openingBalance === account.opening_balance.toString() &&
+                parentAccountId === account.parent_account_id)
+            }
           >
             Update
           </Button>

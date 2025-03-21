@@ -20,7 +20,6 @@ export const mockLocalStorage = (() => {
 // Mock navigate function
 export const mockNavigate = vi.fn();
 
-// Setup for testing with localStorage and navigation
 export function setupTestEnvironment() {
   // Mock localStorage
   Object.defineProperty(window, "localStorage", {
