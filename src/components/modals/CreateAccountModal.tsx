@@ -168,6 +168,18 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
 
   // Handle form submission
   const handleSubmit = (): void => {
+    if (!accountName) {
+      toast({
+        title: "Required Field",
+        description: "Please enter an account name.",
+        status: "warning",
+        duration: 3000,
+        position: "top",
+        isClosable: true,
+      });
+      return;
+    }
+
     const payload: CreateAccountPayload = {
       name: accountName,
       is_group: isGroupAccount,
@@ -349,7 +361,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
               width="100%"
               mb={3}
               isLoading={createAccountMutation.isPending}
-              isDisabled={!accountName}
+              isDisabled={!accountName || isGroupAccountsError}
               loadingText="Creating..."
             >
               Create Account
@@ -374,7 +386,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
             onClick={handleSubmit}
             px={6}
             isLoading={createAccountMutation.isPending}
-            isDisabled={!accountName}
+            isDisabled={!accountName || isGroupAccountsError}
             loadingText="Creating..."
           >
             Create

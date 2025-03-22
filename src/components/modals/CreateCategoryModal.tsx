@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  KeyboardEvent,
-  ChangeEvent,
-  useCallback,
-} from "react";
+import React, { useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -24,8 +18,10 @@ import {
   VStack,
   useColorModeValue,
   Text,
+  Flex,
+  Spinner,
 } from "@chakra-ui/react";
-import axios, { AxiosError } from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import config from "@/config";
 
 interface GroupCategory {
@@ -38,10 +34,9 @@ interface CreateCategoryModalProps {
   onClose: () => void;
   categoryType: "income" | "expense";
   parentCategoryId?: string | null;
-  fetchCategories: () => void;
 }
 
-interface CategoryPayload {
+interface CreateCategoryPayload {
   name: string;
   is_group: boolean;
   parent_category_id: string | null;
@@ -53,51 +48,19 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   onClose,
   categoryType,
   parentCategoryId,
-  fetchCategories,
 }) => {
   const toast = useToast();
+  const queryClient = useQueryClient();
   const [categoryName, setCategoryName] = useState<string>("");
   const [isGroupCategory, setIsGroupCategory] = useState<boolean>(false);
   const [parentCategory, setParentCategory] = useState<string>(
     parentCategoryId || "",
   );
-  const [groupCategories, setGroupCategories] = useState<GroupCategory[]>([]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Color variables for consistent theming
   const buttonColorScheme = "teal";
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.600");
-
-  // Define fetchGroupCategories using useCallback
-  const fetchGroupCategories = useCallback(async (): Promise<void> => {
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
-
-      const response = await axios.get<GroupCategory[]>(
-        `${config.apiBaseUrl}/category/group?category_type=${categoryType}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-      setGroupCategories(response.data);
-    } catch (error) {
-      console.error("Error fetching group categories:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch group categories.",
-        status: "error",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
-      });
-    }
-  }, [categoryType, toast]);
 
   // Update parentCategory state when parentCategoryId prop changes
   useEffect(() => {
@@ -105,11 +68,31 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   }, [parentCategoryId]);
 
   // Fetch group categories when the modal is opened
-  useEffect(() => {
-    if (isOpen && !parentCategoryId) {
-      fetchGroupCategories();
-    }
-  }, [isOpen, categoryType, parentCategoryId, fetchGroupCategories]);
+  const {
+    data: groupCategories,
+    isLoading: isGroupCategoriesLoading,
+    isError: isGroupCategoriesError,
+  } = useQuery({
+    queryKey: ["groupCategories", categoryType],
+    queryFn: async (): Promise<GroupCategory[]> => {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(
+        `${config.apiBaseUrl}/category/group?category_type=${categoryType}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch group categories");
+      }
+
+      return response.json();
+    },
+    enabled: isOpen && !parentCategoryId, // Only fetch group categories when the modal is open and no parentCategoryId is provided
+  });
 
   // Reset form fields
   const resetForm = (): void => {
@@ -119,11 +102,57 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   };
 
   // Handle Enter key press
-  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter") {
       handleSubmit();
     }
   };
+
+  // Mutation for creating a new account
+  const createCategoryMutation = useMutation({
+    mutationFn: async (payload: CreateCategoryPayload) => {
+      const token = localStorage.getItem("access_token");
+      const response = await fetch(`${config.apiBaseUrl}/category/create`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create category");
+      }
+
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Success",
+        description: "Category created successfully.",
+        status: "success",
+        duration: 2000,
+        position: "top",
+        isClosable: true,
+      });
+      resetForm();
+      onClose();
+      queryClient.invalidateQueries({
+        queryKey: ["categories"],
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to create category.",
+        status: "error",
+        duration: 3000,
+        position: "top",
+        isClosable: true,
+      });
+    },
+  });
 
   const handleSubmit = async (): Promise<void> => {
     if (!categoryName) {
@@ -138,53 +167,14 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("Authentication token not found");
-      }
+    const payload: CreateCategoryPayload = {
+      name: categoryName,
+      is_group: isGroupCategory,
+      parent_category_id: parentCategory || null,
+      type: categoryType,
+    };
 
-      const payload: CategoryPayload = {
-        name: categoryName,
-        is_group: isGroupCategory,
-        parent_category_id: parentCategory || null,
-        type: categoryType,
-      };
-
-      await axios.post(`${config.apiBaseUrl}/category/create`, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      toast({
-        title: "Success",
-        description: "Category created successfully.",
-        status: "success",
-        duration: 2000,
-        position: "top",
-        isClosable: true,
-      });
-
-      fetchCategories();
-      resetForm();
-      onClose();
-    } catch (error) {
-      console.error("Error creating category:", error);
-      const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        title: "Error",
-        description:
-          axiosError.response?.data?.detail || "Failed to create category.",
-        status: "error",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
-    }
+    createCategoryMutation.mutate(payload);
   };
 
   return (
@@ -236,9 +226,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               <Input
                 placeholder={`e.g., ${categoryType === "income" ? "Salary, Freelance" : "Groceries, Utilities"}`}
                 value={categoryName}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setCategoryName(e.target.value)
-                }
+                onChange={(e) => setCategoryName(e.target.value)}
                 onKeyPress={handleKeyPress}
                 borderWidth="1px"
                 borderColor={borderColor}
@@ -259,9 +247,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
             <FormControl>
               <Checkbox
                 isChecked={isGroupCategory}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setIsGroupCategory(e.target.checked)
-                }
+                onChange={(e) => setIsGroupCategory(e.target.checked)}
                 colorScheme={buttonColorScheme}
                 size="md"
               >
@@ -272,41 +258,54 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               </FormHelperText>
             </FormControl>
 
-            {!parentCategoryId && groupCategories.length > 0 && (
-              <FormControl>
-                <FormLabel fontWeight="medium">
-                  Parent Category (Optional)
-                </FormLabel>
-                <Select
-                  value={parentCategory}
-                  onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                    setParentCategory(e.target.value)
-                  }
-                  placeholder="Select parent category"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  bg={bgColor}
-                  size="md"
-                  borderRadius="md"
-                  _hover={{ borderColor: buttonColorScheme + ".300" }}
-                  _focus={{
-                    borderColor: buttonColorScheme + ".500",
-                    boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
-                  }}
-                >
-                  {groupCategories.map((category) => (
-                    <option
-                      key={category.category_id}
-                      value={category.category_id}
-                    >
-                      {category.name}
-                    </option>
-                  ))}
-                </Select>
-                <FormHelperText>
-                  Organize this category under an existing group
-                </FormHelperText>
-              </FormControl>
+            {/* Show loading spinner while fetching group categories */}
+            {isGroupCategoriesLoading && (
+              <Flex justify="center" align="center" my={4}>
+                <Spinner size="sm" color={buttonColorScheme + ".500"} />
+              </Flex>
+            )}
+
+            {!parentCategoryId &&
+              groupCategories &&
+              groupCategories.length > 0 && (
+                <FormControl>
+                  <FormLabel fontWeight="medium">
+                    Parent Category (Optional)
+                  </FormLabel>
+                  <Select
+                    value={parentCategory}
+                    onChange={(e) => setParentCategory(e.target.value)}
+                    placeholder="Select parent category"
+                    borderWidth="1px"
+                    borderColor={borderColor}
+                    bg={bgColor}
+                    size="md"
+                    borderRadius="md"
+                    _hover={{ borderColor: buttonColorScheme + ".300" }}
+                    _focus={{
+                      borderColor: buttonColorScheme + ".500",
+                      boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                    }}
+                  >
+                    {groupCategories.map((category) => (
+                      <option
+                        key={category.category_id}
+                        value={category.category_id}
+                      >
+                        {category.name}
+                      </option>
+                    ))}
+                  </Select>
+                  <FormHelperText>
+                    Organize this category under an existing group
+                  </FormHelperText>
+                </FormControl>
+              )}
+            {/* Show error message if fetching group accounts fails */}
+            {isGroupCategoriesError && (
+              <Text color="red.500" fontSize="sm" mt={2}>
+                Failed to load group categories. Please try again.
+              </Text>
             )}
           </VStack>
 
@@ -318,7 +317,8 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               size="lg"
               width="100%"
               mb={3}
-              isLoading={isLoading}
+              isLoading={createCategoryMutation.isPending}
+              isDisabled={!categoryName || isGroupCategoriesError}
               loadingText="Creating..."
             >
               Create Category
@@ -328,7 +328,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               onClick={onClose}
               width="100%"
               size="lg"
-              isDisabled={isLoading}
+              isDisabled={createCategoryMutation.isPending}
             >
               Cancel
             </Button>
@@ -342,12 +342,17 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
             mr={3}
             onClick={handleSubmit}
             px={6}
-            isLoading={isLoading}
+            isLoading={createCategoryMutation.isPending}
+            isDisabled={!categoryName || isGroupCategoriesError}
             loadingText="Creating..."
           >
             Create
           </Button>
-          <Button variant="outline" onClick={onClose} isDisabled={isLoading}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            isDisabled={createCategoryMutation.isPending}
+          >
             Cancel
           </Button>
         </ModalFooter>

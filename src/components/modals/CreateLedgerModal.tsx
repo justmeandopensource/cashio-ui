@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent, ChangeEvent } from "react";
+import React, { useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -83,7 +83,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
   };
 
   // Handle Enter key press
-  const handleKeyPress = (e: KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter") {
       handleSubmit();
     }
@@ -138,9 +138,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
               <Input
                 placeholder="e.g., Personal Finance, Family Budget"
                 value={newLedgerName}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setNewLedgerName(e.target.value)
-                }
+                onChange={(e) => setNewLedgerName(e.target.value)}
                 autoFocus
                 onKeyPress={handleKeyPress}
                 borderWidth="1px"
@@ -164,9 +162,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
               <Select
                 placeholder="Select currency"
                 value={selectedCurrency}
-                onChange={(e: ChangeEvent<HTMLSelectElement>) =>
-                  setSelectedCurrency(e.target.value)
-                }
+                onChange={(e) => setSelectedCurrency(e.target.value)}
                 borderWidth="1px"
                 borderColor={borderColor}
                 bg={bgColor}
@@ -198,6 +194,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
               size="lg"
               width="100%"
               mb={3}
+              isDisabled={!newLedgerName || !selectedCurrency}
             >
               Create Ledger
             </Button>
@@ -214,6 +211,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
             mr={3}
             onClick={handleSubmit}
             px={6}
+            isDisabled={!newLedgerName || !selectedCurrency}
           >
             Create
           </Button>
