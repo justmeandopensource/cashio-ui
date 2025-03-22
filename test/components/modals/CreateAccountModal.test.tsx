@@ -133,7 +133,7 @@ describe("CreateAccountModal Component", () => {
     expect(createBtn).toBeEnabled();
   });
 
-  it("fetches group accounts when parentAccountId is provided", async () => {
+  it("fetches group accounts when parentAccountId is not provided", async () => {
     renderCreateAccountModal();
     await waitFor(() => {
       expect(
@@ -175,6 +175,36 @@ describe("CreateAccountModal Component", () => {
     const options = screen.getAllByRole("option");
     expect(options).toHaveLength(2);
     expect(options[1]).toHaveTextContent("Credit Cards");
+  });
+
+  it("successfully creates account on enter key in account name field when account name is not empty", async () => {
+    const { user } = renderCreateAccountModal();
+    const input = screen.getByLabelText(/Account Name/i);
+    await user.type(input, "Test Account{enter}");
+
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description: "Account created successfully.",
+        }),
+      );
+    });
+    expect(mockOnClose).toHaveBeenCalled();
+  });
+
+  it("shows error toast on enter key in account name field when account name is empty", async () => {
+    const { user } = renderCreateAccountModal();
+    const input = screen.getByLabelText(/Account Name/i);
+    await user.type(input, "{enter}");
+
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description: "Please enter an account name.",
+        }),
+      );
+    });
+    expect(mockOnClose).not.toHaveBeenCalled();
   });
 
   it("shows success toast when regular account creation is successful", async () => {
@@ -235,6 +265,24 @@ describe("CreateAccountModal Component", () => {
       );
     });
 
+    expect(mockOnClose).not.toHaveBeenCalled();
+  });
+
+  it("shows error toast when fetching group accounts fails", async () => {
+    server.use(accountHandlers.getGroupAccountsError);
+    const { user } = renderCreateAccountModal();
+
+    await user.type(screen.getByLabelText(/Account Name/i), "Test Account");
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole("button", { name: /Create/i }),
+      ).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
+    expect(
+      screen.getByText("Failed to load group accounts. Please try again."),
+    ).toBeInTheDocument();
     expect(mockOnClose).not.toHaveBeenCalled();
   });
 });

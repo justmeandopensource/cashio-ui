@@ -107,6 +107,17 @@ export const accountHandlers = {
     },
   ),
 
+  // Get accounts with error
+  getAccountsError: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch accounts" },
+        { status: 500 },
+      );
+    },
+  ),
+
   // Get accounts for a ledger by type
   getGroupAccountsByType: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
@@ -128,30 +139,19 @@ export const accountHandlers = {
   ),
 
   // Get accounts for a ledger by type - return empty list
-  getGroupAccountsEmptyByType: http.get(
+  getGroupAccountsEmpty: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
     () => {
       return HttpResponse.json([], { status: 200 });
     },
   ),
 
-  // Get accounts with error
+  // Get group accounts with error
   getGroupAccountsError: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts/group`,
     () => {
       return HttpResponse.json(
         { error: "Failed to fetch group accounts" },
-        { status: 500 },
-      );
-    },
-  ),
-
-  // Get accounts with error
-  getAccountsError: http.get(
-    `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
-    () => {
-      return HttpResponse.json(
-        { error: "Failed to fetch accounts" },
         { status: 500 },
       );
     },
@@ -209,32 +209,67 @@ export const categoryHandlers = {
   }),
 
   // Get categories
-  getCategoriesWithData: http.get(
-    `${config.apiBaseUrl}/categories/list`,
-    () => {
-      return HttpResponse.json(mockCategories, { status: 200 });
-    },
-  ),
+  getCategoriesWithData: http.get(`${config.apiBaseUrl}/category/list`, () => {
+    return HttpResponse.json(mockCategories, { status: 200 });
+  }),
 
-  // Get categories by type
-  getCategoriesWithDataByType: http.get(
-    `${config.apiBaseUrl}/categories/group`,
+  // Get categories with error
+  getCategoriesError: http.get(`${config.apiBaseUrl}/category/list`, () => {
+    return HttpResponse.json(
+      { error: "Failed to fetch categories" },
+      { status: 500 },
+    );
+  }),
+
+  // Get group categories by type
+  getGroupCategoriesByType: http.get(
+    `${config.apiBaseUrl}/category/group`,
     ({ request }) => {
       const url = new URL(request.url);
       const categoryType = url.searchParams.get("category_type");
 
       const filteredCategories = mockCategories.filter(
-        (category) => category.type === categoryType,
+        (category) => category.type === categoryType && category.is_group,
       );
 
       return HttpResponse.json(filteredCategories, { status: 200 });
     },
   ),
 
-  // Get categories with error
-  getCategoriesError: http.get(`${config.apiBaseUrl}/categories/list`, () => {
+  // Get group categories by type - return empty list
+  getGroupCategoriesEmpty: http.get(
+    `${config.apiBaseUrl}/category/group`,
+    () => {
+      return HttpResponse.json([], { status: 200 });
+    },
+  ),
+
+  // Get group categories with error
+  getGroupCategoriesError: http.get(
+    `${config.apiBaseUrl}/category/group`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch group categories" },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Create category successfully
+  createCategorySuccess: http.post(
+    `${config.apiBaseUrl}/category/create`,
+    () => {
+      return HttpResponse.json(
+        { message: "Category created successfully" },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Create category with error
+  createCategoryError: http.post(`${config.apiBaseUrl}/category/create`, () => {
     return HttpResponse.json(
-      { error: "Failed to fetch categories" },
+      { error: "Failed to create category" },
       { status: 500 },
     );
   }),

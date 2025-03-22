@@ -271,7 +271,7 @@ describe("UpdateAccountModal Component", () => {
   });
 
   it("hides parent account dropdown when there are no group accounts", () => {
-    server.use(accountHandlers.getGroupAccountsEmptyByType);
+    server.use(accountHandlers.getGroupAccountsEmpty);
     renderUpdateAccountModal({ account: liabilityAccountNotChild });
     expect(
       screen.queryByText("Parent Account (Optional)"),

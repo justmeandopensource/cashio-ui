@@ -9,8 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "release": "node build.cjs",
-    "test": "vitest",
-    "test:ui": "vitest --ui"
+    "test": "vitest --reporter=dot",
+    "test:ui": "vitest --ui --reporter=dot"
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
