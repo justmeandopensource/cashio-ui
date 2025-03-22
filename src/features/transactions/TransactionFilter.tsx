@@ -24,6 +24,7 @@ import {
   Grid,
   GridItem,
   Box,
+  VStack,
 } from "@chakra-ui/react";
 import { FiFilter, FiX } from "react-icons/fi";
 import FormTags from "@/components/shared/FormTags";
@@ -37,11 +38,13 @@ interface Tag {
 interface Account {
   account_id: string;
   name: string;
+  type: string;
 }
 
 interface Category {
   category_id: string;
   name: string;
+  type: string;
 }
 
 interface Filters {
@@ -138,7 +141,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
     queryFn: async () => {
       const token = localStorage.getItem("access_token");
       const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts`,
+        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -157,15 +160,18 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
   });
 
   // Fetch categories
-  const { data: categories = [] } = useQuery({
+  const { data: categories = [] } = useQuery<Category[]>({
     queryKey: ["categories"],
     queryFn: async () => {
       const token = localStorage.getItem("access_token");
-      const response = await fetch(`${config.apiBaseUrl}/category/list`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const response = await fetch(
+        `${config.apiBaseUrl}/category/list?ignore_group=true`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
 
       if (!response.ok) {
         throw new Error("Failed to fetch categories");
@@ -371,6 +377,9 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
           borderRadius={{ base: 0, sm: "md" }}
           mx={{ base: 0, sm: 4 }}
           my={{ base: 0, sm: "auto" }}
+          maxHeight={{ base: "100%", md: "80vh" }}
+          display="flex"
+          flexDirection="column"
         >
           <Box
             pt={{ base: 10, sm: 4 }}
@@ -407,9 +416,11 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
             flex="1"
             display="flex"
             flexDirection="column"
+            overflow="auto"
+            maxHeight={{ md: "calc(80vh - 140px)" }}
             justifyContent={{ base: "space-between", sm: "flex-start" }}
           >
-            <Stack spacing={4} mt={2}>
+            <VStack spacing={6} align="stretch" w="100%">
               {/* Account Selection */}
               {!accountId && (
                 <FormControl>
@@ -423,14 +434,32 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                       handleInputChange("account_id", e.target.value)
                     }
                   >
-                    {accounts.map((account: Account) => (
-                      <option
-                        key={account.account_id}
-                        value={account.account_id}
-                      >
-                        {account.name}
-                      </option>
-                    ))}
+                    {/* Group for Asset Accounts */}
+                    <optgroup label="Asset Accounts">
+                      {accounts
+                        .filter((account) => account.type === "asset")
+                        .map((account) => (
+                          <option
+                            key={account.account_id}
+                            value={account.account_id}
+                          >
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                    {/* Group for Liability Accounts */}
+                    <optgroup label="Liability Accounts">
+                      {accounts
+                        .filter((account) => account.type === "liability")
+                        .map((account) => (
+                          <option
+                            key={account.account_id}
+                            value={account.account_id}
+                          >
+                            {account.name}
+                          </option>
+                        ))}
+                    </optgroup>
                   </Select>
                 </FormControl>
               )}
@@ -447,14 +476,32 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                     handleInputChange("category_id", e.target.value)
                   }
                 >
-                  {categories.map((category: Category) => (
-                    <option
-                      key={category.category_id}
-                      value={category.category_id}
-                    >
-                      {category.name}
-                    </option>
-                  ))}
+                  {/* Group for Income Categories */}
+                  <optgroup label="Income Categories">
+                    {categories
+                      .filter((category) => category.type === "income")
+                      .map((category) => (
+                        <option
+                          key={category.category_id}
+                          value={category.category_id}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                  {/* Group for Expense Categories */}
+                  <optgroup label="Expense Categories">
+                    {categories
+                      .filter((category) => category.type === "expense")
+                      .map((category) => (
+                        <option
+                          key={category.category_id}
+                          value={category.category_id}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
+                  </optgroup>
                 </Select>
               </FormControl>
 
@@ -557,25 +604,30 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                   </FormControl>
                 </GridItem>
               </Grid>
-            </Stack>
-          </ModalBody>
+            </VStack>
 
-          {/* Mobile-only action buttons that stay at bottom */}
-          <Box display={{ base: "block", sm: "none" }} mt={6} px={4} pb={4}>
-            <Button
-              onClick={handleApplyFilters}
-              colorScheme={buttonColorScheme}
-              size="lg"
-              width="100%"
-              mb={3}
-              isDisabled={!hasChanged}
-            >
-              Apply Filters
-            </Button>
-            <Button variant="outline" onClick={onClose} size="lg" width="100%">
-              Cancel
-            </Button>
-          </Box>
+            {/* Mobile-only action buttons that stay at bottom */}
+            <Box display={{ base: "block", sm: "none" }} mt={6}>
+              <Button
+                onClick={handleApplyFilters}
+                colorScheme={buttonColorScheme}
+                size="lg"
+                width="100%"
+                mb={3}
+                isDisabled={!hasChanged}
+              >
+                Apply Filters
+              </Button>
+              <Button
+                variant="outline"
+                onClick={onClose}
+                size="lg"
+                width="100%"
+              >
+                Cancel
+              </Button>
+            </Box>
+          </ModalBody>
 
           {/* Desktop-only footer */}
           <ModalFooter display={{ base: "none", sm: "flex" }}>

@@ -202,7 +202,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     const allocatedAmount = roundToTwoDecimals(
       splits.reduce((sum, split) => {
         return roundToTwoDecimals(sum + roundToTwoDecimals(split.amount));
-      }, 0)
+      }, 0),
     );
 
     return roundToTwoDecimals((amount || 0) - allocatedAmount);
@@ -544,17 +544,32 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                   borderColor={borderColor}
                   placeholder="Select a category"
                 >
-                  {/* Filter categories based on transaction type */}
-                  {categories
-                    .filter((category) => category.type === type)
-                    .map((category) => (
-                      <option
-                        key={category.category_id}
-                        value={category.category_id}
-                      >
-                        {category.name}
-                      </option>
-                    ))}
+                  {/* Group for Income Categories */}
+                  <optgroup label="Income Categories">
+                    {categories
+                      .filter((category) => category.type === "income")
+                      .map((category) => (
+                        <option
+                          key={category.category_id}
+                          value={category.category_id}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
+                  </optgroup>
+                  {/* Group for Expense Categories */}
+                  <optgroup label="Expense Categories">
+                    {categories
+                      .filter((category) => category.type === "expense")
+                      .map((category) => (
+                        <option
+                          key={category.category_id}
+                          value={category.category_id}
+                        >
+                          {category.name}
+                        </option>
+                      ))}
+                  </optgroup>
                 </Select>
               </FormControl>
             )}

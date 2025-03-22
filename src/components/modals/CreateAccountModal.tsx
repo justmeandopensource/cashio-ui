@@ -383,8 +383,8 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
           <Button
             colorScheme={buttonColorScheme}
             mr={3}
-            onClick={handleSubmit}
             px={6}
+            onClick={handleSubmit}
             isLoading={createAccountMutation.isPending}
             isDisabled={!accountName || isGroupAccountsError}
             loadingText="Creating..."
