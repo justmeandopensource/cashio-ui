@@ -151,7 +151,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
       resetForm();
       onClose();
       queryClient.invalidateQueries({
-        queryKey: ["accounts", String(ledgerId)],
+        queryKey: ["categories"],
       });
     },
     onError: (error: Error) => {

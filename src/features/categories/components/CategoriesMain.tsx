@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import axios from "axios";
+import React, { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
   Table,
@@ -13,40 +13,57 @@ import {
   SimpleGrid,
   Spinner,
   Link as ChakraLink,
+  useToast,
 } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import CreateCategoryModal from "@components/modals/CreateCategoryModal";
 import config from "@/config";
 
-const CategoriesMain = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const [categoryType, setCategoryType] = useState(null);
-  const [parentCategoryId, setParentCategoryId] = useState(null);
-  const [categories, setCategories] = useState([]); // State to store categories
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+// Define TypeScript interfaces
+interface Category {
+  category_id: string;
+  name: string;
+  type: "income" | "expense";
+  is_group: boolean;
+  parent_category_id: string | null;
+}
 
-  // Fetch categories from the backend
-  const fetchCategories = async () => {
-    setIsLoading(true);
-    try {
+const CategoriesMain: React.FC = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [categoryType, setCategoryType] = useState<"income" | "expense" | null>(
+    null,
+  );
+  const [parentCategoryId, setParentCategoryId] = useState<string | null>(null);
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  // Fetch categories using React Query
+  const {
+    data: categories = [],
+    isLoading: isCategoriesLoading,
+    isError: isCategoriesError,
+  } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: async () => {
       const token = localStorage.getItem("access_token");
-      const response = await axios.get(`${config.apiBaseUrl}/category/list`, {
+      const response = await fetch(`${config.apiBaseUrl}/category/list`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      setCategories(response.data); // Update categories state
-    } catch (error) {
-      console.error("Error fetching categories:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
-  // Fetch categories on component mount
-  useEffect(() => {
-    fetchCategories();
-  }, []);
+      if (!response.ok) {
+        throw new Error("Failed to fetch categories");
+      }
+
+      return response.json();
+    },
+  });
+
+  // Function to refresh categories data
+  const refreshCategories = () => {
+    queryClient.invalidateQueries({ queryKey: ["categories"] });
+  };
 
   // Separate categories into Income and Expense
   const incomeCategories = categories.filter(
@@ -57,7 +74,11 @@ const CategoriesMain = () => {
   );
 
   // Function to render categories in a nested table format
-  const renderCategoriesTable = (categories, parentId = null, level = 0) => {
+  const renderCategoriesTable = (
+    categories: Category[],
+    parentId: string | null = null,
+    level: number = 0,
+  ): React.ReactNode => {
     return categories
       .filter((category) => category.parent_category_id === parentId)
       .map((category) => (
@@ -110,16 +131,39 @@ const CategoriesMain = () => {
   };
 
   // Open modal for creating a new category
-  const handleCreateCategoryClick = (type, parentId = null) => {
+  const handleCreateCategoryClick = (
+    type: "income" | "expense",
+    parentId: string | null = null,
+  ): void => {
     setCategoryType(type);
     setParentCategoryId(parentId);
     onOpen();
   };
 
-  if (isLoading) {
+  if (isCategoriesLoading) {
     return (
       <Box textAlign="center" py={10}>
         <Spinner size="xl" color="teal.500" />
+      </Box>
+    );
+  }
+
+  if (isCategoriesError) {
+    toast({
+      title: "Error",
+      description: "Failed to fetch categories.",
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
+    return (
+      <Box textAlign="center" py={10}>
+        <Text color="red.500" mb={4}>
+          There was an error loading your categories.
+        </Text>
+        <Button onClick={refreshCategories} colorScheme="teal">
+          Try Again
+        </Button>
       </Box>
     );
   }
@@ -235,9 +279,8 @@ const CategoriesMain = () => {
       <CreateCategoryModal
         isOpen={isOpen}
         onClose={onClose}
-        categoryType={categoryType}
+        categoryType={categoryType === "income" ? "income" : "expense"}
         parentCategoryId={parentCategoryId}
-        fetchCategories={fetchCategories} // Pass fetchCategories to the modal
       />
     </Box>
   );

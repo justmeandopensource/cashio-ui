@@ -1,15 +1,15 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@components/Layout";
 import CategoriesMain from "@features/categories/components/CategoriesMain";
 import config from "@/config";
 
-const Categories = () => {
+const Categories: React.FC = () => {
   const navigate = useNavigate();
 
   // Token verification
   useEffect(() => {
-    const verifyToken = async () => {
+    const verifyToken = async (): Promise<void> => {
       const token = localStorage.getItem("access_token");
 
       if (!token) {
@@ -43,7 +43,7 @@ const Categories = () => {
   }, [navigate]);
 
   // handle logout
-  const handleLogout = () => {
+  const handleLogout = (): void => {
     localStorage.removeItem("access_token");
     navigate("/login");
   };
