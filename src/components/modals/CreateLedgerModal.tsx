@@ -66,13 +66,8 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
       return;
     }
 
-    // Get currency symbol from selection
-    const currencySymbol =
-      currencies.find((c) => c.code === selectedCurrency)?.symbol ||
-      selectedCurrency;
-
     // Call the handleCreateLedger function passed from the parent
-    handleCreateLedger(newLedgerName, currencySymbol);
+    handleCreateLedger(newLedgerName, selectedCurrency);
 
     // Reset the form fields
     setNewLedgerName("");

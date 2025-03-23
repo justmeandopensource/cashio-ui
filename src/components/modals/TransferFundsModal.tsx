@@ -18,7 +18,6 @@ import {
   useToast,
   Box,
   useColorModeValue,
-  useBreakpointValue,
   InputGroup,
   InputLeftAddon,
   Stack,
@@ -77,9 +76,6 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
 
-  // Responsive design helpers
-  const modalSize = useBreakpointValue({ base: "full", md: "lg" });
-
   // Theme colors
   const buttonColorScheme = "teal";
   const bgColor = useColorModeValue("white", "gray.800");
@@ -111,10 +107,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       );
       setLedgers(response.data);
     } catch (error) {
-      console.error("Error fetching ledgers:", error);
+      const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
-        description: "Failed to fetch ledgers.",
+        description:
+          axiosError.response?.data?.detail || "Failed to fetch ledgers.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -135,10 +132,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       );
       setAccounts(response.data);
     } catch (error) {
-      console.error("Error fetching accounts:", error);
+      const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
-        description: "Failed to fetch accounts.",
+        description:
+          axiosError.response?.data?.detail || "Failed to fetch accounts.",
         status: "error",
         duration: 3000,
         isClosable: true,
@@ -168,10 +166,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
         );
         setDestinationAccounts(response.data);
       } catch (error) {
-        console.error("Error fetching destination accounts:", error);
+        const axiosError = error as AxiosError<{ detail: string }>;
         toast({
           title: "Error",
-          description: "Failed to fetch destination accounts.",
+          description:
+            axiosError.response?.data?.detail || "Failed to fetch accounts.",
           status: "error",
           duration: 3000,
           isClosable: true,
@@ -189,26 +188,15 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 
   // Filter out the current ledger from the "destination ledger" dropdown
   const getFilteredLedgers = (ledgers: Ledger[]) => {
-    return ledgers.filter((ledger) => ledger.ledger_id !== ledgerId);
+    return ledgers.filter((ledger) => ledger.ledger_id != ledgerId);
   };
 
   // Filter out the current account from the "to account" dropdown
   const getFilteredAccounts = (accounts: Account[]) => {
-    return accounts.filter((account) => account.account_id !== fromAccountId);
+    return accounts.filter((account) => account.account_id != fromAccountId);
   };
 
   const handleSubmit = async () => {
-    if (!fromAccountId || !toAccountId || !amount) {
-      toast({
-        title: "Error",
-        description: "Please fill all required fields.",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
     setIsLoading(true);
     try {
       const token = localStorage.getItem("access_token");
@@ -244,7 +232,6 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       onClose();
       onTransferCompleted();
     } catch (error) {
-      console.error("Error transferring funds:", error);
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
@@ -262,7 +249,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size={modalSize}
+      size={{ base: "full", md: "lg" }}
       motionPreset="slideInBottom"
     >
       <ModalOverlay backdropFilter="blur(2px)" />
@@ -317,6 +304,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                     }
                   }}
                   shouldCloseOnSelect={true}
+                  data-testid="transferfundsmodal-date-picker"
                 />
               </FormControl>
 
@@ -357,11 +345,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                     </FormLabel>
                   </HStack>
                   <Select
-                    value={fromAccountId}
-                    onChange={(e) => setFromAccountId(e.target.value)}
                     borderColor={borderColor}
+                    placeholder="Select an account"
+                    onChange={(e) => setFromAccountId(e.target.value)}
+                    data-testid="transferfundsmodal-from-account-dropdown"
                   >
-                    <option value="">Select an account</option>
                     {/* Group for Asset Accounts */}
                     <optgroup label="Asset Accounts">
                       {accounts
@@ -434,19 +422,19 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                       value={destinationLedgerId}
                       onChange={(e) => {
                         const selectedLedger = ledgers.find(
-                          (ledger) => ledger.ledger_id === e.target.value,
+                          (ledger) => ledger.ledger_id == e.target.value,
                         );
                         setDestinationLedgerId(e.target.value);
                         if (selectedLedger) {
                           setDestinationCurrencySymbolCode(
                             selectedLedger.currency_symbol,
                           );
-                        } else {
-                          setDestinationCurrencySymbolCode("");
                         }
+                        setToAccountId("");
                       }}
                       borderColor={borderColor}
                       bg={bgColor}
+                      data-testid="transferfundsmodal-to-ledger-dropdown"
                     >
                       <option value="">Select a ledger</option>
                       {getFilteredLedgers(ledgers).map((ledger) => (
@@ -471,6 +459,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                     onChange={(e) => setToAccountId(e.target.value)}
                     borderColor={borderColor}
                     bg={bgColor}
+                    data-testid="transferfundsmodal-to-account-dropdown"
                   >
                     <option value="">Select an account</option>
                     {/* Group for Asset Accounts */}
@@ -529,9 +518,6 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         bg={bgColor}
                       />
                     </InputGroup>
-                    <Text fontSize="xs" mt={1} color="gray.500">
-                      Leave empty to use the same amount as source
-                    </Text>
                   </FormControl>
                 )}
               </VStack>
@@ -560,7 +546,8 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                 !fromAccountId ||
                 !toAccountId ||
                 !amount ||
-                (isDifferentLedger && !destinationLedgerId)
+                (isDifferentLedger &&
+                  (!destinationLedgerId || !destinationAmount))
               }
             >
               Complete Transfer
@@ -589,7 +576,8 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
               !fromAccountId ||
               !toAccountId ||
               !amount ||
-              (isDifferentLedger && !destinationLedgerId)
+              (isDifferentLedger &&
+                (!destinationLedgerId || !destinationAmount))
             }
           >
             Complete Transfer
