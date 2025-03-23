@@ -137,7 +137,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
 
   // Fetch accounts for the current ledger
   const { data: accounts = [] } = useQuery<Account[]>({
-    queryKey: ["accounts", ledgerId],
+    queryKey: ["accounts", ledgerId, "transaction-filter"],
     queryFn: async () => {
       const token = localStorage.getItem("access_token");
       const response = await fetch(
