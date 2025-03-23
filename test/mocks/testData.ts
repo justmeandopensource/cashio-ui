@@ -91,6 +91,17 @@ export const mockAccounts = [
     is_group: false,
     parent_account_id: null,
   },
+  {
+    account_id: 8,
+    ledger_id: 2,
+    name: "Wallet",
+    type: "asset" as const,
+    opening_balance: 0,
+    balance: 0,
+    net_balance: 0,
+    is_group: false,
+    parent_account_id: null,
+  },
 ];
 
 export const mockCategories = [

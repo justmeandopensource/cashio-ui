@@ -344,6 +344,25 @@ export const transactionHandlers = {
     },
   ),
 
+  // Transfer transaction success
+  transferFundsSuccess: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/transfer`,
+    () => {
+      return HttpResponse.json(
+        { message: "Transfer completed successfully." },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Transfer transaction error
+  transferFundsError: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/transfer`,
+    () => {
+      return HttpResponse.json({ message: "Transfer failed" }, { status: 500 });
+    },
+  ),
+
   // Show Notes suggestions
   getNotesSuggestionsEmpty: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/transaction/notes/suggestions`,
@@ -359,5 +378,6 @@ export const handlers = [
   ...Object.values(ledgerHandlers),
   ...Object.values(accountHandlers),
   ...Object.values(categoryHandlers),
+  ...Object.values(transactionHandlers),
   ...Object.values(transactionHandlers),
 ];

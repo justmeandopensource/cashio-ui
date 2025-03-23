@@ -81,7 +81,7 @@ describe("CreateLedgerModal Component", () => {
 
     await user.click(screen.getByRole("button", { name: /Create/i }));
 
-    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "£");
+    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "GBP");
     expect(mockOnClose).toHaveBeenCalled();
   });
 
@@ -97,7 +97,7 @@ describe("CreateLedgerModal Component", () => {
 
     await user.click(screen.getByRole("button", { name: /Create/i }));
 
-    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "£");
+    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "GBP");
     expect(mockOnClose).toHaveBeenCalled();
   });
 
