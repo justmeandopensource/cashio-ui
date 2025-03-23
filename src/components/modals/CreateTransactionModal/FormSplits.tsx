@@ -240,6 +240,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
                     setSplits(newSplits);
                   }}
                   borderColor={borderColor}
+                  data-testid="formsplits-category-dropdown"
                 >
                   <option value="">Select category</option>
                   {/* Filter categories based on transaction type */}

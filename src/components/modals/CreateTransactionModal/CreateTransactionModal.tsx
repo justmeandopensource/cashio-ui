@@ -121,7 +121,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       );
       setCategories(response.data);
     } catch (error) {
-      console.error("Error fetching categories:", error);
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
@@ -148,7 +147,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       );
       setAccounts(response.data);
     } catch (error) {
-      console.error("Error fetching accounts:", error);
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
@@ -308,7 +306,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       onClose();
       onTransactionAdded();
     } catch (error) {
-      console.error("Error adding transaction:", error);
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
@@ -417,6 +414,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                       }
                     }}
                     shouldCloseOnSelect={true}
+                    data-testid="createtransactionmodal-date-picker"
                   />
                 </FormControl>
 
@@ -455,6 +453,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                     borderColor={borderColor}
                     placeholder="Select an account"
                     onChange={(e) => setSelectedAccountId(e.target.value)}
+                    data-testid="createtransactionmodal-account-dropdown"
                   >
                     {/* Group for Asset Accounts */}
                     <optgroup label="Asset Accounts">
@@ -543,6 +542,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                   onChange={(e) => setCategoryId(e.target.value)}
                   borderColor={borderColor}
                   placeholder="Select a category"
+                  data-testid="createtransactionmodal-category-dropdown"
                 >
                   {/* Group for Income Categories */}
                   <optgroup label="Income Categories">
@@ -597,9 +597,12 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                   splits.some(
                     (split) => split.amount > 0 && !split.categoryId,
                   )) ||
-                (!isSplit && !categoryId) ||
+                (!isSplit &&
+                  (!categoryId ||
+                    (accountId ? !accountId : !selectedAccountId))) ||
                 !amount ||
-                (isSplit && calculateRemainingAmount() !== 0)
+                (isSplit && calculateRemainingAmount() !== 0) ||
+                (isSplit && !accountId && !selectedAccountId)
               }
             >
               Save Transaction
@@ -629,9 +632,12 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                 splits.some(
                   (split) => split.amount > 0 && !split.categoryId,
                 )) ||
-              (!isSplit && !categoryId) ||
+              (!isSplit &&
+                (!categoryId ||
+                  (accountId ? !accountId : !selectedAccountId))) ||
               !amount ||
-              (isSplit && calculateRemainingAmount() !== 0)
+              (isSplit && calculateRemainingAmount() !== 0) ||
+              (isSplit && !accountId && !selectedAccountId)
             }
           >
             Save Transaction

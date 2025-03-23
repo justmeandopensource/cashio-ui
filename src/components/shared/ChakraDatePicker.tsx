@@ -10,6 +10,7 @@ interface ChakraDatePickerProps {
   placeholderText?: string;
   minDate?: Date | null;
   shouldCloseOnSelect?: boolean;
+  "data-testid"?: string;
 }
 
 const ChakraDatePicker: React.FC<ChakraDatePickerProps> = ({
@@ -18,6 +19,7 @@ const ChakraDatePicker: React.FC<ChakraDatePickerProps> = ({
   placeholderText,
   minDate = null,
   shouldCloseOnSelect = false,
+  "data-testid": testId,
 }) => {
   return (
     <FormControl>
@@ -26,7 +28,7 @@ const ChakraDatePicker: React.FC<ChakraDatePickerProps> = ({
         selected={selected}
         onChange={onChange as any}
         dateFormat="yyyy/MM/dd"
-        customInput={<Input />}
+        customInput={<Input data-testid={testId} />}
         showPopperArrow={false}
         popperPlacement="bottom-start"
         popperModifiers={
