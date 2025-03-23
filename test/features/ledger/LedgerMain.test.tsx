@@ -110,6 +110,19 @@ describe("LedgerMain Component", () => {
     expect(transactionsTab).toHaveAttribute("aria-selected", "false");
   });
 
+  it("shows accounts in accounts tab", async () => {
+    server.use(ledgerHandlers.getLedgerWithData);
+    server.use(accountHandlers.getAccountsWithData);
+    renderLedgerMain();
+
+    await waitFor(() => {
+      expect(screen.getByText("UK")).toBeInTheDocument();
+    });
+
+    expect(screen.getByText("Test Bank 1")).toBeInTheDocument();
+    expect(screen.getByText("Test Credit Card 1")).toBeInTheDocument();
+  });
+
   it("should switch to transactions tab when clicked", async () => {
     server.use(ledgerHandlers.getLedgerWithData);
     server.use(accountHandlers.getAccountsWithData);
