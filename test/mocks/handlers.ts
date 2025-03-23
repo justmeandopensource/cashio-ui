@@ -98,11 +98,21 @@ export const accountHandlers = {
   // Get accounts for a ledger
   getAccountsWithData: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/accounts`,
-    ({ params }) => {
+    ({ params, request }) => {
+      const url = new URL(request.url);
+      const ignoreGroup = url.searchParams.get("ignore_group") === "true";
+
       const ledgerId = Number(params.ledgerId);
-      const filteredAccounts = mockAccounts.filter(
+      let filteredAccounts = mockAccounts.filter(
         (account) => account.ledger_id === ledgerId,
       );
+
+      if (ignoreGroup) {
+        filteredAccounts = filteredAccounts.filter(
+          (account) => account.is_group === false,
+        );
+      }
+
       return HttpResponse.json(filteredAccounts, { status: 200 });
     },
   ),
@@ -208,10 +218,24 @@ export const categoryHandlers = {
     return HttpResponse.json([], { status: 200 });
   }),
 
-  // Get categories
-  getCategoriesWithData: http.get(`${config.apiBaseUrl}/category/list`, () => {
-    return HttpResponse.json(mockCategories, { status: 200 });
-  }),
+  // Get categories with data
+  getCategoriesWithData: http.get(
+    `${config.apiBaseUrl}/category/list`,
+    ({ request }) => {
+      const url = new URL(request.url);
+      const ignoreGroup = url.searchParams.get("ignore_group") === "true";
+
+      let filteredCategories = mockCategories;
+
+      if (ignoreGroup) {
+        filteredCategories = mockCategories.filter(
+          (category) => category.is_group === false,
+        );
+      }
+
+      return HttpResponse.json(filteredCategories, { status: 200 });
+    },
+  ),
 
   // Get categories with error
   getCategoriesError: http.get(`${config.apiBaseUrl}/category/list`, () => {
@@ -275,10 +299,65 @@ export const categoryHandlers = {
   }),
 };
 
+export const transactionHandlers = {
+  // Create income transaction successfully
+  addIncomeTransactionSuccess: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/income`,
+    () => {
+      return HttpResponse.json(
+        { message: "Transaction added successfully" },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Create income transaction error
+  addIncomeTransactionError: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/income`,
+    () => {
+      return HttpResponse.json(
+        { error: "Transaction failed" },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Create expense transaction successfully
+  addExpenseTransactionSuccess: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/expense`,
+    () => {
+      return HttpResponse.json(
+        { message: "Transaction added successfully" },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Create expense transaction error
+  addExpenseTransactionError: http.post(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/expense`,
+    () => {
+      return HttpResponse.json(
+        { error: "Transaction failed" },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Show Notes suggestions
+  getNotesSuggestionsEmpty: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/notes/suggestions`,
+    () => {
+      return HttpResponse.json([], { status: 200 });
+    },
+  ),
+};
+
 // Combine all handlers
 export const handlers = [
   ...Object.values(authHandlers),
   ...Object.values(ledgerHandlers),
   ...Object.values(accountHandlers),
   ...Object.values(categoryHandlers),
+  ...Object.values(transactionHandlers),
 ];
