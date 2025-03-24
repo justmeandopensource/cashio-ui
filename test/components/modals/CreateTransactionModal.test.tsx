@@ -109,6 +109,14 @@ describe("CreateTransactionModal Component", () => {
     });
   });
 
+  it("allows date field to be entered manually without picking from date picker", async () => {
+    const { user } = renderCreateTransactionModal();
+    const dateInput = screen.getByTestId("createtransactionmodal-date-picker");
+    await user.clear(dateInput);
+    await user.type(dateInput, "2025/01/01");
+    expect(dateInput).toHaveValue("2025/01/01");
+  });
+
   it("sets default focus on amount field", () => {
     renderCreateTransactionModal();
     expect(screen.getByLabelText("Amount")).toHaveFocus();

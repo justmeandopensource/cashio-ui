@@ -106,9 +106,11 @@ const Transactions: React.FC<TransactionsProps> = ({
     setPagination((prev) => ({ ...prev, current_page: 1 }));
   };
 
-  const { data: transactionsData, isLoading: isTransactionsLoading } = useQuery<
-    Transaction[]
-  >({
+  const {
+    data: transactionsData,
+    isLoading: isTransactionsLoading,
+    isError: isTransactionsError,
+  } = useQuery<Transaction[]>({
     queryKey: [
       "transactions",
       ledgerId,
@@ -197,13 +199,12 @@ const Transactions: React.FC<TransactionsProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch split transactions");
+        throw new Error("Failed to fetch split transactions.");
       }
 
       const data = await response.json();
       setSplitTransactions(data);
     } catch (error) {
-      console.error("Error fetching split transactions:", error);
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
@@ -233,13 +234,12 @@ const Transactions: React.FC<TransactionsProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to fetch transfer details");
+        throw new Error("Failed to fetch transfer details.");
       }
 
       const data = await response.json();
       setTransferDetails(data);
     } catch (error) {
-      console.error("Error fetching transfer details:", error);
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
@@ -269,7 +269,7 @@ const Transactions: React.FC<TransactionsProps> = ({
       );
 
       if (!response.ok) {
-        throw new Error("Failed to delete transaction");
+        throw new Error("Failed to delete transaction.");
       }
 
       if (onTransactionDeleted) {
@@ -287,13 +287,12 @@ const Transactions: React.FC<TransactionsProps> = ({
       });
 
       toast({
-        title: "Transaction deleted",
+        description: "Transaction deleted",
         status: "success",
         duration: 3000,
         isClosable: true,
       });
     } catch (error) {
-      console.error("Error deleting transaction:", error);
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         title: "Error",
@@ -312,6 +311,17 @@ const Transactions: React.FC<TransactionsProps> = ({
         <Spinner size="xl" color="teal.500" />
       </Box>
     );
+  }
+
+  if (isTransactionsError) {
+    toast({
+      title: "Error",
+      description: "Failed to fetch transactions",
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
+    return null;
   }
 
   return (
@@ -425,6 +435,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                 variant="ghost"
                 size={{ base: "sm", lg: "md" }}
                 aria-label="Previous page"
+                data-testid="transactions-prev-page-icon"
               />
               <Text mx={4} fontSize={{ base: "sm", lg: "md" }}>
                 {pagination.current_page} / {pagination.total_pages}
@@ -436,6 +447,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                 variant="ghost"
                 size={{ base: "sm", lg: "md" }}
                 aria-label="Next page"
+                data-testid="transactions-next-page-icon"
               />
             </Flex>
           )}

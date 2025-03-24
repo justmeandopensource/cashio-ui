@@ -187,6 +187,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                           bg="purple.400"
                           cursor="pointer"
                           borderRadius="md"
+                          data-testid="transactiontable-split-indicator"
                         />
                       </Box>
                     </PopoverTrigger>
@@ -272,6 +273,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                           bg="blue.400"
                           cursor="pointer"
                           borderRadius="md"
+                          data-testid="transactiontable-transfer-indicator"
                         />
                       </Box>
                     </PopoverTrigger>
@@ -379,6 +381,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       color="red.500"
                       _hover={{ color: "red.600" }}
                       transition="opacity 0.2s"
+                      data-testid="transactiontable-trash-icon"
                     />
                   </ChakraLink>
                 </Flex>

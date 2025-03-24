@@ -1,6 +1,14 @@
 import { http, HttpResponse } from "msw";
 import config from "@/config";
-import { mockAccounts, mockCategories, mockLedgers } from "./testData";
+import {
+  mockAccounts,
+  mockCategories,
+  mockLedgers,
+  mockPaginatedTransactions,
+  mockSplits,
+  mockTransactions,
+  mockTransferTransactions,
+} from "./testData";
 
 export const authHandlers = {
   // Login verification for valid credentials
@@ -363,6 +371,213 @@ export const transactionHandlers = {
     },
   ),
 
+  // Get transactions with data
+  getTransactionsWithData: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transactions`,
+    ({ request }) => {
+      const url = new URL(request.url);
+      let filteredTransactions = [...mockTransactions];
+
+      // Parse query parameters
+      const accountId = url.searchParams.get("account_id");
+      const page = parseInt(url.searchParams.get("page") || "1");
+      const perPage = parseInt(url.searchParams.get("per_page") || "15");
+      const fromDate = url.searchParams.get("from_date");
+      const toDate = url.searchParams.get("to_date");
+      const categoryId = url.searchParams.get("category_id");
+      const tags = url.searchParams.getAll("tags");
+      const tagsMatch = url.searchParams.get("tags_match") || "any";
+      const searchText = url.searchParams.get("search_text");
+      const transactionType = url.searchParams.get("transaction_type");
+
+      // Filter by account ID
+      if (accountId) {
+        filteredTransactions = filteredTransactions.filter(
+          (transaction) => transaction.account_id === parseInt(accountId),
+        );
+      }
+
+      // Filter by date range
+      if (fromDate) {
+        const fromDateObj = new Date(fromDate);
+        filteredTransactions = filteredTransactions.filter(
+          (transaction) => new Date(transaction.date) >= fromDateObj,
+        );
+      }
+
+      if (toDate) {
+        const toDateObj = new Date(toDate);
+        filteredTransactions = filteredTransactions.filter(
+          (transaction) => new Date(transaction.date) <= toDateObj,
+        );
+      }
+
+      // Filter by category ID
+      if (categoryId) {
+        filteredTransactions = filteredTransactions.filter(
+          (transaction) => transaction.category_id === parseInt(categoryId),
+        );
+      }
+
+      // Filter by tags
+      if (tags && tags.length > 0) {
+        filteredTransactions = filteredTransactions.filter((transaction) => {
+          if (!transaction.tags || transaction.tags.length === 0) return false;
+
+          const transactionTagNames = transaction.tags.map((tag) => tag.name);
+
+          if (tagsMatch === "all") {
+            // All specified tags must be present
+            return tags.every((tag) => transactionTagNames.includes(tag));
+          } else {
+            // At least one of the specified tags must be present
+            return tags.some((tag) => transactionTagNames.includes(tag));
+          }
+        });
+      }
+
+      // Filter by search text in notes
+      if (searchText) {
+        filteredTransactions = filteredTransactions.filter((transaction) =>
+          transaction.notes.toLowerCase().includes(searchText.toLowerCase()),
+        );
+      }
+
+      // Filter by transaction type (income/expense)
+      if (transactionType) {
+        filteredTransactions = filteredTransactions.filter((transaction) => {
+          if (transactionType.toLowerCase() === "income") {
+            return transaction.credit > 0;
+          } else if (transactionType.toLowerCase() === "expense") {
+            return transaction.debit > 0;
+          }
+          return true;
+        });
+      }
+
+      // Calculate pagination
+      const totalItems = filteredTransactions.length;
+      const totalPages = Math.ceil(totalItems / perPage);
+      const startIndex = (page - 1) * perPage;
+      const endIndex = Math.min(startIndex + perPage, totalItems);
+      const paginatedTransactions = filteredTransactions.slice(
+        startIndex,
+        endIndex,
+      );
+
+      // Return the paginated response with the structure expected by the component
+      return HttpResponse.json(
+        {
+          transactions: paginatedTransactions,
+          current_page: page,
+          total_pages: totalPages,
+        },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Get transactions empty
+  getTransactionsEmpty: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transactions`,
+    () => {
+      return HttpResponse.json(
+        {
+          transactions: [],
+          current_page: 1,
+          total_pages: 0,
+        },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Get transactions error
+  getTransactionsError: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transactions`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch transactions" },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Get transaction splits
+  getTransactionSplitsWithData: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/:transactionId/splits`,
+    ({ params }) => {
+      const transactionId = Number(params.transactionId);
+      let filteredSplits = mockSplits.filter(
+        (split) => split.transaction_id === transactionId,
+      );
+
+      return HttpResponse.json(filteredSplits, { status: 200 });
+    },
+  ),
+
+  // Get transaction splits error
+  getTransactionSplitsError: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/:transactionId/splits`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch split transactions " },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Get transfer transactions
+  getTransferTransactionsWithData: http.get(
+    `${config.apiBaseUrl}/ledger/transfer/:transferId`,
+    () => {
+      return HttpResponse.json(mockTransferTransactions, { status: 200 });
+    },
+  ),
+
+  // Get transaction splits error
+  getTransferTransactionsError: http.get(
+    `${config.apiBaseUrl}/ledger/transfer/:transferId`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch transfer details." },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Delete transaction succcess
+  deleteTransactionSuccess: http.delete(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/:transactionId`,
+    () => {
+      return HttpResponse.json(
+        { message: "Transaction deleted" },
+        { status: 200 },
+      );
+    },
+  ),
+
+  // Delete transaction error
+  deleteTransactionError: http.delete(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/:transactionId`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to delete transaction." },
+        { status: 500 },
+      );
+    },
+  ),
+
+  // Get transactions with pagination
+  getTransactionsWithPagination: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transactions`,
+    () => {
+      return HttpResponse.json(
+        mockPaginatedTransactions,
+        { status: 200 },
+      );
+    },
+  ),
   // Show Notes suggestions
   getNotesSuggestionsEmpty: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/transaction/notes/suggestions`,
@@ -378,6 +593,5 @@ export const handlers = [
   ...Object.values(ledgerHandlers),
   ...Object.values(accountHandlers),
   ...Object.values(categoryHandlers),
-  ...Object.values(transactionHandlers),
   ...Object.values(transactionHandlers),
 ];

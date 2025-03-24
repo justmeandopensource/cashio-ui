@@ -353,6 +353,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                   e.stopPropagation();
                   onOpen();
                 }}
+                data-testid="transactioncard-delete-icon"
               />
             </Flex>
           </Box>
