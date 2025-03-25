@@ -6,6 +6,7 @@ import {
   mockLedgers,
   mockPaginatedTransactions,
   mockSplits,
+  mockTagSuggestions,
   mockTransactions,
   mockTransferTransactions,
 } from "./testData";
@@ -572,12 +573,10 @@ export const transactionHandlers = {
   getTransactionsWithPagination: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/transactions`,
     () => {
-      return HttpResponse.json(
-        mockPaginatedTransactions,
-        { status: 200 },
-      );
+      return HttpResponse.json(mockPaginatedTransactions, { status: 200 });
     },
   ),
+
   // Show Notes suggestions
   getNotesSuggestionsEmpty: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/transaction/notes/suggestions`,
@@ -585,6 +584,29 @@ export const transactionHandlers = {
       return HttpResponse.json([], { status: 200 });
     },
   ),
+
+  // Get tag suggestions based on query
+  getTagsSuggestions: http.get(
+    `${config.apiBaseUrl}/tags/search`,
+    ({ request }) => {
+      const url = new URL(request.url);
+      const query = url.searchParams.get("query")?.toLowerCase() || "";
+
+      const filteredSuggestions = mockTagSuggestions.filter((tag) =>
+        tag.name.toLowerCase().includes(query),
+      );
+
+      return HttpResponse.json(filteredSuggestions, { status: 200 });
+    },
+  ),
+
+  // Get tags suggestions error
+  getTagsSuggestionsError: http.get(`${config.apiBaseUrl}/tags/search`, () => {
+    return HttpResponse.json(
+      { error: "Failed to fetch tag suggestions." },
+      { status: 500 },
+    );
+  }),
 };
 
 // Combine all handlers

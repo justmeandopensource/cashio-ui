@@ -255,7 +255,7 @@ export const mockTransactions = [
     tags: [
       {
         name: "milton",
-        tag_id: 5,
+        tag_id: 1,
         user_id: 1,
       },
     ],
@@ -541,3 +541,11 @@ export const mockPaginatedTransactions = {
   current_page: 1,
   per_page: 15,
 };
+
+export const mockTagSuggestions = [
+  { tag_id: "1", name: "milton" },
+  { tag_id: "2", name: "leicester" },
+  { tag_id: "3", name: "mcd" },
+  { tag_id: "4", name: "employer1" },
+  { tag_id: "5", name: "employer2" },
+];

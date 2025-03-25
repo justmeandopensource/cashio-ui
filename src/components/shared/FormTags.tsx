@@ -83,7 +83,6 @@ const FormTags: React.FC<FormTagsProps> = ({
           );
           setTagSuggestions(response.data);
         } catch (error) {
-          console.error("Error fetching tag suggestions:", error);
           const apiError = error as AxiosError<ApiErrorResponse>;
           toast({
             title: "Error",
