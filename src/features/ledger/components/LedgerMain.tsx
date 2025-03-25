@@ -112,6 +112,16 @@ const LedgerMain = () => {
     setIsTransferModalOpen(true);
   };
 
+  const refreshAccountsData = async (): Promise<void> => {
+    await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+  };
+
+  const refreshTransactionsData = async (): Promise<void> => {
+    await queryClient.invalidateQueries({
+      queryKey: ["transactions"],
+    });
+  };
+
   if (isLedgerLoading || isAccountsLoading) {
     return (
       <Box>
@@ -238,11 +248,10 @@ const LedgerMain = () => {
         currencySymbol={
           currencySymbols[ledger!.currency_symbol as CurrencyCode]
         }
-        onTransactionAdded={() =>
-          queryClient.invalidateQueries({
-            queryKey: ["accounts", String(ledgerId)],
-          })
-        }
+        onTransactionAdded={() => {
+          refreshAccountsData();
+          refreshTransactionsData();
+        }}
       />
 
       {/* Transfer Funds Modal */}
@@ -254,11 +263,10 @@ const LedgerMain = () => {
         currencySymbol={
           currencySymbols[ledger!.currency_symbol as CurrencyCode]
         }
-        onTransferCompleted={() =>
-          queryClient.invalidateQueries({
-            queryKey: ["accounts", String(ledgerId)],
-          })
-        }
+        onTransferCompleted={() => {
+          refreshAccountsData();
+          refreshTransactionsData();
+        }}
       />
     </Box>
   );
