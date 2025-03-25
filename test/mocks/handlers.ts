@@ -577,11 +577,40 @@ export const transactionHandlers = {
     },
   ),
 
-  // Show Notes suggestions
+  // Show Notes suggestions empty
   getNotesSuggestionsEmpty: http.get(
     `${config.apiBaseUrl}/ledger/:ledgerId/transaction/notes/suggestions`,
     () => {
       return HttpResponse.json([], { status: 200 });
+    },
+  ),
+
+  // Get note suggestions with data
+  getNotesSuggestions: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/notes/suggestions`,
+    ({ request }) => {
+      const url = new URL(request.url);
+      const searchText =
+        url.searchParams.get("search_text")?.toLowerCase() || "";
+
+      const suggestions = mockTransactions
+        .filter((tx) => tx.notes && tx.notes.toLowerCase().includes(searchText))
+        .map((tx) => tx.notes)
+        .filter((note, index, self) => self.indexOf(note) === index)
+        .slice(0, 10);
+
+      return HttpResponse.json(suggestions, { status: 200 });
+    },
+  ),
+
+  // Get note suggestions error
+  getNotesSuggestionsError: http.get(
+    `${config.apiBaseUrl}/ledger/:ledgerId/transaction/notes/suggestions`,
+    () => {
+      return HttpResponse.json(
+        { error: "Failed to fetch note suggestions." },
+        { status: 500 },
+      );
     },
   ),
 

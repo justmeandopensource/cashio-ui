@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   FormControl,
   FormLabel,
@@ -16,7 +16,6 @@ interface FormNotesProps {
   notes: string;
   // eslint-disable-next-line no-unused-vars
   setNotes: (notes: string) => void;
-  isOpen: boolean;
   borderColor: string;
 }
 
@@ -29,7 +28,6 @@ const FormNotes: React.FC<FormNotesProps> = ({
   ledgerId,
   notes,
   setNotes,
-  isOpen,
   borderColor,
 }) => {
   const toast = useToast();
@@ -39,12 +37,6 @@ const FormNotes: React.FC<FormNotesProps> = ({
     "gray.100",
     "gray.600",
   );
-
-  useEffect(() => {
-    if (!isOpen) {
-      setNoteSuggestions([]);
-    }
-  }, [isOpen]);
 
   // eslint-disable-next-line no-unused-vars
   const debounce = <F extends (...args: any[]) => any>(
@@ -80,7 +72,6 @@ const FormNotes: React.FC<FormNotesProps> = ({
           );
           setNoteSuggestions(response.data);
         } catch (error) {
-          console.error("Error fetching note suggestions:", error);
           const apiError = error as AxiosError<ApiErrorResponse>;
           toast({
             title: "Error",

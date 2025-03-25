@@ -528,7 +528,6 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
               ledgerId={ledgerId}
               notes={notes}
               setNotes={setNotes}
-              isOpen={isOpen}
               borderColor={borderColor}
             />
           </VStack>

@@ -490,7 +490,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                 ledgerId={ledgerId}
                 notes={notes}
                 setNotes={setNotes}
-                isOpen={isOpen}
                 borderColor={borderColor}
               />
             </Box>

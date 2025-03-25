@@ -192,6 +192,73 @@ describe("CreateTransactionModal Component", () => {
     expect(mockOnClose).not.toHaveBeenCalled();
   });
 
+  it("shows notes suggestions when more than 3 characters entered in notes field", async () => {
+    server.use(transactionHandlers.getNotesSuggestions);
+    const { user } = renderCreateTransactionModal();
+    const notesInput = screen.getByPlaceholderText("Description (optional)");
+    await user.type(notesInput, "Sala");
+    await waitFor(() => {
+      expect(
+        screen.getByText("Salary from Test Company into Test Bank 1"),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByText("Salary from Test Company into Test Bank 2"),
+      ).toBeInTheDocument();
+    });
+  });
+
+  it("does not show notes suggestions when less than 3 characters entered in notes field", async () => {
+    server.use(transactionHandlers.getNotesSuggestions);
+    const { user } = renderCreateTransactionModal();
+    const notesInput = screen.getByPlaceholderText("Description (optional)");
+    await user.type(notesInput, "Sa");
+    await waitFor(() => {
+      expect(
+        screen.queryByText("Salary from Test Company into Test Bank 1"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Salary from Test Company into Test Bank 2"),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("shows error toast when notes fetching fails", async () => {
+    server.use(transactionHandlers.getNotesSuggestionsError);
+    const { user } = renderCreateTransactionModal();
+    const notesInput = screen.getByPlaceholderText("Description (optional)");
+    await user.type(notesInput, "Sala");
+    await waitFor(() => {
+      expect(mockToast).toHaveBeenCalledWith(
+        expect.objectContaining({
+          description: "Failed to fetch note suggestions.",
+        }),
+      );
+      expect(
+        screen.queryByText("Salary from Test Company into Test Bank 1"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Salary from Test Company into Test Bank 2"),
+      ).not.toBeInTheDocument();
+    });
+  });
+
+  it("updates notes field when one of the suggestions is clicked", async () => {
+    server.use(transactionHandlers.getNotesSuggestions);
+    const { user } = renderCreateTransactionModal();
+    const notesInput = screen.getByPlaceholderText("Description (optional)");
+    await user.type(notesInput, "Sala");
+    await waitFor(async () => {
+      const noteSelection = screen.getByText(
+        "Salary from Test Company into Test Bank 1",
+      );
+      expect(noteSelection).toBeInTheDocument();
+      await user.click(noteSelection);
+      expect(notesInput).toHaveValue(
+        "Salary from Test Company into Test Bank 1",
+      );
+    });
+  });
+
   describe("income transaction tests", () => {
     it("adds a new income transaction successfully when account id is passed", async () => {
       server.use(categoryHandlers.getCategoriesWithData);
