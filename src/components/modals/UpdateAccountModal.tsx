@@ -24,6 +24,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import config from "@/config";
+import useLedgerStore from "../shared/store";
 
 interface GroupAccount {
   account_id: string | number;
@@ -43,7 +44,6 @@ interface UpdateAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
   account: Account;
-  currencySymbol: string;
   onUpdateCompleted: () => void;
 }
 
@@ -57,7 +57,6 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   isOpen,
   onClose,
   account,
-  currencySymbol,
   onUpdateCompleted,
 }) => {
   const [name, setName] = useState<string>(account.name);
@@ -71,6 +70,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
 
+  const { currencySymbol } = useLedgerStore();
   // Color variables for consistent theming
   const buttonColorScheme = "teal";
   const bgColor = useColorModeValue("white", "gray.800");

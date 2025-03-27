@@ -36,6 +36,7 @@ import {
 } from "@chakra-ui/react";
 import { FiCreditCard, FiTrash2 } from "react-icons/fi";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
+import useLedgerStore from "@/components/shared/store";
 
 interface TagItem {
   tag_id: string;
@@ -72,7 +73,6 @@ interface Transaction {
 
 interface TransactionTableProps {
   transactions: Transaction[];
-  currencySymbolCode: string;
   // eslint-disable-next-line no-unused-vars
   fetchSplitTransactions: (transactionId: string) => void;
   // eslint-disable-next-line no-unused-vars
@@ -88,7 +88,6 @@ interface TransactionTableProps {
 
 const TransactionTable: React.FC<TransactionTableProps> = ({
   transactions,
-  currencySymbolCode,
   fetchSplitTransactions,
   fetchTransferDetails,
   isSplitLoading,
@@ -102,6 +101,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   const [selectedTransactionId, setSelectedTransactionId] = useState<
     string | null
   >(null);
+
+  const { currencySymbol } = useLedgerStore();
 
   // Handle delete confirmation
   const handleDelete = async () => {
@@ -246,7 +247,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                                 >
                                   {formatNumberAsCurrency(
                                     split.debit,
-                                    currencySymbolCode,
+                                    currencySymbol as string,
                                   )}
                                 </Box>
                                 <Box flex="3" ml={4} color="teal.900">
@@ -346,7 +347,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   <Text color="teal.500">
                     {formatNumberAsCurrency(
                       transaction.credit,
-                      currencySymbolCode,
+                      currencySymbol as string,
                     )}
                   </Text>
                 )}
@@ -356,7 +357,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   <Text color="red.500">
                     {formatNumberAsCurrency(
                       transaction.debit,
-                      currencySymbolCode,
+                      currencySymbol as string,
                     )}
                   </Text>
                 )}

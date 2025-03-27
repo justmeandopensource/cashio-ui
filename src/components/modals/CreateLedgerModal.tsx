@@ -20,15 +20,13 @@ import {
 
 interface Currency {
   symbol: string;
-  code: string;
   name: string;
 }
 
 const currencies: Currency[] = [
-  { symbol: "$", code: "USD", name: "US Dollar" },
-  { symbol: "€", code: "EUR", name: "Euro" },
-  { symbol: "£", code: "GBP", name: "British Pound" },
-  { symbol: "₹", code: "INR", name: "Indian Rupee" },
+  { symbol: "£", name: "British Pound" },
+  { symbol: "₹", name: "Indian Rupee" },
+  { symbol: "$", name: "US Dollar" },
   // Add more common currencies as needed
 ];
 
@@ -170,8 +168,8 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                 }}
               >
                 {currencies.map((currency) => (
-                  <option key={currency.code} value={currency.code}>
-                    {currency.symbol} - {currency.code} ({currency.name})
+                  <option key={currency.symbol} value={currency.symbol}>
+                    {currency.symbol} ({currency.name})
                   </option>
                 ))}
               </Select>

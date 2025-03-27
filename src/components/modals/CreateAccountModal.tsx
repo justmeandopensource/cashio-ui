@@ -25,6 +25,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import config from "@/config";
+import useLedgerStore from "../shared/store";
 
 interface GroupAccount {
   account_id: string;
@@ -34,10 +35,8 @@ interface GroupAccount {
 interface CreateAccountModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ledgerId: string;
   accountType: "asset" | "liability";
   parentAccountId?: string | null;
-  currencySymbol: string;
 }
 
 interface CreateAccountPayload {
@@ -51,13 +50,12 @@ interface CreateAccountPayload {
 const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   isOpen,
   onClose,
-  ledgerId,
   accountType,
   parentAccountId,
-  currencySymbol,
 }) => {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { ledgerId, currencySymbol } = useLedgerStore();
   const [accountName, setAccountName] = useState<string>("");
   const [isGroupAccount, setIsGroupAccount] = useState<boolean>(false);
   const [parentAccount, setParentAccount] = useState<string>(

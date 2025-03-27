@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Badge,
@@ -20,15 +19,9 @@ import LedgerMainAccounts from "./LedgerMainAccounts";
 import LedgerMainTransactions from "./LedgerMainTransactions";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
-import { CurrencyCode, currencySymbols } from "@components/shared/utils";
 import config from "@/config";
 import { FiAlignLeft, FiCreditCard } from "react-icons/fi";
-
-interface Ledger {
-  ledger_id: string;
-  name: string;
-  currency_symbol: string;
-}
+import useLedgerStore from "@/components/shared/store";
 
 interface Account {
   account_id: string;
@@ -38,7 +31,7 @@ interface Account {
 }
 
 const LedgerMain = () => {
-  const { ledgerId } = useParams<{ ledgerId: string }>();
+  const { ledgerId } = useLedgerStore();
   const toast = useToast();
   const queryClient = useQueryClient();
 
@@ -51,29 +44,6 @@ const LedgerMain = () => {
   const [selectedAccountId, setSelectedAccountId] = useState<
     string | undefined
   >(undefined);
-
-  // Fetch ledger details
-  const {
-    data: ledger,
-    isLoading: isLedgerLoading,
-    isError: isLedgerError,
-  } = useQuery<Ledger>({
-    queryKey: ["ledger", ledgerId],
-    queryFn: async () => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${config.apiBaseUrl}/ledger/${ledgerId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch ledger details");
-      }
-
-      return response.json();
-    },
-  });
 
   // Fetch accounts for the ledger
   const {
@@ -122,7 +92,7 @@ const LedgerMain = () => {
     });
   };
 
-  if (isLedgerLoading || isAccountsLoading) {
+  if (isAccountsLoading) {
     return (
       <Box>
         <LedgerMainHeaderSkeleton />
@@ -130,7 +100,7 @@ const LedgerMain = () => {
     );
   }
 
-  if (isLedgerError || isAccountsError) {
+  if (isAccountsError) {
     toast({
       title: "Error",
       description: "Failed to fetch ledger or account details.",
@@ -154,7 +124,6 @@ const LedgerMain = () => {
     <Box>
       {/* Ledger Details Section */}
       <LedgerMainHeader
-        ledger={ledger!}
         onAddTransaction={() => handleAddTransaction(undefined)}
         onTransferFunds={() => handleTransferFunds(undefined)}
         hasAccounts={accounts ? accounts.length > 0 : false}
@@ -216,7 +185,6 @@ const LedgerMain = () => {
             <TabPanel p={{ base: 2, md: 4 }}>
               <LedgerMainAccounts
                 accounts={accounts || []}
-                ledger={ledger!}
                 onAddTransaction={handleAddTransaction}
                 onTransferFunds={handleTransferFunds}
               />
@@ -224,8 +192,6 @@ const LedgerMain = () => {
             {/* Transactions Tab */}
             <TabPanel p={{ base: 2, md: 4 }}>
               <LedgerMainTransactions
-                ledgerId={ledgerId!}
-                currencySymbolCode={ledger!.currency_symbol}
                 onAddTransaction={() => handleAddTransaction(undefined)}
                 onTransactionDeleted={() =>
                   queryClient.invalidateQueries({
@@ -243,11 +209,7 @@ const LedgerMain = () => {
       <CreateTransactionModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        ledgerId={ledgerId!}
         accountId={selectedAccountId}
-        currencySymbol={
-          currencySymbols[ledger!.currency_symbol as CurrencyCode]
-        }
         onTransactionAdded={() => {
           refreshAccountsData();
           refreshTransactionsData();
@@ -258,11 +220,7 @@ const LedgerMain = () => {
       <TransferFundsModal
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
-        ledgerId={ledgerId!}
         accountId={selectedAccountId}
-        currencySymbol={
-          currencySymbols[ledger!.currency_symbol as CurrencyCode]
-        }
         onTransferCompleted={() => {
           refreshAccountsData();
           refreshTransactionsData();

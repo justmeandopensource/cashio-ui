@@ -30,10 +30,9 @@ import { VERSION } from "../version";
 
 interface SidebarProps {
   handleLogout: () => void;
-  currentLedgerId?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ handleLogout, currentLedgerId }) => {
+const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const sidebarBg = useColorModeValue("teal.500", "teal.700");
@@ -86,14 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout, currentLedgerId }) => {
             display="flex"
             alignItems="center"
             onClick={() => {
-              navigate(
-                "/insights",
-                currentLedgerId
-                  ? {
-                      state: { ledgerId: currentLedgerId },
-                    }
-                  : undefined,
-              );
+              navigate("/insights");
               onClose();
             }}
           >
@@ -146,14 +138,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout, currentLedgerId }) => {
                 display="flex"
                 alignItems="center"
                 onClick={() => {
-                  navigate(
-                    "/insights",
-                    currentLedgerId
-                      ? {
-                          state: { ledgerId: currentLedgerId },
-                        }
-                      : undefined,
-                  );
+                  navigate("/insights");
                   onClose();
                 }}
               >

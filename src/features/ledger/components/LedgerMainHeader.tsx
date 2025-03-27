@@ -14,27 +14,22 @@ import {
 } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { FC } from "react";
-
-interface Ledger {
-  name: string;
-  // Add other ledger properties as needed
-}
+import useLedgerStore from "@/components/shared/store";
 
 interface LedgerMainHeaderProps {
-  ledger: Ledger;
   onAddTransaction: () => void;
   onTransferFunds: () => void;
   hasAccounts: boolean;
 }
 
 const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
-  ledger,
   onAddTransaction,
   onTransferFunds,
   hasAccounts,
 }) => {
   const navigate = useNavigate();
 
+  const { ledgerName } = useLedgerStore();
   // Use Chakra's color mode for consistent styling
   const bgColor = useColorModeValue("white", "gray.700");
   const buttonColorScheme = useColorModeValue("teal", "blue");
@@ -69,7 +64,7 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
           {/* Ledger Name and Edit Icon */}
           <Flex alignItems="center" gap={2}>
             <Heading as="h2" size="lg" color="teal.500">
-              {ledger.name}
+              {ledgerName}
             </Heading>
             <IconButton
               aria-label="Edit Account"

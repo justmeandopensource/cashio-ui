@@ -28,6 +28,8 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { FiTrendingUp, FiTrendingDown, FiChevronDown } from "react-icons/fi";
 import config from "@/config";
+import useLedgerStore from "@/components/shared/store";
+import { formatNumberAsCurrency } from "@/components/shared/utils";
 
 // Interfaces
 interface TrendData {
@@ -72,15 +74,6 @@ const periodOptions = [
 ];
 
 // Utility functions
-const formatCurrency = (value: number) => {
-  return new Intl.NumberFormat("en-GB", {
-    style: "currency",
-    currency: "GBP",
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(value);
-};
-
 const formatPeriod = (period: string) => {
   if (period.includes("-")) {
     const [year, month] = period.split("-");
@@ -99,6 +92,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
   ledgerId,
 }) => {
   const [periodType, setPeriodType] = useState<string>("last_12_months");
+  const { currencySymbol } = useLedgerStore();
 
   // Color modes
   const bgColor = useColorModeValue("white", "gray.800");
@@ -215,7 +209,12 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
               />
               <YAxis
                 tickFormatter={(value) =>
-                  value === 0 ? "" : formatCurrency(value).replace("£", "")
+                  value === 0
+                    ? ""
+                    : formatNumberAsCurrency(
+                        value,
+                        currencySymbol as string,
+                      ).replace("£", "")
                 }
                 tick={{
                   fontSize: "0.7rem",
@@ -223,7 +222,12 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
                 }}
               />
               <Tooltip
-                formatter={(value) => formatCurrency(Number(value))}
+                formatter={(value) =>
+                  formatNumberAsCurrency(
+                    Number(value),
+                    currencySymbol as string,
+                  )
+                }
                 labelFormatter={formatPeriod}
                 contentStyle={{
                   backgroundColor: tooltipBg,
@@ -285,11 +289,18 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
                 <Stat>
                   <StatLabel color={secondaryTextColor}>Total Income</StatLabel>
                   <StatNumber color={primaryTextColor}>
-                    {formatCurrency(data.summary.income.total)}
+                    {formatNumberAsCurrency(
+                      data.summary.income.total,
+                      currencySymbol as string,
+                    )}
                   </StatNumber>
                   <StatHelpText>
                     <Badge colorScheme="teal" variant="subtle">
-                      Avg: {formatCurrency(data.summary.income.average)}
+                      Avg:{" "}
+                      {formatNumberAsCurrency(
+                        data.summary.income.average,
+                        currencySymbol as string,
+                      )}
                     </Badge>
                   </StatHelpText>
                 </Stat>
@@ -297,8 +308,11 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
                 <Box>
                   <Text fontSize="sm" color={secondaryTextColor}>
                     Highest:{" "}
-                    {formatCurrency(data.summary.income.highest.amount)} in{" "}
-                    {formatPeriod(data.summary.income.highest.period)}
+                    {formatNumberAsCurrency(
+                      data.summary.income.highest.amount,
+                      currencySymbol as string,
+                    )}{" "}
+                    in {formatPeriod(data.summary.income.highest.period)}
                   </Text>
                 </Box>
               </VStack>
@@ -325,11 +339,18 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
                     Total Expenses
                   </StatLabel>
                   <StatNumber color={primaryTextColor}>
-                    {formatCurrency(data.summary.expense.total)}
+                    {formatNumberAsCurrency(
+                      data.summary.expense.total,
+                      currencySymbol as string,
+                    )}
                   </StatNumber>
                   <StatHelpText>
                     <Badge colorScheme="red" variant="subtle">
-                      Avg: {formatCurrency(data.summary.expense.average)}
+                      Avg:{" "}
+                      {formatNumberAsCurrency(
+                        data.summary.expense.average,
+                        currencySymbol as string,
+                      )}
                     </Badge>
                   </StatHelpText>
                 </Stat>
@@ -337,8 +358,11 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
                 <Box>
                   <Text fontSize="sm" color={secondaryTextColor}>
                     Highest:{" "}
-                    {formatCurrency(data.summary.expense.highest.amount)} in{" "}
-                    {formatPeriod(data.summary.expense.highest.period)}
+                    {formatNumberAsCurrency(
+                      data.summary.expense.highest.amount,
+                      currencySymbol as string,
+                    )}{" "}
+                    in {formatPeriod(data.summary.expense.highest.period)}
                   </Text>
                 </Box>
               </VStack>

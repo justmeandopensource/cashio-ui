@@ -25,9 +25,9 @@ import {
 import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
 import axios, { AxiosError } from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
-import { currencySymbols, CurrencyCode } from "@components/shared/utils";
 import config from "@/config";
 import FormNotes from "../shared/FormNotes";
+import useLedgerStore from "../shared/store";
 
 interface Ledger {
   ledger_id: string;
@@ -44,18 +44,14 @@ interface Account {
 interface TransferFundsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  ledgerId: string;
   accountId?: string;
-  currencySymbol: string;
   onTransferCompleted: () => void;
 }
 
 const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   isOpen,
   onClose,
-  ledgerId,
   accountId,
-  currencySymbol,
   onTransferCompleted,
 }) => {
   const [date, setDate] = useState<Date>(new Date());
@@ -67,7 +63,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const [notes, setNotes] = useState<string>("");
   const [isDifferentLedger, setIsDifferentLedger] = useState<boolean>(false);
   const [destinationLedgerId, setDestinationLedgerId] = useState<string>("");
-  const [destinationCurrencySymbolCode, setDestinationCurrencySymbolCode] =
+  const [destinationCurrencySymbol, setDestinationCurrencySymbol] =
     useState<string>("");
   const [destinationAmount, setDestinationAmount] = useState<string>("");
   const [ledgers, setLedgers] = useState<Ledger[]>([]);
@@ -76,6 +72,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
 
+  const { ledgerId, currencySymbol } = useLedgerStore();
   // Theme colors
   const buttonColorScheme = "teal";
   const bgColor = useColorModeValue("white", "gray.800");
@@ -426,7 +423,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         );
                         setDestinationLedgerId(e.target.value);
                         if (selectedLedger) {
-                          setDestinationCurrencySymbolCode(
+                          setDestinationCurrencySymbol(
                             selectedLedger.currency_symbol,
                           );
                         }
@@ -503,10 +500,8 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                     </FormLabel>
                     <InputGroup>
                       <InputLeftAddon>
-                        {destinationCurrencySymbolCode
-                          ? currencySymbols[
-                              destinationCurrencySymbolCode as CurrencyCode
-                            ]
+                        {destinationCurrencySymbol
+                          ? destinationCurrencySymbol
                           : currencySymbol}
                       </InputLeftAddon>
                       <Input
@@ -525,7 +520,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 
             {/* Notes */}
             <FormNotes
-              ledgerId={ledgerId}
+              ledgerId={ledgerId as string}
               notes={notes}
               setNotes={setNotes}
               borderColor={borderColor}

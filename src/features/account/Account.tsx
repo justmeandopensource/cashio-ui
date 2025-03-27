@@ -1,21 +1,13 @@
 import React, { useEffect } from "react";
-import { useNavigate, useLocation, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Box, Spinner } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import AccountMain from "@features/account/components/AccountMain";
 import config from "@/config";
 
-interface LocationState {
-  currencySymbolCode: string;
-}
-
 const Account: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { ledgerId } = useParams();
-  // Type assertion for location.state
-  const { currencySymbolCode } = (location.state as LocationState) || {};
 
   // Function to verify the token
   const verifyToken = async () => {
@@ -75,8 +67,8 @@ const Account: React.FC = () => {
   }
 
   return (
-    <Layout handleLogout={handleLogout} currentLedgerId={ledgerId}>
-      <AccountMain currencySymbolCode={currencySymbolCode} />
+    <Layout handleLogout={handleLogout}>
+      <AccountMain />
     </Layout>
   );
 };

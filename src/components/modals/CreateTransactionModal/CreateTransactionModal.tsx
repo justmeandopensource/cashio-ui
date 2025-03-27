@@ -31,14 +31,13 @@ import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import FormSplits from "./FormSplits";
 import FormNotes from "@/components/shared/FormNotes";
 import FormTags from "@/components/shared/FormTags";
+import useLedgerStore from "@/components/shared/store";
 
 // Define interfaces for the props and state
 interface CreateTransactionModalProps {
   isOpen: boolean;
   onClose: () => void;
   accountId?: string;
-  ledgerId: string;
-  currencySymbol: string;
   onTransactionAdded: () => void;
 }
 
@@ -72,8 +71,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   isOpen,
   onClose,
   accountId,
-  ledgerId,
-  currencySymbol,
   onTransactionAdded,
 }) => {
   const [date, setDate] = useState<Date>(new Date());
@@ -90,6 +87,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
 
+  const { ledgerId, currencySymbol } = useLedgerStore();
   // Theme colors
   const buttonColorScheme = "teal";
   const bgColor = useColorModeValue("white", "gray.800");
@@ -487,7 +485,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
               {/* Notes */}
               <FormNotes
-                ledgerId={ledgerId}
+                ledgerId={ledgerId as string}
                 notes={notes}
                 setNotes={setNotes}
                 borderColor={borderColor}
@@ -520,7 +518,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               <FormSplits
                 splits={splits}
                 calculateRemainingAmount={calculateRemainingAmount}
-                currencySymbol={currencySymbol}
+                currencySymbol={currencySymbol as string}
                 amount={amount || 0}
                 type={type}
                 categories={categories}

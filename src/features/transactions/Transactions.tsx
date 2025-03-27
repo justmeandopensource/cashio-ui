@@ -21,6 +21,7 @@ import TransactionCard from "./TransactionCard";
 import TransactionTable from "./TransactionTable";
 import TransactionFilter from "./TransactionFilter";
 import { AxiosError } from "axios";
+import useLedgerStore from "@/components/shared/store";
 
 interface Transaction {
   transaction_id: string;
@@ -56,22 +57,19 @@ interface Pagination {
 }
 
 interface TransactionsProps {
-  ledgerId: string;
   accountId?: string;
-  currencySymbolCode: string;
   onAddTransaction: () => void;
   onTransactionDeleted?: () => void;
   shouldFetch?: boolean;
 }
 
 const Transactions: React.FC<TransactionsProps> = ({
-  ledgerId,
   accountId,
-  currencySymbolCode,
   onAddTransaction,
   onTransactionDeleted,
   shouldFetch = true,
 }) => {
+  const { ledgerId } = useLedgerStore();
   const toast = useToast();
   const queryClient = useQueryClient();
 
@@ -370,7 +368,7 @@ const Transactions: React.FC<TransactionsProps> = ({
               Transactions
             </Text>
             <TransactionFilter
-              ledgerId={ledgerId}
+              ledgerId={ledgerId as string}
               accountId={accountId}
               initialFilters={filters}
               onApplyFilters={handleApplyFilters}
@@ -382,7 +380,6 @@ const Transactions: React.FC<TransactionsProps> = ({
           <Box display={{ base: "none", lg: "block" }}>
             <TransactionTable
               transactions={transactionsData}
-              currencySymbolCode={currencySymbolCode}
               fetchSplitTransactions={fetchSplitTransactions}
               fetchTransferDetails={fetchTransferDetails}
               isSplitLoading={isSplitLoading}
@@ -403,7 +400,6 @@ const Transactions: React.FC<TransactionsProps> = ({
                   isExpanded={
                     expandedTransaction === transaction.transaction_id
                   }
-                  currencySymbolCode={currencySymbolCode}
                   toggleExpand={(e) =>
                     toggleExpand(transaction.transaction_id, e)
                   }

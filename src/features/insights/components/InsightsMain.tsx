@@ -2,14 +2,12 @@ import { useState } from "react";
 import { Box } from "@chakra-ui/react";
 import InsightsMainHeader from "./InsightsMainHeader";
 import InsightsMainCharts from "./InsightsMainCharts";
+import useLedgerStore from "@/components/shared/store";
 
-interface InsightsMainProps {
-  initialLedgerId?: string;
-}
-
-const InsightsMain = ({ initialLedgerId }: InsightsMainProps) => {
+const InsightsMain = () => {
+  const { ledgerId } = useLedgerStore();
   const [selectedLedgerId, setSelectedLedgerId] = useState<string | undefined>(
-    initialLedgerId,
+    ledgerId,
   );
   const [selectedVisualization, setSelectedVisualization] = useState<string>(
     "income-expense-trend",

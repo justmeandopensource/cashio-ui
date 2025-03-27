@@ -37,6 +37,7 @@ import {
   formatNumberAsCurrency,
 } from "@/components/shared/utils";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
+import useLedgerStore from "@/components/shared/store";
 
 interface TagItem {
   tag_id: string;
@@ -73,7 +74,6 @@ interface Transaction {
 
 interface TransactionCardProps {
   transaction: Transaction;
-  currencySymbolCode: string;
   isExpanded: boolean;
   // eslint-disable-next-line no-unused-vars
   toggleExpand: (e: React.MouseEvent) => void;
@@ -92,7 +92,6 @@ interface TransactionCardProps {
 
 const TransactionCard: React.FC<TransactionCardProps> = ({
   transaction,
-  currencySymbolCode,
   isExpanded,
   toggleExpand,
   fetchSplitTransactions,
@@ -104,10 +103,11 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   onDeleteTransaction,
   showAccountName = false,
 }) => {
+  const { currencySymbol } = useLedgerStore();
   const amount = formatAmount(
     transaction.credit,
     transaction.debit,
-    currencySymbolCode,
+    currencySymbol as string,
   );
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -269,7 +269,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                             <Text fontSize="sm" fontWeight="bold">
                               {formatNumberAsCurrency(
                                 split.debit,
-                                currencySymbolCode,
+                                currencySymbol as string,
                               )}
                             </Text>
                           </Flex>

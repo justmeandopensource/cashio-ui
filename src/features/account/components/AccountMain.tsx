@@ -8,12 +8,8 @@ import AccountMainTransactions from "./AccountMainTransactions";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
-import { CurrencyCode, currencySymbols } from "@components/shared/utils";
 import config from "@/config";
-
-interface AccountMainProps {
-  currencySymbolCode: string;
-}
+import useLedgerStore from "@/components/shared/store";
 
 interface Account {
   ledger_id: string;
@@ -25,11 +21,9 @@ interface Account {
   parent_account_id: string;
 }
 
-const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
-  const { ledgerId, accountId } = useParams<{
-    ledgerId: string;
-    accountId: string;
-  }>();
+const AccountMain: React.FC = () => {
+  const { accountId } = useParams<{ accountId: string }>();
+  const { ledgerId } = useLedgerStore();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isTransferModalOpen, setIsTransferModalOpen] =
@@ -104,7 +98,6 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
       {/* Account Details Section */}
       <AccountMainHeader
         account={account}
-        currencySymbolCode={currencySymbolCode}
         onAddTransaction={() => setIsCreateModalOpen(true)}
         onTransferFunds={() => setIsTransferModalOpen(true)}
         onUpdateAccount={() => setIsUpdateModalOpen(true)}
@@ -113,7 +106,6 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
       {/* Transactions Section */}
       <AccountMainTransactions
         account={account}
-        currencySymbolCode={currencySymbolCode}
         onAddTransaction={() => setIsCreateModalOpen(true)}
         onTransactionDeleted={refreshAccountData}
       />
@@ -122,9 +114,7 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
       <CreateTransactionModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        ledgerId={ledgerId as string}
         accountId={accountId as string}
-        currencySymbol={currencySymbols[currencySymbolCode as CurrencyCode]}
         onTransactionAdded={() => {
           refreshAccountData();
           refreshTransactionsData();
@@ -135,9 +125,7 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
       <TransferFundsModal
         isOpen={isTransferModalOpen}
         onClose={() => setIsTransferModalOpen(false)}
-        ledgerId={ledgerId as string}
         accountId={accountId as string}
-        currencySymbol={currencySymbols[currencySymbolCode as CurrencyCode]}
         onTransferCompleted={() => {
           refreshAccountData();
           refreshTransactionsData();
@@ -149,7 +137,6 @@ const AccountMain: React.FC<AccountMainProps> = ({ currencySymbolCode }) => {
         isOpen={isUpdateModalOpen}
         onClose={() => setIsUpdateModalOpen(false)}
         account={account}
-        currencySymbol={currencySymbols[currencySymbolCode as CurrencyCode]}
         onUpdateCompleted={refreshAccountData}
       />
     </Box>

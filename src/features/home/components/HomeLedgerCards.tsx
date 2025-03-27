@@ -10,6 +10,7 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { FiFileText, FiPlus } from "react-icons/fi";
+import useLedgerStore from "@/components/shared/store";
 
 interface HomeLedgerCardsProps {
   ledgers?: Array<{ ledger_id: string; name: string; currency_symbol: string }>;
@@ -18,9 +19,15 @@ interface HomeLedgerCardsProps {
 
 const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
   const navigate = useNavigate();
+  const { setLedger } = useLedgerStore();
 
-  const handleLedgerClick = (ledgerId: string) => {
-    navigate(`/ledger/${ledgerId}`);
+  const handleLedgerClick = (
+    ledgerId: string,
+    ledgerName: string,
+    currencySymbol: string,
+  ) => {
+    setLedger(ledgerId, ledgerName, currencySymbol);
+    navigate(`/ledger`);
   };
 
   return (
@@ -58,7 +65,13 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
                   transition: "transform 0.2s",
                 }}
                 cursor="pointer"
-                onClick={() => handleLedgerClick(ledger.ledger_id)}
+                onClick={() =>
+                  handleLedgerClick(
+                    ledger.ledger_id,
+                    ledger.name,
+                    ledger.currency_symbol,
+                  )
+                }
               >
                 <CardBody display="flex" alignItems="center" p={6}>
                   <Box

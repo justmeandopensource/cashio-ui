@@ -15,11 +15,8 @@ const App: React.FC = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/" element={<Home />} />
-        <Route path="/ledger/:ledgerId" element={<Ledger />} />
-        <Route
-          path="/ledger/:ledgerId/account/:accountId"
-          element={<Account />}
-        />
+        <Route path="/ledger" element={<Ledger />} />
+        <Route path="/account/:accountId" element={<Account />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/insights" element={<Insights />} />
       </Routes>

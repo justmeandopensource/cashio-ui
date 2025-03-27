@@ -21,11 +21,8 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { FiPlus, FiRepeat } from "react-icons/fi";
 import CreateAccountModal from "@components/modals/CreateAccountModal";
-import {
-  CurrencyCode,
-  currencySymbols,
-  formatNumberAsCurrency,
-} from "@components/shared/utils";
+import { formatNumberAsCurrency } from "@components/shared/utils";
+import useLedgerStore from "@/components/shared/store";
 
 interface Account {
   account_id: string;
@@ -36,14 +33,8 @@ interface Account {
   parent_account_id?: string;
 }
 
-interface Ledger {
-  ledger_id: string;
-  currency_symbol: string;
-}
-
 interface LedgerMainAccountsProps {
   accounts: Account[];
-  ledger: Ledger;
   // eslint-disable-next-line no-unused-vars
   onAddTransaction: (accountId: string) => void;
   // eslint-disable-next-line no-unused-vars
@@ -52,11 +43,11 @@ interface LedgerMainAccountsProps {
 
 const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   accounts,
-  ledger,
   onAddTransaction,
   onTransferFunds,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const { currencySymbol } = useLedgerStore();
   const [accountType, setAccountType] = useState<"asset" | "liability" | null>(
     null,
   );
@@ -179,8 +170,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                 {!account.is_group ? (
                   <ChakraLink
                     as={RouterLink}
-                    to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`}
-                    state={{ currencySymbolCode: ledger.currency_symbol }}
+                    to={`/account/${account.account_id}`}
                     _hover={{ textDecoration: "none" }}
                   >
                     <Text
@@ -204,7 +194,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                   color={balanceColor}
                   fontSize={account.is_group ? "md" : "sm"}
                 >
-                  {formatNumberAsCurrency(balance, ledger.currency_symbol)}
+                  {formatNumberAsCurrency(balance, currencySymbol as string)}
                 </Text>
               </Td>
               <Td>
@@ -339,8 +329,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       {!account.is_group ? (
                         <ChakraLink
                           as={RouterLink}
-                          to={`/ledger/${ledger.ledger_id}/account/${account.account_id}`}
-                          state={{ currencySymbolCode: ledger.currency_symbol }}
+                          to={`/account/${account.account_id}`}
                           _hover={{ textDecoration: "none" }}
                         >
                           <Text
@@ -360,7 +349,10 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       fontWeight={account.is_group ? "medium" : "normal"}
                       color={balanceColor}
                     >
-                      {formatNumberAsCurrency(balance, ledger.currency_symbol)}
+                      {formatNumberAsCurrency(
+                        balance,
+                        currencySymbol as string,
+                      )}
                     </Text>
                   </Flex>
                   {!account.is_group ? (
@@ -610,10 +602,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
       <CreateAccountModal
         isOpen={isOpen}
         onClose={onClose}
-        ledgerId={ledger.ledger_id}
         accountType={accountType === "asset" ? "asset" : "liability"}
         parentAccountId={parentAccountId}
-        currencySymbol={currencySymbols[ledger.currency_symbol as CurrencyCode]}
       />
     </Box>
   );

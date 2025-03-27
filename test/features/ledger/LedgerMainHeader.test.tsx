@@ -11,14 +11,10 @@ import LedgerMainHeader from "@/features/ledger/components/LedgerMainHeader";
 
 describe("LedgerMainHeader Component", () => {
   const renderLedgerMainHeader = (hasAccounts: boolean) => {
-    const ledger = {
-      name: "Test Ledger",
-    };
     render(
       <ChakraProvider>
         <MemoryRouter>
           <LedgerMainHeader
-            ledger={ledger}
             onAddTransaction={() => {}}
             onTransferFunds={() => {}}
             hasAccounts={hasAccounts}

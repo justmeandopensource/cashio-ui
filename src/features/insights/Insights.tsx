@@ -1,4 +1,4 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Box, Spinner } from "@chakra-ui/react";
 import Layout from "@components/Layout";
@@ -11,10 +11,6 @@ interface TokenVerificationResponse {
 
 const Insights = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-
-  // Get ledgerId from state if coming from ledger page
-  const ledgerId = location.state?.ledgerId;
 
   // Token verification (same pattern as other pages)
   const { isLoading: isTokenVerifying } = useQuery<
@@ -63,7 +59,7 @@ const Insights = () => {
 
   return (
     <Layout handleLogout={handleLogout}>
-      <InsightsMain initialLedgerId={ledgerId} />
+      <InsightsMain />
     </Layout>
   );
 };

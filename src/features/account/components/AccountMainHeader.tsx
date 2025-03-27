@@ -17,6 +17,7 @@ import {
 } from "@chakra-ui/icons";
 import { useNavigate } from "react-router-dom";
 import { formatNumberAsCurrency } from "@components/shared/utils";
+import useLedgerStore from "@/components/shared/store";
 
 interface Account {
   name: string;
@@ -27,7 +28,6 @@ interface Account {
 
 interface AccountMainHeaderProps {
   account: Account;
-  currencySymbolCode: string;
   onAddTransaction: () => void;
   onTransferFunds: () => void;
   onUpdateAccount: () => void;
@@ -35,12 +35,12 @@ interface AccountMainHeaderProps {
 
 const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
   account,
-  currencySymbolCode,
   onAddTransaction,
   onTransferFunds,
   onUpdateAccount,
 }) => {
   const navigate = useNavigate();
+  const { currencySymbol } = useLedgerStore();
 
   // Determine the color for the balance based on its value
   const balanceColor =
@@ -57,7 +57,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
   const buttonColorScheme = useColorModeValue("teal", "blue");
 
   const handleBackToLedger = () => {
-    navigate(`/ledger/${account.ledger_id}`);
+    navigate("/ledger");
   };
 
   return (
@@ -106,7 +106,10 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
 
             {/* Balance moved below account name */}
             <Text fontSize="2xl" fontWeight="bold" color={balanceColor}>
-              {formatNumberAsCurrency(account.net_balance, currencySymbolCode)}
+              {formatNumberAsCurrency(
+                account.net_balance,
+                currencySymbol as string,
+              )}
             </Text>
           </VStack>
         </Flex>
