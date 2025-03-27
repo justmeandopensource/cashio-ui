@@ -13,10 +13,12 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { FiPieChart, FiBarChart2, FiChevronDown } from "react-icons/fi";
 import config from "@/config";
+import useLedgerStore from "@/components/shared/store";
 
 interface Ledger {
   ledger_id: string;
   name: string;
+  currency_symbol: string;
 }
 
 interface InsightsMainHeaderProps {
@@ -56,6 +58,8 @@ const InsightsMainHeader: React.FC<InsightsMainHeaderProps> = ({
     string | undefined
   >(selectedLedgerId);
 
+  const { setLedger } = useLedgerStore();
+
   // Fetch ledgers
   const { data: ledgers, isLoading } = useQuery<Ledger[]>({
     queryKey: ["ledgers"],
@@ -83,6 +87,17 @@ const InsightsMainHeader: React.FC<InsightsMainHeaderProps> = ({
 
   const handleLedgerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const ledgerId = e.target.value;
+    const selectedLedger = ledgers?.find(
+      (ledger) => ledger.ledger_id == ledgerId,
+    );
+    console.log(`DEBUG: ${selectedLedger}`);
+    if (selectedLedger) {
+      setLedger(
+        selectedLedger.ledger_id,
+        selectedLedger.name,
+        selectedLedger.currency_symbol,
+      );
+    }
     setLocalSelectedLedger(ledgerId);
     onLedgerChange(ledgerId);
   };

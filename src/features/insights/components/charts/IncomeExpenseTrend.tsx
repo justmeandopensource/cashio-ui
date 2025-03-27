@@ -14,6 +14,7 @@ import {
   StatNumber,
   StatHelpText,
   Badge,
+  Center,
 } from "@chakra-ui/react";
 import {
   AreaChart,
@@ -26,7 +27,12 @@ import {
   Legend,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import { FiTrendingUp, FiTrendingDown, FiChevronDown } from "react-icons/fi";
+import {
+  FiTrendingUp,
+  FiTrendingDown,
+  FiChevronDown,
+  FiBarChart2,
+} from "react-icons/fi";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import { formatNumberAsCurrency } from "@/components/shared/utils";
@@ -187,7 +193,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
 
       {/* Chart Section */}
       <Box height={{ base: "300px", md: "400px" }} width="full">
-        {data?.trend_data?.length ? (
+        {data?.trend_data && data.trend_data.length > 0 ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
               data={data.trend_data}
@@ -254,16 +260,28 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <Flex height="full" alignItems="center" justifyContent="center">
-            <Text color={secondaryTextColor}>
-              No data available for selected period
+          <Center
+            height="full"
+            bg={bgColor}
+            borderRadius="lg"
+            flexDirection="column"
+            textAlign="center"
+            p={6}
+          >
+            <Icon as={FiBarChart2} boxSize={16} color="gray.400" mb={4} />
+            <Heading size="md" mb={2} color={secondaryTextColor}>
+              No Financial Data Available
+            </Heading>
+            <Text color={secondaryTextColor} fontSize="sm">
+              Select a different time period or add some transactions to see
+              your income and expense trends.
             </Text>
-          </Flex>
+          </Center>
         )}
       </Box>
 
       {/* Summary Cards */}
-      {data?.summary && (
+      {data?.summary && data.trend_data && data.trend_data.length > 0 && (
         <VStack spacing={4} mt={6} width="full">
           <HStack
             spacing={4}
