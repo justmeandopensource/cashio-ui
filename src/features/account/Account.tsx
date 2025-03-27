@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Box, Spinner } from "@chakra-ui/react";
 import Layout from "@components/Layout";
@@ -13,6 +13,7 @@ interface LocationState {
 const Account: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { ledgerId } = useParams();
   // Type assertion for location.state
   const { currencySymbolCode } = (location.state as LocationState) || {};
 
@@ -74,7 +75,7 @@ const Account: React.FC = () => {
   }
 
   return (
-    <Layout handleLogout={handleLogout}>
+    <Layout handleLogout={handleLogout} currentLedgerId={ledgerId}>
       <AccountMain currencySymbolCode={currencySymbolCode} />
     </Layout>
   );

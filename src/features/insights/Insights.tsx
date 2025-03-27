@@ -1,22 +1,22 @@
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { Box, Spinner } from "@chakra-ui/react";
 import Layout from "@components/Layout";
-import LedgerMain from "@features/ledger/components/LedgerMain";
+import InsightsMain from "./components/InsightsMain";
 import config from "@/config";
 
 interface TokenVerificationResponse {
-  // Define the response shape from verify-token endpoint
-  // Add actual properties returned by your API
   valid: boolean;
-  // other properties as needed
 }
 
-const Ledger = () => {
+const Insights = () => {
   const navigate = useNavigate();
-  const { ledgerId } = useParams();
+  const location = useLocation();
 
-  // Token verification
+  // Get ledgerId from state if coming from ledger page
+  const ledgerId = location.state?.ledgerId;
+
+  // Token verification (same pattern as other pages)
   const { isLoading: isTokenVerifying } = useQuery<
     TokenVerificationResponse,
     Error
@@ -26,7 +26,7 @@ const Ledger = () => {
       const token = localStorage.getItem("access_token");
       if (!token) {
         navigate("/login");
-        return {} as TokenVerificationResponse; // Type assertion for early return
+        return {} as TokenVerificationResponse;
       }
 
       const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
@@ -43,10 +43,9 @@ const Ledger = () => {
 
       return response.json();
     },
-    retry: false, // Disable retries to avoid infinite loops
+    retry: false,
   });
 
-  // handle logout
   const handleLogout = (): void => {
     localStorage.removeItem("access_token");
     navigate("/login");
@@ -63,10 +62,10 @@ const Ledger = () => {
   }
 
   return (
-    <Layout handleLogout={handleLogout} currentLedgerId={ledgerId}>
-      <LedgerMain />
+    <Layout handleLogout={handleLogout}>
+      <InsightsMain initialLedgerId={ledgerId} />
     </Layout>
   );
 };
 
-export default Ledger;
+export default Insights;

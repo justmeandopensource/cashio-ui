@@ -161,7 +161,7 @@ const LedgerMain = () => {
       />
 
       {/* Tabs for Accounts and Transactions */}
-      <Box mt={6} borderRadius="lg" boxShadow="md" bg="white" overflow="hidden">
+      <Box mt={6} borderRadius="lg" boxShadow="lg" bg="white" overflow="hidden">
         <Tabs
           variant="soft-rounded"
           colorScheme="teal"

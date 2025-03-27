@@ -17,16 +17,23 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-import { FiHome, FiBookmark, FiLogOut, FiMenu } from "react-icons/fi";
+import {
+  FiHome,
+  FiBookmark,
+  FiLogOut,
+  FiMenu,
+  FiPieChart,
+} from "react-icons/fi";
 
 import { useNavigate } from "react-router-dom";
 import { VERSION } from "../version";
 
 interface SidebarProps {
   handleLogout: () => void;
+  currentLedgerId?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
+const Sidebar: React.FC<SidebarProps> = ({ handleLogout, currentLedgerId }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const sidebarBg = useColorModeValue("teal.500", "teal.700");
@@ -78,6 +85,24 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
           <ChakraLink
             display="flex"
             alignItems="center"
+            onClick={() => {
+              navigate(
+                "/insights",
+                currentLedgerId
+                  ? {
+                      state: { ledgerId: currentLedgerId },
+                    }
+                  : undefined,
+              );
+              onClose();
+            }}
+          >
+            <Icon as={FiPieChart} mr={2} />
+            Insights
+          </ChakraLink>
+          <ChakraLink
+            display="flex"
+            alignItems="center"
             onClick={() => navigate("/categories")}
           >
             <Icon as={FiBookmark} mr={2} />
@@ -116,6 +141,24 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
               >
                 <Icon as={FiHome} mr={2} />
                 Home
+              </ChakraLink>
+              <ChakraLink
+                display="flex"
+                alignItems="center"
+                onClick={() => {
+                  navigate(
+                    "/insights",
+                    currentLedgerId
+                      ? {
+                          state: { ledgerId: currentLedgerId },
+                        }
+                      : undefined,
+                  );
+                  onClose();
+                }}
+              >
+                <Icon as={FiPieChart} mr={2} />
+                Insights
               </ChakraLink>
               <ChakraLink
                 display="flex"

@@ -44,7 +44,7 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
       bg={bgColor}
       p={{ base: 4, md: 5, lg: 6 }}
       borderRadius="lg"
-      boxShadow="md"
+      boxShadow="lg"
       mb={8}
     >
       <Flex
