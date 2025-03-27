@@ -7,6 +7,7 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { server } from "@test/mocks/server";
 import { accountHandlers } from "@test/mocks/handlers";
+import useLedgerStore from "@/components/shared/store";
 
 const mockOnClose = vi.fn();
 
@@ -19,11 +20,20 @@ vi.mock("@chakra-ui/react", async () => {
   };
 });
 
+vi.mock("@/components/shared/store", () => ({
+  default: vi.fn(),
+}));
+
 describe("CreateAccountModal Component", () => {
   beforeEach(() => {
     resetTestState();
     mockOnClose.mockReset();
     mockToast.mockReset();
+  });
+
+  (useLedgerStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    ledgerId: "1",
+    currencySymbol: "£",
   });
 
   const queryClient = new QueryClient({

@@ -1,4 +1,5 @@
 import CreateLedgerModal from "@/components/modals/CreateLedgerModal";
+import useLedgerStore from "@/components/shared/store";
 import { ChakraProvider } from "@chakra-ui/react";
 import { resetTestState } from "@test/mocks/utils";
 import { render, screen, waitFor } from "@testing-library/react";
@@ -17,11 +18,20 @@ vi.mock("@chakra-ui/react", async () => {
   };
 });
 
+vi.mock("@/components/shared/store", () => ({
+  default: vi.fn(),
+}));
+
 describe("CreateLedgerModal Component", () => {
   beforeEach(() => {
     resetTestState();
     mockHandleCreateLedger.mockReset();
     mockOnClose.mockReset();
+  });
+
+  (useLedgerStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    ledgerId: "1",
+    currencySymbol: "£",
   });
 
   const renderCreateLedgerModal = (isOpen = true) => {
@@ -68,8 +78,8 @@ describe("CreateLedgerModal Component", () => {
   it("updates currency dropdown value when selected", async () => {
     const { user } = renderCreateLedgerModal();
     const select = screen.getByLabelText(/Currency/i);
-    await user.selectOptions(select, "£ - GBP (British Pound)");
-    expect(select).toHaveValue("GBP");
+    await user.selectOptions(select, "£ (British Pound)");
+    expect(select).toHaveValue("£");
   });
 
   it("calls handleCreateLedger with correct values when form is filled and submitted", async () => {
@@ -77,11 +87,11 @@ describe("CreateLedgerModal Component", () => {
 
     await user.type(screen.getByLabelText(/Ledger Name/i), "Test Ledger");
     const select = screen.getByLabelText(/Currency/i);
-    await user.selectOptions(select, "£ - GBP (British Pound)");
+    await user.selectOptions(select, "£ (British Pound)");
 
     await user.click(screen.getByRole("button", { name: /Create/i }));
 
-    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "GBP");
+    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "£");
     expect(mockOnClose).toHaveBeenCalled();
   });
 
@@ -89,7 +99,7 @@ describe("CreateLedgerModal Component", () => {
     const { user } = renderCreateLedgerModal();
 
     const select = screen.getByLabelText(/Currency/i);
-    await user.selectOptions(select, "£ - GBP (British Pound)");
+    await user.selectOptions(select, "£ (British Pound)");
     await user.type(
       screen.getByLabelText(/Ledger Name/i),
       "Test Ledger{enter}",
@@ -97,7 +107,7 @@ describe("CreateLedgerModal Component", () => {
 
     await user.click(screen.getByRole("button", { name: /Create/i }));
 
-    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "GBP");
+    expect(mockHandleCreateLedger).toHaveBeenCalledWith("Test Ledger", "£");
     expect(mockOnClose).toHaveBeenCalled();
   });
 
@@ -105,7 +115,7 @@ describe("CreateLedgerModal Component", () => {
     const { user } = renderCreateLedgerModal();
 
     const select = screen.getByLabelText(/Currency/i);
-    await user.selectOptions(select, "£ - GBP (British Pound)");
+    await user.selectOptions(select, "£ (British Pound)");
     await user.type(screen.getByLabelText(/Ledger Name/i), "{enter}");
 
     await waitFor(() => {
@@ -123,7 +133,7 @@ describe("CreateLedgerModal Component", () => {
   it("disables create button when ledger name is empty and currency selected", async () => {
     const { user } = renderCreateLedgerModal();
     const select = screen.getByLabelText(/Currency/i);
-    await user.selectOptions(select, "$ - USD (US Dollar)");
+    await user.selectOptions(select, "$ (US Dollar)");
     expect(screen.getByRole("button", { name: /Create/i })).toBeDisabled();
     expect(mockHandleCreateLedger).not.toHaveBeenCalled();
     expect(mockOnClose).not.toHaveBeenCalled();

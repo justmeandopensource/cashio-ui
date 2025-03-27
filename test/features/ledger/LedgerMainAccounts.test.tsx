@@ -126,10 +126,7 @@ describe("LedgerMainAccounts Component", () => {
           .getByText("Test Bank 1")
           .closest("a");
         expect(nonGroupAccountLink).toBeInTheDocument();
-        expect(nonGroupAccountLink).toHaveAttribute(
-          "href",
-          `/ledger/1/account/2`,
-        );
+        expect(nonGroupAccountLink).toHaveAttribute("href", "/account/2");
       });
     });
 
@@ -262,10 +259,7 @@ describe("LedgerMainAccounts Component", () => {
           .getByText("Test Credit Card 1")
           .closest("a");
         expect(nonGroupAccountLink).toBeInTheDocument();
-        expect(nonGroupAccountLink).toHaveAttribute(
-          "href",
-          `/ledger/1/account/5`,
-        );
+        expect(nonGroupAccountLink).toHaveAttribute("href", "/account/5");
       });
     });
 

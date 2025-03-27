@@ -8,6 +8,7 @@ import LedgerMain from "@/features/ledger/components/LedgerMain";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import { resetTestState } from "@test/mocks/utils";
+import useLedgerStore from "@/components/shared/store";
 
 vi.mock("@components/modals/CreateTransactionModal", () => ({
   default: vi.fn(({ isOpen }) =>
@@ -21,9 +22,18 @@ vi.mock("@components/modals/TransferFundsModal", () => ({
   ),
 }));
 
+vi.mock("@/components/shared/store", () => ({
+  default: vi.fn(),
+}));
+
 describe("LedgerMain Component", () => {
   beforeEach(() => {
     resetTestState();
+  });
+
+  (useLedgerStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    ledgerId: "1",
+    ledgerName: "UK",
   });
 
   const queryClient = new QueryClient({
@@ -38,9 +48,9 @@ describe("LedgerMain Component", () => {
     render(
       <ChakraProvider>
         <QueryClientProvider client={queryClient}>
-          <MemoryRouter initialEntries={["/ledger/1"]}>
+          <MemoryRouter initialEntries={["/ledger"]}>
             <Routes>
-              <Route path="/ledger/:ledgerId" element={<LedgerMain />} />
+              <Route path="/ledger" element={<LedgerMain />} />
             </Routes>
           </MemoryRouter>
         </QueryClientProvider>

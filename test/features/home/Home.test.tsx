@@ -126,7 +126,7 @@ describe("Home Component", () => {
       await user.click(screen.getByText("UK"));
 
       await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/ledger/1");
+        expect(mockNavigate).toHaveBeenCalledWith("/ledger");
       });
     });
 

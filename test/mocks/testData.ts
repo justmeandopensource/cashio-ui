@@ -2,13 +2,13 @@ export const mockLedgers = [
   {
     ledger_id: "1",
     name: "UK",
-    currency_symbol: "GBP",
+    currency_symbol: "£",
     user_id: 1,
   },
   {
     ledger_id: "2",
     name: "India",
-    currency_symbol: "INR",
+    currency_symbol: "₹",
     user_id: 1,
   },
 ];

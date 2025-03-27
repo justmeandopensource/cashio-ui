@@ -1,4 +1,5 @@
 import TransferFundsModal from "@/components/modals/TransferFundsModal";
+import useLedgerStore from "@/components/shared/store";
 import { ChakraProvider } from "@chakra-ui/react";
 import {
   accountHandlers,
@@ -23,12 +24,21 @@ vi.mock("@chakra-ui/react", async () => {
   };
 });
 
+vi.mock("@/components/shared/store", () => ({
+  default: vi.fn(),
+}));
+
 describe("TransferFundsModal Component", () => {
   beforeEach(() => {
     resetTestState();
     mockOnClose.mockReset();
     mockOnTransferCompleted.mockReset();
     mockToast.mockReset();
+  });
+
+  (useLedgerStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    ledgerId: "1",
+    currencySymbol: "£",
   });
 
   const renderTransferFundsModal = (props = {}) => {

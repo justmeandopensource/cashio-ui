@@ -2,14 +2,22 @@ import { ChakraProvider } from "@chakra-ui/react";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { setupTestEnvironment } from "@test/mocks/utils";
 
 const { mockNavigate } = setupTestEnvironment();
 
 import LedgerMainHeader from "@/features/ledger/components/LedgerMainHeader";
+import useLedgerStore from "@/components/shared/store";
+
+vi.mock("@/components/shared/store", () => ({
+  default: vi.fn(),
+}));
 
 describe("LedgerMainHeader Component", () => {
+  (useLedgerStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+    ledgerName: "Test Ledger",
+  });
   const renderLedgerMainHeader = (hasAccounts: boolean) => {
     render(
       <ChakraProvider>
