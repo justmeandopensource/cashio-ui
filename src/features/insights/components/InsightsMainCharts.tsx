@@ -1,6 +1,6 @@
 import { Text, Box, useColorModeValue } from "@chakra-ui/react";
 import IncomeExpenseTrend from "./charts/IncomeExpenseTrend";
-import CategoryVisualization from "./charts/CategoryVisualization";
+import CurrentMonthOverview from "./charts/CurrentMonthOverview";
 
 interface InsightsMainChartsProps {
   ledgerId?: string;
@@ -33,8 +33,8 @@ const InsightsMainCharts = ({
     switch (visualization) {
       case "income-expense-trend":
         return <IncomeExpenseTrend ledgerId={ledgerId} />;
-      case "category-visualization":
-        return <CategoryVisualization />;
+      case "current-month-overview":
+        return <CurrentMonthOverview />;
       default:
         return (
           <Box

@@ -37,15 +37,15 @@ const visualizationOptions = [
     icon: FiBarChart2,
   },
   {
-    value: "category-visualization",
-    label: "Spending Categories",
+    value: "current-month-overview",
+    label: "Current Month Overview",
     icon: FiPieChart,
   },
 ];
 
 const InsightsMainHeader: React.FC<InsightsMainHeaderProps> = ({
   selectedLedgerId,
-  selectedVisualization = "income-expense-trend",
+  selectedVisualization = "current-month-overview",
   onLedgerChange,
   onVisualizationChange,
 }) => {

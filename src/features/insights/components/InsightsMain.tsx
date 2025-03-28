@@ -10,7 +10,7 @@ const InsightsMain = () => {
     ledgerId,
   );
   const [selectedVisualization, setSelectedVisualization] = useState<string>(
-    "income-expense-trend",
+    "current-month-overview",
   );
 
   return (
