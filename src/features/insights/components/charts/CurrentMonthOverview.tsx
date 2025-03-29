@@ -121,7 +121,7 @@ const NestedCategoryBreakdown: React.FC<{
             hasChildren ? () => toggleCategory(category.name) : undefined
           }
           _hover={
-            hasChildren
+            hasChildren || level === 0
               ? { bg: `${type === "income" ? "teal" : "red"}.100` }
               : { bg: "gray.200" }
           }
