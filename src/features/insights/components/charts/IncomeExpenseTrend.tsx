@@ -138,7 +138,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
   // Render loading or error states
   if (isLoading) {
     return (
-      <VStack spacing={4} align="stretch" bg={cardBg} p={6} borderRadius="xl">
+      <VStack spacing={4} align="stretch" bg={cardBg} p={6} borderRadius="lg">
         <Text color={secondaryTextColor}>Loading financial insights...</Text>
       </VStack>
     );
@@ -146,7 +146,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
 
   if (isError) {
     return (
-      <VStack spacing={4} align="center" bg={cardBg} p={6} borderRadius="xl">
+      <VStack spacing={4} align="center" bg={cardBg} p={6} borderRadius="lg">
         <Icon as={FiTrendingDown} color="red.500" boxSize={10} mb={4} />
         <Text color="red.500" fontWeight="bold" fontSize="lg">
           Unable to load financial insights
@@ -292,7 +292,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
             <Box
               bg={cardBg}
               p={6}
-              borderRadius="xl"
+              borderRadius="lg"
               width="full"
               boxShadow="md"
             >
@@ -340,7 +340,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
             <Box
               bg={cardBg}
               p={6}
-              borderRadius="xl"
+              borderRadius="lg"
               width="full"
               boxShadow="md"
             >
