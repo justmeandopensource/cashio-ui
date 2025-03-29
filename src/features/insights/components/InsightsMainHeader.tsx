@@ -34,12 +34,14 @@ const visualizationOptions = [
   {
     value: "income-expense-trend",
     label: "Income vs Expense Trend",
-    icon: FiBarChart2,
   },
   {
     value: "current-month-overview",
     label: "Current Month Overview",
-    icon: FiPieChart,
+  },
+  {
+    value: "category-trend",
+    label: "Category Trend",
   },
 ];
 
