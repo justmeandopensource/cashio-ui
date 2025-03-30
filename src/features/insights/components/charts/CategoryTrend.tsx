@@ -215,13 +215,6 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  // Set first category as default when categories are loaded
-  useEffect(() => {
-    if (categories?.length && !selectedCategory) {
-      setSelectedCategory(categories[0].category_id);
-    }
-  }, [categories, selectedCategory]);
-
   // Define a function to organize and render categories
   const renderOrganizedCategories = () => {
     if (!categories || isCategoriesLoading) return null;
