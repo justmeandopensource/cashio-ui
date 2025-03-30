@@ -222,8 +222,38 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
     }
   }, [categories, selectedCategory]);
 
+  // Define a function to organize and render categories
+  const renderOrganizedCategories = () => {
+    if (!categories || isCategoriesLoading) return null;
+
+    // Separate categories by type
+    const incomeCategories = categories.filter((cat) => cat.type === "income");
+    const expenseCategories = categories.filter(
+      (cat) => cat.type === "expense",
+    );
+
+    return (
+      <>
+        <optgroup label="Income Categories">
+          {incomeCategories.map((category) => (
+            <option key={category.category_id} value={category.category_id}>
+              {category.name} {category.is_group && "(Group)"}
+            </option>
+          ))}
+        </optgroup>
+        <optgroup label="Expense Categories">
+          {expenseCategories.map((category) => (
+            <option key={category.category_id} value={category.category_id}>
+              {category.name} {category.is_group && "(Group)"}
+            </option>
+          ))}
+        </optgroup>
+      </>
+    );
+  };
+
   // Determine if we should use bar chart or area chart based on number of data points
-  const shouldUseBarChart = trendData?.trend_data?.length <= 13;
+  const shouldUseBarChart = (trendData?.trend_data?.length || 0) <= 13;
 
   const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
 
@@ -336,14 +366,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
                   bg={cardBg}
                 >
                   <option value="">Select a category</option>
-                  {categories?.map((category) => (
-                    <option
-                      key={category.category_id}
-                      value={category.category_id}
-                    >
-                      {category.name} {category.is_group ? "(Group)" : ""}
-                    </option>
-                  ))}
+                  {renderOrganizedCategories()}
                 </Select>
               </FormControl>
             </Box>
@@ -422,7 +445,13 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
                     borderRadius: "10px",
                   }}
                 />
-                {!isMobile && <Legend verticalAlign="bottom" height={36} iconType="circle" />}
+                {!isMobile && (
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                  />
+                )}
                 {uniqueSubcategories.map((subcategory, index) => (
                   <Bar
                     key={subcategory}
@@ -479,7 +508,13 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
                     borderRadius: "10px",
                   }}
                 />
-                {!isMobile && <Legend verticalAlign="bottom" height={36} iconType="circle" />}
+                {!isMobile && (
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                  />
+                )}
                 {uniqueSubcategories.map((subcategory, index) => (
                   <Area
                     key={subcategory}
