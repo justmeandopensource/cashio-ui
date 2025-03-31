@@ -11,7 +11,7 @@ import {
   Text,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { FiPieChart, FiBarChart2, FiChevronDown } from "react-icons/fi";
+import { FiChevronDown } from "react-icons/fi";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 
@@ -42,6 +42,10 @@ const visualizationOptions = [
   {
     value: "category-trend",
     label: "Category Trend",
+  },
+  {
+    value: "tag-trend",
+    label: "Tag Trend",
   },
 ];
 

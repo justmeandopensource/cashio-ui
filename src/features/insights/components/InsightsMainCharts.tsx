@@ -2,6 +2,7 @@ import { Text, Box, useColorModeValue } from "@chakra-ui/react";
 import IncomeExpenseTrend from "./charts/IncomeExpenseTrend";
 import CurrentMonthOverview from "./charts/CurrentMonthOverview";
 import CategoryTrend from "./charts/CategoryTrend";
+import TagTrend from "./charts/TagTrend";
 
 interface InsightsMainChartsProps {
   ledgerId?: string;
@@ -38,6 +39,8 @@ const InsightsMainCharts = ({
         return <CurrentMonthOverview />;
       case "category-trend":
         return <CategoryTrend />;
+      case "tag-trend":
+        return <TagTrend />;
       default:
         return (
           <Box
