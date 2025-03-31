@@ -23,6 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import config from "@/config";
+import { toastDefaults } from "../shared/utils";
 
 interface GroupCategory {
   category_id: string;
@@ -129,12 +130,9 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     },
     onSuccess: () => {
       toast({
-        title: "Success",
         description: "Category created successfully.",
         status: "success",
-        duration: 2000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       resetForm();
       onClose();
@@ -144,12 +142,9 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
         description: error.message || "Failed to create category.",
         status: "error",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
     },
   });
@@ -157,12 +152,9 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   const handleSubmit = async (): Promise<void> => {
     if (!categoryName) {
       toast({
-        title: "Required Field",
         description: "Please enter a category name.",
         status: "warning",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }

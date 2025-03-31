@@ -6,6 +6,7 @@ import Layout from "@components/Layout";
 import HomeMain from "@features/home/components/HomeMain";
 import config from "@/config";
 import HomeLedgerCardsSkeleton from "./components/HomeLedgercardsSkeleton";
+import { toastDefaults } from "@/components/shared/utils";
 
 interface Ledger {
   ledger_id: string;
@@ -113,22 +114,16 @@ const Home = () => {
       ]);
       onClose();
       toast({
-        title: "Success",
         description: "Ledger created successfully",
         status: "success",
-        duration: 2000,
-        position: "top-right",
-        isClosable: true,
+        ...toastDefaults,
       });
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
         description: error.message,
         status: "error",
-        duration: 3000,
-        position: "top-right",
-        isClosable: true,
+        ...toastDefaults,
       });
     },
   });
@@ -140,12 +135,9 @@ const Home = () => {
   ) => {
     if (!newLedgerName || !newLedgerCurrency) {
       toast({
-        title: "Error",
         description: "All fields required.",
         status: "error",
-        duration: 2000,
-        position: "top-right",
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }

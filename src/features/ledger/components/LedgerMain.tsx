@@ -22,6 +22,7 @@ import TransferFundsModal from "@components/modals/TransferFundsModal";
 import config from "@/config";
 import { FiAlignLeft, FiCreditCard } from "react-icons/fi";
 import useLedgerStore from "@/components/shared/store";
+import { toastDefaults } from "@/components/shared/utils";
 
 interface Account {
   account_id: string;
@@ -102,11 +103,9 @@ const LedgerMain = () => {
 
   if (isAccountsError) {
     toast({
-      title: "Error",
       description: "Failed to fetch ledger or account details.",
       status: "error",
-      duration: 3000,
-      isClosable: true,
+      ...toastDefaults,
     });
     return null;
   }

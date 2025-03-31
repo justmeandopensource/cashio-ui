@@ -22,6 +22,7 @@ import TransactionTable from "./TransactionTable";
 import TransactionFilter from "./TransactionFilter";
 import { AxiosError } from "axios";
 import useLedgerStore from "@/components/shared/store";
+import { toastDefaults } from "@/components/shared/utils";
 
 interface Transaction {
   transaction_id: string;
@@ -205,13 +206,11 @@ const Transactions: React.FC<TransactionsProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description:
           axiosError.response?.data?.detail ||
           "Failed to fetch split transactions.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     } finally {
       setIsSplitLoading(false);
@@ -240,13 +239,11 @@ const Transactions: React.FC<TransactionsProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description:
           axiosError.response?.data?.detail ||
           "Failed to fetch transfer details.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     } finally {
       setIsTransferLoading(false);
@@ -287,18 +284,15 @@ const Transactions: React.FC<TransactionsProps> = ({
       toast({
         description: "Transaction deleted",
         status: "success",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description:
           axiosError.response?.data?.detail || "Failed to delete transaction.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     }
   };
@@ -313,11 +307,9 @@ const Transactions: React.FC<TransactionsProps> = ({
 
   if (isTransactionsError) {
     toast({
-      title: "Error",
       description: "Failed to fetch transactions",
       status: "error",
-      duration: 3000,
-      isClosable: true,
+      ...toastDefaults,
     });
     return null;
   }

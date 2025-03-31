@@ -25,6 +25,7 @@ import {
 import axios from "axios";
 import config from "@/config";
 import useLedgerStore from "../shared/store";
+import { toastDefaults } from "../shared/utils";
 
 interface GroupAccount {
   account_id: string | number;
@@ -100,15 +101,12 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
         setGroupAccounts(response.data);
       } catch (error) {
         toast({
-          title: "Error",
           description:
             axios.isAxiosError(error) && error.response?.data?.message
               ? error.response.data.message
               : "Failed to fetch group accounts",
           status: "error",
-          duration: 3000,
-          position: "top",
-          isClosable: true,
+          ...toastDefaults,
         });
       } finally {
         setIsLoading(false);
@@ -123,12 +121,9 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   const handleSubmit = async (): Promise<void> => {
     if (!name) {
       toast({
-        title: "Required Field",
         description: "Please enter an account name.",
         status: "warning",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }
@@ -145,12 +140,9 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
     // If no fields have changed, show an error toast
     if (Object.keys(payload).length === 0) {
       toast({
-        title: "No changes detected",
         description: "Please update at least one field.",
         status: "warning",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }
@@ -168,26 +160,20 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
         },
       );
       toast({
-        title: "Success",
         description: "Account updated successfully",
         status: "success",
-        duration: 2000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       onClose();
       onUpdateCompleted();
     } catch (error) {
       toast({
-        title: "Error",
         description:
           axios.isAxiosError(error) && error.response?.data?.message
             ? error.response.data.message
             : "Failed to update account",
         status: "error",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
     } finally {
       setIsLoading(false);

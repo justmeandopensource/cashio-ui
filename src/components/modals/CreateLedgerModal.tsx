@@ -17,6 +17,7 @@ import {
   useColorModeValue,
   Box,
 } from "@chakra-ui/react";
+import { toastDefaults } from "../shared/utils";
 
 interface Currency {
   symbol: string;
@@ -54,12 +55,9 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
   const handleSubmit = (): void => {
     if (!newLedgerName || !selectedCurrency) {
       toast({
-        title: "Required Fields",
         description: "Please enter both ledger name and select a currency.",
         status: "warning",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }

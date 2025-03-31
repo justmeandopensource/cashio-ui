@@ -18,6 +18,7 @@ import {
 import { FiPlus } from "react-icons/fi";
 import CreateCategoryModal from "@components/modals/CreateCategoryModal";
 import config from "@/config";
+import { toastDefaults } from "@/components/shared/utils";
 
 // Define TypeScript interfaces
 interface Category {
@@ -150,11 +151,9 @@ const CategoriesMain: React.FC = () => {
 
   if (isCategoriesError) {
     toast({
-      title: "Error",
       description: "Failed to fetch categories.",
       status: "error",
-      duration: 3000,
-      isClosable: true,
+      ...toastDefaults,
     });
     return (
       <Box textAlign="center" py={10}>

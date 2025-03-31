@@ -32,6 +32,7 @@ import FormSplits from "./FormSplits";
 import FormNotes from "@/components/shared/FormNotes";
 import FormTags from "@/components/shared/FormTags";
 import useLedgerStore from "@/components/shared/store";
+import { toastDefaults } from "@/components/shared/utils";
 
 // Define interfaces for the props and state
 interface CreateTransactionModalProps {
@@ -121,12 +122,10 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description:
           axiosError.response?.data?.detail || "Failed to fetch categories.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     }
   }, [toast]);
@@ -147,12 +146,10 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description:
           axiosError.response?.data?.detail || "Failed to fetch accounts.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     }
   }, [toast, ledgerId]);
@@ -173,11 +170,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const handleSplitToggle = (isChecked: boolean) => {
     if (!amount || parseFloat(amount) <= 0) {
       toast({
-        title: "Error",
         description: "Amount required before enabling split transactions.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }
@@ -208,11 +203,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const handleSubmit = async () => {
     if (categories.length === 0) {
       toast({
-        title: "Error",
         description: "No categories found. Please create categories first.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }
@@ -224,11 +217,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       );
       if (invalidSplits.length > 0) {
         toast({
-          title: "Error",
           description: "Please select a category for each split.",
           status: "error",
-          duration: 3000,
-          isClosable: true,
+          ...toastDefaults,
         });
         return;
       }
@@ -242,12 +233,10 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       if (Math.abs(totalSplitAmount - (parseFloat(amount) || 0)) > 0.01) {
         // Allow for small rounding differences
         toast({
-          title: "Error",
           description:
             "The sum of split amounts must equal the total transaction amount.",
           status: "error",
-          duration: 3000,
-          isClosable: true,
+          ...toastDefaults,
         });
         return;
       }
@@ -294,11 +283,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       });
 
       toast({
-        title: "Success",
         description: "Transaction added successfully.",
         status: "success",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
 
       onClose();
@@ -306,11 +293,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description: axiosError.response?.data?.detail || "Transaction failed",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     } finally {
       setIsLoading(false);

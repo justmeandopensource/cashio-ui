@@ -28,6 +28,7 @@ import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import config from "@/config";
 import FormNotes from "../shared/FormNotes";
 import useLedgerStore from "../shared/store";
+import { toastDefaults } from "../shared/utils";
 
 interface Ledger {
   ledger_id: string;
@@ -106,12 +107,10 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description:
           axiosError.response?.data?.detail || "Failed to fetch ledgers.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     }
   }, [toast]);
@@ -131,12 +130,10 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description:
           axiosError.response?.data?.detail || "Failed to fetch accounts.",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     }
   }, [ledgerId, toast]);
@@ -165,12 +162,10 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       } catch (error) {
         const axiosError = error as AxiosError<{ detail: string }>;
         toast({
-          title: "Error",
           description:
             axiosError.response?.data?.detail || "Failed to fetch accounts.",
           status: "error",
-          duration: 3000,
-          isClosable: true,
+          ...toastDefaults,
         });
       }
     },
@@ -219,11 +214,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       );
 
       toast({
-        title: "Success",
         description: "Transfer completed successfully.",
         status: "success",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
 
       onClose();
@@ -231,11 +224,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
-        title: "Error",
         description: axiosError.response?.data?.detail || "Transfer failed",
         status: "error",
-        duration: 3000,
-        isClosable: true,
+        ...toastDefaults,
       });
     } finally {
       setIsLoading(false);

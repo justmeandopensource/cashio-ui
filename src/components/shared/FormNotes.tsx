@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import axios, { AxiosError } from "axios";
 import config from "@/config";
+import { toastDefaults } from "./utils";
 
 // Define props interface
 interface FormNotesProps {
@@ -74,13 +75,11 @@ const FormNotes: React.FC<FormNotesProps> = ({
         } catch (error) {
           const apiError = error as AxiosError<ApiErrorResponse>;
           toast({
-            title: "Error",
             description:
               apiError.response?.data?.detail ||
               "Failed to fetch note suggestions.",
             status: "error",
-            duration: 3000,
-            isClosable: true,
+            ...toastDefaults,
           });
         }
       } else {

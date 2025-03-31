@@ -26,6 +26,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import config from "@/config";
 import useLedgerStore from "../shared/store";
+import { toastDefaults } from "../shared/utils";
 
 interface GroupAccount {
   account_id: string;
@@ -139,12 +140,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
     },
     onSuccess: () => {
       toast({
-        title: "Success",
         description: "Account created successfully.",
         status: "success",
-        duration: 2000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       resetForm();
       onClose();
@@ -154,12 +152,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
     },
     onError: (error: Error) => {
       toast({
-        title: "Error",
         description: error.message || "Failed to create account.",
         status: "error",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
     },
   });
@@ -168,12 +163,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   const handleSubmit = (): void => {
     if (!accountName) {
       toast({
-        title: "Required Field",
         description: "Please enter an account name.",
         status: "warning",
-        duration: 3000,
-        position: "top",
-        isClosable: true,
+        ...toastDefaults,
       });
       return;
     }
