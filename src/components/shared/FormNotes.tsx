@@ -71,7 +71,7 @@ const FormNotes: React.FC<FormNotesProps> = ({
               },
             },
           );
-          setNoteSuggestions(response.data);
+          setNoteSuggestions(Array.from(new Set(response.data)));
         } catch (error) {
           const apiError = error as AxiosError<ApiErrorResponse>;
           toast({
