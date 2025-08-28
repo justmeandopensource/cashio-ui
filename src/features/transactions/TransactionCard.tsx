@@ -87,6 +87,8 @@ interface TransactionCardProps {
   isTransferLoading: boolean;
   // eslint-disable-next-line no-unused-vars
   onDeleteTransaction: (transactionId: string) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
+  onEditTransaction: (transaction: Transaction) => void;
   showAccountName?: boolean;
 }
 
@@ -101,6 +103,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   isSplitLoading,
   isTransferLoading,
   onDeleteTransaction,
+  onEditTransaction,
   showAccountName = false,
 }) => {
   const { currencySymbol } = useLedgerStore();
@@ -342,8 +345,19 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                 )}
               </Box>
             )}
-            {/* Delete Icon */}
-            <Flex justify="flex-end" mt={3}>
+            {/* Action Icons */}
+            <Flex justify="flex-end" mt={3} gap={2}>
+              <Button
+                size="md"
+                variant="ghost"
+                colorScheme="blue"
+                leftIcon={<Icon as={FiEdit} />}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEditTransaction(transaction);
+                }}
+                data-testid="transactioncard-edit-icon"
+              />
               <Button
                 size="md"
                 variant="ghost"

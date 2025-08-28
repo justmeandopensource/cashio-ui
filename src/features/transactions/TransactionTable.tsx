@@ -34,7 +34,7 @@ import {
   Button,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { FiCreditCard, FiTrash2 } from "react-icons/fi";
+import { FiCreditCard, FiTrash2, FiEdit } from "react-icons/fi";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 import useLedgerStore from "@/components/shared/store";
 
@@ -83,6 +83,8 @@ interface TransactionTableProps {
   transferDetails?: TransferDetails;
   // eslint-disable-next-line no-unused-vars
   onDeleteTransaction: (transactionId: string) => Promise<void>;
+  // eslint-disable-next-line no-unused-vars
+  onEditTransaction: (transaction: Transaction) => void;
   showAccountName?: boolean;
 }
 
@@ -95,6 +97,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   isTransferLoading,
   transferDetails,
   onDeleteTransaction,
+  onEditTransaction,
   showAccountName = false,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -369,6 +372,21 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   transition="opacity 0.2s"
                   className="action-icons"
                 >
+                  {!transaction.is_transfer && (
+                    <ChakraLink
+                      onClick={() => onEditTransaction(transaction)}
+                      _hover={{ textDecoration: "none" }}
+                    >
+                      <Icon
+                        as={FiEdit}
+                        boxSize={4}
+                        color="blue.500"
+                        _hover={{ color: "blue.600" }}
+                        transition="opacity 0.2s"
+                        data-testid="transactiontable-edit-icon"
+                      />
+                    </ChakraLink>
+                  )}
                   <ChakraLink
                     onClick={() => {
                       setSelectedTransactionId(transaction.transaction_id);

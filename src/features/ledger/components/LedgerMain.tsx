@@ -84,7 +84,7 @@ const LedgerMain = () => {
   };
 
   const refreshAccountsData = async (): Promise<void> => {
-    await queryClient.invalidateQueries({ queryKey: ["accounts"] });
+    await queryClient.invalidateQueries({ queryKey: ["accounts", ledgerId] });
   };
 
   const refreshTransactionsData = async (): Promise<void> => {
@@ -197,6 +197,7 @@ const LedgerMain = () => {
                     queryKey: ["transactions-count", ledgerId],
                   })
                 }
+                onTransactionUpdated={refreshAccountsData}
                 shouldFetch={tabIndex === 1}
               />
             </TabPanel>

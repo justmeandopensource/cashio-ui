@@ -3,3 +3,4 @@ dist
 .env
 certs
 test/coverage
+.DS_Store

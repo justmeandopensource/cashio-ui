@@ -23,6 +23,7 @@ import TransactionFilter from "./TransactionFilter";
 import { AxiosError } from "axios";
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "@/components/shared/utils";
+import EditTransactionModal from "@components/modals/EditTransactionModal/EditTransactionModal";
 
 interface Transaction {
   transaction_id: string;
@@ -61,6 +62,7 @@ interface TransactionsProps {
   accountId?: string;
   onAddTransaction: () => void;
   onTransactionDeleted?: () => void;
+  onTransactionUpdated?: () => void;
   shouldFetch?: boolean;
 }
 
@@ -68,6 +70,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   accountId,
   onAddTransaction,
   onTransactionDeleted,
+  onTransactionUpdated,
   shouldFetch = true,
 }) => {
   const { ledgerId } = useLedgerStore();
@@ -86,6 +89,11 @@ const Transactions: React.FC<TransactionsProps> = ({
   const [isSplitLoading, setIsSplitLoading] = useState(false);
   const [isTransferLoading, setIsTransferLoading] = useState(false);
 
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(
+    null,
+  );
+
   const [filters, setFilters] = useState<Filters>({});
   const [pagination, setPagination] = useState<Pagination>({
     total_pages: 1,
@@ -103,6 +111,28 @@ const Transactions: React.FC<TransactionsProps> = ({
   const handleResetFilters = () => {
     setFilters({});
     setPagination((prev) => ({ ...prev, current_page: 1 }));
+  };
+
+  const handleEditTransaction = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setIsEditModalOpen(true);
+  };
+
+  const handleTransactionUpdated = () => {
+    setIsEditModalOpen(false);
+    if (onTransactionUpdated) {
+      onTransactionUpdated();
+    }
+    queryClient.invalidateQueries({
+      queryKey: [
+        "transactions",
+        ledgerId,
+        accountId,
+        pagination.current_page,
+        { ...filters },
+      ],
+    });
+    queryClient.refetchQueries({ queryKey: ["account", accountId] });
   };
 
   const {
@@ -379,6 +409,7 @@ const Transactions: React.FC<TransactionsProps> = ({
               isTransferLoading={isTransferLoading}
               transferDetails={transferDetails || undefined}
               onDeleteTransaction={handleDeleteTransaction}
+              onEditTransaction={handleEditTransaction}
               showAccountName={!accountId}
             />
           </Box>
@@ -408,6 +439,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                   isSplitLoading={isSplitLoading}
                   isTransferLoading={isTransferLoading}
                   onDeleteTransaction={handleDeleteTransaction}
+                  onEditTransaction={handleEditTransaction} // Add this line
                   showAccountName={!accountId}
                 />
               ))}
@@ -441,6 +473,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           )}
         </>
       )}
+      {isEditModalOpen && selectedTransaction && ( <EditTransactionModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} transaction={selectedTransaction} onTransactionUpdated={handleTransactionUpdated} /> )}
     </Box>
   );
 };

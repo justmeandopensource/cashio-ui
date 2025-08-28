@@ -108,6 +108,7 @@ const AccountMain: React.FC = () => {
         account={account}
         onAddTransaction={() => setIsCreateModalOpen(true)}
         onTransactionDeleted={refreshAccountData}
+        onTransactionUpdated={refreshAccountData}
       />
 
       {/* Create Transaction Modal */}

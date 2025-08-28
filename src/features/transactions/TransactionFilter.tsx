@@ -343,7 +343,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
       <IconButton
         aria-label="Filter transactions"
         icon={
-          <>
+          <Box>
             <Icon as={FiFilter} />
             {activeFilterCount > 0 && (
               <Badge
@@ -357,7 +357,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                 {activeFilterCount}
               </Badge>
             )}
-          </>
+          </Box>
         }
         onClick={onOpen}
         variant="outline"
