@@ -30,6 +30,7 @@ import {
   FiCreditCard,
   FiTrash2,
   FiMessageSquare,
+  FiEdit,
 } from "react-icons/fi";
 import {
   formatAmount,
