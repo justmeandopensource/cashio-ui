@@ -348,17 +348,19 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             )}
             {/* Action Icons */}
             <Flex justify="flex-end" mt={3} gap={2}>
-              <Button
-                size="md"
-                variant="ghost"
-                colorScheme="blue"
-                leftIcon={<Icon as={FiEdit} />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onEditTransaction(transaction);
-                }}
-                data-testid="transactioncard-edit-icon"
-              />
+              {!transaction.is_transfer && (
+                <Button
+                  size="md"
+                  variant="ghost"
+                  colorScheme="blue"
+                  leftIcon={<Icon as={FiEdit} />}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onEditTransaction(transaction);
+                  }}
+                  data-testid="transactioncard-edit-icon"
+                />
+              )}
               <Button
                 size="md"
                 variant="ghost"
