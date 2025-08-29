@@ -80,33 +80,34 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
   return (
     <Popover placement="top">
       <PopoverTrigger>
-        <Box
+        <ChakraLink
           ref={triggerRef}
-          p={4}
+          display="flex"
+          alignItems="center"
+          py={2}
+          px={4}
           cursor="pointer"
           _hover={{ bg: "teal.600", borderRadius: "md" }}
           _expanded={{ bg: "teal.600", borderRadius: "md" }}
           borderRadius="md"
         >
-          <Flex align="center">
-            <Avatar
-              size="sm"
-              name={userProfile.full_name}
-              src="" // No image, just initials
-              getInitials={getInitials}
-              bg="teal.600"
-              color="white"
-            />
-            <Box ml={3} textAlign="left">
-              <Text fontWeight="bold" color="white" fontSize="sm">
-                {userProfile.full_name}
-              </Text>
-              <Text fontSize="xs" color="gray.200">
-                {userProfile.email}
-              </Text>
-            </Box>
-          </Flex>
-        </Box>
+          <Avatar
+            size="sm"
+            name={userProfile.full_name}
+            src="" // No image, just initials
+            getInitials={getInitials}
+            bg="teal.600"
+            color="white"
+          />
+          <Box ml={3} textAlign="left">
+            <Text fontWeight="bold" color="white" fontSize="md">
+              {userProfile.full_name}
+            </Text>
+            <Text fontSize="sm" color="gray.200">
+              {userProfile.email}
+            </Text>
+          </Box>
+        </ChakraLink>
       </PopoverTrigger>
       <PopoverContent bg="teal.50" borderColor="gray.200" boxShadow="lg" width={triggerWidth}>
         <PopoverArrow />
