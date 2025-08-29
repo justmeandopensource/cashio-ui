@@ -17,16 +17,10 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-import {
-  FiHome,
-  FiBookmark,
-  FiLogOut,
-  FiMenu,
-  FiPieChart,
-} from "react-icons/fi";
+import { FiHome, FiBookmark, FiMenu, FiPieChart } from "react-icons/fi";
 
 import { useNavigate } from "react-router-dom";
-import { VERSION } from "../version";
+import UserProfileDisplay from "./shared/UserProfileDisplay";
 
 interface SidebarProps {
   handleLogout: () => void;
@@ -69,9 +63,6 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
             <Heading as="h1" size="lg" mb={6} mr={2}>
               Cashio
             </Heading>
-            <Text fontSize="sm" color={sidebarColor} opacity={0.8}>
-              v{VERSION}
-            </Text>
           </Flex>
           <ChakraLink
             display="flex"
@@ -100,11 +91,9 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
             <Icon as={FiBookmark} mr={2} />
             Manage Categories
           </ChakraLink>
-          <ChakraLink display="flex" alignItems="center" onClick={handleLogout}>
-            <Icon as={FiLogOut} mr={2} />
-            Log Out
-          </ChakraLink>
         </VStack>
+        {/* User Profile Display */}
+        <UserProfileDisplay handleLogout={handleLogout} />
       </Box>
 
       {/* Mobile Drawer */}
@@ -116,55 +105,48 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
               <Heading as="h1" size="lg" mr={2}>
                 Cashio
               </Heading>
-              <Text fontSize="sm" opacity={0.8}>
-                v{VERSION}
-              </Text>
             </Flex>
           </DrawerHeader>
           <DrawerBody>
-            <VStack align="flex-start" spacing={3}>
-              <ChakraLink
-                display="flex"
-                alignItems="center"
-                onClick={() => {
-                  navigate("/");
-                  onClose();
-                }}
-              >
-                <Icon as={FiHome} mr={2} />
-                Home
-              </ChakraLink>
-              <ChakraLink
-                display="flex"
-                alignItems="center"
-                onClick={() => {
-                  navigate("/insights");
-                  onClose();
-                }}
-              >
-                <Icon as={FiPieChart} mr={2} />
-                Insights
-              </ChakraLink>
-              <ChakraLink
-                display="flex"
-                alignItems="center"
-                onClick={() => {
-                  navigate("/categories");
-                  onClose();
-                }}
-              >
-                <Icon as={FiBookmark} mr={2} />
-                Manage Categories
-              </ChakraLink>
-              <ChakraLink
-                display="flex"
-                alignItems="center"
-                onClick={handleLogout}
-              >
-                <Icon as={FiLogOut} mr={2} />
-                Log Out
-              </ChakraLink>
-            </VStack>
+            <Flex direction="column" justify="space-between" h="full">
+              <VStack align="flex-start" spacing={3}>
+                <ChakraLink
+                  display="flex"
+                  alignItems="center"
+                  onClick={() => {
+                    navigate("/");
+                    onClose();
+                  }}
+                >
+                  <Icon as={FiHome} mr={2} />
+                  Home
+                </ChakraLink>
+                <ChakraLink
+                  display="flex"
+                  alignItems="center"
+                  onClick={() => {
+                    navigate("/insights");
+                    onClose();
+                  }}
+                >
+                  <Icon as={FiPieChart} mr={2} />
+                  Insights
+                </ChakraLink>
+                <ChakraLink
+                  display="flex"
+                  alignItems="center"
+                  onClick={() => {
+                    navigate("/categories");
+                    onClose();
+                  }}
+                >
+                  <Icon as={FiBookmark} mr={2} />
+                  Manage Categories
+                </ChakraLink>
+              </VStack>
+              {/* User Profile Display */}
+              <UserProfileDisplay handleLogout={handleLogout} />
+            </Flex>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
