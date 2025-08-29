@@ -116,11 +116,12 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
         <PopoverBody>
           <VStack align="flex-start" spacing={2}>
             <ChakraLink
+              onClick={() => navigate("/profile")}
               display="flex"
               alignItems="center"
               color="gray.800"
             >
-              <FiUser style={{ marginRight: "8px" }} /> Profile
+              <FiSettings style={{ marginRight: "8px" }} /> Profile
             </ChakraLink>
             <ChakraLink
               onClick={handleLogout}

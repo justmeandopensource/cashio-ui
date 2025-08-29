@@ -7,6 +7,7 @@ import Ledger from "@features/ledger/Ledger";
 import Account from "@features/account/Account";
 import Categories from "@features/categories/Categories";
 import Insights from "./features/insights/Insights";
+import Profile from "@features/profile/Profile";
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
         <Route path="/account/:accountId" element={<Account />} />
         <Route path="/categories" element={<Categories />} />
         <Route path="/insights" element={<Insights />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </Router>
   );
