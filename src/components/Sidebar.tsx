@@ -6,7 +6,6 @@ import {
   Heading,
   Link as ChakraLink,
   Icon,
-  Text,
   useDisclosure,
   useColorModeValue,
   Drawer,
@@ -17,7 +16,7 @@ import {
   Button,
 } from "@chakra-ui/react";
 
-import { FiHome, FiBookmark, FiMenu, FiPieChart } from "react-icons/fi";
+import { Home, Bookmark, Menu, PieChart, Wallet } from "lucide-react";
 
 import { useNavigate } from "react-router-dom";
 import UserProfileDisplay from "./shared/UserProfileDisplay";
@@ -38,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
       {/* Mobile Hamburger Menu */}
       <Box display={{ base: "block", md: "none" }} p={4}>
         <Button onClick={onOpen} variant="ghost" color="teal.400">
-          <Icon as={FiMenu} />
+          <Icon as={Menu} />
         </Button>
       </Box>
 
@@ -59,8 +58,9 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         flexShrink={0}
       >
         <VStack align="flex-start" spacing={3}>
-          <Flex align="baseline">
-            <Heading as="h1" size="lg" mb={6} mr={2}>
+          <Flex align="center" mb={6}>
+            <Icon as={Wallet} boxSize={6} mr={3} />
+            <Heading as="h1" size="lg">
               Cashio
             </Heading>
           </Flex>
@@ -69,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
             alignItems="center"
             onClick={() => navigate("/")}
           >
-            <Icon as={FiHome} mr={2} />
+            <Icon as={Home} mr={2} />
             Home
           </ChakraLink>
           <ChakraLink
@@ -80,7 +80,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
               onClose();
             }}
           >
-            <Icon as={FiPieChart} mr={2} />
+            <Icon as={PieChart} mr={2} />
             Insights
           </ChakraLink>
           <ChakraLink
@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
             alignItems="center"
             onClick={() => navigate("/categories")}
           >
-            <Icon as={FiBookmark} mr={2} />
+            <Icon as={Bookmark} mr={2} />
             Manage Categories
           </ChakraLink>
         </VStack>
@@ -101,8 +101,9 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         <DrawerOverlay />
         <DrawerContent bg={sidebarBg} color={sidebarColor}>
           <DrawerHeader>
-            <Flex align="baseline">
-              <Heading as="h1" size="lg" mr={2}>
+            <Flex align="center">
+              <Icon as={Wallet} boxSize={6} mr={3} />
+              <Heading as="h1" size="lg">
                 Cashio
               </Heading>
             </Flex>
@@ -118,7 +119,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
                     onClose();
                   }}
                 >
-                  <Icon as={FiHome} mr={2} />
+                  <Icon as={Home} mr={2} />
                   Home
                 </ChakraLink>
                 <ChakraLink
@@ -129,7 +130,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
                     onClose();
                   }}
                 >
-                  <Icon as={FiPieChart} mr={2} />
+                  <Icon as={PieChart} mr={2} />
                   Insights
                 </ChakraLink>
                 <ChakraLink
@@ -140,7 +141,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
                     onClose();
                   }}
                 >
-                  <Icon as={FiBookmark} mr={2} />
+                  <Icon as={Bookmark} mr={2} />
                   Manage Categories
                 </ChakraLink>
               </VStack>

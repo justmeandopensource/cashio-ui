@@ -19,7 +19,7 @@ import {
 } from "@chakra-ui/react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import { FiPieChart, FiAlertCircle, FiRefreshCw } from "react-icons/fi";
+import { BarChart, RefreshCw, PieChart as PieChartIcon, AlertCircle, Tag } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import { formatNumberAsCurrency } from "@/components/shared/utils";
@@ -162,11 +162,14 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
   return (
     <Box bg={bgColor} borderRadius="lg" p={{ base: 4, md: 6 }} boxShadow="lg">
       {/* Header */}
-      <VStack spacing={4} align="stretch" mb={6}>
-        <Heading size="md" color={primaryTextColor}>
-          Tag Trend Analysis
-        </Heading>
-        <Text color={secondaryTextColor} fontSize="sm">
+      <VStack align="flex-start" spacing={1} flex={1} mb={6}>
+        <Flex alignItems="center" gap={3}>
+          <Icon as={Tag} w={5} h={5} color="black" />
+          <Heading as="h2" size="md" color="black">
+            Tag Trend Analysis
+          </Heading>
+        </Flex>
+        <Text color={secondaryTextColor} fontSize="sm" pl="2rem">
           Analyze your spending by tags and categories
         </Text>
       </VStack>
@@ -205,11 +208,12 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
               loadingText="Analyzing"
               isDisabled={selectedTags.length === 0}
               minW="120px"
+              leftIcon={<BarChart size={18} />}
             >
               Analyze Trends
             </Button>
             <Button
-              leftIcon={<Icon as={FiRefreshCw} />}
+              leftIcon={<RefreshCw size={18} />}
               variant="outline"
               onClick={handleReset}
               isDisabled={selectedTags.length === 0}
@@ -234,7 +238,7 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
       {isError && (
         <Center p={10} bg={cardBg} borderRadius="lg">
           <VStack spacing={4}>
-            <Icon as={FiAlertCircle} color="red.500" boxSize={10} />
+            <Icon as={AlertCircle} color="red.500" boxSize={10} />
             <Text color="red.500" fontWeight="bold">
               Unable to load tag analysis
             </Text>
@@ -249,7 +253,7 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
       {!isLoading && !isError && !data && (
         <Center p={10} bg={cardBg} borderRadius="lg">
           <VStack spacing={4}>
-            <Icon as={FiPieChart} boxSize={10} color="gray.400" />
+            <Icon as={PieChartIcon} boxSize={16} color="gray.400" />
             <Text color={secondaryTextColor} fontWeight="medium" fontSize="lg">
               Select tags to analyze your spending trends
             </Text>

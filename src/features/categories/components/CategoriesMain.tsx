@@ -14,8 +14,14 @@ import {
   Spinner,
   Link as ChakraLink,
   useToast,
+  HStack,
 } from "@chakra-ui/react";
-import { FiPlus } from "react-icons/fi";
+import {
+  Plus,
+  RefreshCw,
+  ArrowUpCircle,
+  ArrowDownCircle,
+} from "lucide-react";
 import CreateCategoryModal from "@components/modals/CreateCategoryModal";
 import config from "@/config";
 import { toastDefaults } from "@/components/shared/utils";
@@ -114,7 +120,7 @@ const CategoriesMain: React.FC = () => {
                     _hover={{ textDecoration: "none" }}
                   >
                     <Icon
-                      as={FiPlus}
+                      as={Plus}
                       boxSize={4}
                       color="teal.500"
                       _hover={{ color: "teal.600" }}
@@ -160,7 +166,7 @@ const CategoriesMain: React.FC = () => {
         <Text color="red.500" mb={4}>
           There was an error loading your categories.
         </Text>
-        <Button onClick={refreshCategories} colorScheme="teal">
+        <Button onClick={refreshCategories} colorScheme="teal" leftIcon={<RefreshCw size={16} />}>
           Try Again
         </Button>
       </Box>
@@ -185,15 +191,18 @@ const CategoriesMain: React.FC = () => {
             alignItems="center"
             mb={4}
           >
-            <Text fontSize="xl" fontWeight="bold" color="teal.500">
-              Income Categories
-            </Text>
+            <HStack spacing={2}>
+              <Icon as={ArrowUpCircle} boxSize={6} color="green.500" />
+              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+                Income Categories
+              </Text>
+            </HStack>
             <ChakraLink
               onClick={() => handleCreateCategoryClick("income")}
               _hover={{ textDecoration: "none" }}
             >
               <Icon
-                as={FiPlus}
+                as={Plus}
                 boxSize={5}
                 color="teal.500"
                 _hover={{ color: "teal.600" }}
@@ -209,7 +218,7 @@ const CategoriesMain: React.FC = () => {
                 You do not have any income categories yet.
               </Text>
               <Button
-                leftIcon={<FiPlus />}
+                leftIcon={<Plus />}
                 onClick={() => handleCreateCategoryClick("income")}
               >
                 Create Income Category
@@ -236,15 +245,18 @@ const CategoriesMain: React.FC = () => {
             alignItems="center"
             mb={4}
           >
-            <Text fontSize="xl" fontWeight="bold" color="teal.500">
-              Expense Categories
-            </Text>
+            <HStack spacing={2}>
+              <Icon as={ArrowDownCircle} boxSize={6} color="green.500" />
+              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+                Expense Categories
+              </Text>
+            </HStack>
             <ChakraLink
               onClick={() => handleCreateCategoryClick("expense")}
               _hover={{ textDecoration: "none" }}
             >
               <Icon
-                as={FiPlus}
+                as={Plus}
                 boxSize={5}
                 color="teal.500"
                 _hover={{ color: "teal.600" }}
@@ -260,7 +272,7 @@ const CategoriesMain: React.FC = () => {
                 You do not have any expense categories yet.
               </Text>
               <Button
-                leftIcon={<FiPlus />}
+                leftIcon={<Plus />}
                 onClick={() => handleCreateCategoryClick("expense")}
               >
                 Create Expense Category

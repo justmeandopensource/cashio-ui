@@ -24,6 +24,7 @@ import {
   InputGroup,
   InputLeftAddon,
   Stack,
+  Flex,
 } from "@chakra-ui/react";
 import axios, { AxiosError } from "axios";
 import config from "@/config";
@@ -32,6 +33,7 @@ import FormSplits from "../CreateTransactionModal/FormSplits";
 import FormNotes from "@/components/shared/FormNotes";
 import FormTags from "@/components/shared/FormTags";
 import useLedgerStore from "@/components/shared/store";
+import { Edit, Check, X } from "lucide-react";
 import { toastDefaults } from "@/components/shared/utils";
 
 // Define interfaces for the props and state
@@ -421,7 +423,10 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Edit Transaction
+            <Flex alignItems="center">
+              <Edit size={24} style={{ marginRight: '8px' }} />
+              Edit Transaction
+            </Flex>
           </ModalHeader>
         </Box>
 
@@ -618,6 +623,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               mb={3}
               isLoading={isLoading}
               isDisabled={isSaveDisabled}
+              leftIcon={<Check />}
             >
               Save Changes
             </Button>
@@ -627,6 +633,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               size="lg"
               width="100%"
               isDisabled={isLoading}
+              leftIcon={<X />}
             >
               Cancel
             </Button>
@@ -642,10 +649,11 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             onClick={handleSubmit}
             isLoading={isLoading}
             isDisabled={isSaveDisabled}
+            leftIcon={<Check />}
           >
             Save Changes
           </Button>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} leftIcon={<X />}>
             Cancel
           </Button>
         </ModalFooter>

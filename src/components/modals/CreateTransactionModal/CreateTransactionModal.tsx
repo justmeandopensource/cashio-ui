@@ -24,6 +24,7 @@ import {
   InputGroup,
   InputLeftAddon,
   Stack,
+  Flex,
 } from "@chakra-ui/react";
 import axios, { AxiosError } from "axios";
 import config from "@/config";
@@ -32,6 +33,7 @@ import FormSplits from "./FormSplits";
 import FormNotes from "@/components/shared/FormNotes";
 import FormTags from "@/components/shared/FormTags";
 import useLedgerStore from "@/components/shared/store";
+import { Plus, Check, X } from "lucide-react";
 import { toastDefaults } from "@/components/shared/utils";
 
 // Define interfaces for the props and state
@@ -331,7 +333,10 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Add Transaction
+            <Flex alignItems="center">
+              <Plus size={24} style={{ marginRight: '8px' }} />
+              Add Transaction
+            </Flex>
           </ModalHeader>
         </Box>
 
@@ -580,6 +585,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                 (isSplit && calculateRemainingAmount() !== 0) ||
                 (isSplit && !accountId && !selectedAccountId)
               }
+              leftIcon={<Check />}
             >
               Save Transaction
             </Button>
@@ -589,6 +595,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               size="lg"
               width="100%"
               isDisabled={isLoading}
+              leftIcon={<X />}
             >
               Cancel
             </Button>
@@ -615,10 +622,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               (isSplit && calculateRemainingAmount() !== 0) ||
               (isSplit && !accountId && !selectedAccountId)
             }
+            leftIcon={<Check />}
           >
             Save Transaction
           </Button>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} leftIcon={<X />}>
             Cancel
           </Button>
         </ModalFooter>

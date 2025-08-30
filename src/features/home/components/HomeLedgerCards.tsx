@@ -8,8 +8,9 @@ import {
   Text,
   Button,
   Icon,
+  Flex,
 } from "@chakra-ui/react";
-import { FiFileText, FiPlus } from "react-icons/fi";
+import { BookText, FileText, Plus } from 'lucide-react';
 import useLedgerStore from "@/components/shared/store";
 
 interface HomeLedgerCardsProps {
@@ -34,7 +35,7 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
     <Box mb={8}>
       {ledgers.length === 0 ? (
         <Box textAlign="center" py={10} px={6}>
-          <Icon as={FiFileText} boxSize={12} color="teal.500" mb={4} />
+          <Icon as={FileText} boxSize={12} color="teal.500" mb={4} />
           <Text fontSize="xl" fontWeight="bold" mb={2}>
             No Ledgers Found
           </Text>
@@ -43,7 +44,7 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
           </Text>
           <Button
             onClick={onOpen}
-            leftIcon={<FiPlus />}
+            leftIcon={<Plus />}
             colorScheme="teal"
             size="lg"
           >
@@ -52,9 +53,12 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
         </Box>
       ) : (
         <Box>
-          <Heading as="h2" size="lg" mb={4} color="teal.500">
-            Ledgers
-          </Heading>
+          <Flex alignItems="center" gap={2} mb={4}>
+            <BookText size={28} color="teal" />
+            <Heading as="h2" size="lg" color="teal.500">
+              Ledgers
+            </Heading>
+          </Flex>
           <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} spacing={6}>
             {ledgers.map((ledger) => (
               <Card
@@ -106,7 +110,7 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
                 justifyContent="center"
                 p={6}
               >
-                <Icon as={FiPlus} boxSize={6} color="teal.500" />
+                <Icon as={Plus} boxSize={6} color="teal.500" />
               </CardBody>
             </Card>
           </SimpleGrid>

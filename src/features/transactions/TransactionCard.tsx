@@ -23,15 +23,7 @@ import {
   Button,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import {
-  FiCalendar,
-  FiTag,
-  FiInfo,
-  FiCreditCard,
-  FiTrash2,
-  FiMessageSquare,
-  FiEdit,
-} from "react-icons/fi";
+import { Calendar, Tag as TagIcon, Info, CreditCard, Trash2, MessageSquare, Edit, X } from "lucide-react";
 import {
   formatAmount,
   formatDate,
@@ -150,7 +142,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           {/* Left side with date, category and notes */}
           <VStack align="flex-start" spacing={1} maxW="70%">
             <HStack spacing={2}>
-              <Icon as={FiCalendar} color="gray.500" />
+              <Icon as={Calendar} color="gray.500" />
               <Text fontSize="sm" color="gray.600">
                 {formatDate(transaction.date)}
               </Text>
@@ -205,7 +197,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             {transaction.tags && transaction.tags.length > 0 && (
               <Box mt={1}>
                 <HStack mb={1}>
-                  <Icon as={FiTag} color="gray.500" />
+                  <Icon as={TagIcon} color="gray.500" />
                   <Text fontSize="xs" fontWeight="medium" color="gray.600">
                     TAGS
                   </Text>
@@ -232,7 +224,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               <Box mt={3}>
                 <Button
                   size="xs"
-                  leftIcon={<FiInfo />}
+                  leftIcon={<Info size={14} />}
                   colorScheme="purple"
                   variant="outline"
                   onClick={(e) => {
@@ -282,7 +274,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                           {split.notes && (
                             <Flex align="center" mt={1}>
                               <Icon
-                                as={FiMessageSquare}
+                                as={MessageSquare}
                                 color="gray.500"
                                 mr={1}
                                 fontSize="xs"
@@ -309,7 +301,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               <Box mt={3}>
                 <Button
                   size="xs"
-                  leftIcon={<FiCreditCard />}
+                  leftIcon={<CreditCard size={14} />}
                   colorScheme="blue"
                   variant="outline"
                   onClick={(e) => {
@@ -353,7 +345,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                   size="md"
                   variant="ghost"
                   colorScheme="blue"
-                  leftIcon={<Icon as={FiEdit} />}
+                  leftIcon={<Edit size={18} />}
                   onClick={(e) => {
                     e.stopPropagation();
                     onEditTransaction(transaction);
@@ -365,7 +357,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                 size="md"
                 variant="ghost"
                 colorScheme="red"
-                leftIcon={<Icon as={FiTrash2} />}
+                leftIcon={<Trash2 size={18} />}
                 onClick={(e) => {
                   e.stopPropagation();
                   onOpen();
@@ -408,6 +400,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               mr={3}
               onClick={onClose}
               isDisabled={isDeleting}
+              leftIcon={<X size={18} />}
             >
               Cancel
             </Button>
@@ -416,6 +409,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               onClick={handleDelete}
               isLoading={isDeleting}
               loadingText="Deleting"
+              leftIcon={<Trash2 size={18} />}
             >
               Delete
             </Button>

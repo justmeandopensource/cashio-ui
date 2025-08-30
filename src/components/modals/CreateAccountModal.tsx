@@ -26,6 +26,7 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import config from "@/config";
 import useLedgerStore from "../shared/store";
+import { Plus, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
 
 interface GroupAccount {
@@ -214,7 +215,10 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Create {accountType === "asset" ? "Asset" : "Liability"} Account
+            <Flex alignItems="center">
+              <Plus size={24} style={{ marginRight: '8px' }} />
+              Create {accountType === "asset" ? "Asset" : "Liability"} Account
+            </Flex>
           </ModalHeader>
         </Box>
 
@@ -353,6 +357,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
               isLoading={createAccountMutation.isPending}
               isDisabled={!accountName || isGroupAccountsError}
               loadingText="Creating..."
+              leftIcon={<Plus />}
             >
               Create Account
             </Button>
@@ -362,6 +367,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
               width="100%"
               size="lg"
               isDisabled={createAccountMutation.isPending}
+              leftIcon={<X />}
             >
               Cancel
             </Button>
@@ -378,6 +384,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
             isLoading={createAccountMutation.isPending}
             isDisabled={!accountName || isGroupAccountsError}
             loadingText="Creating..."
+            leftIcon={<Plus />}
           >
             Create
           </Button>
@@ -385,6 +392,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
             variant="outline"
             onClick={onClose}
             isDisabled={createAccountMutation.isPending}
+            leftIcon={<X />}
           >
             Cancel
           </Button>

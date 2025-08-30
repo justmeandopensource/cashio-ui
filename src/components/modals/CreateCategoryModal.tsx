@@ -23,6 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import config from "@/config";
+import { Plus, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
 
 interface GroupCategory {
@@ -198,7 +199,10 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Create {categoryType === "income" ? "Income" : "Expense"} Category
+            <Flex alignItems="center">
+              <Plus size={24} style={{ marginRight: '8px' }} />
+              Create {categoryType === "income" ? "Income" : "Expense"} Category
+            </Flex>
           </ModalHeader>
         </Box>
 
@@ -312,6 +316,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               isLoading={createCategoryMutation.isPending}
               isDisabled={!categoryName || isGroupCategoriesError}
               loadingText="Creating..."
+              leftIcon={<Plus />}
             >
               Create Category
             </Button>
@@ -321,6 +326,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               width="100%"
               size="lg"
               isDisabled={createCategoryMutation.isPending}
+              leftIcon={<X />}
             >
               Cancel
             </Button>
@@ -337,6 +343,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
             isLoading={createCategoryMutation.isPending}
             isDisabled={!categoryName || isGroupCategoriesError}
             loadingText="Creating..."
+            leftIcon={<Plus />}
           >
             Create
           </Button>
@@ -344,6 +351,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
             variant="outline"
             onClick={onClose}
             isDisabled={createCategoryMutation.isPending}
+            leftIcon={<X />}
           >
             Cancel
           </Button>

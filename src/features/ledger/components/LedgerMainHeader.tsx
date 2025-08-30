@@ -6,15 +6,11 @@ import {
   useColorModeValue,
   IconButton,
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  ArrowForwardIcon,
-  ArrowBackIcon,
-  EditIcon,
-} from "@chakra-ui/icons";
+import { Plus, ArrowRight, ArrowLeft, Edit } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FC } from "react";
 import useLedgerStore from "@/components/shared/store";
+import { BookText } from 'lucide-react';
 
 interface LedgerMainHeaderProps {
   onAddTransaction: () => void;
@@ -53,7 +49,7 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
           {/* Back to Home Icon */}
           <IconButton
             aria-label="Back to Home"
-            icon={<ArrowBackIcon boxSize={6} />}
+            icon={<ArrowLeft />}
             variant="ghost"
             color="teal.500"
             size="lg"
@@ -62,16 +58,29 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
           />
 
           {/* Ledger Name and Edit Icon */}
-          <Flex alignItems="center" gap={2}>
+          <Flex
+            alignItems="center"
+            gap={2}
+            sx={{
+              "& .edit-icon": {
+                visibility: "hidden",
+              },
+              "&:hover .edit-icon": {
+                visibility: "visible",
+              },
+            }}
+          >
+            <BookText size={28} color="teal" />
             <Heading as="h2" size="lg" color="teal.500">
               {ledgerName}
             </Heading>
             <IconButton
               aria-label="Edit Account"
-              icon={<EditIcon boxSize={4} />}
+              icon={<Edit />}
               variant="ghost"
               color="teal.500"
               size="sm"
+              className="edit-icon"
             />
           </Flex>
         </Flex>
@@ -85,7 +94,7 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
           >
             {/* Button to Add a New Transaction */}
             <Button
-              leftIcon={<AddIcon />}
+              leftIcon={<Plus />}
               colorScheme={buttonColorScheme}
               variant="solid"
               onClick={onAddTransaction}
@@ -97,7 +106,7 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
 
             {/* Button to Transfer Funds */}
             <Button
-              rightIcon={<ArrowForwardIcon />}
+              rightIcon={<ArrowRight />}
               colorScheme={buttonColorScheme}
               variant="outline"
               onClick={onTransferFunds}

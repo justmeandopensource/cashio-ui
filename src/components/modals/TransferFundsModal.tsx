@@ -21,8 +21,9 @@ import {
   InputGroup,
   InputLeftAddon,
   Stack,
+  Flex,
 } from "@chakra-ui/react";
-import { ArrowDownIcon, ArrowUpIcon } from "@chakra-ui/icons";
+import { ArrowDown, ArrowUp, ArrowRightLeft, Check, X } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import config from "@/config";
@@ -262,7 +263,10 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Transfer Funds
+            <Flex alignItems="center">
+              <ArrowRightLeft size={24} style={{ marginRight: '8px' }} />
+              Transfer Funds
+            </Flex>
           </ModalHeader>
         </Box>
 
@@ -326,12 +330,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                 mb={4}
               >
                 <FormControl>
-                  <HStack alignItems="center" mb={2}>
-                    <ArrowUpIcon color="red.500" />
-                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>
-                      From Account
-                    </FormLabel>
-                  </HStack>
+                  <FormLabel fontSize="sm" fontWeight="medium" mb={2}>
+                    From Account
+                  </FormLabel>
                   <Select
                     borderColor={borderColor}
                     placeholder="Select an account"
@@ -436,12 +437,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 
                 {/* To Account Selection */}
                 <FormControl>
-                  <HStack alignItems="center" mb={2}>
-                    <ArrowDownIcon color="green.500" />
-                    <FormLabel fontSize="sm" fontWeight="medium" mb={0}>
-                      To Account
-                    </FormLabel>
-                  </HStack>
+                  <FormLabel fontSize="sm" fontWeight="medium" mb={2}>
+                    To Account
+                  </FormLabel>
                   <Select
                     value={toAccountId}
                     onChange={(e) => setToAccountId(e.target.value)}
@@ -534,6 +532,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                 (isDifferentLedger &&
                   (!destinationLedgerId || !destinationAmount))
               }
+              leftIcon={<Check />}
             >
               Complete Transfer
             </Button>
@@ -543,6 +542,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
               size="lg"
               width="100%"
               isDisabled={isLoading}
+              leftIcon={<X />}
             >
               Cancel
             </Button>
@@ -564,10 +564,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
               (isDifferentLedger &&
                 (!destinationLedgerId || !destinationAmount))
             }
+            leftIcon={<Check />}
           >
             Complete Transfer
           </Button>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} leftIcon={<X />}>
             Cancel
           </Button>
         </ModalFooter>

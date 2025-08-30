@@ -26,7 +26,7 @@ import {
   Box,
   VStack,
 } from "@chakra-ui/react";
-import { FiFilter, FiX } from "react-icons/fi";
+import { Filter, X, Check } from "lucide-react";
 import FormTags from "@/components/shared/FormTags";
 import config from "@/config";
 import ChakraDatePicker from "@/components/shared/ChakraDatePicker";
@@ -344,7 +344,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
         aria-label="Filter transactions"
         icon={
           <Box>
-            <Icon as={FiFilter} />
+            <Icon as={Filter} />
             {activeFilterCount > 0 && (
               <Badge
                 colorScheme="teal"
@@ -399,7 +399,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                 <Button
                   size="xs"
                   onClick={handleResetFilters}
-                  leftIcon={<FiX />}
+                  leftIcon={<X size={14} />}
                   variant="ghost"
                   color={{ base: "white", sm: "inherit" }}
                   _hover={{ sm: { bg: "gray.100" } }}
@@ -615,6 +615,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                 width="100%"
                 mb={3}
                 isDisabled={!hasChanged}
+                leftIcon={<Check size={18} />}
               >
                 Apply Filters
               </Button>
@@ -623,6 +624,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                 onClick={onClose}
                 size="lg"
                 width="100%"
+                leftIcon={<X size={18} />}
               >
                 Cancel
               </Button>
@@ -637,10 +639,11 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
               px={6}
               onClick={handleApplyFilters}
               isDisabled={!hasChanged}
+              leftIcon={<Check size={18} />}
             >
               Apply Filters
             </Button>
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" onClick={onClose} leftIcon={<X size={18} />}>
               Cancel
             </Button>
           </ModalFooter>

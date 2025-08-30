@@ -25,6 +25,7 @@ import {
 import axios from "axios";
 import config from "@/config";
 import useLedgerStore from "../shared/store";
+import { Edit, Check, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
 
 interface GroupAccount {
@@ -209,7 +210,10 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Update {account.type === "asset" ? "Asset" : "Liability"} Account
+            <Flex alignItems="center">
+              <Edit size={24} style={{ marginRight: '8px' }} />
+              Update {account.type === "asset" ? "Asset" : "Liability"} Account
+            </Flex>
           </ModalHeader>
         </Box>
 
@@ -336,6 +340,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                   openingBalance === account.opening_balance.toString() &&
                   parentAccountId === account.parent_account_id)
               }
+              leftIcon={<Check />}
             >
               Update Account
             </Button>
@@ -345,6 +350,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
               width="100%"
               size="lg"
               isDisabled={isLoading}
+              leftIcon={<X />}
             >
               Cancel
             </Button>
@@ -366,10 +372,11 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                 openingBalance === account.opening_balance.toString() &&
                 parentAccountId === account.parent_account_id)
             }
+            leftIcon={<Check />}
           >
             Update
           </Button>
-          <Button variant="outline" onClick={onClose} isDisabled={isLoading}>
+          <Button variant="outline" onClick={onClose} isDisabled={isLoading} leftIcon={<X />}>
             Cancel
           </Button>
         </ModalFooter>

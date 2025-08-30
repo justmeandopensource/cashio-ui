@@ -27,12 +27,7 @@ import {
   Legend,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import {
-  FiTrendingUp,
-  FiTrendingDown,
-  FiChevronDown,
-  FiBarChart2,
-} from "react-icons/fi";
+import { LineChart, TrendingUp, TrendingDown, ChevronDown, BarChart2 } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import { formatNumberAsCurrency } from "@/components/shared/utils";
@@ -147,7 +142,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
   if (isError) {
     return (
       <VStack spacing={4} align="center" bg={cardBg} p={6} borderRadius="lg">
-        <Icon as={FiTrendingDown} color="red.500" boxSize={10} mb={4} />
+        <Icon as={TrendingDown} color="red.500" boxSize={6} mb={4} />
         <Text color="red.500" fontWeight="bold" fontSize="lg">
           Unable to load financial insights
         </Text>
@@ -166,10 +161,13 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
           gap={4}
         >
           <VStack align="flex-start" spacing={1} flex={1}>
-            <Heading size="md" color={primaryTextColor}>
-              Income vs Expense Trend
-            </Heading>
-            <Text color={secondaryTextColor} fontSize="sm">
+            <Flex alignItems="center" gap={3}>
+              <Icon as={LineChart} w={5} h={5} color="black" />
+              <Heading as="h2" size="md" color="black">
+                Income vs Expense Trend
+              </Heading>
+            </Flex>
+            <Text color={secondaryTextColor} fontSize="sm" pl="2rem">
               {periodOptions.find((opt) => opt.value === periodType)?.label}
             </Text>
           </VStack>
@@ -178,7 +176,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
             value={periodType}
             onChange={(e) => setPeriodType(e.target.value)}
             maxW={{ base: "full", md: "250px" }}
-            icon={<FiChevronDown />}
+            icon={<ChevronDown />}
             variant="filled"
             bg={cardBg}
           >
@@ -268,7 +266,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
             textAlign="center"
             p={6}
           >
-            <Icon as={FiBarChart2} boxSize={16} color="gray.400" mb={4} />
+            <Icon as={BarChart2} boxSize={6} color="gray.400" mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Financial Data Available
             </Heading>
@@ -301,7 +299,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
                   <Heading size="md" color="teal.500">
                     Income
                   </Heading>
-                  <Icon as={FiTrendingUp} color="teal.500" boxSize={6} />
+                  <Icon as={TrendingUp} color="teal.500" boxSize={6} />
                 </HStack>
 
                 <Stat>
@@ -349,7 +347,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
                   <Heading size="md" color="red.500">
                     Expenses
                   </Heading>
-                  <Icon as={FiTrendingDown} color="red.500" boxSize={6} />
+                  <Icon as={TrendingDown} color="red.500" boxSize={6} />
                 </HStack>
 
                 <Stat>

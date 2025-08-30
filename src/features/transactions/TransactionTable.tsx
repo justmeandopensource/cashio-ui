@@ -34,7 +34,7 @@ import {
   Button,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { FiCreditCard, FiTrash2, FiEdit } from "react-icons/fi";
+import { CreditCard, Trash2, Edit, X } from "lucide-react";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 import useLedgerStore from "@/components/shared/store";
 
@@ -291,7 +291,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         px={4}
                       >
                         <Flex align="center">
-                          <Icon as={FiCreditCard} mr={2} />
+                          <Icon as={CreditCard} mr={2} />
                           <Text fontWeight="bold">
                             {transaction.debit > 0
                               ? "Funds transferred to"
@@ -378,7 +378,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                       _hover={{ textDecoration: "none" }}
                     >
                       <Icon
-                        as={FiEdit}
+                        as={Edit}
                         boxSize={4}
                         color="blue.500"
                         _hover={{ color: "blue.600" }}
@@ -395,7 +395,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                     _hover={{ textDecoration: "none" }}
                   >
                     <Icon
-                      as={FiTrash2}
+                      as={Trash2}
                       boxSize={4}
                       color="red.500"
                       _hover={{ color: "red.600" }}
@@ -419,10 +419,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             Are you sure you want to delete this transaction?
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose}>
+            <Button variant="ghost" mr={3} onClick={onClose} leftIcon={<X size={18} />}>
               Cancel
             </Button>
-            <Button colorScheme="red" onClick={handleDelete}>
+            <Button colorScheme="red" onClick={handleDelete} leftIcon={<Trash2 size={18} />}>
               Delete
             </Button>
           </ModalFooter>

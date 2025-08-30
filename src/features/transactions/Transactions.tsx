@@ -9,13 +9,9 @@ import {
   VStack,
   IconButton,
   Spinner,
+  Icon,
 } from "@chakra-ui/react";
-import {
-  FiPlus,
-  FiChevronLeft,
-  FiChevronRight,
-  FiFilter,
-} from "react-icons/fi";
+import { Plus, ChevronLeft, ChevronRight, Filter, AlignLeft } from "lucide-react";
 import config from "@/config";
 import TransactionCard from "./TransactionCard";
 import TransactionTable from "./TransactionTable";
@@ -366,7 +362,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           {/* Show different actions based on whether filters are active */}
           {hasActiveFilters ? (
             <Button
-              leftIcon={<FiFilter />}
+              leftIcon={<Filter />}
               colorScheme="teal"
               onClick={handleResetFilters}
               mr={3}
@@ -375,7 +371,7 @@ const Transactions: React.FC<TransactionsProps> = ({
             </Button>
           ) : (
             <Button
-              leftIcon={<FiPlus />}
+              leftIcon={<Plus />}
               colorScheme="teal"
               onClick={onAddTransaction}
             >
@@ -386,9 +382,12 @@ const Transactions: React.FC<TransactionsProps> = ({
       ) : (
         <>
           <Flex justify="space-between" align="center" mb={4}>
-            <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold">
-              Transactions
-            </Text>
+            <Flex align="center" gap={2}>
+              <Icon as={AlignLeft} size={24} color="gray.600" />
+              <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold">
+                Transactions
+              </Text>
+            </Flex>
             <TransactionFilter
               ledgerId={ledgerId as string}
               accountId={accountId}
@@ -449,7 +448,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           {pagination.total_pages > 1 && (
             <Flex justifyContent="center" mt={6} alignItems="center">
               <IconButton
-                icon={<FiChevronLeft />}
+                icon={<ChevronLeft />}
                 isDisabled={pagination.current_page === 1}
                 onClick={() => handlePageChange(pagination.current_page - 1)}
                 variant="ghost"
@@ -461,7 +460,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                 {pagination.current_page} / {pagination.total_pages}
               </Text>
               <IconButton
-                icon={<FiChevronRight />}
+                icon={<ChevronRight />}
                 isDisabled={pagination.current_page === pagination.total_pages}
                 onClick={() => handlePageChange(pagination.current_page + 1)}
                 variant="ghost"

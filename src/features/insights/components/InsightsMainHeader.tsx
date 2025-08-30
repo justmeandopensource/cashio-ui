@@ -9,9 +9,10 @@ import {
   FormLabel,
   VStack,
   Text,
+  Icon,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { FiChevronDown } from "react-icons/fi";
+import { ChevronDown, BarChart } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 
@@ -129,10 +130,13 @@ const InsightsMainHeader: React.FC<InsightsMainHeaderProps> = ({
         gap={4}
       >
         <VStack align="flex-start" spacing={1} flex={1}>
-          <Heading as="h2" size="lg" color="teal.500">
-            Financial Insights
-          </Heading>
-          <Text color={secondaryTextColor} fontSize="sm">
+          <Flex alignItems="center" gap={3}>
+            <Icon as={BarChart} w={8} h={8} color="teal.500" />
+            <Heading as="h2" size="lg" color="teal.500">
+              Financial Insights
+            </Heading>
+          </Flex>
+          <Text color={secondaryTextColor} fontSize="sm" pl={12}>
             Explore and analyze your financial data
           </Text>
         </VStack>
@@ -151,7 +155,7 @@ const InsightsMainHeader: React.FC<InsightsMainHeaderProps> = ({
                 value={localSelectedLedger || ""}
                 onChange={handleLedgerChange}
                 isDisabled={isLoading}
-                icon={<FiChevronDown />}
+                icon={<ChevronDown />}
                 variant="filled"
                 bg={cardBg}
               >
@@ -173,7 +177,7 @@ const InsightsMainHeader: React.FC<InsightsMainHeaderProps> = ({
               <Select
                 value={selectedVisualization}
                 onChange={handleVisualizationChange}
-                icon={<FiChevronDown />}
+                icon={<ChevronDown />}
                 variant="filled"
                 bg={cardBg}
               >

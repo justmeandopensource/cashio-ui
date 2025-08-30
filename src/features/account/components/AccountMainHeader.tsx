@@ -8,13 +8,9 @@ import {
   useColorModeValue,
   IconButton,
   VStack,
+  Icon,
 } from "@chakra-ui/react";
-import {
-  AddIcon,
-  ArrowForwardIcon,
-  ArrowBackIcon,
-  EditIcon,
-} from "@chakra-ui/icons";
+import { Plus, ArrowRight, ArrowLeft, Edit, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import useLedgerStore from "@/components/shared/store";
@@ -79,7 +75,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
           {/* Back to Ledger Icon with Light Teal Hover Effect */}
           <IconButton
             aria-label="Back to Ledger"
-            icon={<ArrowBackIcon boxSize={6} />}
+            icon={<ArrowLeft boxSize={6} />}
             variant="ghost"
             color="teal.500"
             size="lg"
@@ -90,17 +86,32 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
 
           {/* Account name and balance stacked vertically */}
           <VStack spacing={1} alignItems="flex-start">
-            <Flex alignItems="center" gap={2}>
-              <Heading as="h2" size="lg" color="teal.500">
-                {account.name}
-              </Heading>
+            <Flex
+              alignItems="center"
+              gap={2}
+              sx={{
+                "& .edit-icon": {
+                  visibility: "hidden",
+                },
+                "&:hover .edit-icon": {
+                  visibility: "visible",
+                },
+              }}
+            >
+              <Flex align="center" gap={2}>
+                <Icon as={CreditCard} w={8} h={8} color="teal.500" />
+                <Heading as="h2" size="lg" color="teal.500">
+                  {account.name}
+                </Heading>
+              </Flex>
               <IconButton
                 aria-label="Edit Account"
-                icon={<EditIcon boxSize={4} />}
+                icon={<Edit boxSize={4} />}
                 variant="ghost"
                 color="teal.500"
                 size="sm"
                 onClick={onUpdateAccount}
+                className="edit-icon"
               />
             </Flex>
 
@@ -122,7 +133,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
         >
           {/* Button to Add a New Transaction */}
           <Button
-            leftIcon={<AddIcon />}
+            leftIcon={<Plus />}
             colorScheme={buttonColorScheme}
             variant="solid"
             onClick={onAddTransaction}
@@ -133,7 +144,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
 
           {/* Button to Transfer Funds */}
           <Button
-            rightIcon={<ArrowForwardIcon />}
+            rightIcon={<ArrowRight />}
             colorScheme={buttonColorScheme}
             variant="outline"
             onClick={onTransferFunds}

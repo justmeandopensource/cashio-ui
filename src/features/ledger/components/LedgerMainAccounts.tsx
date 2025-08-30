@@ -19,7 +19,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { FiPlus, FiRepeat } from "react-icons/fi";
+import { Plus, Repeat, Eye, EyeOff, TrendingUp, ShieldAlert } from "lucide-react";
 import CreateAccountModal from "@components/modals/CreateAccountModal";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import useLedgerStore from "@/components/shared/store";
@@ -211,8 +211,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       data-testid={`ledgermainaccounts-group-account-plus-icon-${account.account_id}`}
                     >
                       <Icon
-                        as={FiPlus}
-                        boxSize={4}
+                        as={Plus}
+                        size={16}
                         color="teal.500"
                         _hover={{ color: "teal.600" }}
                       />
@@ -230,8 +230,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         _hover={{ textDecoration: "none" }}
                       >
                         <Icon
-                          as={FiPlus}
-                          boxSize={4}
+                          as={Plus}
+                          size={16}
                           color="teal.500"
                           _hover={{ color: "teal.600" }}
                         />
@@ -241,8 +241,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         _hover={{ textDecoration: "none" }}
                       >
                         <Icon
-                          as={FiRepeat}
-                          boxSize={4}
+                          as={Repeat}
+                          size={16}
                           color="teal.500"
                           _hover={{ color: "teal.600" }}
                         />
@@ -356,37 +356,38 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                     </Text>
                   </Flex>
                   {!account.is_group ? (
-                    <Flex gap={1} align="center" justify="flex-end">
-                      <IconButton
-                        icon={<FiPlus />}
-                        size="xs"
-                        colorScheme="teal"
-                        variant="ghost"
-                        aria-label="Add Transaction"
+                    <Flex gap={2} align="center" justify="flex-end">
+                      <ChakraLink
                         onClick={(e) => {
                           e.stopPropagation();
                           onAddTransaction(account.account_id);
                         }}
-                      />
-                      <IconButton
-                        icon={<FiRepeat />}
-                        size="xs"
-                        colorScheme="teal"
-                        variant="ghost"
-                        aria-label="Transfer Funds"
+                        _hover={{ textDecoration: "none" }}
+                      >
+                        <Icon
+                          as={Plus}
+                          size={16}
+                          color="teal.500"
+                          _hover={{ color: "teal.600" }}
+                        />
+                      </ChakraLink>
+                      <ChakraLink
                         onClick={(e) => {
                           e.stopPropagation();
                           onTransferFunds(account.account_id);
                         }}
-                      />
+                        _hover={{ textDecoration: "none" }}
+                      >
+                        <Icon
+                          as={Repeat}
+                          size={16}
+                          color="teal.500"
+                          _hover={{ color: "teal.600" }}
+                        />
+                      </ChakraLink>
                     </Flex>
                   ) : (
-                    <IconButton
-                      icon={<FiPlus />}
-                      size="xs"
-                      colorScheme="teal"
-                      variant="ghost"
-                      aria-label="Add Account"
+                    <ChakraLink
                       onClick={(e) => {
                         e.stopPropagation();
                         handleCreateAccountClick(
@@ -394,7 +395,15 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                           account.account_id,
                         );
                       }}
-                    />
+                      _hover={{ textDecoration: "none" }}
+                    >
+                      <Icon
+                        as={Plus}
+                        size={16}
+                        color="teal.500"
+                        _hover={{ color: "teal.600" }}
+                      />
+                    </ChakraLink>
                   )}
                 </Flex>
               </CardHeader>
@@ -430,7 +439,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
         {message}
       </Text>
       <Button
-        leftIcon={<FiPlus />}
+        leftIcon={<Plus />}
         onClick={onClick}
         size="sm"
         colorScheme="teal"
@@ -458,24 +467,27 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
             alignItems="center"
             mb={4}
             flexWrap={{ base: "wrap", sm: "nowrap" }}
-            gap={2}
           >
-            <Heading size="md" color="teal.500" mb={{ base: 1, sm: 0 }}>
-              Assets
-            </Heading>
-            <Flex align="center" gap={2} ml="auto">
+            <Flex align="center" gap={2}>
+              <Icon as={TrendingUp} size={20} color="teal.500" />
+              <Heading size="md" color="teal.500" mb={{ base: 1, sm: 0 }}>
+                Assets
+              </Heading>
+            </Flex>
+            <Flex align="center" gap={2}>
               <Button
                 size="xs"
                 variant="ghost"
                 colorScheme="teal"
                 onClick={() => setShowZeroBalanceAssets(!showZeroBalanceAssets)}
+                leftIcon={showZeroBalanceAssets ? <EyeOff size={14} /> : <Eye size={14} />}
               >
                 {showZeroBalanceAssets
                   ? "Hide zero balances"
                   : "Show zero balances"}
               </Button>
               <IconButton
-                icon={<FiPlus />}
+                icon={<Plus />}
                 size="sm"
                 colorScheme="teal"
                 variant="ghost"
@@ -533,12 +545,14 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
             alignItems="center"
             mb={4}
             flexWrap={{ base: "wrap", sm: "nowrap" }}
-            gap={2}
           >
-            <Heading size="md" color="teal.500" mb={{ base: 1, sm: 0 }}>
-              Liabilities
-            </Heading>
-            <Flex align="center" gap={2} ml="auto">
+            <Flex align="center" gap={2}>
+              <Icon as={ShieldAlert} size={20} color="teal.500" />
+              <Heading size="md" color="teal.500" mb={{ base: 1, sm: 0 }}>
+                Liabilities
+              </Heading>
+            </Flex>
+            <Flex align="center" gap={2}>
               <Button
                 size="xs"
                 variant="ghost"
@@ -546,13 +560,14 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                 onClick={() =>
                   setShowZeroBalanceLiabilities(!showZeroBalanceLiabilities)
                 }
+                leftIcon={showZeroBalanceLiabilities ? <EyeOff size={14} /> : <Eye size={14} />}
               >
                 {showZeroBalanceLiabilities
                   ? "Hide zero balances"
                   : "Show zero balances"}
               </Button>
               <IconButton
-                icon={<FiPlus />}
+                icon={<Plus />}
                 size="sm"
                 colorScheme="teal"
                 variant="ghost"

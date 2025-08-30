@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from "react";
-import { AddIcon } from "@chakra-ui/icons";
 import {
   Box,
   Divider,
@@ -15,6 +14,7 @@ import {
   Select,
   Button,
 } from "@chakra-ui/react";
+import { Plus, Trash2 } from "lucide-react";
 
 // Define the interfaces for our props and data structures
 interface Category {
@@ -279,15 +279,15 @@ const FormSplits: React.FC<FormSplitsProps> = ({
                 />
               </FormControl>
               {splits.length > 1 && (
-                <Text
-                  fontSize="sm"
-                  color="red.500"
-                  cursor="pointer"
+                <Button
+                  leftIcon={<Trash2 size={14} />}
+                  variant="link"
+                  colorScheme="red"
+                  size="sm"
                   onClick={() => removeSplit(index)}
-                  textDecoration="underline"
                 >
                   Remove Split
-                </Text>
+                </Button>
               )}
             </VStack>
           </Box>
@@ -295,7 +295,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
 
         {/* Add Split Button */}
         <Button
-          leftIcon={<AddIcon />}
+          leftIcon={<Plus size={14} />}
           variant="outline"
           size="sm"
           onClick={addSplit}

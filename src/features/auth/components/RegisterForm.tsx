@@ -19,14 +19,7 @@ import {
   useColorModeValue,
   Progress,
 } from "@chakra-ui/react";
-import {
-  ViewIcon,
-  ViewOffIcon,
-  EmailIcon,
-  LockIcon,
-  InfoIcon,
-  AtSignIcon,
-} from "@chakra-ui/icons";
+import { UserPlus, Eye, EyeOff, Mail, Lock, Info, AtSign } from "lucide-react";
 
 interface RegisterFormProps {
   // eslint-disable-next-line no-unused-vars
@@ -171,7 +164,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <InfoIcon color="gray.400" />
+                <Info size={18} color="gray" />
               </InputLeftElement>
               <Input
                 ref={fullNameRef}
@@ -204,7 +197,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <AtSignIcon color="gray.400" />
+                <AtSign size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type="text"
@@ -236,7 +229,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <EmailIcon color="gray.400" />
+                <Mail size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type="email"
@@ -268,7 +261,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <LockIcon color="gray.400" />
+                <Lock size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type={showPassword ? "text" : "password"}
@@ -290,7 +283,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                   size="sm"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </Button>
               </InputRightElement>
             </InputGroup>
@@ -348,6 +341,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
             _active={{ boxShadow: "md", transform: "translateY(0)" }}
             transition="all 0.2s"
+            leftIcon={<UserPlus size={18} />}
           >
             Create Account
           </Button>

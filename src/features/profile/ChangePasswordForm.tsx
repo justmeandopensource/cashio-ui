@@ -1,5 +1,6 @@
 
 import React from "react";
+import { KeyRound } from "lucide-react";
 import { useForm } from "react-hook-form";
 import {
   Box,
@@ -56,7 +57,7 @@ const ChangePasswordForm: React.FC = () => {
           <Input type="password" {...register("new_password", { required: "New password is required" })} />
           <FormErrorMessage>{errors.new_password?.message}</FormErrorMessage>
         </FormControl>
-        <Button type="submit" isLoading={isLoading} colorScheme="teal">
+        <Button type="submit" isLoading={isLoading} colorScheme="teal" leftIcon={<KeyRound size={18} />}>
           Change Password
         </Button>
       </VStack>

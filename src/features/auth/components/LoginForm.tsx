@@ -18,7 +18,7 @@ import {
   InputLeftElement,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { ViewIcon, ViewOffIcon, EmailIcon, LockIcon } from "@chakra-ui/icons";
+import { LogIn, Eye, EyeOff, Mail, Lock } from "lucide-react";
 
 interface LoginFormProps {
   // eslint-disable-next-line no-unused-vars
@@ -113,7 +113,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <EmailIcon color="gray.400" />
+                <Mail size={18} color="gray" />
               </InputLeftElement>
               <Input
                 ref={usernameInputRef}
@@ -148,7 +148,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <LockIcon color="gray.400" />
+                <Lock size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type={showPassword ? "text" : "password"}
@@ -172,7 +172,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                   size="sm"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? <ViewOffIcon /> : <ViewIcon />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </Button>
               </InputRightElement>
             </InputGroup>
@@ -194,6 +194,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
             _active={{ boxShadow: "md", transform: "translateY(0)" }}
             transition="all 0.2s"
+            leftIcon={<LogIn size={18} />}
           >
             Log In
           </Button>

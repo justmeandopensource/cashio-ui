@@ -20,14 +20,7 @@ import {
 } from "@chakra-ui/react";
 import { ResponsiveContainer, Treemap, Tooltip } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import {
-  FiTrendingUp,
-  FiTrendingDown,
-  FiPieChart,
-  FiBarChart2,
-  FiChevronRight,
-  FiChevronDown,
-} from "react-icons/fi";
+import { Calendar, TrendingUp, TrendingDown, PieChart, BarChart2, ChevronRight, ChevronDown } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import { formatNumberAsCurrency } from "@/components/shared/utils";
@@ -128,7 +121,7 @@ const NestedCategoryBreakdown: React.FC<{
         >
           {hasChildren && (
             <Icon
-              as={isExpanded ? FiChevronDown : FiChevronRight}
+              as={isExpanded ? ChevronDown : ChevronRight}
               mr={2}
               color={textColor}
             />
@@ -168,7 +161,7 @@ const NestedCategoryBreakdown: React.FC<{
         alignItems="center"
       >
         <Icon
-          as={FiBarChart2}
+          as={BarChart2}
           mr={2}
           color={type === "income" ? "teal.500" : "red.500"}
         />
@@ -277,7 +270,7 @@ const CurrentMonthOverview: React.FC = () => {
   if (isError || !data) {
     return (
       <VStack spacing={4} align="center" bg={cardBg} p={6} borderRadius="xl">
-        <Icon as={FiTrendingDown} color="red.500" boxSize={10} mb={4} />
+        <Icon as={TrendingDown} color="red.500" boxSize={10} mb={4} />
         <Text color="red.500" fontWeight="bold" fontSize="lg">
           Unable to load financial insights
         </Text>
@@ -326,10 +319,13 @@ const CurrentMonthOverview: React.FC = () => {
   return (
     <Box bg={bgColor} borderRadius="lg" p={{ base: 4, md: 6 }} boxShadow="lg">
       <VStack align="flex-start" spacing={1} flex={1}>
-        <Heading size="md" color={primaryTextColor}>
-          Current Month Overview
-        </Heading>
-        <Text color={secondaryTextColor} fontSize="sm">
+        <Flex alignItems="center" gap={3}>
+          <Icon as={Calendar} w={5} h={5} color="black" />
+          <Heading as="h2" size="md" color="black">
+            Current Month Overview
+          </Heading>
+        </Flex>
+        <Text color={secondaryTextColor} fontSize="sm" pl="2rem">
           Your financial snapshot for the current month
         </Text>
       </VStack>
@@ -348,7 +344,7 @@ const CurrentMonthOverview: React.FC = () => {
               <Heading size="md" color="teal.500">
                 Income
               </Heading>
-              <Icon as={FiTrendingUp} color="teal.500" boxSize={6} />
+              <Icon as={TrendingUp} color="teal.500" size={24} />
             </HStack>
 
             <Stat>
@@ -375,7 +371,7 @@ const CurrentMonthOverview: React.FC = () => {
               <Heading size="md" color="red.500">
                 Expenses
               </Heading>
-              <Icon as={FiTrendingDown} color="red.500" boxSize={6} />
+              <Icon as={TrendingDown} color="red.500" size={24} />
             </HStack>
 
             <Stat>
@@ -415,7 +411,7 @@ const CurrentMonthOverview: React.FC = () => {
                   display="flex"
                   alignItems="center"
                 >
-                  <Icon as={FiPieChart} mr={2} color="teal.500" />
+                  <Icon as={PieChart} mr={2} color="teal.500" />
                   Income Breakdown
                 </Heading>
                 <Box height="300px" width="full">
@@ -448,7 +444,7 @@ const CurrentMonthOverview: React.FC = () => {
                   display="flex"
                   alignItems="center"
                 >
-                  <Icon as={FiPieChart} mr={2} color="red.500" />
+                  <Icon as={PieChart} mr={2} color="red.500" />
                   Expense Breakdown
                 </Heading>
                 <Box height="300px" width="full">
@@ -504,7 +500,7 @@ const CurrentMonthOverview: React.FC = () => {
             textAlign="center"
             p={6}
           >
-            <Icon as={FiBarChart2} boxSize={16} color="gray.400" mb={4} />
+            <Icon as={BarChart2} boxSize={16} color="gray.400" mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Financial Data Available
             </Heading>

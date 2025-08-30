@@ -1,7 +1,6 @@
 import React, { useRef, useState, useEffect } from "react";
 import {
   Box,
-  Flex,
   Text,
   Avatar,
   Popover,
@@ -9,10 +8,8 @@ import {
   PopoverContent,
   PopoverArrow,
   PopoverBody,
-  PopoverHeader,
   PopoverFooter,
   PopoverCloseButton,
-  Button,
   VStack,
   Link as ChakraLink,
 } from "@chakra-ui/react";
@@ -20,7 +17,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import config from "../../config"; // Adjust path as needed
 import { useNavigate } from "react-router-dom";
-import { FiUser, FiSettings, FiLogOut } from "react-icons/fi";
+import { Settings, LogOut } from "lucide-react";
 import { VERSION } from "../../version";
 
 interface UserProfile {
@@ -121,7 +118,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
               alignItems="center"
               color="gray.800"
             >
-              <FiSettings style={{ marginRight: "8px" }} /> Profile
+              <Settings style={{ marginRight: "8px" }} /> Profile
             </ChakraLink>
             <ChakraLink
               onClick={handleLogout}
@@ -129,7 +126,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
               alignItems="center"
               color="gray.800"
             >
-              <FiLogOut style={{ marginRight: "8px" }} /> Log Out
+              <LogOut style={{ marginRight: "8px" }} /> Log Out
             </ChakraLink>
           </VStack>
         </PopoverBody>

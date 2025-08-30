@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
   Box,
   VStack,
@@ -31,12 +31,7 @@ import {
   Legend,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import {
-  FiTrendingUp,
-  FiTrendingDown,
-  FiChevronDown,
-  FiBarChart2,
-} from "react-icons/fi";
+import { TrendingUp, TrendingDown, ChevronDown, BarChart2 } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import { formatNumberAsCurrency } from "@/components/shared/utils";
@@ -299,7 +294,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
   if (isError) {
     return (
       <VStack spacing={4} align="center" bg={cardBg} p={6} borderRadius="lg">
-        <Icon as={FiTrendingDown} color="red.500" boxSize={10} mb={4} />
+        <Icon as={TrendingDown} color="red.500" boxSize={10} mb={4} />
         <Text color="red.500" fontWeight="bold" fontSize="lg">
           Unable to load category trend data
         </Text>
@@ -318,25 +313,13 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
           gap={4}
         >
           <VStack align="flex-start" spacing={1} flex={1}>
-            <Heading size="md" color={primaryTextColor}>
-              Category Trend Analysis
-            </Heading>
-            {trendData && (
-              <Flex align="center" gap={2}>
-                <Text color={primaryTextColor} fontWeight="semibold">
-                  {trendData.category_name}
-                </Text>
-                <Badge colorScheme={getCategoryTypeBadgeColor()}>
-                  {trendData.category_type}
-                </Badge>
-                {trendData.is_group && (
-                  <Badge colorScheme="blue" ml={1}>
-                    Group
-                  </Badge>
-                )}
-              </Flex>
-            )}
-            <Text color={secondaryTextColor} fontSize="sm">
+            <Flex alignItems="center" gap={3}>
+              <Icon as={TrendingUp} w={5} h={5} color="black" />
+              <Heading as="h2" size="md" color="black">
+                Category Trend Analysis
+              </Heading>
+            </Flex>
+            <Text color={secondaryTextColor} fontSize="sm" pl="2rem">
               {periodOptions.find((opt) => opt.value === periodType)?.label}
             </Text>
           </VStack>
@@ -354,7 +337,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
                 <Select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
-                  icon={<FiChevronDown />}
+                  icon={<ChevronDown />}
                   variant="filled"
                   bg={cardBg}
                 >
@@ -372,7 +355,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
                 <Select
                   value={periodType}
                   onChange={(e) => setPeriodType(e.target.value)}
-                  icon={<FiChevronDown />}
+                  icon={<ChevronDown />}
                   variant="filled"
                   bg={cardBg}
                 >
@@ -532,7 +515,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
             textAlign="center"
             p={6}
           >
-            <Icon as={FiBarChart2} boxSize={16} color="gray.400" mb={4} />
+            <Icon as={BarChart2} boxSize={16} color="gray.400" mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Category Data Available
             </Heading>
@@ -564,8 +547,8 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
                 <Icon
                   as={
                     trendData.category_type === "income"
-                      ? FiTrendingUp
-                      : FiTrendingDown
+                      ? TrendingUp
+                      : TrendingDown
                   }
                   color={
                     trendData.category_type === "income"

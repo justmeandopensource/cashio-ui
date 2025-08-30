@@ -20,7 +20,7 @@ import LedgerMainTransactions from "./LedgerMainTransactions";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
 import config from "@/config";
-import { FiAlignLeft, FiCreditCard } from "react-icons/fi";
+import { AlignLeft, CreditCard } from "lucide-react";
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "@/components/shared/utils";
 
@@ -152,7 +152,7 @@ const LedgerMain = () => {
               }}
             >
               <Flex align="center">
-                <Icon as={FiCreditCard} mr={2} />
+                <Icon as={CreditCard} mr={2} />
                 <Text>Accounts</Text>
                 {accountsCount > 0 && (
                   <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
@@ -174,7 +174,7 @@ const LedgerMain = () => {
               }}
             >
               <Flex align="center">
-                <Icon as={FiAlignLeft} mr={2} />
+                <Icon as={AlignLeft} mr={2} />
                 <Text>Transactions</Text>
               </Flex>
             </Tab>

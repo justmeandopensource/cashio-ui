@@ -16,7 +16,9 @@ import {
   Select,
   useColorModeValue,
   Box,
+  Flex,
 } from "@chakra-ui/react";
+import { Plus, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
 
 interface Currency {
@@ -109,7 +111,10 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
             p={{ base: 0, sm: 6 }}
             pb={{ base: 4, sm: 2 }}
           >
-            Create New Ledger
+            <Flex alignItems="center">
+              <Plus size={24} style={{ marginRight: '8px' }} />
+              Create New Ledger
+            </Flex>
           </ModalHeader>
         </Box>
 
@@ -186,10 +191,11 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
               width="100%"
               mb={3}
               isDisabled={!newLedgerName || !selectedCurrency}
+              leftIcon={<Plus />}
             >
               Create Ledger
             </Button>
-            <Button variant="outline" onClick={onClose} width="100%" size="lg">
+            <Button variant="outline" onClick={onClose} width="100%" size="lg" leftIcon={<X />}>
               Cancel
             </Button>
           </Box>
@@ -203,10 +209,11 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
             onClick={handleSubmit}
             px={6}
             isDisabled={!newLedgerName || !selectedCurrency}
+            leftIcon={<Plus />}
           >
             Create
           </Button>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} leftIcon={<X />}>
             Cancel
           </Button>
         </ModalFooter>

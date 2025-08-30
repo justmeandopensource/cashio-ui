@@ -1,5 +1,6 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
+import { Save } from "lucide-react";
 import { useForm } from "react-hook-form";
 import {
   Box,
@@ -68,7 +69,7 @@ const UpdateProfileForm: React.FC = () => {
           <FormLabel>Email</FormLabel>
           <Input type="email" {...register("email")} />
         </FormControl>
-        <Button type="submit" isLoading={isUpdating} colorScheme="teal" isDisabled={!isDirty}>
+        <Button type="submit" isLoading={isUpdating} colorScheme="teal" isDisabled={!isDirty} leftIcon={<Save size={18} />}>
           Save Changes
         </Button>
       </VStack>
