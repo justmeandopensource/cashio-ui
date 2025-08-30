@@ -81,7 +81,8 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
             size="lg"
             onClick={handleBackToLedger}
             _hover={{ bg: "teal.50" }}
-            alignSelf="center"
+            alignSelf="flex-start"
+            mt="-6px"
           />
 
           {/* Account name and balance stacked vertically */}
@@ -116,7 +117,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
             </Flex>
 
             {/* Balance moved below account name */}
-            <Text fontSize="2xl" fontWeight="bold" color={balanceColor}>
+            <Text fontSize="2xl" fontWeight="bold" color={balanceColor} ml={10}>
               {formatNumberAsCurrency(
                 account.net_balance,
                 currencySymbol as string,

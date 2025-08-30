@@ -117,16 +117,20 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
               display="flex"
               alignItems="center"
               color="gray.800"
+              fontWeight="normal"
+              fontSize="md"
             >
-              <Settings style={{ marginRight: "8px" }} /> Profile
+              <Settings size={18} style={{ marginRight: "8px" }} /> Profile
             </ChakraLink>
             <ChakraLink
               onClick={handleLogout}
               display="flex"
               alignItems="center"
               color="gray.800"
+              fontWeight="normal"
+              fontSize="md"
             >
-              <LogOut style={{ marginRight: "8px" }} /> Log Out
+              <LogOut size={18} style={{ marginRight: "8px" }} /> Log Out
             </ChakraLink>
           </VStack>
         </PopoverBody>
