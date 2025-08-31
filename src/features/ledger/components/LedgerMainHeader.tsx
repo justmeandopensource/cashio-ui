@@ -15,12 +15,14 @@ import { BookText } from 'lucide-react';
 interface LedgerMainHeaderProps {
   onAddTransaction: () => void;
   onTransferFunds: () => void;
+  onUpdateLedger: () => void;
   hasAccounts: boolean;
 }
 
 const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
   onAddTransaction,
   onTransferFunds,
+  onUpdateLedger,
   hasAccounts,
 }) => {
   const navigate = useNavigate();
@@ -75,11 +77,12 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
               {ledgerName}
             </Heading>
             <IconButton
-              aria-label="Edit Account"
+              aria-label="Edit Ledger"
               icon={<Edit />}
               variant="ghost"
               color="teal.500"
               size="sm"
+              onClick={onUpdateLedger}
               className="edit-icon"
             />
           </Flex>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FC, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Badge,
@@ -31,7 +31,11 @@ interface Account {
   is_group: boolean;
 }
 
-const LedgerMain = () => {
+interface LedgerMainProps {
+  onUpdateLedger: () => void;
+}
+
+const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
   const { ledgerId } = useLedgerStore();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -125,6 +129,7 @@ const LedgerMain = () => {
       <LedgerMainHeader
         onAddTransaction={() => handleAddTransaction(undefined)}
         onTransferFunds={() => handleTransferFunds(undefined)}
+        onUpdateLedger={onUpdateLedger}
         hasAccounts={accounts ? accounts.length > 0 : false}
       />
 

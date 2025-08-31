@@ -1,9 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { Box, Spinner } from "@chakra-ui/react";
+import { Box, Spinner, useDisclosure } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import LedgerMain from "@features/ledger/components/LedgerMain";
 import config from "@/config";
+import useLedgerStore from "@/components/shared/store";
+import UpdateLedgerModal from "@components/modals/UpdateLedgerModal";
 
 interface TokenVerificationResponse {
   // Define the response shape from verify-token endpoint
@@ -14,6 +16,14 @@ interface TokenVerificationResponse {
 
 const Ledger = () => {
   const navigate = useNavigate();
+  const { ledgerId, ledgerName, currencySymbol, setLedger } = useLedgerStore();
+  const { isOpen: isUpdateLedgerModalOpen, onOpen: onUpdateLedgerModalOpen, onClose: onUpdateLedgerModalClose } = useDisclosure();
+
+  const handleUpdateCompleted = (updatedName: string, updatedCurrencySymbol: string) => {
+    if (ledgerId) {
+      setLedger(ledgerId, updatedName, updatedCurrencySymbol);
+    }
+  };
 
   // Token verification
   const { isLoading: isTokenVerifying } = useQuery<
@@ -63,7 +73,17 @@ const Ledger = () => {
 
   return (
     <Layout handleLogout={handleLogout}>
-      <LedgerMain />
+      <LedgerMain onUpdateLedger={onUpdateLedgerModalOpen} />
+
+      {ledgerName && currencySymbol && (
+        <UpdateLedgerModal
+          isOpen={isUpdateLedgerModalOpen}
+          onClose={onUpdateLedgerModalClose}
+          currentLedgerName={ledgerName}
+          currentCurrencySymbol={currencySymbol}
+          onUpdateCompleted={handleUpdateCompleted}
+        />
+      )}
     </Layout>
   );
 };
