@@ -6,6 +6,25 @@ const Theme: ThemeConfig = extendTheme({
       "*": {
         WebkitTapHighlightColor: "transparent",
       },
+      body: {
+        color: "secondaryTextColor",
+      },
+    },
+  },
+  semanticTokens: {
+    colors: {
+      primaryTextColor: {
+        default: "gray.800",
+        _dark: "gray.100",
+      },
+      secondaryTextColor: {
+        default: "gray.700",
+        _dark: "gray.300",
+      },
+      tertiaryTextColor: {
+        default: "gray.600",
+        _dark: "gray.400",
+      },
     },
   },
   components: {

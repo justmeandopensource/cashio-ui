@@ -175,7 +175,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                   >
                     <Text
                       fontWeight="normal"
-                      color="gray.700"
+                      color="secondaryTextColor"
                       fontSize="sm"
                       _hover={{ color: "teal.500" }}
                     >
@@ -334,7 +334,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         >
                           <Text
                             fontWeight={account.is_group ? "medium" : "normal"}
-                            color={account.is_group ? "teal.700" : "gray.700"}
+                            color={account.is_group ? "teal.700" : "secondaryTextColor"}
                           >
                             {account.name}
                           </Text>
@@ -435,7 +435,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
       <Text fontSize="lg" fontWeight="medium" mb={2}>
         {title}
       </Text>
-      <Text color="gray.600" mb={4} fontSize="sm">
+      <Text color="secondaryTextColor" mb={4} fontSize="sm">
         {message}
       </Text>
       <Button

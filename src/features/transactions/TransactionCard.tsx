@@ -142,8 +142,8 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           {/* Left side with date, category and notes */}
           <VStack align="flex-start" spacing={1} maxW="70%">
             <HStack spacing={2}>
-              <Icon as={Calendar} color="gray.500" />
-              <Text fontSize="sm" color="gray.600">
+              <Icon as={Calendar} color="tertiaryTextColor" />
+              <Text fontSize="sm" color="secondaryTextColor">
                 {formatDate(transaction.date)}
               </Text>
 
@@ -168,7 +168,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
 
             {/* Notes section - visible by default */}
             {transaction.notes && (
-              <Text fontSize="sm" color="gray.600" mt={1} noOfLines={2}>
+              <Text fontSize="sm" color="secondaryTextColor" mt={1} noOfLines={2}>
                 {transaction.notes}
               </Text>
             )}
@@ -197,8 +197,8 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             {transaction.tags && transaction.tags.length > 0 && (
               <Box mt={1}>
                 <HStack mb={1}>
-                  <Icon as={TagIcon} color="gray.500" />
-                  <Text fontSize="xs" fontWeight="medium" color="gray.600">
+                  <Icon as={TagIcon} color="tertiaryTextColor" />
+                  <Text fontSize="xs" fontWeight="medium" color="secondaryTextColor">
                     TAGS
                   </Text>
                 </HStack>
@@ -275,13 +275,13 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                             <Flex align="center" mt={1}>
                               <Icon
                                 as={MessageSquare}
-                                color="gray.500"
+                                color="tertiaryTextColor"
                                 mr={1}
                                 fontSize="xs"
                               />
                               <Text
                                 fontSize="xs"
-                                color="gray.600"
+                                color="secondaryTextColor"
                                 noOfLines={2}
                               >
                                 {split.notes}
@@ -328,7 +328,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                           ? transferDetails.destination_account_name || "N/A"
                           : transferDetails.source_account_name || "N/A"}
                       </Text>
-                      <Text fontSize="xs" color="gray.600">
+                      <Text fontSize="xs" color="secondaryTextColor">
                         {transaction.debit > 0
                           ? transferDetails.destination_ledger_name || "N/A"
                           : transferDetails.source_ledger_name || "N/A"}

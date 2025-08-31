@@ -275,11 +275,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
       return result;
     }) || [];
 
-  // Category type badge color
-  const getCategoryTypeBadgeColor = () => {
-    if (!trendData) return "gray";
-    return trendData.category_type === "income" ? "green" : "red";
-  };
+  
 
   // Render loading state
   if (isCategoriesLoading || (isTrendDataLoading && selectedCategory)) {
@@ -314,8 +310,8 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
         >
           <VStack align="flex-start" spacing={1} flex={1}>
             <Flex alignItems="center" gap={3}>
-              <Icon as={TrendingUp} w={5} h={5} color="black" />
-              <Heading as="h2" size="md" color="black">
+              <Icon as={TrendingUp} w={5} h={5} color={primaryTextColor} />
+              <Heading as="h2" size="md" color={primaryTextColor}>
                 Category Trend Analysis
               </Heading>
             </Flex>
@@ -515,7 +511,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
             textAlign="center"
             p={6}
           >
-            <Icon as={BarChart2} boxSize={16} color="gray.400" mb={4} />
+            <Icon as={BarChart2} boxSize={16} color="tertiaryTextColor" mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Category Data Available
             </Heading>

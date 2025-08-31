@@ -1,6 +1,7 @@
 import { defineConfig } from "vitest/config";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import { fileURLToPath } from 'url';
 
 export default defineConfig({
   plugins: [react()],
@@ -19,10 +20,10 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      "@": path.resolve(__dirname, "./src"),
-      "@components": path.resolve(__dirname, "./src/components"),
-      "@features": path.resolve(__dirname, "./src/features"),
-      "@test": path.resolve(__dirname, "./test"),
+      "@": path.resolve(path.dirname(fileURLToPath(import.meta.url)), "./src"),
+      "@components": path.resolve(path.dirname(fileURLToPath(import.meta.url)), "./src/components"),
+      "@features": path.resolve(path.dirname(fileURLToPath(import.meta.url)), "./src/features"),
+      "@test": path.resolve(path.dirname(fileURLToPath(import.meta.url)), "./test"),
     },
   },
 });

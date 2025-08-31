@@ -39,7 +39,7 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
           <Text fontSize="xl" fontWeight="bold" mb={2}>
             No Ledgers Found
           </Text>
-          <Text color="gray.600" mb={6}>
+          <Text color="secondaryTextColor" mb={6}>
             You do not have any ledgers yet. Create one to get started.
           </Text>
           <Button

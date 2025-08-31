@@ -23,7 +23,7 @@ import {
   Stack,
   Flex,
 } from "@chakra-ui/react";
-import { ArrowDown, ArrowUp, ArrowRightLeft, Check, X } from "lucide-react";
+import { ArrowRightLeft, Check, X } from "lucide-react";
 import axios, { AxiosError } from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import config from "@/config";

@@ -164,8 +164,8 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
       {/* Header */}
       <VStack align="flex-start" spacing={1} flex={1} mb={6}>
         <Flex alignItems="center" gap={3}>
-          <Icon as={Tag} w={5} h={5} color="black" />
-          <Heading as="h2" size="md" color="black">
+          <Icon as={Tag} w={5} h={5} color={primaryTextColor} />
+          <Heading as="h2" size="md" color={primaryTextColor}>
             Tag Trend Analysis
           </Heading>
         </Flex>
@@ -253,7 +253,7 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
       {!isLoading && !isError && !data && (
         <Center p={10} bg={cardBg} borderRadius="lg">
           <VStack spacing={4}>
-            <Icon as={PieChartIcon} boxSize={16} color="gray.400" />
+            <Icon as={PieChartIcon} boxSize={16} color="tertiaryTextColor" />
             <Text color={secondaryTextColor} fontWeight="medium" fontSize="lg">
               Select tags to analyze your spending trends
             </Text>

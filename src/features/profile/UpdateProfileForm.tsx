@@ -18,7 +18,7 @@ import { UserUpdate } from "./api";
 const UpdateProfileForm: React.FC = () => {
   const toast = useToast();
   const { data: user, isLoading: isUserLoading } = useUserProfile();
-  const { register, handleSubmit, setValue, reset, formState: { isDirty } } = useForm<UserUpdate>();
+  const { register, handleSubmit, reset, formState: { isDirty } } = useForm<UserUpdate>();
   const { mutate: updateUser, isLoading: isUpdating } = useUpdateUserProfile();
 
   useEffect(() => {

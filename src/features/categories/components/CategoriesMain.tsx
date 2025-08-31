@@ -97,7 +97,7 @@ const CategoriesMain: React.FC = () => {
           >
             <Td pl={`${level * 24 + 8}px`}>
               {!category.is_group ? (
-                <Text fontWeight="normal" color="gray.700" fontSize="sm">
+                <Text fontWeight="normal" color="secondaryTextColor" fontSize="sm">
                   {category.name}
                 </Text>
               ) : (
@@ -214,7 +214,7 @@ const CategoriesMain: React.FC = () => {
               <Text fontSize="xl" fontWeight="bold" mb={2}>
                 No Income Categories Found
               </Text>
-              <Text color="gray.600" mb={6}>
+              <Text color="secondaryTextColor" mb={6}>
                 You do not have any income categories yet.
               </Text>
               <Button
@@ -268,7 +268,7 @@ const CategoriesMain: React.FC = () => {
               <Text fontSize="xl" fontWeight="bold" mb={2}>
                 No Expense Categories Found
               </Text>
-              <Text color="gray.600" mb={6}>
+              <Text color="secondaryTextColor" mb={6}>
                 You do not have any expense categories yet.
               </Text>
               <Button

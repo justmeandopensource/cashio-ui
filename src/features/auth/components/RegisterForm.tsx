@@ -164,7 +164,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Info size={18} color="gray" />
+                <Info size={18} color="tertiaryTextColor" />
               </InputLeftElement>
               <Input
                 ref={fullNameRef}
@@ -197,7 +197,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <AtSign size={18} color="gray" />
+                <AtSign size={18} color="tertiaryTextColor" />
               </InputLeftElement>
               <Input
                 type="text"
@@ -229,7 +229,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Mail size={18} color="gray" />
+                <Mail size={18} color="tertiaryTextColor" />
               </InputLeftElement>
               <Input
                 type="email"
@@ -261,7 +261,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Lock size={18} color="gray" />
+                <Lock size={18} color="tertiaryTextColor" />
               </InputLeftElement>
               <Input
                 type={showPassword ? "text" : "password"}
@@ -292,7 +292,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             {password && (
               <Box mt={2}>
                 <Flex justify="space-between" align="center" mb={1}>
-                  <Text fontSize="xs" color="gray.500">
+                  <Text fontSize="xs" color="tertiaryTextColor">
                     Password strength
                   </Text>
                   <Text
@@ -346,7 +346,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             Create Account
           </Button>
 
-          <Text textAlign="center" fontSize="sm" color="gray.600" mt={1}>
+          <Text textAlign="center" fontSize="sm" color="secondaryTextColor" mt={1}>
             Already have an account?{" "}
             <RouterLink to="/login">
               <Text as="span" color={primaryColor} fontWeight="semibold">

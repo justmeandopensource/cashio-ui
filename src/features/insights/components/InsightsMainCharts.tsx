@@ -24,7 +24,7 @@ const InsightsMainCharts = ({
         boxShadow="md"
         textAlign="center"
       >
-        <Text fontSize="lg" color="gray.500">
+        <Text fontSize="lg" color="tertiaryTextColor">
           Select a ledger to view insights
         </Text>
       </Box>
@@ -50,7 +50,7 @@ const InsightsMainCharts = ({
             boxShadow="md"
             textAlign="center"
           >
-            <Text fontSize="lg" color="gray.500">
+            <Text fontSize="lg" color="tertiaryTextColor">
               Visualization not found
             </Text>
           </Box>

@@ -68,6 +68,12 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
             display="flex"
             alignItems="center"
             onClick={() => navigate("/")}
+            py={2}
+            px={4}
+            borderRadius="md"
+            _hover={{ bg: "teal.600" }}
+            _expanded={{ bg: "teal.600" }}
+            width="full"
           >
             <Icon as={Home} mr={2} />
             Home
@@ -79,6 +85,12 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
               navigate("/insights");
               onClose();
             }}
+            py={2}
+            px={4}
+            borderRadius="md"
+            _hover={{ bg: "teal.600" }}
+            _expanded={{ bg: "teal.600" }}
+            width="full"
           >
             <Icon as={PieChart} mr={2} />
             Insights
@@ -87,6 +99,12 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
             display="flex"
             alignItems="center"
             onClick={() => navigate("/categories")}
+            py={2}
+            px={4}
+            borderRadius="md"
+            _hover={{ bg: "teal.600" }}
+            _expanded={{ bg: "teal.600" }}
+            width="full"
           >
             <Icon as={Bookmark} mr={2} />
             Manage Categories
@@ -118,6 +136,12 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
                     navigate("/");
                     onClose();
                   }}
+                  py={2}
+                  px={4}
+                  borderRadius="md"
+                  _hover={{ bg: "teal.600" }}
+                  _expanded={{ bg: "teal.600" }}
+                  width="full"
                 >
                   <Icon as={Home} mr={2} />
                   Home
@@ -129,6 +153,12 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
                     navigate("/insights");
                     onClose();
                   }}
+                  py={2}
+                  px={4}
+                  borderRadius="md"
+                  _hover={{ bg: "teal.600" }}
+                  _expanded={{ bg: "teal.600" }}
+                  width="full"
                 >
                   <Icon as={PieChart} mr={2} />
                   Insights
@@ -140,6 +170,12 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
                     navigate("/categories");
                     onClose();
                   }}
+                  py={2}
+                  px={4}
+                  borderRadius="md"
+                  _hover={{ bg: "teal.600" }}
+                  _expanded={{ bg: "teal.600" }}
+                  width="full"
                 >
                   <Icon as={Bookmark} mr={2} />
                   Manage Categories

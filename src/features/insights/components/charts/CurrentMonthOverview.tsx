@@ -99,7 +99,7 @@ const NestedCategoryBreakdown: React.FC<{
     const hasChildren = category.children && category.children.length > 0;
 
     const textColor =
-      level === 0 ? `${type === "income" ? "teal" : "red"}.700` : "gray.800";
+      level === 0 ? `${type === "income" ? "teal" : "red"}.700` : "primaryTextColor";
 
     return (
       <Box key={category.name}>
@@ -320,8 +320,8 @@ const CurrentMonthOverview: React.FC = () => {
     <Box bg={bgColor} borderRadius="lg" p={{ base: 4, md: 6 }} boxShadow="lg">
       <VStack align="flex-start" spacing={1} flex={1}>
         <Flex alignItems="center" gap={3}>
-          <Icon as={Calendar} w={5} h={5} color="black" />
-          <Heading as="h2" size="md" color="black">
+          <Icon as={Calendar} w={5} h={5} color={primaryTextColor} />
+          <Heading as="h2" size="md" color={primaryTextColor}>
             Current Month Overview
           </Heading>
         </Flex>
@@ -500,7 +500,7 @@ const CurrentMonthOverview: React.FC = () => {
             textAlign="center"
             p={6}
           >
-            <Icon as={BarChart2} boxSize={16} color="gray.400" mb={4} />
+            <Icon as={BarChart2} boxSize={16} color="tertiaryTextColor" mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Financial Data Available
             </Heading>

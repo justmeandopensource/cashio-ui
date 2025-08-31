@@ -113,7 +113,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Mail size={18} color="gray" />
+                <Mail size={18} color="tertiaryTextColor" />
               </InputLeftElement>
               <Input
                 ref={usernameInputRef}
@@ -148,7 +148,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Lock size={18} color="gray" />
+                <Lock size={18} color="tertiaryTextColor" />
               </InputLeftElement>
               <Input
                 type={showPassword ? "text" : "password"}
@@ -199,7 +199,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
             Log In
           </Button>
 
-          <Text textAlign="center" fontSize="sm" color="gray.600" mt={2}>
+          <Text textAlign="center" fontSize="sm" color="secondaryTextColor" mt={2}>
             New user?{" "}
             <RouterLink to="/register">
               <Text as="span" color={primaryColor} fontWeight="semibold">

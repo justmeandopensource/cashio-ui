@@ -162,8 +162,8 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
         >
           <VStack align="flex-start" spacing={1} flex={1}>
             <Flex alignItems="center" gap={3}>
-              <Icon as={LineChart} w={5} h={5} color="black" />
-              <Heading as="h2" size="md" color="black">
+              <Icon as={LineChart} w={5} h={5} color={primaryTextColor} />
+              <Heading as="h2" size="md" color={primaryTextColor}>
                 Income vs Expense Trend
               </Heading>
             </Flex>
@@ -266,7 +266,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
             textAlign="center"
             p={6}
           >
-            <Icon as={BarChart2} boxSize={6} color="gray.400" mb={4} />
+            <Icon as={BarChart2} boxSize={6} color="tertiaryTextColor" mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Financial Data Available
             </Heading>

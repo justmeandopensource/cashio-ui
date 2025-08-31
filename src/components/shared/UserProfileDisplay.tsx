@@ -44,7 +44,11 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
   handleLogout,
 }) => {
   const navigate = useNavigate();
-  const { data: userProfile, isLoading, isError } = useQuery<UserProfile>({
+  const {
+    data: userProfile,
+    isLoading,
+    isError,
+  } = useQuery<UserProfile>({
     queryKey: ["userProfile"],
     queryFn: fetchUserProfile,
   });
@@ -93,30 +97,34 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
             name={userProfile.full_name}
             src="" // No image, just initials
             getInitials={getInitials}
-            bg="teal.600"
+            bg="teal.700"
+            borderRadius="md"
             color="white"
           />
           <Box ml={3} textAlign="left">
-            <Text fontWeight="bold" color="white" fontSize="md">
+            <Text fontWeight="bold" fontSize="md">
               {userProfile.full_name}
             </Text>
-            <Text fontSize="sm" color="gray.200">
-              {userProfile.email}
-            </Text>
+            <Text fontSize="sm">{userProfile.email}</Text>
           </Box>
         </ChakraLink>
       </PopoverTrigger>
-      <PopoverContent bg="teal.50" borderColor="gray.200" boxShadow="lg" width={triggerWidth}>
+      <PopoverContent
+        bg="teal.50"
+        borderColor="gray.200"
+        boxShadow="lg"
+        width={triggerWidth}
+      >
         <PopoverArrow />
         <PopoverCloseButton />
-        
+
         <PopoverBody>
           <VStack align="flex-start" spacing={2}>
             <ChakraLink
               onClick={() => navigate("/profile")}
               display="flex"
               alignItems="center"
-              color="gray.800"
+              color="secondaryTextColor"
               fontWeight="normal"
               fontSize="md"
             >
@@ -126,7 +134,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
               onClick={handleLogout}
               display="flex"
               alignItems="center"
-              color="gray.800"
+              color="secondaryTextColor"
               fontWeight="normal"
               fontSize="md"
             >
@@ -135,7 +143,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
           </VStack>
         </PopoverBody>
         <PopoverFooter>
-          <Text fontSize="xs" color="gray.500">
+          <Text fontSize="xs" color="tertiaryTextColor">
             Version: {VERSION}
           </Text>
         </PopoverFooter>

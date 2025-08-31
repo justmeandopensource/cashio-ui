@@ -353,7 +353,7 @@ const Transactions: React.FC<TransactionsProps> = ({
               ? "No Matching Transactions"
               : "No Transactions Found"}
           </Text>
-          <Text color="gray.600" mb={6}>
+          <Text color="secondaryTextColor" mb={6}>
             {hasActiveFilters
               ? "No transactions match your filter criteria."
               : "You do not have any transactions for this account yet."}
@@ -384,7 +384,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           <Flex justify="space-between" align="center" mb={4}>
             <Flex align="center" gap={2}>
               <Icon as={AlignLeft} size={24} color="gray.600" />
-              <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold">
+              <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold" color="primaryTextColor">
                 Transactions
               </Text>
             </Flex>
