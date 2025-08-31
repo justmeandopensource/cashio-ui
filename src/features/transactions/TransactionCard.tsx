@@ -22,8 +22,10 @@ import {
   ModalCloseButton,
   Button,
   useBreakpointValue,
+  Link as ChakraLink,
 } from "@chakra-ui/react";
 import { Calendar, Tag as TagIcon, Info, CreditCard, Trash2, MessageSquare, Edit, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import {
   formatAmount,
   formatDate,
@@ -56,6 +58,7 @@ interface Transaction {
   date: string;
   category_name: string;
   notes?: string;
+  account_id?: string;
   account_name?: string;
   is_split: boolean;
   is_transfer: boolean;
@@ -174,10 +177,10 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             )}
 
             {/* Account name - displayed when showAccountName is true */}
-            {showAccountName && transaction.account_name && (
-              <Text fontSize="sm" color="blue.500" mt={1}>
+            {showAccountName && transaction.account_name && transaction.account_id && (
+              <ChakraLink as={Link} to={`/account/${transaction.account_id}`} fontSize="sm" color="blue.500" mt={1}>
                 {transaction.account_name}
-              </Text>
+              </ChakraLink>
             )}
           </VStack>
 

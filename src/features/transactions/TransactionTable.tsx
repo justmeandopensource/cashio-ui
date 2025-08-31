@@ -35,6 +35,7 @@ import {
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import { CreditCard, Trash2, Edit, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 import useLedgerStore from "@/components/shared/store";
 
@@ -61,6 +62,7 @@ interface Transaction {
   transaction_id: string;
   date: string;
   category_name: string;
+  account_id?: string;
   account_name?: string;
   tags?: TagItem[];
   is_split: boolean;
@@ -153,8 +155,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               <Td width="15%">{transaction.category_name}</Td>
               {showAccountName && (
                 <Td width="12%">
-                  {transaction.account_name && (
-                    <Text color="blue.500">{transaction.account_name}</Text>
+                  {transaction.account_name && transaction.account_id && (
+                    <ChakraLink as={Link} to={`/account/${transaction.account_id}`} color="blue.500">
+                      {transaction.account_name}
+                    </ChakraLink>
                   )}
                 </Td>
               )}

@@ -25,6 +25,7 @@ interface Transaction {
   transaction_id: string;
   date: string;
   category_name: string;
+  account_id?: string;
   account_name?: string;
   is_split: boolean;
   is_transfer: boolean;
