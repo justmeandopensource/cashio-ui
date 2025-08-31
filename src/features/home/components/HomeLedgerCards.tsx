@@ -1,16 +1,14 @@
 import { useNavigate } from "react-router-dom";
 import {
   Box,
-  Heading,
   SimpleGrid,
   Card,
   CardBody,
   Text,
   Button,
   Icon,
-  Flex,
 } from "@chakra-ui/react";
-import { BookText, FileText, Plus } from 'lucide-react';
+import { FileText, Plus } from 'lucide-react';
 import useLedgerStore from "@/components/shared/store";
 
 interface HomeLedgerCardsProps {
@@ -53,12 +51,7 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
         </Box>
       ) : (
         <Box>
-          <Flex alignItems="center" gap={2} mb={4}>
-            <BookText size={28} color="teal" />
-            <Heading as="h2" size="lg" color="teal.500">
-              Ledgers
-            </Heading>
-          </Flex>
+          
           <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 4 }} spacing={6}>
             {ledgers.map((ledger) => (
               <Card

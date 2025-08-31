@@ -57,8 +57,8 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         overflowY="auto"
         flexShrink={0}
       >
-        <VStack align="flex-start" spacing={3}>
-          <Flex align="center" mb={6}>
+        <VStack align="flex-start" spacing={2}>
+          <Flex align="center" mb={3}>
             <Icon as={Wallet} boxSize={6} mr={3} />
             <Heading as="h1" size="lg">
               Cashio
@@ -128,7 +128,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
           </DrawerHeader>
           <DrawerBody>
             <Flex direction="column" justify="space-between" h="full">
-              <VStack align="flex-start" spacing={3}>
+              <VStack align="flex-start" spacing={2}>
                 <ChakraLink
                   display="flex"
                   alignItems="center"

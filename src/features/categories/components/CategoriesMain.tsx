@@ -16,13 +16,13 @@ import {
   useToast,
   HStack,
 } from "@chakra-ui/react";
-import {
-  Plus,
+import { Plus,
   RefreshCw,
   ArrowUpCircle,
   ArrowDownCircle,
 } from "lucide-react";
 import CreateCategoryModal from "@components/modals/CreateCategoryModal";
+import CategoriesMainHeader from "./CategoriesMainHeader";
 import config from "@/config";
 import { toastDefaults } from "@/components/shared/utils";
 
@@ -174,7 +174,9 @@ const CategoriesMain: React.FC = () => {
   }
 
   return (
-    <Box bg="gray.50" p={6} borderRadius="lg">
+    <Box>
+      <CategoriesMainHeader onCreateCategory={handleCreateCategoryClick} />
+      <Box bg="gray.50" p={6} borderRadius="lg">
       {/* Responsive Grid for Income and Expense Categories */}
       <SimpleGrid columns={{ base: 1, md: 1, lg: 2 }} spacing={6}>
         {/* Income Categories Table */}
@@ -285,6 +287,7 @@ const CategoriesMain: React.FC = () => {
           )}
         </Box>
       </SimpleGrid>
+      </Box>
 
       {/* Create Category Modal */}
       <CreateCategoryModal

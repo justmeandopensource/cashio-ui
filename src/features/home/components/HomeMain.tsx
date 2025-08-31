@@ -1,5 +1,6 @@
 import HomeLedgerCards from "@features/home/components/HomeLedgerCards";
 import CreateLedgerModal from "@components/modals/CreateLedgerModal";
+import HomeMainHeader from "./HomeMainHeader";
 
 interface HomeMainProps {
   ledgers?: Array<{ ledger_id: string; name: string; currency_symbol: string }>;
@@ -19,6 +20,7 @@ const HomeMain = ({
 }: HomeMainProps) => {
   return (
     <>
+      <HomeMainHeader onCreateLedger={onOpen} />
       <HomeLedgerCards ledgers={ledgers} onOpen={onOpen} />
       <CreateLedgerModal
         isOpen={isOpen}

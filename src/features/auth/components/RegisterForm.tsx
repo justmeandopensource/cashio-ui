@@ -164,7 +164,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Info size={18} color="tertiaryTextColor" />
+                <Info size={18} color="gray" />
               </InputLeftElement>
               <Input
                 ref={fullNameRef}
@@ -197,7 +197,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <AtSign size={18} color="tertiaryTextColor" />
+                <AtSign size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type="text"
@@ -229,7 +229,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Mail size={18} color="tertiaryTextColor" />
+                <Mail size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type="email"
@@ -261,7 +261,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Lock size={18} color="tertiaryTextColor" />
+                <Lock size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type={showPassword ? "text" : "password"}

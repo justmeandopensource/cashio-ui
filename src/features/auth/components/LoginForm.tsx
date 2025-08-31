@@ -113,7 +113,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Mail size={18} color="tertiaryTextColor" />
+                <Mail size={18} color="gray" />
               </InputLeftElement>
               <Input
                 ref={usernameInputRef}
@@ -148,7 +148,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
                 display="flex"
                 alignItems="center"
               >
-                <Lock size={18} color="tertiaryTextColor" />
+                <Lock size={18} color="gray" />
               </InputLeftElement>
               <Input
                 type={showPassword ? "text" : "password"}
