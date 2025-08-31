@@ -53,7 +53,7 @@ interface Filters {
   tags: Tag[];
   tags_match: "any" | "all";
   search_text: string;
-  transaction_type: string;
+  transaction_type: "" | "income" | "expense" | "transfer";
   from_date: Date | null;
   to_date: Date | null;
 }
@@ -569,6 +569,9 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                     </Radio>
                     <Radio value="expense" colorScheme="teal">
                       Expense
+                    </Radio>
+                    <Radio value="transfer" colorScheme="teal">
+                      Transfer
                     </Radio>
                   </Stack>
                 </RadioGroup>
