@@ -140,18 +140,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
       >
         <VStack as="form" spacing={{ base: 4, md: 5 }} onSubmit={handleSubmit}>
           {/* Logo/Brand */}
-          <Flex justify="center" mb={2}>
-            <Image
-              src="/cashio.svg"
-              alt="Cashio Logo"
-              boxSize="60px"
-              objectFit="contain"
-            />
-          </Flex>
-
-          <Heading fontSize={{ base: "xl", md: "2xl" }} color={primaryColor}>
-            Create Account
+          <Heading fontSize={{ base: "xl", md: "2xl" }} color={primaryColor} mb="-4">
+            Create your Cashio Account
           </Heading>
+          <Text textAlign="center" fontSize="sm" color="secondaryTextColor">
+            Start managing your finances today.
+          </Text>
 
           <FormControl isInvalid={nameError}>
             <FormLabel fontSize="sm" fontWeight="medium">

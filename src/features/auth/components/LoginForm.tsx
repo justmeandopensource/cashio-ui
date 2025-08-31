@@ -89,18 +89,12 @@ const LoginForm: React.FC<LoginFormProps> = ({
       >
         <VStack as="form" spacing={{ base: 5, md: 6 }} onSubmit={handleSubmit}>
           {/* Logo/Brand */}
-          <Flex justify="center" mb={2}>
-            <Image
-              src="/cashio.svg"
-              alt="Cashio Logo"
-              boxSize="60px"
-              objectFit="contain"
-            />
-          </Flex>
-
-          <Heading fontSize={{ base: "xl", md: "2xl" }} color={primaryColor}>
-            Welcome Back
+          <Heading fontSize={{ base: "xl", md: "2xl" }} color={primaryColor} mb="-4">
+            Log in to Cashio
           </Heading>
+          <Text textAlign="center" fontSize="sm" color="secondaryTextColor">
+            Manage your finances with ease.
+          </Text>
 
           <FormControl isInvalid={usernameError}>
             <FormLabel fontSize="sm" fontWeight="medium">
