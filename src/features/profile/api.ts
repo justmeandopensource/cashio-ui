@@ -1,8 +1,5 @@
 
-import axios from "axios";
-import config from "../../config";
-
-const API_URL = `${config.apiBaseUrl}`;
+import api from "@/lib/api";
 
 export interface UserProfile {
   full_name: string;
@@ -20,29 +17,18 @@ export interface ChangePassword {
   new_password: string;
 }
 
-const getAuthHeaders = () => {
-  const token = localStorage.getItem("access_token");
-  return { Authorization: `Bearer ${token}` };
-};
-
 export const getUserProfile = async (): Promise<UserProfile> => {
-  const response = await axios.get(`${API_URL}/user/me`, {
-    headers: getAuthHeaders(),
-  });
+  const response = await api.get("/user/me");
   return response.data;
 };
 
 export const updateUserProfile = async (
   data: UserUpdate
 ): Promise<UserProfile> => {
-  const response = await axios.put(`${API_URL}/user/me`, data, {
-    headers: getAuthHeaders(),
-  });
+  const response = await api.put("/user/me", data);
   return response.data;
 };
 
 export const changePassword = async (data: ChangePassword): Promise<void> => {
-  await axios.put(`${API_URL}/user/change-password`, data, {
-    headers: getAuthHeaders(),
-  });
+  await api.put("/user/change-password", data);
 };

@@ -12,8 +12,8 @@ import {
   Wrap,
   WrapItem,
 } from "@chakra-ui/react";
-import axios, { AxiosError } from "axios";
-import config from "@/config";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
 import { toastDefaults } from "./utils";
 
 // Define interfaces for the component
@@ -46,14 +46,14 @@ const FormTags: React.FC<FormTagsProps> = ({
   const tagsSuggestionsBoxBgColor = useColorModeValue("gray.50", "gray.700");
   const tagsSuggestionsBoxItemBgColor = useColorModeValue(
     "gray.100",
-    "gray.600",
+    "gray.600"
   );
   const [tagInput, setTagInput] = useState<string>("");
 
   // eslint-disable-next-line no-unused-vars
   const debounce = <F extends (...args: any[]) => any>(
     func: F,
-    delay: number,
+    delay: number
   ) => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
@@ -73,15 +73,7 @@ const FormTags: React.FC<FormTagsProps> = ({
     async (query: string): Promise<void> => {
       if (query.length >= 3) {
         try {
-          const token = localStorage.getItem("access_token");
-          const response = await axios.get(
-            `${config.apiBaseUrl}/tags/search?query=${query}`,
-            {
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
-          );
+          const response = await api.get(`/tags/search?query=${query}`);
           setTagSuggestions(response.data);
         } catch (error) {
           const apiError = error as AxiosError<ApiErrorResponse>;
@@ -97,12 +89,12 @@ const FormTags: React.FC<FormTagsProps> = ({
         setTagSuggestions([]);
       }
     },
-    [toast, setTagSuggestions],
+    [toast, setTagSuggestions]
   );
 
   const debouncedFetchTagSuggestions = useMemo(
     () => debounce(fetchTagSuggestions, 500),
-    [fetchTagSuggestions],
+    [fetchTagSuggestions]
   );
 
   // Ensure all tags have a valid name property
@@ -118,7 +110,7 @@ const FormTags: React.FC<FormTagsProps> = ({
   const addTag = (tag: TagItem): void => {
     if (
       !normalizedTags.some(
-        (t) => t.tag_id === tag.tag_id && t.name === tag.name,
+        (t) => t.tag_id === tag.tag_id && t.name === tag.name
       )
     ) {
       setTags([...normalizedTags, tag]);
@@ -134,7 +126,7 @@ const FormTags: React.FC<FormTagsProps> = ({
 
   // Handle Enter key press in the tags input field
   const handleTagInputKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>,
+    e: React.KeyboardEvent<HTMLInputElement>
   ): void => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -143,7 +135,7 @@ const FormTags: React.FC<FormTagsProps> = ({
       if (newTagName) {
         // Check if the tag already exists in the selected tags
         const isTagAlreadyAdded = normalizedTags.some(
-          (tag) => tag.name.toLowerCase() === newTagName.toLowerCase(),
+          (tag) => tag.name.toLowerCase() === newTagName.toLowerCase()
         );
 
         if (!isTagAlreadyAdded) {

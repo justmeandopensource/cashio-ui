@@ -17,12 +17,10 @@ import {
   useColorModeValue,
   Box,
   Flex,
-  Text,
-  Spinner,
 } from "@chakra-ui/react";
 import { Edit, Check, X } from "lucide-react";
-import axios from "axios";
-import config from "@/config";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "../shared/utils";
 
@@ -59,8 +57,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
   onUpdateCompleted,
 }) => {
   const [ledgerName, setLedgerName] = useState<string>(currentLedgerName);
-  const [selectedCurrency, setSelectedCurrency] =
-    useState<string>(currentCurrencySymbol);
+  const [selectedCurrency, setSelectedCurrency] = useState<string>(
+    currentCurrencySymbol
+  );
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
 
@@ -101,15 +100,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
 
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("access_token");
-      const response = await axios.put(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/update`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const response = await api.put(
+        `/ledger/${ledgerId}/update`,
+        payload
       );
       toast({
         description: "Ledger updated successfully",
@@ -119,11 +112,10 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
       onClose();
       onUpdateCompleted(response.data.name, response.data.currency_symbol);
     } catch (error) {
+      const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         description:
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : "Failed to update ledger",
+          axiosError.response?.data?.detail || "Failed to update ledger",
         status: "error",
         ...toastDefaults,
       });
@@ -169,7 +161,7 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
             pb={{ base: 4, sm: 2 }}
           >
             <Flex alignItems="center">
-              <Edit size={24} style={{ marginRight: '8px' }} />
+              <Edit size={24} style={{ marginRight: "8px" }} />
               Update Ledger
             </Flex>
           </ModalHeader>

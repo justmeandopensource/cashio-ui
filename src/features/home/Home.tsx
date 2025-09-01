@@ -1,12 +1,11 @@
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Flex, Spinner, useDisclosure, useToast, Text } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import HomeMain from "@features/home/components/HomeMain";
-import config from "@/config";
+import api from "@/lib/api";
 import HomeLedgerCardsSkeleton from "./components/HomeLedgercardsSkeleton";
 import { toastDefaults } from "@/components/shared/utils";
+import { useNavigate } from "react-router-dom";
 
 interface Ledger {
   ledger_id: string;
@@ -20,40 +19,6 @@ const Home = () => {
   const queryClient = useQueryClient();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // token verification
-  const { isLoading: isTokenVerifying, isError: isTokenError } = useQuery({
-    queryKey: ["verifyToken"],
-    queryFn: async () => {
-      const token = localStorage.getItem("access_token");
-      if (!token) {
-        throw new Error("No token found");
-      }
-
-      const response = await fetch(`${config.apiBaseUrl}/user/verify-token`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Token verification failed");
-      }
-
-      return response.json();
-    },
-    retry: false, // Disable retries to avoid infinite loops
-  });
-
-  // Redirect to login if token verification fails
-  useEffect(() => {
-    if (isTokenError) {
-      localStorage.removeItem("access_token");
-      navigate("/login");
-    }
-  }, [isTokenError, navigate]);
-
   // Fetch ledgers
   const {
     data: ledgers,
@@ -62,22 +27,9 @@ const Home = () => {
   } = useQuery<Ledger[]>({
     queryKey: ["ledgers"],
     queryFn: async () => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${config.apiBaseUrl}/ledger/list`, {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch ledgers");
-      }
-
-      return response.json();
+      const response = await api.get("/ledger/list");
+      return response.data;
     },
-    enabled: !isTokenVerifying && !isTokenError, // Only fetch ledgers after token verification
   });
 
   // Create ledger mutation
@@ -89,22 +41,11 @@ const Home = () => {
       name: string;
       currency_symbol: string;
     }) => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${config.apiBaseUrl}/ledger/create`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ name, currency_symbol }),
+      const response = await api.post("/ledger/create", {
+        name,
+        currency_symbol,
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || "Ledger creation failed");
-      }
-
-      return response.json();
+      return response.data;
     },
     onSuccess: (data: Ledger) => {
       // Update the cached ledgers list with the new ledger
@@ -131,7 +72,7 @@ const Home = () => {
   // handle ledger creation
   const handleCreateLedger = async (
     newLedgerName: string,
-    newLedgerCurrency: string,
+    newLedgerCurrency: string
   ) => {
     if (!newLedgerName || !newLedgerCurrency) {
       toast({
@@ -153,18 +94,6 @@ const Home = () => {
     localStorage.removeItem("access_token");
     navigate("/login");
   };
-
-  if (isTokenVerifying) {
-    return (
-      <Flex justify="center" align="center" minH="100vh">
-        <Spinner size="xl" />
-      </Flex>
-    );
-  }
-
-  if (isTokenError) {
-    return null;
-  }
 
   if (isFetchingLedgers) {
     return (

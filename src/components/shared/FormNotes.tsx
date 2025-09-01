@@ -7,8 +7,8 @@ import {
   useColorModeValue,
   useToast,
 } from "@chakra-ui/react";
-import axios, { AxiosError } from "axios";
-import config from "@/config";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
 import { toastDefaults } from "./utils";
 
 // Define props interface
@@ -36,13 +36,13 @@ const FormNotes: React.FC<FormNotesProps> = ({
   const notesSuggestionsBoxBgColor = useColorModeValue("gray.50", "gray.700");
   const notesSuggestionsBoxItemBgColor = useColorModeValue(
     "gray.100",
-    "gray.600",
+    "gray.600"
   );
 
   // eslint-disable-next-line no-unused-vars
   const debounce = <F extends (...args: any[]) => any>(
     func: F,
-    delay: number,
+    delay: number
   ) => {
     let timeoutId: ReturnType<typeof setTimeout> | undefined;
 
@@ -61,15 +61,11 @@ const FormNotes: React.FC<FormNotesProps> = ({
     async (search_text: string) => {
       if (search_text.length >= 3) {
         try {
-          const token = localStorage.getItem("access_token");
-          const response = await axios.get(
-            `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/notes/suggestions`,
+          const response = await api.get(
+            `/ledger/${ledgerId}/transaction/notes/suggestions`,
             {
               params: { search_text },
-              headers: {
-                Authorization: `Bearer ${token}`,
-              },
-            },
+            }
           );
           setNoteSuggestions(Array.from(new Set(response.data)));
         } catch (error) {
@@ -86,12 +82,12 @@ const FormNotes: React.FC<FormNotesProps> = ({
         setNoteSuggestions([]);
       }
     },
-    [ledgerId, toast, setNoteSuggestions],
+    [ledgerId, toast, setNoteSuggestions]
   );
 
   const debouncedFetchNoteSuggestions = useMemo(
     () => debounce(fetchNoteSuggestions, 500),
-    [fetchNoteSuggestions],
+    [fetchNoteSuggestions]
   );
 
   return (

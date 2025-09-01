@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import { Flex, useToast } from "@chakra-ui/react";
 import RegisterForm from "@features/auth/components/RegisterForm";
-import config from "@/config";
+import api from "@/lib/api";
 
 interface RegisterFormData {
   full_name: string;
@@ -37,7 +37,7 @@ const Register: React.FC = () => {
     RegisterFormData
   >({
     mutationFn: (formDetails: RegisterFormData) =>
-      axios.post(`${config.apiBaseUrl}/user/create`, formDetails),
+      api.post("/user/create", formDetails),
     onSuccess: () => {
       toast({
         title: "Account created",

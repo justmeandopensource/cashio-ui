@@ -24,9 +24,9 @@ import {
   Flex,
 } from "@chakra-ui/react";
 import { ArrowRightLeft, Check, X } from "lucide-react";
-import axios, { AxiosError } from "axios";
+import { AxiosError } from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
-import config from "@/config";
+import api from "@/lib/api";
 import FormNotes from "../shared/FormNotes";
 import useLedgerStore from "../shared/store";
 import { toastDefaults } from "../shared/utils";
@@ -77,7 +77,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 }) => {
   const [date, setDate] = useState<Date>(new Date());
   const [fromAccountId, setFromAccountId] = useState<string>(
-    accountId?.toString() || "",
+    accountId?.toString() || ""
   );
   const [toAccountId, setToAccountId] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
@@ -114,15 +114,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 
   const fetchLedgers = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get<Ledger[]>(
-        `${config.apiBaseUrl}/ledger/list`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+      const response = await api.get<Ledger[]>("/ledger/list");
       setLedgers(response.data);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
@@ -137,14 +129,8 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 
   const fetchAccounts = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get<Account[]>(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const response = await api.get<Account[]>(
+        `/ledger/${ledgerId}/accounts?ignore_group=true`
       );
       setAccounts(response.data);
     } catch (error) {
@@ -164,7 +150,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
         setDate(new Date());
         setFromAccountId(initialData.account_id || "");
         setToAccountId(""); // This will be selected by the user
-        setAmount(initialData.debit > 0 ? initialData.debit.toString() : initialData.credit.toString());
+        setAmount(
+          initialData.debit > 0
+            ? initialData.debit.toString()
+            : initialData.credit.toString()
+        );
         setNotes(initialData.notes || "");
         setIsDifferentLedger(false);
         setDestinationLedgerId("");
@@ -180,14 +170,8 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const fetchDestinationAccounts = useCallback(
     async (ledgerId: string) => {
       try {
-        const token = localStorage.getItem("access_token");
-        const response = await axios.get<Account[]>(
-          `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
+        const response = await api.get<Account[]>(
+          `/ledger/${ledgerId}/accounts?ignore_group=true`
         );
         setDestinationAccounts(response.data);
       } catch (error) {
@@ -200,7 +184,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
         });
       }
     },
-    [toast],
+    [toast]
   );
 
   useEffect(() => {
@@ -222,7 +206,6 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("access_token");
       const payload = {
         source_account_id: fromAccountId,
         destination_account_id: toAccountId,
@@ -234,14 +217,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
           : null,
       };
 
-      await axios.post(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/transfer`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      await api.post(
+        `/ledger/${ledgerId}/transaction/transfer`,
+        payload
       );
 
       toast({
@@ -294,7 +272,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
             pb={{ base: 4, sm: 2 }}
           >
             <Flex alignItems="center">
-              <ArrowRightLeft size={24} style={{ marginRight: '8px' }} />
+              <ArrowRightLeft size={24} style={{ marginRight: "8px" }} />
               Transfer Funds
             </Flex>
           </ModalHeader>
@@ -441,12 +419,12 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                       value={destinationLedgerId}
                       onChange={(e) => {
                         const selectedLedger = ledgers.find(
-                          (ledger) => ledger.ledger_id == e.target.value,
+                          (ledger) => ledger.ledger_id == e.target.value
                         );
                         setDestinationLedgerId(e.target.value);
                         if (selectedLedger) {
                           setDestinationCurrencySymbol(
-                            selectedLedger.currency_symbol,
+                            selectedLedger.currency_symbol
                           );
                         }
                         setToAccountId("");
@@ -481,7 +459,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                     {/* Group for Asset Accounts */}
                     <optgroup label="Asset Accounts">
                       {getFilteredAccounts(
-                        isDifferentLedger ? destinationAccounts : accounts,
+                        isDifferentLedger ? destinationAccounts : accounts
                       )
                         .filter((account) => account.type === "asset")
                         .map((account) => (
@@ -496,7 +474,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                     {/* Group for Liability Accounts */}
                     <optgroup label="Liability Accounts">
                       {getFilteredAccounts(
-                        isDifferentLedger ? destinationAccounts : accounts,
+                        isDifferentLedger ? destinationAccounts : accounts
                       )
                         .filter((account) => account.type === "liability")
                         .map((account) => (

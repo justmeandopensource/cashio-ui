@@ -22,8 +22,8 @@ import {
   useColorModeValue,
   Text,
 } from "@chakra-ui/react";
-import axios from "axios";
-import config from "@/config";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
 import useLedgerStore from "../shared/store";
 import { Edit, Check, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
@@ -63,7 +63,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
 }) => {
   const [name, setName] = useState<string>(account.name);
   const [openingBalance, setOpeningBalance] = useState<string>(
-    account.opening_balance.toString(),
+    account.opening_balance.toString()
   );
   const [parentAccountId, setParentAccountId] = useState<
     string | number | null
@@ -90,22 +90,16 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
     const fetchGroupAccounts = async (): Promise<void> => {
       try {
         setIsLoading(true);
-        const token = localStorage.getItem("access_token");
-        const response = await axios.get<GroupAccount[]>(
-          `${config.apiBaseUrl}/ledger/${account.ledger_id}/accounts/group?account_type=${account.type}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          },
+        const response = await api.get<GroupAccount[]>(
+          `/ledger/${account.ledger_id}/accounts/group?account_type=${account.type}`
         );
         setGroupAccounts(response.data);
       } catch (error) {
+        const axiosError = error as AxiosError<{ detail: string }>;
         toast({
           description:
-            axios.isAxiosError(error) && error.response?.data?.message
-              ? error.response.data.message
-              : "Failed to fetch group accounts",
+            axiosError.response?.data?.detail ||
+            "Failed to fetch group accounts",
           status: "error",
           ...toastDefaults,
         });
@@ -150,15 +144,9 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
 
     try {
       setIsLoading(true);
-      const token = localStorage.getItem("access_token");
-      await axios.put(
-        `${config.apiBaseUrl}/ledger/${account.ledger_id}/account/${account.account_id}/update`,
-        payload,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      await api.put(
+        `/ledger/${account.ledger_id}/account/${account.account_id}/update`,
+        payload
       );
       toast({
         description: "Account updated successfully",
@@ -168,11 +156,10 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
       onClose();
       onUpdateCompleted();
     } catch (error) {
+      const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         description:
-          axios.isAxiosError(error) && error.response?.data?.message
-            ? error.response.data.message
-            : "Failed to update account",
+          axiosError.response?.data?.detail || "Failed to update account",
         status: "error",
         ...toastDefaults,
       });
@@ -211,7 +198,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
             pb={{ base: 4, sm: 2 }}
           >
             <Flex alignItems="center">
-              <Edit size={24} style={{ marginRight: '8px' }} />
+              <Edit size={24} style={{ marginRight: "8px" }} />
               Update {account.type === "asset" ? "Asset" : "Liability"} Account
             </Flex>
           </ModalHeader>
@@ -231,7 +218,11 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
             <FormControl isRequired>
               <FormLabel fontWeight="medium">Account Name</FormLabel>
               <Input
-                placeholder={`e.g., ${account.type === "asset" ? "Cash, Bank Account" : "Credit Card, Mortgage"}`}
+                placeholder={`e.g., ${
+                  account.type === "asset"
+                    ? "Cash, Bank Account"
+                    : "Credit Card, Mortgage"
+                }`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 onKeyPress={handleKeyPress}
@@ -376,7 +367,12 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
           >
             Update
           </Button>
-          <Button variant="outline" onClick={onClose} isDisabled={isLoading} leftIcon={<X />}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            isDisabled={isLoading}
+            leftIcon={<X />}
+          >
             Cancel
           </Button>
         </ModalFooter>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useRef, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import { AxiosError, AxiosResponse } from "axios";
 import { Flex, useToast } from "@chakra-ui/react";
 import LoginForm from "@features/auth/components/LoginForm";
-import config from "@/config";
+import api from "@/lib/api";
 
 interface LoginResponse {
   access_token: string;
@@ -23,31 +23,34 @@ const Login: React.FC = () => {
   const usernameInputRef = useRef<HTMLInputElement>(null as any);
 
   useEffect(() => {
+    // On component mount, clear any existing token to ensure a clean login.
+    // This helps prevent the "double login" issue.
+    localStorage.removeItem("access_token");
     usernameInputRef.current?.focus();
   }, []);
 
   const loginMutation = useMutation({
     mutationFn: (formDetails: URLSearchParams) =>
-      axios.post<LoginResponse>(
-        `${config.apiBaseUrl}/user/login`,
-        formDetails,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
+      api.post<LoginResponse>("/user/login", formDetails, {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
         },
-      ),
+      }),
     onSuccess: (response: AxiosResponse<LoginResponse>) => {
+      // Set the new token and then navigate.
       localStorage.setItem("access_token", response.data.access_token);
       navigate("/");
     },
     onError: (error: AxiosError<ErrorResponse>) => {
       toast({
-        title: "Error",
-        description: error.response?.data?.detail || error.message,
+        title: "Login Failed",
+        description:
+          error.response?.data?.detail ||
+          "Invalid credentials. Please try again.",
         status: "error",
         position: "top-right",
-        duration: 2000,
+        duration: 3000,
+        isClosable: true,
       });
       setUsername("");
       setPassword("");
@@ -80,6 +83,7 @@ const Login: React.FC = () => {
         password={password}
         setPassword={setPassword}
         usernameInputRef={usernameInputRef}
+        isLoading={loginMutation.isPending}
         maxW="400px"
         w="100%"
       />

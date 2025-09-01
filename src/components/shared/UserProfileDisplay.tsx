@@ -14,8 +14,7 @@ import {
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import config from "../../config"; // Adjust path as needed
+import api from "@/lib/api";
 import { useNavigate } from "react-router-dom";
 import { Settings, LogOut } from "lucide-react";
 import { VERSION } from "../../version";
@@ -31,12 +30,7 @@ interface UserProfileDisplayProps {
 }
 
 const fetchUserProfile = async (): Promise<UserProfile> => {
-  const token = localStorage.getItem("access_token");
-  const response = await axios.get(`${config.apiBaseUrl}/user/me`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+  const response = await api.get("/user/me");
   return response.data;
 };
 

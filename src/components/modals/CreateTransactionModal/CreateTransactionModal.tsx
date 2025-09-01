@@ -26,8 +26,8 @@ import {
   Stack,
   Flex,
 } from "@chakra-ui/react";
-import axios, { AxiosError } from "axios";
-import config from "@/config";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import FormSplits from "./FormSplits";
 import FormNotes from "@/components/shared/FormNotes";
@@ -113,14 +113,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   // Fetch categories based on the transaction type
   const fetchCategories = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get<Category[]>(
-        `${config.apiBaseUrl}/category/list?ignore_group=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const response = await api.get<Category[]>(
+        `/category/list?ignore_group=true`
       );
       setCategories(response.data);
     } catch (error) {
@@ -137,14 +131,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   // Fetch accounts if no accountId is provided (from ledger page)
   const fetchAccounts = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get<Account[]>(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts?ignore_group=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const response = await api.get<Account[]>(
+        `/ledger/${ledgerId}/accounts?ignore_group=true`
       );
       setAccounts(response.data);
     } catch (error) {
@@ -260,8 +248,6 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("access_token");
-
       const payload = {
         account_id: parseInt(accountId || selectedAccountId, 10),
         category_id: parseInt(categoryId, 10),
@@ -289,14 +275,10 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
       const endpoint =
         type === "income"
-          ? `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/income`
-          : `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/expense`;
+          ? `/ledger/${ledgerId}/transaction/income`
+          : `/ledger/${ledgerId}/transaction/expense`;
 
-      await axios.post(endpoint, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.post(endpoint, payload);
 
       toast({
         description: "Transaction added successfully.",
