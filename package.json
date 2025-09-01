@@ -8,9 +8,8 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "release": "node build.cjs",
-    "test": "vitest --reporter=dot",
-    "test:ui": "vitest --ui --reporter=dot"
+    "release": "node build.cjs"
+    
   },
   "dependencies": {
     "@chakra-ui/icons": "^2.2.4",
@@ -34,28 +33,20 @@
     "@eslint/js": "^9.19.0",
     "@semantic-release/exec": "^7.0.3",
     "@semantic-release/git": "^10.0.1",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.2.0",
-    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "@types/recharts": "^1.8.29",
     "@typescript-eslint/eslint-plugin": "^8.26.1",
     "@typescript-eslint/parser": "^8.26.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "@vitest/coverage-v8": "^3.0.8",
-    "@vitest/ui": "^3.0.8",
     "eslint": "^9.19.0",
     "eslint-plugin-react": "^7.37.4",
     "eslint-plugin-react-hooks": "^5.0.0",
     "eslint-plugin-react-refresh": "^0.4.18",
     "globals": "^15.14.0",
-    "jsdom": "^26.0.0",
-    "msw": "^2.7.3",
     "semantic-release": "^24.2.3",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.26.1",
-    "vite": "^6.1.0",
-    "vitest": "^3.0.8"
+    "vite": "^6.1.0"
   }
 }
