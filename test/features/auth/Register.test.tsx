@@ -33,7 +33,7 @@ describe("Register Component", () => {
     );
 
     return {
-      title: screen.getByRole("heading", { name: /create account/i }),
+      title: screen.getByRole("heading", { name: /Create your Cashio Account/i }),
       fullnameInput: screen.getByPlaceholderText(/enter your full name/i),
       usernameInput: screen.getByPlaceholderText(/create a username/i),
       emailInput: screen.getByPlaceholderText(/enter your email/i),
@@ -127,7 +127,7 @@ describe("Register Component", () => {
     await user.click(logInLink);
 
     expect(
-      screen.getByRole("heading", { name: /welcome back/i }),
+            screen.getByRole("heading", { name: /log in to cashio/i }),
     ).toBeInTheDocument();
   });
 
@@ -156,7 +156,7 @@ describe("Register Component", () => {
     // Wait for the redirection to /login
     await waitFor(() => {
       expect(
-        screen.getByRole("heading", { name: /welcome back/i }),
+              screen.getByRole("heading", { name: /log in to cashio/i }),
       ).toBeInTheDocument();
     });
   });

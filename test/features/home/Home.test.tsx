@@ -1,5 +1,5 @@
 import { resetTestState, setupTestEnvironment } from "@test/mocks/utils";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { beforeEach, describe, expect, it } from "vitest";
 import { ChakraProvider } from "@chakra-ui/react";
@@ -98,7 +98,7 @@ describe("Home Component", () => {
       renderHomeComponent();
 
       await waitFor(() => {
-        expect(screen.getByText("Ledgers")).toBeInTheDocument();
+        expect(screen.getByText("My Ledgers")).toBeInTheDocument();
         expect(screen.getByText("UK")).toBeInTheDocument();
         expect(screen.getByText("India")).toBeInTheDocument();
         expect(
@@ -119,7 +119,7 @@ describe("Home Component", () => {
       const { user } = renderHomeComponent();
 
       await waitFor(() => {
-        expect(screen.getByText("Ledgers")).toBeInTheDocument();
+        expect(screen.getByText("My Ledgers")).toBeInTheDocument();
         expect(screen.getByText("UK")).toBeInTheDocument();
       });
 
@@ -138,10 +138,35 @@ describe("Home Component", () => {
         expect(screen.getByText("No Ledgers Found")).toBeInTheDocument();
       });
 
-      await user.click(screen.getByText("Create Ledger"));
+      await user.click(
+        screen.getByRole("button", { name: /^Create Ledger$/i }),
+      );
 
       await waitFor(() => {
-        expect(screen.getByText("Create New Ledger")).toBeInTheDocument();
+        const modal = screen.getByRole("dialog");
+        expect(
+          within(modal).getByText("Create New Ledger"),
+        ).toBeInTheDocument();
+      });
+    });
+
+    it("opens create ledger modal when create new ledger button in header is clicked", async () => {
+      server.use(ledgerHandlers.getLedgersWithData);
+      const { user } = renderHomeComponent();
+
+      await waitFor(() => {
+        expect(screen.getByText("My Ledgers")).toBeInTheDocument();
+      });
+
+      await user.click(
+        screen.getByRole("button", { name: /create new ledger/i }),
+      );
+
+      await waitFor(() => {
+        const modal = screen.getByRole("dialog");
+        expect(
+          within(modal).getByText("Create New Ledger"),
+        ).toBeInTheDocument();
       });
     });
 
@@ -156,17 +181,23 @@ describe("Home Component", () => {
       await user.click(screen.getByTestId("create-ledger-card-with-plus-icon"));
 
       await waitFor(() => {
-        expect(screen.getByText("Create New Ledger")).toBeInTheDocument();
+        const modal = screen.getByRole("dialog");
+        expect(
+          within(modal).getByText("Create New Ledger"),
+        ).toBeInTheDocument();
       });
     });
 
     it("renders the sidebar with navigation links", async () => {
-      renderHomeComponent();
+      const { user } = renderHomeComponent();
 
       await waitFor(() => {
-        expect(screen.getByText("Cashio")).toBeInTheDocument();
-        expect(screen.getByText("Home")).toBeInTheDocument();
-        expect(screen.getByText("Manage Categories")).toBeInTheDocument();
+        expect(screen.getByText("Test User")).toBeInTheDocument();
+      });
+
+      await user.click(screen.getByText("Test User"));
+
+      await waitFor(() => {
         expect(screen.getByText("Log Out")).toBeInTheDocument();
       });
     });

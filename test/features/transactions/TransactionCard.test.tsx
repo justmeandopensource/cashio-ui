@@ -2,6 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect, beforeEach } from "vitest";
 import TransactionCard from "@/features/transactions/TransactionCard";
+import { MemoryRouter } from "react-router-dom";
 import { ChakraProvider } from "@chakra-ui/react";
 
 // Mock transaction data for different test scenarios
@@ -10,6 +11,7 @@ const mockBaseTransaction = {
   date: "2023-05-20",
   category_name: "Groceries",
   notes: "Weekly shopping",
+  account_id: "1",
   account_name: "Test Bank",
   is_split: false,
   is_transfer: false,
@@ -52,7 +54,9 @@ const renderTransactionCard = (props = {}) => {
 
   return render(
     <ChakraProvider>
-      <TransactionCard {...mergedProps} />
+      <MemoryRouter>
+        <TransactionCard {...mergedProps} />
+      </MemoryRouter>
     </ChakraProvider>,
   );
 };

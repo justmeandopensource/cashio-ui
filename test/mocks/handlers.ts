@@ -59,6 +59,17 @@ export const authHandlers = {
       { status: 400 },
     );
   }),
+
+  // Get user profile
+  userMe: http.get(`${config.apiBaseUrl}/user/me`, () => {
+    return HttpResponse.json(
+      {
+        full_name: "Test User",
+        email: "testuser@cashio.com",
+      },
+      { status: 200 },
+    );
+  }),
 };
 
 export const ledgerHandlers = {

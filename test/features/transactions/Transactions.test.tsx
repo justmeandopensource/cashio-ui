@@ -1,5 +1,7 @@
 import Transactions from "@/features/transactions/Transactions";
 import { ChakraProvider } from "@chakra-ui/react";
+import { ChakraProvider } from "@chakra-ui/react";
+import { MemoryRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { transactionHandlers } from "@test/mocks/handlers";
 import { server } from "@test/mocks/server";
@@ -50,7 +52,9 @@ describe("Transaction Component", () => {
     render(
       <QueryClientProvider client={queryClient}>
         <ChakraProvider>
-          <Transactions {...mergedProps} />
+          <MemoryRouter>
+            <Transactions {...mergedProps} />
+          </MemoryRouter>
         </ChakraProvider>
         ,
       </QueryClientProvider>,

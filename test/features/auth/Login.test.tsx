@@ -42,7 +42,7 @@ describe("Login Component", () => {
     );
 
     return {
-      title: screen.getByRole("heading", { name: /welcome back/i }),
+            title: screen.getByRole("heading", { name: /log in to cashio/i }),
       usernameInput: screen.getByPlaceholderText(/enter your username/i),
       passwordInput: screen.getByPlaceholderText(/enter your password/i),
       passwordToggleButton: screen.getByRole("button", {
@@ -126,7 +126,7 @@ describe("Login Component", () => {
     await user.click(createAccountLink);
 
     expect(
-      screen.getByRole("heading", { name: /create account/i }),
+      screen.getByRole("heading", { name: "Create your Cashio Account" }),
     ).toBeInTheDocument();
   });
 

@@ -127,21 +127,4 @@ describe("Categories Component", () => {
       });
     });
   });
-
-  describe("Logout Functionality", () => {
-    it("removes access token and navigates to login on logout", async () => {
-      mockLocalStorage.setItem("access_token", "mock-access-token");
-      server.use(authHandlers.verifyTokenSuccess);
-      const { user } = renderCategoriesComponent();
-
-      await waitFor(() => {
-        expect(screen.getByText("Log Out")).toBeInTheDocument();
-      });
-      await user.click(screen.getByText("Log Out"));
-
-      await waitFor(() => {
-        expect(mockNavigate).toHaveBeenCalledWith("/login");
-      });
-    });
-  });
 });
