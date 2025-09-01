@@ -60,6 +60,7 @@ interface TransactionsProps {
   onAddTransaction: () => void;
   onTransactionDeleted?: () => void;
   onTransactionUpdated?: () => void;
+  onCopyTransaction: (transaction: Transaction) => void;
   shouldFetch?: boolean;
 }
 
@@ -68,6 +69,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   onAddTransaction,
   onTransactionDeleted,
   onTransactionUpdated,
+  onCopyTransaction,
   shouldFetch = true,
 }) => {
   const { ledgerId } = useLedgerStore();
@@ -410,6 +412,7 @@ const Transactions: React.FC<TransactionsProps> = ({
               transferDetails={transferDetails || undefined}
               onDeleteTransaction={handleDeleteTransaction}
               onEditTransaction={handleEditTransaction}
+              onCopyTransaction={onCopyTransaction}
               showAccountName={!accountId}
             />
           </Box>
@@ -440,6 +443,7 @@ const Transactions: React.FC<TransactionsProps> = ({
                   isTransferLoading={isTransferLoading}
                   onDeleteTransaction={handleDeleteTransaction}
                   onEditTransaction={handleEditTransaction} // Add this line
+                  onCopyTransaction={onCopyTransaction}
                   showAccountName={!accountId}
                 />
               ))}

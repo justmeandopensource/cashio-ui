@@ -43,11 +43,29 @@ interface Account {
   type: string;
 }
 
+interface Transaction {
+  transaction_id: string;
+  date: string;
+  category_id?: string;
+  category_name: string;
+  account_id?: string;
+  account_name?: string;
+  is_split: boolean;
+  is_transfer: boolean;
+  notes?: string;
+  credit: number;
+  debit: number;
+  transfer_id?: string;
+  splits?: any[]; // Define more specific type if needed
+  tags?: any[]; // Define more specific type if needed
+}
+
 interface TransferFundsModalProps {
   isOpen: boolean;
   onClose: () => void;
   accountId?: string;
   onTransferCompleted: () => void;
+  initialData?: Transaction;
 }
 
 const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
@@ -55,6 +73,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   onClose,
   accountId,
   onTransferCompleted,
+  initialData,
 }) => {
   const [date, setDate] = useState<Date>(new Date());
   const [fromAccountId, setFromAccountId] = useState<string>(
@@ -141,11 +160,22 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      resetForm();
+      if (initialData) {
+        setDate(new Date());
+        setFromAccountId(initialData.account_id || "");
+        setToAccountId(""); // This will be selected by the user
+        setAmount(initialData.debit > 0 ? initialData.debit.toString() : initialData.credit.toString());
+        setNotes(initialData.notes || "");
+        setIsDifferentLedger(false);
+        setDestinationLedgerId("");
+        setDestinationAmount("");
+      } else {
+        resetForm();
+      }
       fetchLedgers();
       fetchAccounts();
     }
-  }, [isOpen, resetForm, fetchLedgers, fetchAccounts]);
+  }, [isOpen, resetForm, fetchLedgers, fetchAccounts, initialData]);
 
   const fetchDestinationAccounts = useCallback(
     async (ledgerId: string) => {

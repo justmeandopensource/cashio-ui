@@ -29,7 +29,19 @@ const AccountMain: React.FC = () => {
   const [isTransferModalOpen, setIsTransferModalOpen] =
     useState<boolean>(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+  const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(
+    undefined,
+  );
   const queryClient = useQueryClient();
+
+  const handleCopyTransaction = (transaction: any) => {
+    setTransactionToCopy(transaction);
+    if (transaction.is_transfer) {
+      setIsTransferModalOpen(true);
+    } else {
+      setIsCreateModalOpen(true);
+    }
+  };
 
   // Fetch account
   const fetchAccount = async (): Promise<Account> => {
@@ -109,28 +121,37 @@ const AccountMain: React.FC = () => {
         onAddTransaction={() => setIsCreateModalOpen(true)}
         onTransactionDeleted={refreshAccountData}
         onTransactionUpdated={refreshAccountData}
+        onCopyTransaction={handleCopyTransaction}
       />
 
       {/* Create Transaction Modal */}
       <CreateTransactionModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setTransactionToCopy(undefined);
+        }}
         accountId={accountId as string}
         onTransactionAdded={() => {
           refreshAccountData();
           refreshTransactionsData();
         }}
+        initialData={transactionToCopy}
       />
 
       {/* Transfer Funds Modal */}
       <TransferFundsModal
         isOpen={isTransferModalOpen}
-        onClose={() => setIsTransferModalOpen(false)}
+        onClose={() => {
+          setIsTransferModalOpen(false);
+          setTransactionToCopy(undefined);
+        }}
         accountId={accountId as string}
         onTransferCompleted={() => {
           refreshAccountData();
           refreshTransactionsData();
         }}
+        initialData={transactionToCopy}
       />
 
       {/* Update Account Modal */}

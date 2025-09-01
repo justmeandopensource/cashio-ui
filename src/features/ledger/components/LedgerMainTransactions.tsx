@@ -5,6 +5,7 @@ interface LedgerMainTransactionsProps {
   onAddTransaction: () => void;
   onTransactionDeleted: () => void;
   onTransactionUpdated: () => void;
+  onCopyTransaction: (transaction: any) => void;
   shouldFetch?: boolean;
 }
 
@@ -12,6 +13,7 @@ const LedgerMainTransactions: React.FC<LedgerMainTransactionsProps> = ({
   onAddTransaction,
   onTransactionDeleted,
   onTransactionUpdated,
+  onCopyTransaction,
   shouldFetch = false,
 }) => {
   return (
@@ -20,6 +22,7 @@ const LedgerMainTransactions: React.FC<LedgerMainTransactionsProps> = ({
       onAddTransaction={onAddTransaction}
       onTransactionDeleted={onTransactionDeleted}
       onTransactionUpdated={onTransactionUpdated}
+      onCopyTransaction={onCopyTransaction}
       shouldFetch={shouldFetch}
     />
   );

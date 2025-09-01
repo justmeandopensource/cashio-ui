@@ -24,7 +24,7 @@ import {
   useBreakpointValue,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { Calendar, Tag as TagIcon, Info, CreditCard, Trash2, MessageSquare, Edit, X } from "lucide-react";
+import { Calendar, Tag as TagIcon, Info, CreditCard, Trash2, MessageSquare, Edit, X, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   formatAmount,
@@ -85,6 +85,7 @@ interface TransactionCardProps {
   onDeleteTransaction: (transactionId: string) => Promise<void>;
   // eslint-disable-next-line no-unused-vars
   onEditTransaction: (transaction: Transaction) => void;
+  onCopyTransaction: (transaction: Transaction) => void;
   showAccountName?: boolean;
 }
 
@@ -100,6 +101,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   isTransferLoading,
   onDeleteTransaction,
   onEditTransaction,
+  onCopyTransaction,
   showAccountName = false,
 }) => {
   const { currencySymbol } = useLedgerStore();
@@ -344,17 +346,30 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             {/* Action Icons */}
             <Flex justify="flex-end" mt={3} gap={2}>
               {!transaction.is_transfer && (
-                <Button
-                  size="md"
-                  variant="ghost"
-                  colorScheme="blue"
-                  leftIcon={<Edit size={18} />}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onEditTransaction(transaction);
-                  }}
-                  data-testid="transactioncard-edit-icon"
-                />
+                <>
+                  <Button
+                    size="md"
+                    variant="ghost"
+                    colorScheme="blue"
+                    leftIcon={<Edit size={18} />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onEditTransaction(transaction);
+                    }}
+                    data-testid="transactioncard-edit-icon"
+                  />
+                  <Button
+                    size="md"
+                    variant="ghost"
+                    colorScheme="gray"
+                    leftIcon={<Copy size={18} />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onCopyTransaction(transaction);
+                    }}
+                    data-testid="transactioncard-copy-icon"
+                  />
+                </>
               )}
               <Button
                 size="md"

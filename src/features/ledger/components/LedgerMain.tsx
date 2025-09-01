@@ -49,6 +49,19 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
   const [selectedAccountId, setSelectedAccountId] = useState<
     string | undefined
   >(undefined);
+  const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(
+    undefined,
+  );
+
+  const handleCopyTransaction = (transaction: any) => {
+    setTransactionToCopy(transaction);
+    setSelectedAccountId(transaction.account_id);
+    if (transaction.is_transfer) {
+      setIsTransferModalOpen(true);
+    } else {
+      setIsCreateModalOpen(true);
+    }
+  };
 
   // Fetch accounts for the ledger
   const {
@@ -203,6 +216,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
                   })
                 }
                 onTransactionUpdated={refreshAccountsData}
+                onCopyTransaction={handleCopyTransaction}
                 shouldFetch={tabIndex === 1}
               />
             </TabPanel>
@@ -213,23 +227,31 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
       {/* Create Transaction Modal */}
       <CreateTransactionModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setTransactionToCopy(undefined);
+        }}
         accountId={selectedAccountId}
         onTransactionAdded={() => {
           refreshAccountsData();
           refreshTransactionsData();
         }}
+        initialData={transactionToCopy}
       />
 
       {/* Transfer Funds Modal */}
       <TransferFundsModal
         isOpen={isTransferModalOpen}
-        onClose={() => setIsTransferModalOpen(false)}
+        onClose={() => {
+          setIsTransferModalOpen(false);
+          setTransactionToCopy(undefined);
+        }}
         accountId={selectedAccountId}
         onTransferCompleted={() => {
           refreshAccountsData();
           refreshTransactionsData();
         }}
+        initialData={transactionToCopy}
       />
     </Box>
   );

@@ -11,6 +11,7 @@ interface AccountMainTransactionsProps {
   onAddTransaction: () => void;
   onTransactionDeleted: () => void;
   onTransactionUpdated: () => void;
+  onCopyTransaction: (transaction: any) => void;
 }
 
 const AccountMainTransactions: React.FC<AccountMainTransactionsProps> = ({
@@ -18,6 +19,7 @@ const AccountMainTransactions: React.FC<AccountMainTransactionsProps> = ({
   onAddTransaction,
   onTransactionDeleted,
   onTransactionUpdated,
+  onCopyTransaction,
 }) => {
   return (
     <Transactions
@@ -25,6 +27,7 @@ const AccountMainTransactions: React.FC<AccountMainTransactionsProps> = ({
       onAddTransaction={onAddTransaction}
       onTransactionDeleted={onTransactionDeleted}
       onTransactionUpdated={onTransactionUpdated}
+      onCopyTransaction={onCopyTransaction}
     />
   );
 };

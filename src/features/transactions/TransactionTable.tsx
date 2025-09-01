@@ -34,7 +34,7 @@ import {
   Button,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { CreditCard, Trash2, Edit, X } from "lucide-react";
+import { CreditCard, Trash2, Edit, X, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 import useLedgerStore from "@/components/shared/store";
@@ -87,6 +87,7 @@ interface TransactionTableProps {
   onDeleteTransaction: (transactionId: string) => Promise<void>;
   // eslint-disable-next-line no-unused-vars
   onEditTransaction: (transaction: Transaction) => void;
+  onCopyTransaction: (transaction: Transaction) => void;
   showAccountName?: boolean;
 }
 
@@ -100,6 +101,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
   transferDetails,
   onDeleteTransaction,
   onEditTransaction,
+  onCopyTransaction,
   showAccountName = false,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -377,19 +379,34 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   className="action-icons"
                 >
                   {!transaction.is_transfer && (
-                    <ChakraLink
-                      onClick={() => onEditTransaction(transaction)}
-                      _hover={{ textDecoration: "none" }}
-                    >
-                      <Icon
-                        as={Edit}
-                        boxSize={4}
-                        color="blue.500"
-                        _hover={{ color: "blue.600" }}
-                        transition="opacity 0.2s"
-                        data-testid="transactiontable-edit-icon"
-                      />
-                    </ChakraLink>
+                    <>
+                      <ChakraLink
+                        onClick={() => onEditTransaction(transaction)}
+                        _hover={{ textDecoration: "none" }}
+                      >
+                        <Icon
+                          as={Edit}
+                          boxSize={4}
+                          color="blue.500"
+                          _hover={{ color: "blue.600" }}
+                          transition="opacity 0.2s"
+                          data-testid="transactiontable-edit-icon"
+                        />
+                      </ChakraLink>
+                      <ChakraLink
+                        onClick={() => onCopyTransaction(transaction)}
+                        _hover={{ textDecoration: "none" }}
+                      >
+                        <Icon
+                          as={Copy}
+                          boxSize={4}
+                          color="gray.500"
+                          _hover={{ color: "gray.600" }}
+                          transition="opacity 0.2s"
+                          data-testid="transactiontable-copy-icon"
+                        />
+                      </ChakraLink>
+                    </>
                   )}
                   <ChakraLink
                     onClick={() => {

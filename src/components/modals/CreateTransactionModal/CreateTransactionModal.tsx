@@ -42,6 +42,7 @@ interface CreateTransactionModalProps {
   onClose: () => void;
   accountId?: string;
   onTransactionAdded: () => void;
+  initialData?: Transaction;
 }
 
 interface Category {
@@ -75,6 +76,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   onClose,
   accountId,
   onTransactionAdded,
+  initialData,
 }) => {
   const [date, setDate] = useState<Date>(new Date());
   const [type, setType] = useState<"expense" | "income">("expense");
@@ -160,13 +162,25 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   // Fetch accounts if no accountId is provided
   useEffect(() => {
     if (isOpen) {
-      resetForm();
+      if (initialData) {
+        setDate(new Date()); // Set to current date for copied transaction
+        setType(initialData.debit > 0 ? "expense" : "income");
+        setCategoryId(initialData.category_id || "");
+        setNotes(initialData.notes || "");
+        setAmount(initialData.debit > 0 ? initialData.debit.toString() : initialData.credit.toString());
+        setSelectedAccountId(initialData.account_id || "");
+        setIsSplit(initialData.is_split);
+        setSplits(initialData.splits || []);
+        setTags(initialData.tags || []);
+      } else {
+        resetForm();
+      }
       fetchCategories();
       if (!accountId) {
         fetchAccounts();
       }
     }
-  }, [isOpen, accountId, fetchCategories, fetchAccounts]);
+  }, [isOpen, accountId, fetchCategories, fetchAccounts, initialData]);
 
   // Handle split transaction toggle
   const handleSplitToggle = (isChecked: boolean) => {
