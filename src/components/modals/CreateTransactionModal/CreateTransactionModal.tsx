@@ -35,6 +35,10 @@ import FormTags from "@/components/shared/FormTags";
 import useLedgerStore from "@/components/shared/store";
 import { Plus, Check, X } from "lucide-react";
 import { toastDefaults } from "@/components/shared/utils";
+import {
+  handleNumericInput,
+  handleNumericPaste,
+} from "@/components/shared/numericInputUtils";
 
 // Define interfaces for the props and state
 interface CreateTransactionModalProps {
@@ -58,7 +62,7 @@ interface Account {
 }
 
 interface Split {
-  amount: number;
+  amount: string;
   categoryId: string;
   notes?: string;
 }
@@ -114,7 +118,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const fetchCategories = useCallback(async () => {
     try {
       const response = await api.get<Category[]>(
-        `/category/list?ignore_group=true`
+        `/category/list?ignore_group=true`,
       );
       setCategories(response.data);
     } catch (error) {
@@ -132,7 +136,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const fetchAccounts = useCallback(async () => {
     try {
       const response = await api.get<Account[]>(
-        `/ledger/${ledgerId}/accounts?ignore_group=true`
+        `/ledger/${ledgerId}/accounts?ignore_group=true`,
       );
       setAccounts(response.data);
     } catch (error) {
@@ -155,7 +159,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         setType(initialData.debit > 0 ? "expense" : "income");
         setCategoryId(initialData.category_id || "");
         setNotes(initialData.notes || "");
-        setAmount(initialData.debit > 0 ? initialData.debit.toString() : initialData.credit.toString());
+        setAmount(
+          initialData.debit > 0
+            ? initialData.debit.toString()
+            : initialData.credit.toString(),
+        );
         setSelectedAccountId(initialData.account_id || "");
         setIsSplit(initialData.is_split);
         setSplits(initialData.splits || []);
@@ -185,7 +193,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
     if (isChecked) {
       // Initialize with the total amount
-      setSplits([{ amount: parseFloat(amount), categoryId: "" }]);
+      setSplits([{ amount: amount, categoryId: "" }]);
     } else {
       // Clear splits when toggle is turned off
       setSplits([]);
@@ -196,7 +204,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const calculateRemainingAmount = () => {
     const allocatedAmount = roundToTwoDecimals(
       splits.reduce((sum, split) => {
-        return roundToTwoDecimals(sum + roundToTwoDecimals(split.amount));
+        return roundToTwoDecimals(
+          sum + roundToTwoDecimals(parseFloat(split.amount) || 0),
+        );
       }, 0),
     );
 
@@ -230,7 +240,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
       // Check if the total split amount matches the transaction amount
       const totalSplitAmount = splits.reduce(
-        (sum, split) => sum + split.amount,
+        (sum, split) => sum + (parseFloat(split.amount) || 0),
         0,
       );
 
@@ -262,10 +272,12 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         is_split: isSplit,
         splits: isSplit
           ? splits
-              .filter((split) => split.amount > 0)
+              .filter((split) => (parseFloat(split.amount) || 0) > 0)
               .map((split) => ({
-                credit: type === "income" ? split.amount : 0,
-                debit: type === "expense" ? split.amount : 0,
+                credit:
+                  type === "income" ? parseFloat(split.amount) || 0 : 0,
+                debit:
+                  type === "expense" ? parseFloat(split.amount) || 0 : 0,
                 category_id: parseInt(split.categoryId, 10),
                 notes: split.notes,
               }))
@@ -330,7 +342,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             pb={{ base: 4, sm: 2 }}
           >
             <Flex alignItems="center">
-              <Plus size={24} style={{ marginRight: '8px' }} />
+              <Plus size={24} style={{ marginRight: "8px" }} />
               Add Transaction
             </Flex>
           </ModalHeader>
@@ -410,9 +422,12 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                   <InputGroup>
                     <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                     <Input
-                      type="number"
+                      type="text"
+                      inputMode="decimal"
                       value={amount}
                       onChange={(e) => setAmount(e.target.value)}
+                      onKeyDown={(e) => handleNumericInput(e, amount)}
+                      onPaste={(e) => handleNumericPaste(e, setAmount)}
                       placeholder="0.00"
                       borderColor={borderColor}
                       autoFocus

@@ -35,6 +35,10 @@ import FormTags from "@/components/shared/FormTags";
 import useLedgerStore from "@/components/shared/store";
 import { Edit, Check, X } from "lucide-react";
 import { toastDefaults } from "@/components/shared/utils";
+import {
+  handleNumericInput,
+  handleNumericPaste,
+} from "@/components/shared/numericInputUtils";
 
 // Define interfaces for the props and state
 interface EditTransactionModalProps {
@@ -51,7 +55,7 @@ interface Category {
 }
 
 interface Split {
-  amount: number;
+  amount: string;
   categoryId: string;
   notes?: string;
 }
@@ -112,8 +116,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           },
         },
       );
-      const fetchedSplits = response.data.map(split => ({
-        amount: split.debit > 0 ? split.debit : split.credit,
+      const fetchedSplits = response.data.map((split) => ({
+        amount: (split.debit > 0 ? split.debit : split.credit).toString(),
         categoryId: split.category_id.toString(),
         notes: split.notes,
       }));
@@ -222,7 +226,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
     if (isChecked) {
       // Initialize with the total amount
-      setSplits([{ amount: parseFloat(amount), categoryId: "" }]);
+      setSplits([{ amount: amount, categoryId: "" }]);
     } else {
       // Clear splits when toggle is turned off
       setSplits([]);
@@ -233,7 +237,9 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   const calculateRemainingAmount = () => {
     const allocatedAmount = roundToTwoDecimals(
       splits.reduce((sum, split) => {
-        return roundToTwoDecimals(sum + roundToTwoDecimals(split.amount));
+        return roundToTwoDecimals(
+          sum + roundToTwoDecimals(parseFloat(split.amount) || 0),
+        );
       }, 0),
     );
 
@@ -254,7 +260,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     // Validate all splits have categories if split is enabled
     if (isSplit) {
       const invalidSplits = splits.filter(
-        (split) => !split.categoryId && split.amount > 0,
+        (split) => !split.categoryId && (parseFloat(split.amount) || 0) > 0,
       );
       if (invalidSplits.length > 0) {
         toast({
@@ -267,7 +273,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
       // Check if the total split amount matches the transaction amount
       const totalSplitAmount = splits.reduce(
-        (sum, split) => sum + split.amount,
+        (sum, split) => sum + (parseFloat(split.amount) || 0),
         0,
       );
 
@@ -296,10 +302,12 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         is_split: isSplit,
         splits: isSplit
           ? splits
-              .filter((split) => split.amount > 0)
+              .filter((split) => (parseFloat(split.amount) || 0) > 0)
               .map((split) => ({
-                credit: type === "income" ? split.amount : 0,
-                debit: type === "expense" ? split.amount : 0,
+                credit:
+                  type === "income" ? parseFloat(split.amount) || 0 : 0,
+                debit:
+                  type === "expense" ? parseFloat(split.amount) || 0 : 0,
                 category_id: parseInt(split.categoryId, 10),
                 notes: split.notes,
               }))
@@ -354,7 +362,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     }
     for (let i = 0; i < splits.length; i++) {
       if (
-        splits[i].amount !== initialTransactionState.splits[i].amount ||
+        parseFloat(splits[i].amount) !==
+          parseFloat(initialTransactionState.splits[i].amount) ||
         splits[i].categoryId !== initialTransactionState.splits[i].categoryId ||
         splits[i].notes !== initialTransactionState.splits[i].notes
       ) {
@@ -389,7 +398,9 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     isLoading ||
     !hasFormChanged() ||
     (isSplit &&
-      (splits.some((split) => split.amount > 0 && !split.categoryId) ||
+      (splits.some(
+        (split) => (parseFloat(split.amount) || 0) > 0 && !split.categoryId,
+      ) ||
         calculateRemainingAmount() !== 0)) ||
     (!isSplit && !categoryId) ||
     !amount;
@@ -505,9 +516,12 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                     <InputGroup>
                       <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                       <Input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
+                        onKeyDown={(e) => handleNumericInput(e, amount)}
+                        onPaste={(e) => handleNumericPaste(e, setAmount)}
                         placeholder="0.00"
                         borderColor={borderColor}
                         autoFocus
@@ -552,7 +566,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   splits={splits}
                   calculateRemainingAmount={calculateRemainingAmount}
                   currencySymbol={currencySymbol as string}
-                  amount={parseFloat(amount) || 0}
+                  amount={amount}
                   type={type}
                   categories={categories}
                   setSplits={setSplits}

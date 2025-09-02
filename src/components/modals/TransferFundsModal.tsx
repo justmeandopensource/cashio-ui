@@ -30,6 +30,10 @@ import api from "@/lib/api";
 import FormNotes from "../shared/FormNotes";
 import useLedgerStore from "../shared/store";
 import { toastDefaults } from "../shared/utils";
+import {
+  handleNumericInput,
+  handleNumericPaste,
+} from "@/components/shared/numericInputUtils";
 
 interface Ledger {
   ledger_id: string;
@@ -316,9 +320,12 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                 <InputGroup>
                   <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                   <Input
-                    type="number"
+                    type="text"
+                    inputMode="decimal"
                     value={amount}
                     onChange={(e) => setAmount(e.target.value)}
+                    onKeyDown={(e) => handleNumericInput(e, amount)}
+                    onPaste={(e) => handleNumericPaste(e, setAmount)}
                     placeholder="0.00"
                     borderColor={borderColor}
                     autoFocus
@@ -502,9 +509,16 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                           : currencySymbol}
                       </InputLeftAddon>
                       <Input
-                        type="number"
+                        type="text"
+                        inputMode="decimal"
                         value={destinationAmount}
                         onChange={(e) => setDestinationAmount(e.target.value)}
+                        onKeyDown={(e) =>
+                          handleNumericInput(e, destinationAmount)
+                        }
+                        onPaste={(e) =>
+                          handleNumericPaste(e, setDestinationAmount)
+                        }
                         placeholder="0.00"
                         borderColor={borderColor}
                         bg={bgColor}

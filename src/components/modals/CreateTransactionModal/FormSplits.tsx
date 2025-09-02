@@ -15,6 +15,10 @@ import {
   Button,
 } from "@chakra-ui/react";
 import { Plus, Trash2 } from "lucide-react";
+import {
+  handleNumericInput,
+  handleNumericPaste,
+} from "@/components/shared/numericInputUtils";
 
 // Define the interfaces for our props and data structures
 interface Category {
@@ -24,7 +28,7 @@ interface Category {
 }
 
 interface Split {
-  amount: number;
+  amount: string;
   categoryId: string;
   notes?: string;
 }
@@ -33,7 +37,7 @@ interface FormSplitsProps {
   splits: Split[];
   calculateRemainingAmount: () => number;
   currencySymbol: string;
-  amount: number | string;
+  amount: string;
   type: "income" | "expense";
   categories: Category[];
   // eslint-disable-next-line no-unused-vars
@@ -64,21 +68,20 @@ const FormSplits: React.FC<FormSplitsProps> = ({
 }) => {
   // Update splits based on the current amount
   const updateSplitsBasedOnAmount = useCallback((): void => {
-    const currentAmount =
-      typeof amount === "string" ? parseFloat(amount) : amount || 0;
+    const currentAmount = parseFloat(amount) || 0;
 
     // Round to ensure we have a clean 2-decimal value
     const roundedAmount = roundToTwoDecimals(currentAmount);
 
     if (splits.length === 0) {
-      setSplits([{ amount: roundedAmount, categoryId: "" }]);
+      setSplits([{ amount: roundedAmount.toString(), categoryId: "" }]);
       return;
     }
   }, [amount, splits, setSplits]);
 
   // Recalculate splits when amount changes
   useEffect(() => {
-    const amountNum = typeof amount === "string" ? parseFloat(amount) : amount;
+    const amountNum = parseFloat(amount);
     if (amountNum > 0) {
       updateSplitsBasedOnAmount();
     }
@@ -88,13 +91,9 @@ const FormSplits: React.FC<FormSplitsProps> = ({
   const handleSplitAmountChange = (index: number, inputValue: string): void => {
     const newSplits: Split[] = [...splits];
 
-    const value = inputValue === "" ? 0 : parseFloat(inputValue);
-    // Round the input value to 2 decimal places
-    const roundedValue = roundToTwoDecimals(value);
-
     newSplits[index] = {
       ...newSplits[index],
-      amount: roundedValue,
+      amount: inputValue,
     };
 
     const totalAllocated = roundToTwoDecimals(
@@ -102,32 +101,30 @@ const FormSplits: React.FC<FormSplitsProps> = ({
         return roundToTwoDecimals(
           sum +
             (i !== newSplits.length - 1 || i === index
-              ? roundToTwoDecimals(parseFloat(split.amount.toString()) || 0)
+              ? roundToTwoDecimals(parseFloat(split.amount) || 0)
               : 0),
         );
       }, 0),
     );
 
-    const totalAmount = roundToTwoDecimals(
-      typeof amount === "string" ? parseFloat(amount) : amount || 0,
-    );
+    const totalAmount = roundToTwoDecimals(parseFloat(amount) || 0);
 
     // Calculate remaining amount with proper rounding
     const remaining = roundToTwoDecimals(totalAmount - totalAllocated);
 
     if (index < newSplits.length - 1) {
       if (newSplits.length > 1) {
-        newSplits[newSplits.length - 1].amount = remaining > 0 ? remaining : 0;
+        newSplits[newSplits.length - 1].amount =
+          (remaining > 0 ? remaining : 0).toString();
       }
     } else if (remaining > 0) {
-      newSplits.push({ amount: remaining, categoryId: "" });
+      newSplits.push({ amount: remaining.toString(), categoryId: "" });
     }
 
     let i = newSplits.length - 1;
     while (
       i > 0 &&
-      roundToTwoDecimals(parseFloat(newSplits[i].amount.toString()) || 0) ===
-        0 &&
+      roundToTwoDecimals(parseFloat(newSplits[i].amount) || 0) === 0 &&
       i !== index
     ) {
       newSplits.pop();
@@ -142,10 +139,13 @@ const FormSplits: React.FC<FormSplitsProps> = ({
     const remaining = roundToTwoDecimals(calculateRemainingAmount());
     if (remaining <= 0) {
       // If no remaining amount, add a zero split
-      setSplits([...splits, { amount: 0, categoryId: "", notes: "" }]);
+      setSplits([...splits, { amount: "0", categoryId: "", notes: "" }]);
     } else {
       // Otherwise, add a split with the remaining amount
-      setSplits([...splits, { amount: remaining, categoryId: "", notes: "" }]);
+      setSplits([
+        ...splits,
+        { amount: remaining.toString(), categoryId: "", notes: "" },
+      ]);
     }
   };
 
@@ -157,7 +157,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
 
     const newSplits = [...splits];
     const removedAmount = roundToTwoDecimals(
-      parseFloat(newSplits[index].amount.toString()) || 0,
+      parseFloat(newSplits[index].amount) || 0,
     );
     newSplits.splice(index, 1);
 
@@ -165,11 +165,11 @@ const FormSplits: React.FC<FormSplitsProps> = ({
     if (newSplits.length > 0 && removedAmount > 0) {
       const lastIndex = newSplits.length - 1;
       const currentLastAmount = roundToTwoDecimals(
-        parseFloat(newSplits[lastIndex].amount.toString()) || 0,
+        parseFloat(newSplits[lastIndex].amount) || 0,
       );
       newSplits[lastIndex].amount = roundToTwoDecimals(
         currentLastAmount + removedAmount,
-      );
+      ).toString();
     }
 
     setSplits(newSplits);
@@ -218,14 +218,22 @@ const FormSplits: React.FC<FormSplitsProps> = ({
                 <InputGroup size="sm">
                   <InputLeftAddon>{currencySymbol}</InputLeftAddon>
                   <Input
-                    type="number"
-                    value={split.amount || ""}
+                    type="text"
+                    inputMode="decimal"
+                    value={(split.amount || "").toString()}
                     onChange={(e) => {
                       handleSplitAmountChange(index, e.target.value);
                     }}
+                    onKeyDown={(e) =>
+                      handleNumericInput(e, (split.amount || "").toString())
+                    }
+                    onPaste={(e) =>
+                      handleNumericPaste(e, (value) => {
+                        handleSplitAmountChange(index, value);
+                      })
+                    }
                     placeholder="0.00"
                     borderColor={borderColor}
-                    step="0.01"
                   />
                 </InputGroup>
               </FormControl>
@@ -304,8 +312,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
           isDisabled={
             displayRemainingAmount() <= 0 &&
             splits.some(
-              (split) =>
-                roundToTwoDecimals(parseFloat(split.amount.toString())) === 0,
+              (split) => roundToTwoDecimals(parseFloat(split.amount)) === 0,
             )
           }
         >
@@ -316,11 +323,7 @@ const FormSplits: React.FC<FormSplitsProps> = ({
         <HStack justifyContent="space-between" pt={2}>
           <Text fontSize="sm">
             Total: {currencySymbol}
-            {roundToTwoDecimals(
-              typeof amount === "string"
-                ? parseFloat(amount) || 0
-                : amount || 0,
-            ).toFixed(2)}
+            {roundToTwoDecimals(parseFloat(amount) || 0).toFixed(2)}
           </Text>
           {!isEffectivelyEqual(calculateRemainingAmount(), 0) && (
             <Text
