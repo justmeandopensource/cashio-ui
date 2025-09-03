@@ -107,7 +107,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
               </Flex>
               <IconButton
                 aria-label="Edit Account"
-                icon={<Icon as={Edit} boxSize={4} />}
+                icon={<Edit />}
                 variant="ghost"
                 color="teal.500"
                 size="sm"

@@ -194,7 +194,7 @@ const CategoriesMain: React.FC = () => {
             mb={4}
           >
             <HStack spacing={2}>
-              <Icon as={ArrowUpCircle} boxSize={6} color="green.500" />
+              <Icon as={ArrowUpCircle} boxSize={6} color="teal.500" />
               <Text fontSize="xl" fontWeight="bold" color="teal.500">
                 Income Categories
               </Text>
@@ -248,7 +248,7 @@ const CategoriesMain: React.FC = () => {
             mb={4}
           >
             <HStack spacing={2}>
-              <Icon as={ArrowDownCircle} boxSize={6} color="green.500" />
+              <Icon as={ArrowDownCircle} boxSize={6} color="teal.500" />
               <Text fontSize="xl" fontWeight="bold" color="teal.500">
                 Expense Categories
               </Text>
