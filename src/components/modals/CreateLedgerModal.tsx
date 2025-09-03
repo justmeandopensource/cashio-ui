@@ -37,7 +37,12 @@ interface CreateLedgerModalProps {
   isOpen: boolean;
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  handleCreateLedger: (newLedgerName: string, currencySymbol: string) => void;
+  handleCreateLedger: (
+    newLedgerName: string, 
+    currencySymbol: string,
+    description: string,
+    notes: string
+  ) => void;
 }
 
 const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
