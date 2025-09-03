@@ -20,6 +20,7 @@ import LedgerMainTransactions from "./LedgerMainTransactions";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
 import config from "@/config";
+import api from "@/lib/api";
 import { AlignLeft, CreditCard } from "lucide-react";
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "@/components/shared/utils";
@@ -71,22 +72,8 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
   } = useQuery<Account[]>({
     queryKey: ["accounts", ledgerId],
     queryFn: async () => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch accounts");
-      }
-
-      const data = await response.json();
-      return data;
+      const response = await api.get(`/ledger/${ledgerId}/accounts`);
+      return response.data;
     },
   });
 
@@ -119,11 +106,6 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
   }
 
   if (isAccountsError) {
-    toast({
-      description: "Failed to fetch ledger or account details.",
-      status: "error",
-      ...toastDefaults,
-    });
     return null;
   }
 

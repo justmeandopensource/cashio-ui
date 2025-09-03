@@ -13,6 +13,7 @@ import {
 } from "@chakra-ui/react";
 import { Plus, ChevronLeft, ChevronRight, Filter, AlignLeft } from "lucide-react";
 import config from "@/config";
+import api from "@/lib/api";
 import TransactionCard from "./TransactionCard";
 import TransactionTable from "./TransactionTable";
 import TransactionFilter from "./TransactionFilter";
@@ -147,8 +148,6 @@ const Transactions: React.FC<TransactionsProps> = ({
       { ...filters },
     ],
     queryFn: async () => {
-      const token = localStorage.getItem("access_token");
-
       const params = new URLSearchParams();
       params.append("page", pagination.current_page.toString());
 
@@ -166,24 +165,13 @@ const Transactions: React.FC<TransactionsProps> = ({
         }
       });
 
-      const url = `${config.apiBaseUrl}/ledger/${ledgerId}/transactions?${params.toString()}`;
+      const response = await api.get(`/ledger/${ledgerId}/transactions`, { params });
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch transactions");
-      }
-
-      const data = await response.json();
       setPagination({
-        total_pages: data.total_pages,
-        current_page: data.current_page,
+        total_pages: response.data.total_pages,
+        current_page: response.data.current_page,
       });
-      return data.transactions;
+      return response.data.transactions;
     },
     enabled: shouldFetch,
   });
@@ -216,31 +204,10 @@ const Transactions: React.FC<TransactionsProps> = ({
   const fetchSplitTransactions = async (transactionId: string) => {
     setIsSplitLoading(true);
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/${transactionId}/splits`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const response = await api.get(
+        `/ledger/${ledgerId}/transaction/${transactionId}/splits`,
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch split transactions.");
-      }
-
-      const data = await response.json();
-      setSplitTransactions(data);
-    } catch (error) {
-      const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail ||
-          "Failed to fetch split transactions.",
-        status: "error",
-        ...toastDefaults,
-      });
+      setSplitTransactions(response.data);
     } finally {
       setIsSplitLoading(false);
     }
@@ -249,31 +216,8 @@ const Transactions: React.FC<TransactionsProps> = ({
   const fetchTransferDetails = async (transferId: string) => {
     setIsTransferLoading(true);
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${config.apiBaseUrl}/ledger/transfer/${transferId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch transfer details.");
-      }
-
-      const data = await response.json();
-      setTransferDetails(data);
-    } catch (error) {
-      const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail ||
-          "Failed to fetch transfer details.",
-        status: "error",
-        ...toastDefaults,
-      });
+      const response = await api.get(`/ledger/transfer/${transferId}`);
+      setTransferDetails(response.data);
     } finally {
       setIsTransferLoading(false);
     }
@@ -281,20 +225,9 @@ const Transactions: React.FC<TransactionsProps> = ({
 
   const handleDeleteTransaction = async (transactionId: string) => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/${transactionId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      await api.delete(
+        `/ledger/${ledgerId}/transaction/${transactionId}`,
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to delete transaction.");
-      }
 
       if (onTransactionDeleted) {
         await onTransactionDeleted();
@@ -316,6 +249,7 @@ const Transactions: React.FC<TransactionsProps> = ({
         ...toastDefaults,
       });
     } catch (error) {
+      // Let the global interceptor handle 401 errors
       const axiosError = error as AxiosError<{ detail: string }>;
       toast({
         description:
