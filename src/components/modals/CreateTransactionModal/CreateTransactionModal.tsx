@@ -123,12 +123,14 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       setCategories(response.data);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to fetch categories.",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to fetch categories.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     }
   }, [toast]);
 
@@ -141,12 +143,14 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       setAccounts(response.data);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to fetch accounts.",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to fetch accounts.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     }
   }, [toast, ledgerId]);
 
@@ -302,11 +306,13 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       onTransactionAdded();
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description: axiosError.response?.data?.detail || "Transaction failed",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description: axiosError.response?.data?.detail || "Transaction failed",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     } finally {
       setIsLoading(false);
     }

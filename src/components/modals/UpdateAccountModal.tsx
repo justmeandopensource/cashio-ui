@@ -96,13 +96,15 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
         setGroupAccounts(response.data);
       } catch (error) {
         const axiosError = error as AxiosError<{ detail: string }>;
-        toast({
-          description:
-            axiosError.response?.data?.detail ||
-            "Failed to fetch group accounts",
-          status: "error",
-          ...toastDefaults,
-        });
+        if (axiosError.response?.status !== 401) {
+          toast({
+            description:
+              axiosError.response?.data?.detail ||
+              "Failed to fetch group accounts",
+            status: "error",
+            ...toastDefaults,
+          });
+        }
       } finally {
         setIsLoading(false);
       }
@@ -157,12 +159,14 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
       onUpdateCompleted();
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to update account",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to update account",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     } finally {
       setIsLoading(false);
     }

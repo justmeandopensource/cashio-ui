@@ -26,8 +26,8 @@ import {
   Stack,
   Flex,
 } from "@chakra-ui/react";
-import axios, { AxiosError } from "axios";
-import config from "@/config";
+import api from "@/lib/api";
+import { AxiosError } from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import FormSplits from "../CreateTransactionModal/FormSplits";
 import FormNotes from "@/components/shared/FormNotes";
@@ -107,14 +107,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
   const fetchSplits = useCallback(async (transactionId: string): Promise<Split[]> => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get<Split[]>(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/${transactionId}/splits`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const response = await api.get<Split[]>(
+        `/ledger/${ledgerId}/transaction/${transactionId}/splits`
       );
       const fetchedSplits = response.data.map((split) => ({
         amount: (split.debit > 0 ? split.debit : split.credit).toString(),
@@ -125,12 +119,14 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       return fetchedSplits;
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to fetch splits.",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to fetch splits.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
       return [];
     }
   }, [ledgerId, toast]);
@@ -184,24 +180,20 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   // Fetch categories based on the transaction type
   const fetchCategories = useCallback(async () => {
     try {
-      const token = localStorage.getItem("access_token");
-      const response = await axios.get<Category[]>(
-        `${config.apiBaseUrl}/category/list?ignore_group=true`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const response = await api.get<Category[]>(
+        `/category/list?ignore_group=true`
       );
       setCategories(response.data);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to fetch categories.",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to fetch categories.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     }
   }, [toast]);
 
@@ -291,7 +283,6 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
     setIsLoading(true);
     try {
-      const token = localStorage.getItem("access_token");
       const payload = {
         category_id: parseInt(categoryId, 10),
         type: type,
@@ -314,12 +305,10 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           : [],
         tags: tags.map((tag) => ({ name: tag.name })),
       };
-      const endpoint = `${config.apiBaseUrl}/ledger/${ledgerId}/transaction/${transaction.transaction_id}`;
-      await axios.put(endpoint, payload, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await api.put(
+        `/ledger/${ledgerId}/transaction/${transaction.transaction_id}`,
+        payload
+      );
 
       toast({
         description: "Transaction updated successfully.",
@@ -331,11 +320,13 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       onTransactionUpdated();
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description: axiosError.response?.data?.detail || "Transaction failed",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description: axiosError.response?.data?.detail || "Transaction failed",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     } finally {
       setIsLoading(false);
     }

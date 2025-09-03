@@ -113,12 +113,14 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
       onUpdateCompleted(response.data.name, response.data.currency_symbol);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to update ledger",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to update ledger",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     } finally {
       setIsLoading(false);
     }

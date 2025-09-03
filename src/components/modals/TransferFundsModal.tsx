@@ -122,12 +122,14 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       setLedgers(response.data);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to fetch ledgers.",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to fetch ledgers.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     }
   }, [toast]);
 
@@ -139,12 +141,14 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       setAccounts(response.data);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to fetch accounts.",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description:
+            axiosError.response?.data?.detail || "Failed to fetch accounts.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     }
   }, [ledgerId, toast]);
 
@@ -180,12 +184,14 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
         setDestinationAccounts(response.data);
       } catch (error) {
         const axiosError = error as AxiosError<{ detail: string }>;
-        toast({
-          description:
-            axiosError.response?.data?.detail || "Failed to fetch accounts.",
-          status: "error",
-          ...toastDefaults,
-        });
+        if (axiosError.response?.status !== 401) {
+          toast({
+            description:
+              axiosError.response?.data?.detail || "Failed to fetch accounts.",
+            status: "error",
+            ...toastDefaults,
+          });
+        }
       }
     },
     [toast]
@@ -236,11 +242,13 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       onTransferCompleted();
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description: axiosError.response?.data?.detail || "Transfer failed",
-        status: "error",
-        ...toastDefaults,
-      });
+      if (axiosError.response?.status !== 401) {
+        toast({
+          description: axiosError.response?.data?.detail || "Transfer failed",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     } finally {
       setIsLoading(false);
     }

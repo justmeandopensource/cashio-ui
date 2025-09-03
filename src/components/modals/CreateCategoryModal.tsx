@@ -22,7 +22,7 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import config from "@/config";
+import api from "@/lib/api";
 import { Plus, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
 
@@ -77,21 +77,18 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   } = useQuery({
     queryKey: ["groupCategories", categoryType],
     queryFn: async (): Promise<GroupCategory[]> => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${config.apiBaseUrl}/category/group?category_type=${categoryType}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch group categories");
+      try {
+        const response = await api.get<GroupCategory[]>(
+          `/category/group?category_type=${categoryType}`
+        );
+        return response.data;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ detail: string }>;
+        if (axiosError.response?.status === 401) {
+          throw error; // Let the interceptor handle the redirect
+        }
+        throw new Error(axiosError.response?.data?.detail || "Failed to fetch group categories");
       }
-
-      return response.json();
     },
     enabled: isOpen && !parentCategoryId, // Only fetch group categories when the modal is open and no parentCategoryId is provided
   });
@@ -113,21 +110,11 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   // Mutation for creating a new account
   const createCategoryMutation = useMutation({
     mutationFn: async (payload: CreateCategoryPayload) => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(`${config.apiBaseUrl}/category/create`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create category");
-      }
-
-      return response.json();
+      const response = await api.post(
+        `/category/create`,
+        payload
+      );
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -141,12 +128,14 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
         queryKey: ["categories"],
       });
     },
-    onError: (error: Error) => {
-      toast({
-        description: error.message || "Failed to create category.",
-        status: "error",
-        ...toastDefaults,
-      });
+    onError: (error: AxiosError<{ detail: string }>) => {
+      if (error.response?.status !== 401) {
+        toast({
+          description: error.response?.data?.detail || "Failed to create category.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     },
   });
 

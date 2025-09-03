@@ -24,7 +24,7 @@ import {
   InputLeftAddon,
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import config from "@/config";
+import api from "@/lib/api";
 import useLedgerStore from "../shared/store";
 import { Plus, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
@@ -83,21 +83,18 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   } = useQuery({
     queryKey: ["groupAccounts", ledgerId, accountType],
     queryFn: async (): Promise<GroupAccount[]> => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/accounts/group?account_type=${accountType}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch group accounts");
+      try {
+        const response = await api.get<GroupAccount[]>(
+          `/ledger/${ledgerId}/accounts/group?account_type=${accountType}`
+        );
+        return response.data;
+      } catch (error) {
+        const axiosError = error as AxiosError<{ detail: string }>;
+        if (axiosError.response?.status === 401) {
+          throw error; // Let the interceptor handle the redirect
+        }
+        throw new Error(axiosError.response?.data?.detail || "Failed to fetch group accounts");
       }
-
-      return response.json();
     },
     enabled: isOpen && !parentAccountId, // Only fetch group accounts when the modal is open and no parentAccountId is provided
   });
@@ -120,24 +117,11 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   // Mutation for creating a new account
   const createAccountMutation = useMutation({
     mutationFn: async (payload: CreateAccountPayload) => {
-      const token = localStorage.getItem("access_token");
-      const response = await fetch(
-        `${config.apiBaseUrl}/ledger/${ledgerId}/account/create`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        },
+      const response = await api.post(
+        `/ledger/${ledgerId}/account/create`,
+        payload
       );
-
-      if (!response.ok) {
-        throw new Error("Failed to create account");
-      }
-
-      return response.json();
+      return response.data;
     },
     onSuccess: () => {
       toast({
@@ -151,12 +135,14 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
         queryKey: ["accounts"],
       });
     },
-    onError: (error: Error) => {
-      toast({
-        description: error.message || "Failed to create account.",
-        status: "error",
-        ...toastDefaults,
-      });
+    onError: (error: AxiosError<{ detail: string }>) => {
+      if (error.response?.status !== 401) {
+        toast({
+          description: error.response?.data?.detail || "Failed to create account.",
+          status: "error",
+          ...toastDefaults,
+        });
+      }
     },
   });
 
