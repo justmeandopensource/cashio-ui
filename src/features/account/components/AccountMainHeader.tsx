@@ -75,7 +75,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
           {/* Back to Ledger Icon with Light Teal Hover Effect */}
           <IconButton
             aria-label="Back to Ledger"
-            icon={<ArrowLeft boxSize={6} />}
+            icon={<Icon as={ArrowLeft} boxSize={6} />}
             variant="ghost"
             color="teal.500"
             size="lg"
@@ -107,7 +107,7 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
               </Flex>
               <IconButton
                 aria-label="Edit Account"
-                icon={<Edit boxSize={4} />}
+                icon={<Icon as={Edit} boxSize={4} />}
                 variant="ghost"
                 color="teal.500"
                 size="sm"
