@@ -177,7 +177,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
 
       return response.json();
     },
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0, // Refetch on every mount to ensure freshness
   });
 
   // Fetch trend data
