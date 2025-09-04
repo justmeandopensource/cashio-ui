@@ -17,6 +17,7 @@ import {
   useColorModeValue,
   Box,
   Flex,
+  Textarea,
 } from "@chakra-ui/react";
 import { Plus, X } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
@@ -52,6 +53,8 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
 }) => {
   const [newLedgerName, setNewLedgerName] = useState<string>("");
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
   const toast = useToast();
 
   // Color variables for consistent theming
@@ -70,11 +73,13 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
     }
 
     // Call the handleCreateLedger function passed from the parent
-    handleCreateLedger(newLedgerName, selectedCurrency);
+    handleCreateLedger(newLedgerName, selectedCurrency, description, notes);
 
     // Reset the form fields
     setNewLedgerName("");
     setSelectedCurrency("");
+    setDescription("");
+    setNotes("");
 
     // Close the modal
     onClose();
@@ -183,6 +188,50 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
               </Select>
               <FormHelperText>
                 Select the primary currency for this ledger
+              </FormHelperText>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel fontWeight="medium">Description</FormLabel>
+              <Input
+                placeholder="e.g., My main personal finance ledger"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                borderWidth="1px"
+                borderColor={borderColor}
+                bg={bgColor}
+                size="md"
+                borderRadius="md"
+                _hover={{ borderColor: buttonColorScheme + ".300" }}
+                _focus={{
+                  borderColor: buttonColorScheme + ".500",
+                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                }}
+              />
+              <FormHelperText>
+                A brief overview of this ledger's purpose
+              </FormHelperText>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel fontWeight="medium">Notes</FormLabel>
+              <Textarea
+                placeholder="Any additional notes or details"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                borderWidth="1px"
+                borderColor={borderColor}
+                bg={bgColor}
+                size="md"
+                borderRadius="md"
+                _hover={{ borderColor: buttonColorScheme + ".300" }}
+                _focus={{
+                  borderColor: buttonColorScheme + ".500",
+                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                }}
+              />
+              <FormHelperText>
+                Detailed notes for this ledger
               </FormHelperText>
             </FormControl>
           </VStack>

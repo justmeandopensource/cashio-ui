@@ -7,7 +7,7 @@ import UpdateLedgerModal from "@components/modals/UpdateLedgerModal";
 
 const Ledger = () => {
   const navigate = useNavigate();
-  const { ledgerId, ledgerName, currencySymbol, setLedger } = useLedgerStore();
+  const { ledgerId, ledgerName, currencySymbol, description, notes, setLedger } = useLedgerStore();
   const {
     isOpen: isUpdateLedgerModalOpen,
     onOpen: onUpdateLedgerModalOpen,
@@ -16,10 +16,12 @@ const Ledger = () => {
 
   const handleUpdateCompleted = (
     updatedName: string,
-    updatedCurrencySymbol: string
+    updatedCurrencySymbol: string,
+    updatedDescription: string,
+    updatedNotes: string
   ) => {
     if (ledgerId) {
-      setLedger(ledgerId, updatedName, updatedCurrencySymbol);
+      setLedger(ledgerId, updatedName, updatedCurrencySymbol, updatedDescription, updatedNotes);
     }
   };
 
@@ -39,6 +41,8 @@ const Ledger = () => {
           onClose={onUpdateLedgerModalClose}
           currentLedgerName={ledgerName}
           currentCurrencySymbol={currencySymbol}
+          currentDescription={description}
+          currentNotes={notes}
           onUpdateCompleted={handleUpdateCompleted}
         />
       )}

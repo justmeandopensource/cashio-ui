@@ -17,6 +17,7 @@ import {
   useColorModeValue,
   Box,
   Flex,
+  Textarea,
 } from "@chakra-ui/react";
 import { Edit, Check, X } from "lucide-react";
 import { AxiosError } from "axios";
@@ -41,12 +42,21 @@ interface UpdateLedgerModalProps {
   onClose: () => void;
   currentLedgerName: string;
   currentCurrencySymbol: string;
-  onUpdateCompleted: (updatedName: string, updatedCurrencySymbol: string) => void;
+  currentDescription: string;
+  currentNotes: string;
+  onUpdateCompleted: (
+    updatedName: string,
+    updatedCurrencySymbol: string,
+    updatedDescription: string,
+    updatedNotes: string
+  ) => void;
 }
 
 interface UpdateLedgerPayload {
   name?: string;
   currency_symbol?: string;
+  description?: string;
+  notes?: string;
 }
 
 const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
@@ -54,14 +64,24 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
   onClose,
   currentLedgerName,
   currentCurrencySymbol,
+  currentDescription,
+  currentNotes,
   onUpdateCompleted,
 }) => {
   const [ledgerName, setLedgerName] = useState<string>(currentLedgerName);
   const [selectedCurrency, setSelectedCurrency] = useState<string>(
     currentCurrencySymbol
   );
+  const [description, setDescription] = useState<string>(currentDescription ?? "");
+  const [notes, setNotes] = useState<string>(currentNotes ?? "");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
+
+  // Update state when props change
+  React.useEffect(() => {
+    setDescription(currentDescription ?? "");
+    setNotes(currentNotes ?? "");
+  }, [currentDescription, currentNotes]);
 
   const { ledgerId } = useLedgerStore();
 
@@ -88,6 +108,12 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
     if (selectedCurrency !== currentCurrencySymbol) {
       payload.currency_symbol = selectedCurrency;
     }
+    if (description !== currentDescription) {
+      payload.description = description;
+    }
+    if (notes !== currentNotes) {
+      payload.notes = notes;
+    }
 
     if (Object.keys(payload).length === 0) {
       toast({
@@ -110,7 +136,12 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
         ...toastDefaults,
       });
       onClose();
-      onUpdateCompleted(response.data.name, response.data.currency_symbol);
+      onUpdateCompleted(
+        response.data.name,
+        response.data.currency_symbol,
+        response.data.description,
+        response.data.notes
+      );
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       if (axiosError.response?.status !== 401) {
@@ -231,6 +262,50 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
                 Update the primary currency for this ledger
               </FormHelperText>
             </FormControl>
+
+            <FormControl>
+              <FormLabel fontWeight="medium">Description</FormLabel>
+              <Input
+                placeholder="e.g., My main personal finance ledger"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                borderWidth="1px"
+                borderColor={borderColor}
+                bg={bgColor}
+                size="md"
+                borderRadius="md"
+                _hover={{ borderColor: buttonColorScheme + ".300" }}
+                _focus={{
+                  borderColor: buttonColorScheme + ".500",
+                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                }}
+              />
+              <FormHelperText>
+                A brief overview of this ledger's purpose
+              </FormHelperText>
+            </FormControl>
+
+            <FormControl>
+              <FormLabel fontWeight="medium">Notes</FormLabel>
+              <Textarea
+                placeholder="Any additional notes or details"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                borderWidth="1px"
+                borderColor={borderColor}
+                bg={bgColor}
+                size="md"
+                borderRadius="md"
+                _hover={{ borderColor: buttonColorScheme + ".300" }}
+                _focus={{
+                  borderColor: buttonColorScheme + ".500",
+                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                }}
+              />
+              <FormHelperText>
+                Detailed notes for this ledger
+              </FormHelperText>
+            </FormControl>
           </VStack>
 
           {/* Mobile-only action buttons that stay at bottom */}
@@ -247,7 +322,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
                 !ledgerName ||
                 !selectedCurrency ||
                 (ledgerName === currentLedgerName &&
-                  selectedCurrency === currentCurrencySymbol)
+                  selectedCurrency === currentCurrencySymbol &&
+                  description === (currentDescription ?? "") &&
+                  notes === (currentNotes ?? ""))
               }
               leftIcon={<Check />}
             >
@@ -279,7 +356,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
               !ledgerName ||
               !selectedCurrency ||
               (ledgerName === currentLedgerName &&
-                selectedCurrency === currentCurrencySymbol)
+                selectedCurrency === currentCurrencySymbol &&
+                description === (currentDescription ?? "") &&
+                notes === (currentNotes ?? ""))
             }
             leftIcon={<Check />}
           >

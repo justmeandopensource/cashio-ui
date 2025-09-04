@@ -11,6 +11,8 @@ interface Ledger {
   ledger_id: string;
   name: string;
   currency_symbol: string;
+  description: string;
+  notes: string;
 }
 
 const Home = () => {
@@ -37,13 +39,19 @@ const Home = () => {
     mutationFn: async ({
       name,
       currency_symbol,
+      description,
+      notes,
     }: {
       name: string;
       currency_symbol: string;
+      description: string;
+      notes: string;
     }) => {
       const response = await api.post("/ledger/create", {
         name,
         currency_symbol,
+        description,
+        notes,
       });
       return response.data;
     },
@@ -72,7 +80,9 @@ const Home = () => {
   // handle ledger creation
   const handleCreateLedger = async (
     newLedgerName: string,
-    newLedgerCurrency: string
+    newLedgerCurrency: string,
+    description: string,
+    notes: string
   ) => {
     if (!newLedgerName || !newLedgerCurrency) {
       toast({
@@ -86,6 +96,8 @@ const Home = () => {
     createLedgerMutation.mutate({
       name: newLedgerName,
       currency_symbol: newLedgerCurrency,
+      description: description,
+      notes: notes,
     });
   };
 

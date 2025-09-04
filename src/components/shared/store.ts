@@ -5,8 +5,10 @@ interface LedgerState {
   ledgerId: string | undefined;
   ledgerName: string | undefined;
   currencySymbol: string | undefined;
+  description: string | undefined;
+  notes: string | undefined;
   // eslint-disable-next-line no-unused-vars
-  setLedger: (id: string, name: string, symbol: string) => void;
+  setLedger: (id: string, name: string, symbol: string, description: string, notes: string) => void;
   clearLedger: () => void;
 }
 
@@ -16,11 +18,13 @@ const useLedgerStore = create<LedgerState>()(
       ledgerId: undefined,
       ledgerName: undefined,
       currencySymbol: undefined,
-      setLedger: (id, name, symbol) =>
+      setLedger: (id, name, symbol, description, notes) =>
         set({
           ledgerId: id,
           ledgerName: name,
           currencySymbol: symbol,
+          description: description,
+          notes: notes,
         }),
       clearLedger: () =>
         set({
@@ -36,6 +40,8 @@ const useLedgerStore = create<LedgerState>()(
         ledgerId: state.ledgerId,
         ledgerName: state.ledgerName,
         currencySymbol: state.currencySymbol,
+        description: state.description,
+        notes: state.notes,
       }),
     },
   ),
