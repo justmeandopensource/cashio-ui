@@ -71,7 +71,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
       <ModalOverlay backdropFilter="blur(4px)" bg="blackAlpha.300" />
       <ModalContent
         bg={bgColor}
-        borderRadius={{ base: 0, sm: "2xl" }}
+        borderRadius={{ base: 0, sm: "md" }}
         boxShadow="2xl"
         border="1px solid"
         borderColor={borderColor}
@@ -84,7 +84,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
       >
         {/* Header with gradient background */}
         <Box
-          bgGradient="linear(135deg, teal.500, teal.400)"
+          bgGradient="linear(135deg, teal.400, teal.600)"
           color="white"
           px={{ base: 4, sm: 8 }}
           py={{ base: 6, sm: 6 }}
@@ -104,7 +104,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
             <Box
               p={{ base: 2, sm: 3 }}
               bg="whiteAlpha.200"
-              borderRadius="xl"
+              borderRadius="md"
               backdropFilter="blur(10px)"
             >
               <Icon as={BookText} boxSize={{ base: 5, sm: 6 }} />
@@ -157,7 +157,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
             <Box
               bg={cardBg}
               p={{ base: 4, sm: 6 }}
-              borderRadius="xl"
+              borderRadius="md"
               border="1px solid"
               borderColor={borderColor}
             >
@@ -183,7 +183,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
             <Box
               bg={cardBg}
               p={{ base: 4, sm: 6 }}
-              borderRadius="xl"
+              borderRadius="md"
               border="1px solid"
               borderColor={borderColor}
             >
@@ -239,4 +239,3 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
 };
 
 export default LedgerDetailsModal;
-
