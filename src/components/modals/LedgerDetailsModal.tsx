@@ -125,7 +125,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
                 <Badge
                   colorScheme="whiteAlpha"
                   variant="solid"
-                  fontSize={{ base: "xs", sm: "sm" }}
+                  fontSize={{ base: "sm", sm: "md" }}
                   px={3}
                   py={1}
                   borderRadius="full"
@@ -138,7 +138,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
               </HStack>
 
               <Text
-                fontSize={{ base: "sm", sm: "md" }}
+                fontSize={{ base: "md", sm: "lg" }}
                 color="whiteAlpha.900"
                 fontWeight="medium"
                 lineHeight="1.4"
@@ -161,8 +161,8 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
               borderColor={borderColor}
             >
               <HStack spacing={3} mb={4}>
-                <Icon as={FileText} color={iconColor} boxSize={5} />
-                <Text fontSize={{ base: "md", sm: "lg" }} fontWeight="semibold">
+                <Icon as={FileText} color={iconColor} boxSize={6} />
+                <Text fontSize={{ base: "lg", sm: "xl" }} fontWeight="semibold">
                   Notes
                 </Text>
               </HStack>
@@ -171,7 +171,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
                 color={notes ? textSecondary : textMuted}
                 lineHeight="1.7"
                 whiteSpace="pre-wrap"
-                fontSize={{ base: "sm", sm: "md" }}
+                fontSize={{ base: "md", sm: "lg" }}
                 fontStyle={!notes ? "italic" : "normal"}
               >
                 {notes || "No notes available for this ledger."}
@@ -191,7 +191,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
                   <HStack spacing={2}>
                     <Box w={2} h={2} bg="green.400" borderRadius="full" />
                     <Text
-                      fontSize={{ base: "xs", sm: "sm" }}
+                      fontSize={{ base: "sm", sm: "md" }}
                       color={textSecondary}
                       fontWeight="medium"
                     >
@@ -199,7 +199,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
                     </Text>
                   </HStack>
                   <Text
-                    fontSize={{ base: "xs", sm: "sm" }}
+                    fontSize={{ base: "sm", sm: "md" }}
                     color={textMuted}
                     fontFamily="mono"
                   >
@@ -213,7 +213,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
                   <HStack spacing={2}>
                     <Box w={2} h={2} bg="blue.400" borderRadius="full" />
                     <Text
-                      fontSize={{ base: "xs", sm: "sm" }}
+                      fontSize={{ base: "sm", sm: "md" }}
                       color={textSecondary}
                       fontWeight="medium"
                     >
@@ -221,7 +221,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
                     </Text>
                   </HStack>
                   <Text
-                    fontSize={{ base: "xs", sm: "sm" }}
+                    fontSize={{ base: "sm", sm: "md" }}
                     color={textMuted}
                     fontFamily="mono"
                   >
