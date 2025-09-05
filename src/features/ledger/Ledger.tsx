@@ -21,7 +21,7 @@ const Ledger = () => {
     updatedNotes: string
   ) => {
     if (ledgerId) {
-      setLedger(ledgerId, updatedName, updatedCurrencySymbol, updatedDescription, updatedNotes);
+      setLedger(ledgerId, updatedName, updatedCurrencySymbol, updatedDescription, updatedNotes, "", "");
     }
   };
 

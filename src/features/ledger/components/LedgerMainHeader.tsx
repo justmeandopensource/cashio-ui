@@ -5,12 +5,15 @@ import {
   Flex,
   useColorModeValue,
   IconButton,
+  useDisclosure,
 } from "@chakra-ui/react";
-import { Plus, ArrowRight, ArrowLeft, Edit } from "lucide-react";
+import { Plus, ArrowRight, ArrowLeft, Edit, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { FC } from "react";
+import { FC, useState } from "react";
 import useLedgerStore from "@/components/shared/store";
 import { BookText } from 'lucide-react';
+import LedgerDetailsModal from "@/components/modals/LedgerDetailsModal";
+import api from "@/lib/api";
 
 interface LedgerMainHeaderProps {
   onAddTransaction: () => void;
@@ -27,7 +30,68 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const { ledgerName } = useLedgerStore();
+  const {
+    ledgerId,
+    ledgerName,
+    currencySymbol,
+    description,
+    notes,
+    createdAt,
+    updatedAt,
+    setLedger
+  } = useLedgerStore();
+
+  // State for fetched ledger details
+  const [fetchedLedgerData, setFetchedLedgerData] = useState<{
+    name: string;
+    currency_symbol: string;
+    description?: string;
+    notes?: string;
+    created_at: string;
+    updated_at: string;
+  } | null>(null);
+
+  // Modal state for ledger details
+  const {
+    isOpen: isDetailsModalOpen,
+    onOpen: onDetailsModalOpen,
+    onClose: onDetailsModalClose,
+  } = useDisclosure();
+
+  // Fetch full ledger details from API
+  const fetchLedgerDetails = async () => {
+    if (!ledgerId) return;
+
+    try {
+      const response = await api.get(`/ledger/${ledgerId}`);
+      const ledgerData = response.data;
+
+      // Update store with complete data
+      setLedger(
+        ledgerId,
+        ledgerData.name,
+        ledgerData.currency_symbol,
+        ledgerData.description,
+        ledgerData.notes,
+        ledgerData.created_at,
+        ledgerData.updated_at
+      );
+
+      setFetchedLedgerData(ledgerData);
+    } catch (error) {
+      console.error("Failed to fetch ledger details:", error);
+    }
+  };
+
+  // Handle opening the details modal
+  const handleOpenDetailsModal = async () => {
+    // Fetch fresh data if dates are not available in store
+    if (!createdAt || !updatedAt) {
+      await fetchLedgerDetails();
+    }
+    onDetailsModalOpen();
+  };
+
   // Use Chakra's color mode for consistent styling
   const bgColor = useColorModeValue("white", "gray.700");
   const buttonColorScheme = useColorModeValue("teal", "blue");
@@ -77,6 +141,15 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
               {ledgerName}
             </Heading>
             <IconButton
+              aria-label="View Ledger Details"
+              icon={<Info />}
+              variant="ghost"
+              color="teal.500"
+              size="sm"
+              onClick={handleOpenDetailsModal}
+              className="edit-icon"
+            />
+            <IconButton
               aria-label="Edit Ledger"
               icon={<Edit />}
               variant="ghost"
@@ -121,6 +194,18 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
           </Flex>
         )}
       </Flex>
+
+      {/* Ledger Details Modal */}
+      <LedgerDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={onDetailsModalClose}
+        ledgerName={fetchedLedgerData?.name || ledgerName || ""}
+        currencySymbol={fetchedLedgerData?.currency_symbol || currencySymbol || ""}
+        description={fetchedLedgerData?.description || description}
+        notes={fetchedLedgerData?.notes || notes}
+        createdAt={fetchedLedgerData?.created_at || createdAt}
+        updatedAt={fetchedLedgerData?.updated_at || updatedAt}
+      />
     </Box>
   );
 };

@@ -13,6 +13,8 @@ interface Ledger {
   currency_symbol: string;
   description: string;
   notes: string;
+  created_at: string;
+  updated_at: string;
 }
 
 const Home = () => {

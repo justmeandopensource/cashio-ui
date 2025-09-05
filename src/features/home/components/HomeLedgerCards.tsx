@@ -27,7 +27,7 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
     description: string,
     notes: string,
   ) => {
-    setLedger(ledgerId, ledgerName, currencySymbol, description, notes);
+    setLedger(ledgerId, ledgerName, currencySymbol, description, notes, "", "");
     navigate(`/ledger`);
   };
 
