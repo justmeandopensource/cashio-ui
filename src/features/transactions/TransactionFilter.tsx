@@ -5,7 +5,6 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
   ModalFooter,
   ModalBody,
   FormControl,
@@ -18,15 +17,17 @@ import {
   Flex,
   Radio,
   RadioGroup,
-  Text,
   Badge,
   useDisclosure,
   Grid,
   GridItem,
   Box,
   VStack,
+  HStack,
+  useColorModeValue,
+  Spinner,
 } from "@chakra-ui/react";
-import { Filter, X, Check } from "lucide-react";
+import { Filter, X, CheckCircle, RotateCcw } from "lucide-react";
 import FormTags from "@/components/shared/FormTags";
 import config from "@/config";
 import ChakraDatePicker from "@/components/shared/ChakraDatePicker";
@@ -77,6 +78,14 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
   onResetFilters,
 }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // Modern theme colors - matching CreateAccountModal
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
+  const inputBorderColor = useColorModeValue("gray.200", "gray.600");
+  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
 
   // State for filter form values
   const [filters, setFilters] = useState<Filters>({
@@ -136,7 +145,9 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
   }, [isOpen, currentFilters]);
 
   // Fetch accounts for the current ledger
-  const { data: accounts = [] } = useQuery<Account[]>({
+  const { data: accounts = [], isLoading: isAccountsLoading } = useQuery<
+    Account[]
+  >({
     queryKey: ["accounts", ledgerId, "transaction-filter"],
     queryFn: async () => {
       const token = localStorage.getItem("access_token");
@@ -160,7 +171,9 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
   });
 
   // Fetch categories
-  const { data: categories = [] } = useQuery<Category[]>({
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery<
+    Category[]
+  >({
     queryKey: ["categories"],
     queryFn: async () => {
       const token = localStorage.getItem("access_token");
@@ -335,9 +348,6 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
 
   const activeFilterCount = getActiveFilterCount();
 
-  // Responsive design helpers
-  const buttonColorScheme = "teal";
-
   return (
     <>
       <IconButton
@@ -369,256 +379,396 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
       <Modal
         isOpen={isOpen}
         onClose={onClose}
-        size={{ base: "full", md: "lg" }}
+        size={{ base: "full", sm: "xl" }}
         motionPreset="slideInBottom"
       >
-        <ModalOverlay backdropFilter="blur(2px)" />
+        <ModalOverlay backdropFilter="blur(4px)" bg="blackAlpha.300" />
         <ModalContent
+          bg={bgColor}
           borderRadius={{ base: 0, sm: "md" }}
+          boxShadow="2xl"
+          border="1px solid"
+          borderColor={borderColor}
+          overflow="hidden"
           mx={{ base: 0, sm: 4 }}
           my={{ base: 0, sm: "auto" }}
-          maxHeight={{ base: "100%", md: "80vh" }}
+          maxHeight={{ base: "100%", md: "90vh" }}
           display="flex"
           flexDirection="column"
         >
+          {/* Modern gradient header */}
           <Box
-            pt={{ base: 10, sm: 4 }}
-            pb={{ base: 2, sm: 0 }}
-            px={{ base: 4, sm: 0 }}
-            bg={{ base: buttonColorScheme + ".500", sm: "transparent" }}
-            color={{ base: "white", sm: "inherit" }}
-            borderTopRadius={{ base: 0, sm: "md" }}
+            bgGradient="linear(135deg, teal.400, teal.600)"
+            color="white"
+            px={{ base: 4, sm: 8 }}
+            py={{ base: 6, sm: 6 }}
+            pt={{ base: 12, sm: 6 }}
+            position="relative"
           >
-            <ModalHeader
-              fontSize={{ base: "xl", sm: "lg" }}
-              p={{ base: 0, sm: 6 }}
-              pb={{ base: 4, sm: 2 }}
+            <HStack
+              spacing={{ base: 3, sm: 4 }}
+              align="center"
+              justify="space-between"
             >
-              <Flex justify="space-between" align="center">
-                <Text>Filter Transactions</Text>
-                <Button
-                  size="xs"
-                  onClick={handleResetFilters}
-                  leftIcon={<X size={14} />}
-                  variant="ghost"
-                  color={{ base: "white", sm: "inherit" }}
-                  _hover={{ sm: { bg: "gray.100" } }}
+              <HStack spacing={{ base: 3, sm: 4 }} align="center">
+                <Box
+                  p={{ base: 2, sm: 3 }}
+                  bg="whiteAlpha.200"
+                  borderRadius="md"
+                  backdropFilter="blur(10px)"
                 >
-                  Reset All
-                </Button>
-              </Flex>
-            </ModalHeader>
+                  <Filter size={24} style={{ margin: 0 }} />
+                </Box>
+
+                <Box>
+                  <Box
+                    fontSize={{ base: "xl", sm: "2xl" }}
+                    fontWeight="bold"
+                    lineHeight="1.2"
+                  >
+                    Filter Transactions
+                  </Box>
+                  <Box
+                    fontSize={{ base: "sm", sm: "md" }}
+                    color="whiteAlpha.900"
+                    fontWeight="medium"
+                    mt={1}
+                  >
+                    Refine your transaction search
+                  </Box>
+                </Box>
+              </HStack>
+
+              <Button
+                size="sm"
+                onClick={handleResetFilters}
+                leftIcon={<RotateCcw size={16} />}
+                variant="ghost"
+                color="white"
+                _hover={{ bg: "whiteAlpha.200" }}
+                borderRadius="md"
+              >
+                Reset
+              </Button>
+            </HStack>
           </Box>
 
           <ModalBody
-            px={{ base: 4, sm: 6 }}
-            py={{ base: 4, sm: 4 }}
+            px={{ base: 4, sm: 8 }}
+            py={{ base: 4, sm: 6 }}
             flex="1"
             display="flex"
             flexDirection="column"
             overflow="auto"
-            maxHeight={{ md: "calc(80vh - 140px)" }}
             justifyContent={{ base: "space-between", sm: "flex-start" }}
           >
-            <VStack spacing={6} align="stretch" w="100%">
-              {/* Account Selection */}
+            <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
+              {/* Account Selection Card */}
               {!accountId && (
-                <FormControl>
-                  <FormLabel fontSize="sm" fontWeight="medium">
-                    Account
-                  </FormLabel>
-                  <Select
-                    placeholder="All Accounts"
-                    value={filters.account_id}
-                    onChange={(e) =>
-                      handleInputChange("account_id", e.target.value)
-                    }
-                  >
-                    {/* Group for Asset Accounts */}
-                    <optgroup label="Asset Accounts">
-                      {accounts
-                        .filter((account) => account.type === "asset")
-                        .map((account) => (
-                          <option
-                            key={account.account_id}
-                            value={account.account_id}
-                          >
-                            {account.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    {/* Group for Liability Accounts */}
-                    <optgroup label="Liability Accounts">
-                      {accounts
-                        .filter((account) => account.type === "liability")
-                        .map((account) => (
-                          <option
-                            key={account.account_id}
-                            value={account.account_id}
-                          >
-                            {account.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  </Select>
-                </FormControl>
+                <Box
+                  bg={cardBg}
+                  p={{ base: 4, sm: 6 }}
+                  borderRadius="md"
+                  border="1px solid"
+                  borderColor={borderColor}
+                >
+                  <FormControl>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Account
+                    </FormLabel>
+                    {isAccountsLoading ? (
+                      <Flex justify="center" align="center" py={4}>
+                        <Spinner size="md" color="teal.500" thickness="3px" />
+                      </Flex>
+                    ) : (
+                      <Select
+                        placeholder="All Accounts"
+                        value={filters.account_id}
+                        onChange={(e) =>
+                          handleInputChange("account_id", e.target.value)
+                        }
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        bg={inputBg}
+                        size="lg"
+                        borderRadius="md"
+                        _hover={{ borderColor: "teal.300" }}
+                        _focus={{
+                          borderColor: focusBorderColor,
+                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                        }}
+                      >
+                        {/* Group for Asset Accounts */}
+                        <optgroup label="Asset Accounts">
+                          {accounts
+                            .filter((account) => account.type === "asset")
+                            .map((account) => (
+                              <option
+                                key={account.account_id}
+                                value={account.account_id}
+                              >
+                                {account.name}
+                              </option>
+                            ))}
+                        </optgroup>
+                        {/* Group for Liability Accounts */}
+                        <optgroup label="Liability Accounts">
+                          {accounts
+                            .filter((account) => account.type === "liability")
+                            .map((account) => (
+                              <option
+                                key={account.account_id}
+                                value={account.account_id}
+                              >
+                                {account.name}
+                              </option>
+                            ))}
+                        </optgroup>
+                      </Select>
+                    )}
+                  </FormControl>
+                </Box>
               )}
 
-              {/* Category Selection */}
-              <FormControl>
-                <FormLabel fontSize="sm" fontWeight="medium">
-                  Category
-                </FormLabel>
-                <Select
-                  placeholder="All Categories"
-                  value={filters.category_id}
-                  onChange={(e) =>
-                    handleInputChange("category_id", e.target.value)
-                  }
-                >
-                  {/* Group for Income Categories */}
-                  <optgroup label="Income Categories">
-                    {categories
-                      .filter((category) => category.type === "income")
-                      .map((category) => (
-                        <option
-                          key={category.category_id}
-                          value={category.category_id}
-                        >
-                          {category.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                  {/* Group for Expense Categories */}
-                  <optgroup label="Expense Categories">
-                    {categories
-                      .filter((category) => category.type === "expense")
-                      .map((category) => (
-                        <option
-                          key={category.category_id}
-                          value={category.category_id}
-                        >
-                          {category.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                </Select>
-              </FormControl>
+              {/* Category Selection Card */}
+              <Box
+                bg={cardBg}
+                p={{ base: 4, sm: 6 }}
+                borderRadius="md"
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <FormControl>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Category
+                  </FormLabel>
+                  {isCategoriesLoading ? (
+                    <Flex justify="center" align="center" py={4}>
+                      <Spinner size="md" color="teal.500" thickness="3px" />
+                    </Flex>
+                  ) : (
+                    <Select
+                      placeholder="All Categories"
+                      value={filters.category_id}
+                      onChange={(e) =>
+                        handleInputChange("category_id", e.target.value)
+                      }
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      size="lg"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                    >
+                      {/* Group for Income Categories */}
+                      <optgroup label="Income Categories">
+                        {categories
+                          .filter((category) => category.type === "income")
+                          .map((category) => (
+                            <option
+                              key={category.category_id}
+                              value={category.category_id}
+                            >
+                              {category.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                      {/* Group for Expense Categories */}
+                      <optgroup label="Expense Categories">
+                        {categories
+                          .filter((category) => category.type === "expense")
+                          .map((category) => (
+                            <option
+                              key={category.category_id}
+                              value={category.category_id}
+                            >
+                              {category.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                    </Select>
+                  )}
+                </FormControl>
+              </Box>
 
-              {/* Tags Selection */}
-              <FormTags
-                tags={filters.tags}
-                setTags={(tags) => handleInputChange("tags", tags)}
-                borderColor="gray.300"
-                buttonColorScheme={buttonColorScheme}
-              />
+              {/* Tags Card */}
+              <Box
+                bg={cardBg}
+                p={{ base: 4, sm: 6 }}
+                borderRadius="md"
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <VStack spacing={5} align="stretch">
+                  {/* Tags Selection */}
+                  <FormTags
+                    tags={filters.tags}
+                    setTags={(tags) => handleInputChange("tags", tags)}
+                    borderColor={inputBorderColor}
+                    buttonColorScheme="teal"
+                  />
 
-              {/* Tags Match Type */}
-              <FormControl>
-                <FormLabel fontSize="sm" fontWeight="medium">
-                  Tags Match
-                </FormLabel>
-                <RadioGroup
-                  value={filters.tags_match}
-                  onChange={(value) =>
-                    handleInputChange("tags_match", value as "any" | "all")
-                  }
-                >
-                  <Stack direction="row">
-                    <Radio value="any" colorScheme="teal">
-                      Match Any Tag
-                    </Radio>
-                    <Radio value="all" colorScheme="teal">
-                      Match All Tags
-                    </Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-
-              {/* Search Text */}
-              <FormControl>
-                <FormLabel fontSize="sm" fontWeight="medium">
-                  Search Notes
-                </FormLabel>
-                <Input
-                  placeholder="Search in transaction notes"
-                  value={filters.search_text}
-                  onChange={(e) =>
-                    handleInputChange("search_text", e.target.value)
-                  }
-                />
-              </FormControl>
-
-              {/* Transaction Type */}
-              <FormControl>
-                <FormLabel fontSize="sm" fontWeight="medium">
-                  Transaction Type
-                </FormLabel>
-                <RadioGroup
-                  value={filters.transaction_type}
-                  onChange={(value) =>
-                    handleInputChange("transaction_type", value)
-                  }
-                >
-                  <Stack direction="row">
-                    <Radio value="" colorScheme="teal">
-                      All
-                    </Radio>
-                    <Radio value="income" colorScheme="teal">
-                      Income
-                    </Radio>
-                    <Radio value="expense" colorScheme="teal">
-                      Expense
-                    </Radio>
-                    <Radio value="transfer" colorScheme="teal">
-                      Transfer
-                    </Radio>
-                  </Stack>
-                </RadioGroup>
-              </FormControl>
-
-              {/* Date Range */}
-              <Grid templateColumns="repeat(2, 1fr)" gap={4}>
-                <GridItem>
+                  {/* Tags Match Criteria */}
                   <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="medium">
-                      From Date
-                    </FormLabel>
-                    <ChakraDatePicker
-                      selected={filters.from_date}
-                      onChange={(date) => handleInputChange("from_date", date)}
-                      shouldCloseOnSelect={true}
-                      placeholderText="From"
-                    />
+                    <RadioGroup
+                      value={filters.tags_match}
+                      onChange={(value) =>
+                        handleInputChange("tags_match", value as "any" | "all")
+                      }
+                    >
+                      <Stack direction="row" spacing={6}>
+                        <Radio value="any" colorScheme="teal" size="lg">
+                          Match Any Tag
+                        </Radio>
+                        <Radio value="all" colorScheme="teal" size="lg">
+                          Match All Tags
+                        </Radio>
+                      </Stack>
+                    </RadioGroup>
                   </FormControl>
-                </GridItem>
-                <GridItem>
-                  <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="medium">
-                      To Date
-                    </FormLabel>
-                    <ChakraDatePicker
-                      selected={filters.to_date}
-                      onChange={(date) => handleInputChange("to_date", date)}
-                      shouldCloseOnSelect={true}
-                      placeholderText="To"
-                      minDate={filters.from_date}
-                    />
-                  </FormControl>
-                </GridItem>
-              </Grid>
+                </VStack>
+              </Box>
+
+              {/* Search Notes Card */}
+              <Box
+                bg={cardBg}
+                p={{ base: 4, sm: 6 }}
+                borderRadius="md"
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <FormControl>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Search Notes
+                  </FormLabel>
+                  <Input
+                    placeholder="Search in transaction notes"
+                    value={filters.search_text}
+                    onChange={(e) =>
+                      handleInputChange("search_text", e.target.value)
+                    }
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                  />
+                </FormControl>
+              </Box>
+
+              {/* Transaction Type Card */}
+              <Box
+                bg={cardBg}
+                p={{ base: 4, sm: 6 }}
+                borderRadius="md"
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <FormControl>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Transaction Type
+                  </FormLabel>
+                  <RadioGroup
+                    value={filters.transaction_type}
+                    onChange={(value) =>
+                      handleInputChange("transaction_type", value)
+                    }
+                  >
+                    <Stack
+                      direction={{ base: "column", sm: "row" }}
+                      spacing={4}
+                    >
+                      <Radio value="" colorScheme="teal" size="lg">
+                        All Types
+                      </Radio>
+                      <Radio value="income" colorScheme="teal" size="lg">
+                        Income
+                      </Radio>
+                      <Radio value="expense" colorScheme="teal" size="lg">
+                        Expense
+                      </Radio>
+                      <Radio value="transfer" colorScheme="teal" size="lg">
+                        Transfer
+                      </Radio>
+                    </Stack>
+                  </RadioGroup>
+                </FormControl>
+              </Box>
+
+              {/* Date Range Card */}
+              <Box
+                bg={cardBg}
+                p={{ base: 4, sm: 6 }}
+                borderRadius="md"
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <FormControl>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Date Range
+                  </FormLabel>
+                  <Grid templateColumns="repeat(2, 1fr)" gap={4}>
+                    <GridItem>
+                      <FormControl>
+                        <FormLabel fontSize="sm" color="gray.600" mb={1}>
+                          From Date
+                        </FormLabel>
+                        <ChakraDatePicker
+                          selected={filters.from_date}
+                          onChange={(date) =>
+                            handleInputChange("from_date", date)
+                          }
+                          shouldCloseOnSelect={true}
+                          placeholderText="From"
+                        />
+                      </FormControl>
+                    </GridItem>
+                    <GridItem>
+                      <FormControl>
+                        <FormLabel fontSize="sm" color="gray.600" mb={1}>
+                          To Date
+                        </FormLabel>
+                        <ChakraDatePicker
+                          selected={filters.to_date}
+                          onChange={(date) =>
+                            handleInputChange("to_date", date)
+                          }
+                          shouldCloseOnSelect={true}
+                          placeholderText="To"
+                          minDate={filters.from_date}
+                        />
+                      </FormControl>
+                    </GridItem>
+                  </Grid>
+                </FormControl>
+              </Box>
             </VStack>
 
             {/* Mobile-only action buttons that stay at bottom */}
             <Box display={{ base: "block", sm: "none" }} mt={6}>
               <Button
                 onClick={handleApplyFilters}
-                colorScheme={buttonColorScheme}
+                colorScheme="teal"
                 size="lg"
                 width="100%"
                 mb={3}
+                borderRadius="md"
                 isDisabled={!hasChanged}
-                leftIcon={<Check size={18} />}
+                leftIcon={<CheckCircle />}
+                _hover={{
+                  transform: !hasChanged ? "none" : "translateY(-2px)",
+                  boxShadow: !hasChanged ? "none" : "lg",
+                }}
+                transition="all 0.2s"
               >
                 Apply Filters
               </Button>
@@ -627,7 +777,10 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                 onClick={onClose}
                 size="lg"
                 width="100%"
-                leftIcon={<X size={18} />}
+                borderRadius="md"
+                leftIcon={<X />}
+                borderWidth="2px"
+                _hover={{ bg: cardBg }}
               >
                 Cancel
               </Button>
@@ -635,18 +788,41 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
           </ModalBody>
 
           {/* Desktop-only footer */}
-          <ModalFooter display={{ base: "none", sm: "flex" }}>
+          <ModalFooter
+            display={{ base: "none", sm: "flex" }}
+            px={8}
+            py={6}
+            bg={cardBg}
+            borderTop="1px solid"
+            borderColor={borderColor}
+          >
             <Button
-              colorScheme={buttonColorScheme}
+              colorScheme="teal"
               mr={3}
-              px={6}
               onClick={handleApplyFilters}
+              px={8}
+              py={3}
+              borderRadius="md"
               isDisabled={!hasChanged}
-              leftIcon={<Check size={18} />}
+              leftIcon={<CheckCircle />}
+              _hover={{
+                transform: !hasChanged ? "none" : "translateY(-2px)",
+                boxShadow: !hasChanged ? "none" : "lg",
+              }}
+              transition="all 0.2s"
             >
               Apply Filters
             </Button>
-            <Button variant="outline" onClick={onClose} leftIcon={<X size={18} />}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              leftIcon={<X />}
+              px={6}
+              py={3}
+              borderRadius="md"
+              borderWidth="2px"
+              _hover={{ bg: inputBg }}
+            >
               Cancel
             </Button>
           </ModalFooter>

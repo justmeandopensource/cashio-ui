@@ -9,14 +9,18 @@ import {
   PopoverArrow,
   PopoverBody,
   PopoverFooter,
-  PopoverCloseButton,
   VStack,
   Link as ChakraLink,
+  HStack,
+  Divider,
+  useColorModeValue,
+  Icon,
+  Button,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import { useNavigate } from "react-router-dom";
-import { Settings, LogOut } from "lucide-react";
+import { LogOut, User, ChevronUp } from "lucide-react";
 import { VERSION } from "../../version";
 
 interface UserProfile {
@@ -47,14 +51,31 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
     queryFn: fetchUserProfile,
   });
 
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const [triggerWidth, setTriggerWidth] = useState(0);
 
+  // Modern color scheme
+  const bgColor = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const hoverBg = useColorModeValue("gray.50", "gray.700");
+  const textColor = useColorModeValue("gray.800", "gray.100");
+  const secondaryTextColor = useColorModeValue("gray.600", "gray.400");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const avatarBg = useColorModeValue("teal.500", "teal.600");
+
   useEffect(() => {
-    if (triggerRef.current) {
-      setTriggerWidth(triggerRef.current.offsetWidth);
-    }
-  }, [userProfile]); // Recalculate if userProfile changes
+    const measureTriggerWidth = () => {
+      if (triggerRef.current) {
+        setTriggerWidth(triggerRef.current.offsetWidth);
+      }
+    };
+
+    measureTriggerWidth();
+
+    // Re-measure on window resize
+    window.addEventListener("resize", measureTriggerWidth);
+    return () => window.removeEventListener("resize", measureTriggerWidth);
+  }, [userProfile]);
 
   const getInitials = (fullName: string) => {
     return fullName
@@ -65,80 +86,198 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
   };
 
   if (isLoading) {
-    return <Text>Loading user...</Text>;
+    return (
+      <Box
+        p={3}
+        borderRadius="md"
+        bg={cardBg}
+        border="1px solid"
+        borderColor={borderColor}
+      >
+        <HStack spacing={3}>
+          <Box
+            width="40px"
+            height="40px"
+            borderRadius="md"
+            bg={hoverBg}
+            animate="pulse"
+          />
+          <Box flex="1">
+            <Box height="16px" bg={hoverBg} borderRadius="md" mb={1} />
+            <Box height="12px" bg={hoverBg} borderRadius="md" width="70%" />
+          </Box>
+        </HStack>
+      </Box>
+    );
   }
 
   if (isError || !userProfile) {
-    return <Text>Error loading user profile.</Text>;
+    return (
+      <Box
+        p={3}
+        borderRadius="md"
+        bg={cardBg}
+        border="1px solid"
+        borderColor="red.200"
+        color="red.600"
+        textAlign="center"
+      >
+        <Text fontSize="sm">Error loading profile</Text>
+      </Box>
+    );
   }
 
   return (
-    <Popover placement="top">
+    <Popover placement="top" isLazy>
       <PopoverTrigger>
-        <ChakraLink
+        <Button
           ref={triggerRef}
-          display="flex"
-          alignItems="center"
-          py={2}
-          px={4}
-          cursor="pointer"
-          _hover={{ bg: "teal.600", borderRadius: "md" }}
-          _expanded={{ bg: "teal.600", borderRadius: "md" }}
+          variant="ghost"
+          p={3}
+          height="auto"
           borderRadius="md"
+          bg="transparent"
+          border="1px solid"
+          borderColor={borderColor}
+          _hover={{
+            bg: hoverBg,
+            transform: "translateY(-2px)",
+            boxShadow: "lg",
+          }}
+          _active={{ transform: "translateY(0)" }}
+          transition="all 0.2s ease"
+          width="full"
+          justifyContent="flex-start"
         >
-          <Avatar
-            size="sm"
-            name={userProfile.full_name}
-            src="" // No image, just initials
-            getInitials={getInitials}
-            bg="teal.700"
-            borderRadius="md"
-            color="white"
-          />
-          <Box ml={3} textAlign="left">
-            <Text fontWeight="bold" fontSize="md">
-              {userProfile.full_name}
-            </Text>
-            <Text fontSize="sm">{userProfile.email}</Text>
-          </Box>
-        </ChakraLink>
-      </PopoverTrigger>
-      <PopoverContent
-        bg="teal.50"
-        borderColor="gray.200"
-        boxShadow="lg"
-        width={triggerWidth}
-      >
-        <PopoverArrow />
-        <PopoverCloseButton />
+          <HStack spacing={3} width="full">
+            <Avatar
+              size="sm"
+              name={userProfile.full_name}
+              src=""
+              getInitials={getInitials}
+              bg={avatarBg}
+              borderRadius="md"
+              color="white"
+              fontWeight="bold"
+              fontSize="sm"
+            />
 
-        <PopoverBody>
-          <VStack align="flex-start" spacing={2}>
+            <Box flex="1" textAlign="left" minWidth="0">
+              <Text
+                fontWeight="semibold"
+                fontSize="sm"
+                color={textColor}
+                noOfLines={1}
+              >
+                {userProfile.full_name}
+              </Text>
+              <Text fontSize="xs" color={secondaryTextColor} noOfLines={1}>
+                {userProfile.email}
+              </Text>
+            </Box>
+
+            <Icon
+              as={ChevronUp}
+              boxSize={4}
+              color={secondaryTextColor}
+              opacity={0.7}
+            />
+          </HStack>
+        </Button>
+      </PopoverTrigger>
+
+      <PopoverContent
+        bg={bgColor}
+        borderColor="transparent"
+        boxShadow="rgba(0, 0, 0, 0.1) 0px 4px 12px"
+        borderRadius="xl"
+        border="none"
+        width={triggerWidth > 0 ? `${triggerWidth}px` : "240px"}
+        maxWidth="none"
+        overflow="hidden"
+        _focus={{ outline: "none" }}
+        css={{
+          "--popper-arrow-shadow-color": "transparent",
+        }}
+      >
+        <PopoverArrow bg={bgColor} shadow="none" border="none" />
+
+        {/* Header */}
+        <Box p={4} pb={0}>
+          <HStack spacing={3}>
+            <Avatar
+              size="md"
+              name={userProfile.full_name}
+              src=""
+              getInitials={getInitials}
+              bg={avatarBg}
+              borderRadius="md"
+              color="white"
+              fontWeight="bold"
+            />
+            <Box flex="1" minWidth="0">
+              <Text
+                fontWeight="bold"
+                fontSize="md"
+                color={textColor}
+                noOfLines={1}
+              >
+                {userProfile.full_name}
+              </Text>
+              <Text fontSize="sm" color={secondaryTextColor} noOfLines={1}>
+                {userProfile.email}
+              </Text>
+            </Box>
+          </HStack>
+        </Box>
+
+        <PopoverBody p={0} pt={4}>
+          <VStack align="stretch" spacing={0}>
             <ChakraLink
               onClick={() => navigate("/profile")}
               display="flex"
               alignItems="center"
-              color="secondaryTextColor"
-              fontWeight="normal"
-              fontSize="md"
+              px={4}
+              py={3}
+              color={textColor}
+              fontWeight="medium"
+              fontSize="sm"
+              _hover={{ bg: hoverBg }}
+              transition="all 0.2s"
             >
-              <Settings size={18} style={{ marginRight: "8px" }} /> Profile
+              <Icon as={User} boxSize={4} mr={3} color="teal.500" />
+              Profile Settings
             </ChakraLink>
+
+            <Divider borderColor={borderColor} />
+
             <ChakraLink
               onClick={handleLogout}
               display="flex"
               alignItems="center"
-              color="secondaryTextColor"
-              fontWeight="normal"
-              fontSize="md"
+              px={4}
+              py={3}
+              color="red.500"
+              fontWeight="medium"
+              fontSize="sm"
+              _hover={{ bg: "red.50", color: "red.600" }}
+              transition="all 0.2s"
             >
-              <LogOut size={18} style={{ marginRight: "8px" }} /> Log Out
+              <Icon as={LogOut} boxSize={4} mr={3} />
+              Sign Out
             </ChakraLink>
           </VStack>
         </PopoverBody>
-        <PopoverFooter>
-          <Text fontSize="xs" color="tertiaryTextColor">
-            Version: {VERSION}
+
+        <PopoverFooter
+          px={4}
+          py={3}
+          bg={cardBg}
+          borderTop="1px solid"
+          borderColor={borderColor}
+        >
+          <Text fontSize="xs" color={secondaryTextColor}>
+            Version {VERSION}
           </Text>
         </PopoverFooter>
       </PopoverContent>

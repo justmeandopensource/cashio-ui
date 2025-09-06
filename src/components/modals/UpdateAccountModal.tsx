@@ -5,7 +5,6 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
   ModalFooter,
   ModalBody,
   FormControl,
@@ -19,6 +18,7 @@ import {
   useToast,
   Box,
   VStack,
+  HStack,
   useColorModeValue,
   Text,
 } from "@chakra-ui/react";
@@ -63,20 +63,25 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
 }) => {
   const [name, setName] = useState<string>(account.name);
   const [openingBalance, setOpeningBalance] = useState<string>(
-    account.opening_balance.toString()
+    account.opening_balance.toString(),
   );
   const [parentAccountId, setParentAccountId] = useState<
     string | number | null
   >(account.parent_account_id);
   const [groupAccounts, setGroupAccounts] = useState<GroupAccount[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isFetchingGroups, setIsFetchingGroups] = useState<boolean>(false);
   const toast = useToast();
 
   const { currencySymbol } = useLedgerStore();
-  // Color variables for consistent theming
-  const buttonColorScheme = "teal";
+
+  // Modern theme colors - matching other modals
   const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
+  const inputBorderColor = useColorModeValue("gray.200", "gray.600");
+  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
 
   // Handle Enter key press
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -89,9 +94,9 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   useEffect(() => {
     const fetchGroupAccounts = async (): Promise<void> => {
       try {
-        setIsLoading(true);
+        setIsFetchingGroups(true);
         const response = await api.get<GroupAccount[]>(
-          `/ledger/${account.ledger_id}/accounts/group?account_type=${account.type}`
+          `/ledger/${account.ledger_id}/accounts/group?account_type=${account.type}`,
         );
         setGroupAccounts(response.data);
       } catch (error) {
@@ -106,7 +111,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
           });
         }
       } finally {
-        setIsLoading(false);
+        setIsFetchingGroups(false);
       }
     };
 
@@ -148,7 +153,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
       setIsLoading(true);
       await api.put(
         `/ledger/${account.ledger_id}/account/${account.account_id}/update`,
-        payload
+        payload,
       );
       toast({
         description: "Account updated successfully",
@@ -176,157 +181,247 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size={{ base: "full", sm: "md" }}
+      size={{ base: "full", sm: "xl" }}
       motionPreset="slideInBottom"
     >
-      <ModalOverlay backdropFilter="blur(2px)" />
+      <ModalOverlay backdropFilter="blur(4px)" bg="blackAlpha.300" />
       <ModalContent
+        bg={bgColor}
         borderRadius={{ base: 0, sm: "md" }}
+        boxShadow="2xl"
+        border="1px solid"
+        borderColor={borderColor}
+        overflow="hidden"
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        maxHeight={{ base: "100%", md: "80vh" }}
+        maxHeight={{ base: "100%", md: "90vh" }}
         display="flex"
         flexDirection="column"
       >
+        {/* Modern gradient header */}
         <Box
-          pt={{ base: 10, sm: 4 }}
-          pb={{ base: 2, sm: 0 }}
-          px={{ base: 4, sm: 0 }}
-          bg={{ base: buttonColorScheme + ".500", sm: "transparent" }}
-          color={{ base: "white", sm: "inherit" }}
-          borderTopRadius={{ base: 0, sm: "md" }}
+          bgGradient="linear(135deg, teal.400, teal.600)"
+          color="white"
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 6, sm: 6 }}
+          pt={{ base: 12, sm: 6 }}
+          position="relative"
         >
-          <ModalHeader
-            fontSize={{ base: "xl", sm: "lg" }}
-            p={{ base: 0, sm: 6 }}
-            pb={{ base: 4, sm: 2 }}
-          >
-            <Flex alignItems="center">
-              <Edit size={24} style={{ marginRight: "8px" }} />
-              Update {account.type === "asset" ? "Asset" : "Liability"} Account
-            </Flex>
-          </ModalHeader>
+          <HStack spacing={{ base: 3, sm: 4 }} align="center">
+            <Box
+              p={{ base: 2, sm: 3 }}
+              bg="whiteAlpha.200"
+              borderRadius="md"
+              backdropFilter="blur(10px)"
+            >
+              <Edit size={24} style={{ margin: 0 }} />
+            </Box>
+
+            <Box>
+              <Box
+                fontSize={{ base: "xl", sm: "2xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+              >
+                Update {account.type === "asset" ? "Asset" : "Liability"}{" "}
+                Account
+              </Box>
+              <Box
+                fontSize={{ base: "sm", sm: "md" }}
+                color="whiteAlpha.900"
+                fontWeight="medium"
+                mt={1}
+              >
+                Modify account details and settings
+              </Box>
+            </Box>
+          </HStack>
         </Box>
 
         <ModalBody
-          px={{ base: 4, sm: 6 }}
-          py={{ base: 4, sm: 4 }}
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 4, sm: 6 }}
           flex="1"
           display="flex"
           flexDirection="column"
           overflow="auto"
-          maxHeight={{ md: "calc(80vh - 140px)" }}
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
-          <VStack spacing={6} align="stretch" w="100%">
-            <FormControl isRequired>
-              <FormLabel fontWeight="medium">Account Name</FormLabel>
-              <Input
-                placeholder={`e.g., ${
-                  account.type === "asset"
-                    ? "Cash, Bank Account"
-                    : "Credit Card, Mortgage"
-                }`}
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                onKeyPress={handleKeyPress}
-                borderWidth="1px"
-                borderColor={borderColor}
-                bg={bgColor}
-                size="md"
-                borderRadius="md"
-                _hover={{ borderColor: buttonColorScheme + ".300" }}
-                _focus={{
-                  borderColor: buttonColorScheme + ".500",
-                  boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
-                }}
-              />
-              <FormHelperText>
-                Update the name of your {account.type} account
-              </FormHelperText>
-            </FormControl>
-
-            <FormControl>
-              <FormLabel fontWeight="medium">Opening Balance</FormLabel>
-              <InputGroup>
-                <InputLeftAddon>{currencySymbol}</InputLeftAddon>
-                <Input
-                  type="number"
-                  value={openingBalance}
-                  onChange={(e) => setOpeningBalance(e.target.value)}
-                  placeholder="0.00"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  bg={bgColor}
-                  size="md"
-                  borderRadius="md"
-                  _hover={{ borderColor: buttonColorScheme + ".300" }}
-                  _focus={{
-                    borderColor: buttonColorScheme + ".500",
-                    boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
-                  }}
-                />
-              </InputGroup>
-              <FormHelperText>Starting balance for this account</FormHelperText>
-            </FormControl>
-
-            {/* Show loading spinner while fetching group accounts */}
-            {isLoading && groupAccounts.length === 0 && (
-              <Flex justify="center" align="center" my={4}>
-                <Spinner size="sm" color={buttonColorScheme + ".500"} />
-                <Text ml={2} color="gray.500">
-                  Loading parent accounts...
-                </Text>
-              </Flex>
-            )}
-
-            {groupAccounts.length > 0 && (
-              <FormControl>
-                <FormLabel fontWeight="medium">
-                  Parent Account (Optional)
+          <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
+            {/* Account Name Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+            >
+              <FormControl isRequired>
+                <FormLabel fontWeight="semibold" mb={2}>
+                  Account Name
                 </FormLabel>
-                <Select
-                  value={parentAccountId?.toString() || ""}
-                  onChange={(e) =>
-                    setParentAccountId(e.target.value ? e.target.value : null)
-                  }
-                  placeholder="Select parent account"
-                  borderWidth="1px"
-                  borderColor={borderColor}
-                  bg={bgColor}
-                  size="md"
+                <Input
+                  placeholder={`e.g., ${
+                    account.type === "asset"
+                      ? "Cash, Bank Account"
+                      : "Credit Card, Mortgage"
+                  }`}
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  borderWidth="2px"
+                  borderColor={inputBorderColor}
+                  bg={inputBg}
+                  size="lg"
                   borderRadius="md"
-                  _hover={{ borderColor: buttonColorScheme + ".300" }}
+                  _hover={{ borderColor: "teal.300" }}
                   _focus={{
-                    borderColor: buttonColorScheme + ".500",
-                    boxShadow: "0 0 0 1px " + buttonColorScheme + ".500",
+                    borderColor: focusBorderColor,
+                    boxShadow: `0 0 0 1px ${focusBorderColor}`,
                   }}
-                  data-testid="updateaccountmodal-parent-account-dropdown"
-                >
-                  {groupAccounts.map((group) => (
-                    <option
-                      key={group.account_id.toString()}
-                      value={group.account_id.toString()}
-                    >
-                      {group.name}
-                    </option>
-                  ))}
-                </Select>
-                <FormHelperText>
-                  Organize this account under an existing group
+                  autoFocus
+                />
+                <FormHelperText mt={2}>
+                  Update the name of your {account.type} account
                 </FormHelperText>
               </FormControl>
-            )}
+            </Box>
+
+            {/* Opening Balance Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+            >
+              <FormControl>
+                <FormLabel fontWeight="semibold" mb={2}>
+                  Opening Balance
+                </FormLabel>
+                <InputGroup size="lg">
+                  <InputLeftAddon
+                    bg={inputBorderColor}
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    color="gray.600"
+                    fontWeight="semibold"
+                  >
+                    {currencySymbol}
+                  </InputLeftAddon>
+                  <Input
+                    type="number"
+                    value={openingBalance}
+                    onChange={(e) => setOpeningBalance(e.target.value)}
+                    placeholder="0.00"
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                  />
+                </InputGroup>
+                <FormHelperText mt={2}>
+                  Starting balance for this account
+                </FormHelperText>
+              </FormControl>
+            </Box>
+
+            {/* Parent Account Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+            >
+              <FormControl>
+                <FormLabel fontWeight="semibold" mb={2}>
+                  Parent Account (Optional)
+                </FormLabel>
+
+                {/* Show loading spinner while fetching group accounts */}
+                {isFetchingGroups && (
+                  <Flex justify="center" align="center" py={8}>
+                    <VStack spacing={3}>
+                      <Spinner size="md" color="teal.500" thickness="3px" />
+                      <Text fontSize="sm" color="gray.600">
+                        Loading parent accounts...
+                      </Text>
+                    </VStack>
+                  </Flex>
+                )}
+
+                {/* Show parent account selection if data is available */}
+                {groupAccounts.length > 0 && !isFetchingGroups && (
+                  <>
+                    <Select
+                      value={parentAccountId?.toString() || ""}
+                      onChange={(e) =>
+                        setParentAccountId(
+                          e.target.value ? e.target.value : null,
+                        )
+                      }
+                      placeholder="Select parent account"
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      size="lg"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      data-testid="updateaccountmodal-parent-account-dropdown"
+                    >
+                      {groupAccounts.map((group) => (
+                        <option
+                          key={group.account_id.toString()}
+                          value={group.account_id.toString()}
+                        >
+                          {group.name}
+                        </option>
+                      ))}
+                    </Select>
+                    <FormHelperText mt={2}>
+                      Organize this account under an existing group
+                    </FormHelperText>
+                  </>
+                )}
+
+                {/* Show message if no group accounts are available */}
+                {groupAccounts.length === 0 && !isFetchingGroups && (
+                  <Box
+                    bg="blue.50"
+                    border="2px solid"
+                    borderColor="blue.200"
+                    borderRadius="md"
+                    p={4}
+                  >
+                    <Text color="blue.700" fontSize="sm" fontWeight="medium">
+                      No group accounts available. This account will remain at
+                      the root level.
+                    </Text>
+                  </Box>
+                )}
+              </FormControl>
+            </Box>
           </VStack>
 
           {/* Mobile-only action buttons that stay at bottom */}
           <Box display={{ base: "block", sm: "none" }} mt={6}>
             <Button
               onClick={handleSubmit}
-              colorScheme={buttonColorScheme}
+              colorScheme="teal"
               size="lg"
               width="100%"
               mb={3}
+              borderRadius="md"
               isLoading={isLoading}
               loadingText="Updating..."
               isDisabled={
@@ -336,16 +431,24 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                   parentAccountId === account.parent_account_id)
               }
               leftIcon={<Check />}
+              _hover={{
+                transform: isLoading ? "none" : "translateY(-2px)",
+                boxShadow: isLoading ? "none" : "lg",
+              }}
+              transition="all 0.2s"
             >
               Update Account
             </Button>
             <Button
               variant="outline"
               onClick={onClose}
-              width="100%"
               size="lg"
+              width="100%"
+              borderRadius="md"
               isDisabled={isLoading}
               leftIcon={<X />}
+              borderWidth="2px"
+              _hover={{ bg: cardBg }}
             >
               Cancel
             </Button>
@@ -353,12 +456,21 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
         </ModalBody>
 
         {/* Desktop-only footer */}
-        <ModalFooter display={{ base: "none", sm: "flex" }}>
+        <ModalFooter
+          display={{ base: "none", sm: "flex" }}
+          px={8}
+          py={6}
+          bg={cardBg}
+          borderTop="1px solid"
+          borderColor={borderColor}
+        >
           <Button
-            colorScheme={buttonColorScheme}
+            colorScheme="teal"
             mr={3}
             onClick={handleSubmit}
-            px={6}
+            px={8}
+            py={3}
+            borderRadius="md"
             isLoading={isLoading}
             loadingText="Updating..."
             isDisabled={
@@ -368,14 +480,24 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                 parentAccountId === account.parent_account_id)
             }
             leftIcon={<Check />}
+            _hover={{
+              transform: isLoading ? "none" : "translateY(-2px)",
+              boxShadow: isLoading ? "none" : "lg",
+            }}
+            transition="all 0.2s"
           >
-            Update
+            Update Account
           </Button>
           <Button
             variant="outline"
             onClick={onClose}
             isDisabled={isLoading}
             leftIcon={<X />}
+            px={6}
+            py={3}
+            borderRadius="md"
+            borderWidth="2px"
+            _hover={{ bg: inputBg }}
           >
             Cancel
           </Button>

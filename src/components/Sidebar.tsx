@@ -14,175 +14,372 @@ import {
   DrawerHeader,
   DrawerBody,
   Button,
+  Text,
+  HStack,
 } from "@chakra-ui/react";
 
-import { Home, Bookmark, Menu, PieChart, Wallet } from "lucide-react";
+import { Home, Bookmark, Menu, PieChart, Wallet, X } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import UserProfileDisplay from "./shared/UserProfileDisplay";
 
 interface SidebarProps {
   handleLogout: () => void;
 }
 
+// Mobile Header Component for consistent spacing
+export const MobileHeader: React.FC<{
+  onMenuOpen: () => void;
+  title?: string;
+}> = ({ onMenuOpen, title = "Dashboard" }) => {
+  const headerBg = useColorModeValue("white", "gray.900");
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const gradientBg = useColorModeValue(
+    "linear(135deg, teal.500, teal.600)",
+    "linear(135deg, teal.600, teal.700)",
+  );
+
+  return (
+    <Box
+      display={{ base: "block", md: "none" }}
+      position="sticky"
+      top={0}
+      zIndex={999}
+      bg={headerBg}
+      borderBottom="1px solid"
+      borderColor={borderColor}
+      backdropFilter="blur(10px)"
+      boxShadow="sm"
+    >
+      <Flex align="center" justify="space-between" px={4} py={3}>
+        <Button
+          onClick={onMenuOpen}
+          variant="ghost"
+          size="sm"
+          borderRadius="md"
+          bgGradient={gradientBg}
+          color="white"
+          _hover={{
+            transform: "scale(1.05)",
+            boxShadow: "lg",
+          }}
+          _active={{ transform: "scale(0.95)" }}
+          transition="all 0.2s ease"
+          boxShadow="md"
+        >
+          <Icon as={Menu} boxSize={5} />
+        </Button>
+
+        <Heading
+          size="md"
+          color="gray.700"
+          fontWeight="semibold"
+          textAlign="center"
+          flex="1"
+          mx={4}
+        >
+          {title}
+        </Heading>
+
+        {/* Invisible spacer for balance */}
+        <Box w="40px" />
+      </Flex>
+    </Box>
+  );
+};
+
 const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
-
-  const sidebarBg = useColorModeValue("teal.500", "teal.700");
-  const sidebarColor = useColorModeValue("white", "gray.200");
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Modern color scheme
+  const sidebarBg = useColorModeValue("white", "gray.900");
+  const sidebarColor = useColorModeValue("gray.800", "gray.100");
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const activeBg = useColorModeValue("teal.50", "teal.900");
+  const activeColor = useColorModeValue("teal.700", "teal.200");
+  const hoverBg = useColorModeValue("gray.50", "gray.800");
+  const cardBg = useColorModeValue("gray.50", "gray.800");
+  const gradientBg = useColorModeValue(
+    "linear(135deg, teal.500, teal.600)",
+    "linear(135deg, teal.600, teal.700)",
+  );
+
+  const menuItems = [
+    { path: "/", label: "Dashboard", icon: Home },
+    { path: "/insights", label: "Insights", icon: PieChart },
+    { path: "/categories", label: "Categories", icon: Bookmark },
+  ];
+
+  const isActivePath = (path: string) => {
+    if (path === "/") return location.pathname === "/";
+    return location.pathname.startsWith(path);
+  };
+
+  // Get current page title for mobile header
+  const getCurrentPageTitle = () => {
+    const currentItem = menuItems.find((item) => isActivePath(item.path));
+    return currentItem?.label || "Dashboard";
+  };
+
+  const NavItem = ({
+    path,
+    label,
+    icon,
+    onClick,
+  }: {
+    path: string;
+    label: string;
+    icon: any;
+    onClick?: () => void;
+  }) => {
+    const isActive = isActivePath(path);
+
+    return (
+      <ChakraLink
+        display="flex"
+        alignItems="center"
+        onClick={onClick || (() => navigate(path))}
+        py={{ base: 4, md: 3 }}
+        px={{ base: 4, md: 4 }}
+        borderRadius="md"
+        bg={isActive ? activeBg : "transparent"}
+        color={isActive ? activeColor : sidebarColor}
+        fontWeight={isActive ? "semibold" : "medium"}
+        fontSize={{ base: "md", md: "sm" }}
+        _hover={{
+          bg: isActive ? activeBg : hoverBg,
+          transform: "translateX(4px)",
+          boxShadow: isActive ? "lg" : "md",
+        }}
+        transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+        position="relative"
+        width="full"
+        textDecoration="none"
+        _focus={{ boxShadow: "outline" }}
+        border="1px solid transparent"
+        _focusVisible={{
+          borderColor: "teal.500",
+          boxShadow: "0 0 0 3px rgba(56, 178, 172, 0.1)",
+        }}
+      >
+        {isActive && (
+          <Box
+            position="absolute"
+            left="0"
+            top="50%"
+            transform="translateY(-50%)"
+            width="4px"
+            height="24px"
+            bg="teal.500"
+            borderRadius="full"
+            boxShadow="0 0 8px rgba(56, 178, 172, 0.3)"
+          />
+        )}
+        <Flex align="center" gap={{ base: 4, md: 3 }}>
+          <Box
+            p={2}
+            borderRadius="md"
+            bg={isActive ? "whiteAlpha.200" : "transparent"}
+            transition="all 0.2s ease"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Icon
+              as={icon}
+              boxSize={{ base: 5, md: 4 }}
+              opacity={isActive ? 1 : 0.7}
+            />
+          </Box>
+          <Text>{label}</Text>
+        </Flex>
+      </ChakraLink>
+    );
+  };
 
   return (
     <>
-      {/* Mobile Hamburger Menu */}
-      <Box display={{ base: "block", md: "none" }} p={4}>
-        <Button onClick={onOpen} variant="ghost" color="teal.400">
-          <Icon as={Menu} />
-        </Button>
-      </Box>
+      {/* Mobile Header - Replaces floating hamburger */}
+      <MobileHeader onMenuOpen={onOpen} title={getCurrentPageTitle()} />
 
       {/* Desktop Sidebar */}
       <Box
-        w={{ base: "full", md: "250px" }}
+        w="280px"
         bg={sidebarBg}
-        color={sidebarColor}
-        p={4}
+        borderRight="1px solid"
+        borderColor={borderColor}
         display={{ base: "none", md: "flex" }}
         flexDirection="column"
-        justifyContent="space-between"
         height="100vh"
         position="sticky"
         top={0}
         left={0}
         overflowY="auto"
         flexShrink={0}
+        boxShadow="xl"
       >
-        <VStack align="flex-start" spacing={2}>
-          <Flex align="center" mb={3}>
-            <Icon as={Wallet} boxSize={6} mr={3} />
-            <Heading as="h1" size="lg">
-              Cashio
-            </Heading>
-          </Flex>
-          <ChakraLink
-            display="flex"
-            alignItems="center"
-            onClick={() => navigate("/")}
-            py={2}
-            px={4}
-            borderRadius="md"
-            _hover={{ bg: "teal.600" }}
-            _expanded={{ bg: "teal.600" }}
-            width="full"
-          >
-            <Icon as={Home} mr={2} />
-            Home
-          </ChakraLink>
-          <ChakraLink
-            display="flex"
-            alignItems="center"
-            onClick={() => {
-              navigate("/insights");
-              onClose();
-            }}
-            py={2}
-            px={4}
-            borderRadius="md"
-            _hover={{ bg: "teal.600" }}
-            _expanded={{ bg: "teal.600" }}
-            width="full"
-          >
-            <Icon as={PieChart} mr={2} />
-            Insights
-          </ChakraLink>
-          <ChakraLink
-            display="flex"
-            alignItems="center"
-            onClick={() => navigate("/categories")}
-            py={2}
-            px={4}
-            borderRadius="md"
-            _hover={{ bg: "teal.600" }}
-            _expanded={{ bg: "teal.600" }}
-            width="full"
-          >
-            <Icon as={Bookmark} mr={2} />
-            Manage Categories
-          </ChakraLink>
-        </VStack>
-        {/* User Profile Display */}
-        <UserProfileDisplay handleLogout={handleLogout} />
-      </Box>
-
-      {/* Mobile Drawer */}
-      <Drawer isOpen={isOpen} placement="left" onClose={onClose}>
-        <DrawerOverlay />
-        <DrawerContent bg={sidebarBg} color={sidebarColor}>
-          <DrawerHeader>
-            <Flex align="center">
-              <Icon as={Wallet} boxSize={6} mr={3} />
-              <Heading as="h1" size="lg">
+        {/* Modern Header */}
+        <Box bgGradient={gradientBg} color="white" p={6} mb={2}>
+          <HStack spacing={3} align="center">
+            <Box
+              p={3}
+              bg="whiteAlpha.200"
+              borderRadius="md"
+              backdropFilter="blur(20px)"
+              border="1px solid whiteAlpha.300"
+              boxShadow="xl"
+            >
+              <Icon as={Wallet} boxSize={6} />
+            </Box>
+            <Box>
+              <Heading
+                as="h1"
+                size="lg"
+                fontWeight="bold"
+                letterSpacing="-0.02em"
+              >
                 Cashio
               </Heading>
-            </Flex>
+              <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
+                Financial Management
+              </Text>
+            </Box>
+          </HStack>
+        </Box>
+
+        {/* Navigation */}
+        <Box flex="1" px={4} py={2}>
+          <VStack align="stretch" spacing={2}>
+            {menuItems.map((item) => (
+              <NavItem
+                key={item.path}
+                path={item.path}
+                label={item.label}
+                icon={item.icon}
+              />
+            ))}
+          </VStack>
+        </Box>
+
+        {/* User Profile at bottom */}
+        <Box p={4} borderTop="1px solid" borderColor={borderColor} bg={cardBg}>
+          <UserProfileDisplay handleLogout={handleLogout} />
+        </Box>
+      </Box>
+
+      {/* Enhanced Mobile Drawer */}
+      <Drawer isOpen={isOpen} placement="left" onClose={onClose} size="sm">
+        <DrawerOverlay
+          bg="blackAlpha.600"
+          backdropFilter="blur(8px)"
+          transition="all 0.3s ease"
+        />
+        <DrawerContent
+          bg={sidebarBg}
+          maxW="85vw"
+          borderTopRightRadius="3xl"
+          borderBottomRightRadius="3xl"
+          boxShadow="2xl"
+          border="1px solid"
+          borderColor={borderColor}
+        >
+          <DrawerHeader
+            bgGradient={gradientBg}
+            color="white"
+            borderTopRightRadius="3xl"
+            pb={6}
+            position="relative"
+            boxShadow="lg"
+          >
+            <Button
+              position="absolute"
+              top={4}
+              right={4}
+              onClick={onClose}
+              variant="ghost"
+              size="sm"
+              color="white"
+              _hover={{
+                bg: "whiteAlpha.200",
+                transform: "scale(1.05)",
+              }}
+              _active={{ transform: "scale(0.95)" }}
+              borderRadius="md"
+              transition="all 0.2s ease"
+            >
+              <Icon as={X} boxSize={4} />
+            </Button>
+
+            <HStack spacing={3} align="center" mt={2}>
+              <Box
+                p={3}
+                bg="whiteAlpha.200"
+                borderRadius="md"
+                backdropFilter="blur(20px)"
+                border="1px solid whiteAlpha.300"
+                boxShadow="xl"
+              >
+                <Icon as={Wallet} boxSize={6} />
+              </Box>
+              <Box>
+                <Heading
+                  as="h1"
+                  size="lg"
+                  fontWeight="bold"
+                  letterSpacing="-0.02em"
+                >
+                  Cashio
+                </Heading>
+                <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
+                  Financial Management
+                </Text>
+              </Box>
+            </HStack>
           </DrawerHeader>
-          <DrawerBody>
+
+          <DrawerBody px={0} py={6}>
             <Flex direction="column" justify="space-between" h="full">
-              <VStack align="flex-start" spacing={2}>
-                <ChakraLink
-                  display="flex"
-                  alignItems="center"
-                  onClick={() => {
-                    navigate("/");
-                    onClose();
-                  }}
-                  py={2}
-                  px={4}
-                  borderRadius="md"
-                  _hover={{ bg: "teal.600" }}
-                  _expanded={{ bg: "teal.600" }}
-                  width="full"
-                >
-                  <Icon as={Home} mr={2} />
-                  Home
-                </ChakraLink>
-                <ChakraLink
-                  display="flex"
-                  alignItems="center"
-                  onClick={() => {
-                    navigate("/insights");
-                    onClose();
-                  }}
-                  py={2}
-                  px={4}
-                  borderRadius="md"
-                  _hover={{ bg: "teal.600" }}
-                  _expanded={{ bg: "teal.600" }}
-                  width="full"
-                >
-                  <Icon as={PieChart} mr={2} />
-                  Insights
-                </ChakraLink>
-                <ChakraLink
-                  display="flex"
-                  alignItems="center"
-                  onClick={() => {
-                    navigate("/categories");
-                    onClose();
-                  }}
-                  py={2}
-                  px={4}
-                  borderRadius="md"
-                  _hover={{ bg: "teal.600" }}
-                  _expanded={{ bg: "teal.600" }}
-                  width="full"
-                >
-                  <Icon as={Bookmark} mr={2} />
-                  Manage Categories
-                </ChakraLink>
-              </VStack>
-              {/* User Profile Display */}
-              <UserProfileDisplay handleLogout={handleLogout} />
+              <Box px={6}>
+                <VStack align="stretch" spacing={2}>
+                  <Text
+                    fontSize="xs"
+                    fontWeight="bold"
+                    color="gray.500"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                    mb={3}
+                    px={4}
+                  >
+                    Navigation
+                  </Text>
+                  {menuItems.map((item) => (
+                    <NavItem
+                      key={item.path}
+                      path={item.path}
+                      label={item.label}
+                      icon={item.icon}
+                      onClick={() => {
+                        navigate(item.path);
+                        onClose();
+                      }}
+                    />
+                  ))}
+                </VStack>
+              </Box>
+
+              {/* User Profile at bottom */}
+              <Box
+                px={6}
+                py={4}
+                borderTop="1px solid"
+                borderColor={borderColor}
+                bg={cardBg}
+                borderBottomRightRadius="3xl"
+              >
+                <UserProfileDisplay handleLogout={handleLogout} />
+              </Box>
             </Flex>
           </DrawerBody>
         </DrawerContent>

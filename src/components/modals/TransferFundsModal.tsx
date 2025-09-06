@@ -3,7 +3,6 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
   ModalFooter,
   ModalBody,
   Button,
@@ -21,7 +20,7 @@ import {
   InputGroup,
   InputLeftAddon,
   Stack,
-  Flex,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { ArrowRightLeft, Check, X } from "lucide-react";
 import { AxiosError } from "axios";
@@ -60,8 +59,8 @@ interface Transaction {
   credit: number;
   debit: number;
   transfer_id?: string;
-  splits?: any[]; // Define more specific type if needed
-  tags?: any[]; // Define more specific type if needed
+  splits?: any[];
+  tags?: any[];
 }
 
 interface TransferFundsModalProps {
@@ -81,7 +80,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
 }) => {
   const [date, setDate] = useState<Date>(new Date());
   const [fromAccountId, setFromAccountId] = useState<string>(
-    accountId?.toString() || ""
+    accountId?.toString() || "",
   );
   const [toAccountId, setToAccountId] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
@@ -98,12 +97,15 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const toast = useToast();
 
   const { ledgerId, currencySymbol } = useLedgerStore();
-  // Theme colors
-  const buttonColorScheme = "teal";
+
+  // Modern theme colors - matching CreateTransactionModal
   const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
+  const inputBorderColor = useColorModeValue("gray.200", "gray.600");
+  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
   const highlightColor = useColorModeValue("teal.50", "teal.900");
-  const formBgColor = useColorModeValue("gray.50", "gray.700");
 
   const resetForm = useCallback(() => {
     setDate(new Date());
@@ -136,7 +138,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const fetchAccounts = useCallback(async () => {
     try {
       const response = await api.get<Account[]>(
-        `/ledger/${ledgerId}/accounts?ignore_group=true`
+        `/ledger/${ledgerId}/accounts?ignore_group=true`,
       );
       setAccounts(response.data);
     } catch (error) {
@@ -157,11 +159,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       if (initialData) {
         setDate(new Date());
         setFromAccountId(initialData.account_id || "");
-        setToAccountId(""); // This will be selected by the user
+        setToAccountId("");
         setAmount(
           initialData.debit > 0
             ? initialData.debit.toString()
-            : initialData.credit.toString()
+            : initialData.credit.toString(),
         );
         setNotes(initialData.notes || "");
         setIsDifferentLedger(false);
@@ -179,7 +181,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     async (ledgerId: string) => {
       try {
         const response = await api.get<Account[]>(
-          `/ledger/${ledgerId}/accounts?ignore_group=true`
+          `/ledger/${ledgerId}/accounts?ignore_group=true`,
         );
         setDestinationAccounts(response.data);
       } catch (error) {
@@ -194,7 +196,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
         }
       }
     },
-    [toast]
+    [toast],
   );
 
   useEffect(() => {
@@ -227,10 +229,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
           : null,
       };
 
-      await api.post(
-        `/ledger/${ledgerId}/transaction/transfer`,
-        payload
-      );
+      await api.post(`/ledger/${ledgerId}/transaction/transfer`, payload);
 
       toast({
         description: "Transfer completed successfully.",
@@ -258,111 +257,193 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size={{ base: "full", md: "lg" }}
+      size={{ base: "full", sm: "xl" }}
       motionPreset="slideInBottom"
     >
-      <ModalOverlay backdropFilter="blur(2px)" />
+      <ModalOverlay backdropFilter="blur(4px)" bg="blackAlpha.300" />
       <ModalContent
+        bg={bgColor}
         borderRadius={{ base: 0, sm: "md" }}
+        boxShadow="2xl"
+        border="1px solid"
+        borderColor={borderColor}
+        overflow="hidden"
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        maxHeight={{ base: "100%", md: "80vh" }}
+        maxHeight={{ base: "100%", md: "90vh" }}
         display="flex"
         flexDirection="column"
       >
+        {/* Modern gradient header */}
         <Box
-          pt={{ base: 10, sm: 4 }}
-          pb={{ base: 2, sm: 0 }}
-          px={{ base: 4, sm: 0 }}
-          bg={{ base: buttonColorScheme + ".500", sm: "transparent" }}
-          color={{ base: "white", sm: "inherit" }}
-          borderTopRadius={{ base: 0, sm: "md" }}
+          bgGradient="linear(135deg, teal.400, teal.600)"
+          color="white"
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 6, sm: 6 }}
+          pt={{ base: 12, sm: 6 }}
+          position="relative"
         >
-          <ModalHeader
-            fontSize={{ base: "xl", sm: "lg" }}
-            p={{ base: 0, sm: 6 }}
-            pb={{ base: 4, sm: 2 }}
-          >
-            <Flex alignItems="center">
-              <ArrowRightLeft size={24} style={{ marginRight: "8px" }} />
-              Transfer Funds
-            </Flex>
-          </ModalHeader>
+          <HStack spacing={{ base: 3, sm: 4 }} align="center">
+            <Box
+              p={{ base: 2, sm: 3 }}
+              bg="whiteAlpha.200"
+              borderRadius="md"
+              backdropFilter="blur(10px)"
+            >
+              <ArrowRightLeft size={24} style={{ margin: 0 }} />
+            </Box>
+
+            <Box>
+              <Box
+                fontSize={{ base: "xl", sm: "2xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+              >
+                Transfer Funds
+              </Box>
+              <Box
+                fontSize={{ base: "sm", sm: "md" }}
+                color="whiteAlpha.900"
+                fontWeight="medium"
+                mt={1}
+              >
+                Move money between accounts
+              </Box>
+            </Box>
+          </HStack>
         </Box>
 
         <ModalBody
-          px={{ base: 4, sm: 6 }}
-          py={{ base: 4, sm: 4 }}
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 4, sm: 6 }}
           flex="1"
           display="flex"
           flexDirection="column"
           overflow="auto"
-          maxHeight={{ md: "calc(80vh - 140px)" }}
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
-          <VStack spacing={6} align="stretch" w="100%">
-            {/* Basic Info Section */}
-            <Stack direction={{ base: "column", md: "row" }} spacing={4} mb={4}>
-              {/* Date Picker */}
-              <FormControl flex="1">
-                <FormLabel fontSize="sm" fontWeight="medium">
-                  Date
-                </FormLabel>
-                <ChakraDatePicker
-                  selected={date}
-                  onChange={(date: Date | null) => {
-                    if (date) {
-                      setDate(date);
-                    }
-                  }}
-                  shouldCloseOnSelect={true}
-                  data-testid="transferfundsmodal-date-picker"
-                />
-              </FormControl>
+          <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
+            {/* Basic Info Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+            >
+              <VStack spacing={5} align="stretch">
+                <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+                  {/* Date Picker */}
+                  <FormControl flex="1" isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Date
+                    </FormLabel>
+                    <Box
+                      sx={{
+                        ".react-datepicker-wrapper": {
+                          width: "100%",
+                        },
+                        ".react-datepicker__input-container input": {
+                          width: "100%",
+                          height: "48px",
+                          borderWidth: "2px",
+                          borderColor: inputBorderColor,
+                          borderRadius: "md",
+                          bg: inputBg,
+                          fontSize: "lg",
+                          _hover: { borderColor: "teal.300" },
+                          _focus: {
+                            borderColor: focusBorderColor,
+                            boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                          },
+                        },
+                      }}
+                    >
+                      <ChakraDatePicker
+                        selected={date}
+                        onChange={(date: Date | null) => {
+                          if (date) {
+                            setDate(date);
+                          }
+                        }}
+                        shouldCloseOnSelect={true}
+                        data-testid="transferfundsmodal-date-picker"
+                      />
+                    </Box>
+                  </FormControl>
 
-              {/* Amount Input */}
-              <FormControl flex="1">
-                <FormLabel fontSize="sm" fontWeight="medium">
-                  Amount
-                </FormLabel>
-                <InputGroup>
-                  <InputLeftAddon>{currencySymbol}</InputLeftAddon>
-                  <Input
-                    type="text"
-                    inputMode="decimal"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    onKeyDown={(e) => handleNumericInput(e, amount)}
-                    onPaste={(e) => handleNumericPaste(e, setAmount)}
-                    placeholder="0.00"
-                    borderColor={borderColor}
-                    autoFocus
-                  />
-                </InputGroup>
-              </FormControl>
-            </Stack>
+                  {/* Amount Input */}
+                  <FormControl flex="1" isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Amount
+                    </FormLabel>
+                    <InputGroup size="lg">
+                      <InputLeftAddon
+                        bg={inputBorderColor}
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        color="gray.600"
+                        fontWeight="semibold"
+                      >
+                        {currencySymbol}
+                      </InputLeftAddon>
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        onKeyDown={(e) => handleNumericInput(e, amount)}
+                        onPaste={(e) => handleNumericPaste(e, setAmount)}
+                        placeholder="0.00"
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        bg={inputBg}
+                        borderRadius="md"
+                        _hover={{ borderColor: "teal.300" }}
+                        _focus={{
+                          borderColor: focusBorderColor,
+                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                        }}
+                        autoFocus
+                      />
+                    </InputGroup>
+                    <FormHelperText mt={2}>
+                      Enter the transfer amount
+                    </FormHelperText>
+                  </FormControl>
+                </Stack>
+              </VStack>
+            </Box>
 
-            {/* From Account Selection */}
+            {/* From Account Selection (only shown if no accountId) */}
             {!accountId && (
               <Box
-                p={4}
-                borderWidth="1px"
+                bg={cardBg}
+                p={{ base: 4, sm: 6 }}
                 borderRadius="md"
+                border="1px solid"
                 borderColor={borderColor}
-                bg={formBgColor}
-                mb={4}
               >
-                <FormControl>
-                  <FormLabel fontSize="sm" fontWeight="medium" mb={2}>
+                <FormControl isRequired>
+                  <FormLabel fontWeight="semibold" mb={2}>
                     From Account
                   </FormLabel>
                   <Select
-                    borderColor={borderColor}
-                    placeholder="Select an account"
+                    value={fromAccountId}
                     onChange={(e) => setFromAccountId(e.target.value)}
+                    placeholder="Select source account"
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
                     data-testid="transferfundsmodal-from-account-dropdown"
                   >
-                    {/* Group for Asset Accounts */}
                     <optgroup label="Asset Accounts">
                       {accounts
                         .filter((account) => account.type === "asset")
@@ -375,7 +456,6 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                           </option>
                         ))}
                     </optgroup>
-                    {/* Group for Liability Accounts */}
                     <optgroup label="Liability Accounts">
                       {accounts
                         .filter((account) => account.type === "liability")
@@ -389,92 +469,122 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         ))}
                     </optgroup>
                   </Select>
+                  <FormHelperText mt={2}>
+                    Choose which account to transfer from
+                  </FormHelperText>
                 </FormControl>
               </Box>
             )}
 
-            {/* Different Ledger Toggle */}
+            {/* Different Ledger Toggle Card */}
             <Box
-              p={3}
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
               borderRadius="md"
-              borderWidth="1px"
+              border="1px solid"
               borderColor={borderColor}
-              bg={useColorModeValue("gray.50", "gray.700")}
-              mb={4}
             >
-              <HStack justifyContent="space-between">
-                <Text fontSize="sm" fontWeight="medium">
-                  Transfer to Different Ledger
-                </Text>
+              <HStack justifyContent="space-between" align="center">
+                <Box>
+                  <Text fontWeight="semibold" mb={1}>
+                    Transfer to Different Ledger
+                  </Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Enable to transfer funds to another ledger with different
+                    currency
+                  </Text>
+                </Box>
                 <Switch
-                  colorScheme={buttonColorScheme}
+                  colorScheme="teal"
+                  size="lg"
                   isChecked={isDifferentLedger}
                   onChange={(e) => setIsDifferentLedger(e.target.checked)}
                 />
               </HStack>
             </Box>
 
-            {/* Destination Section */}
+            {/* Destination Section Card */}
             <Box
-              p={4}
-              borderWidth="1px"
-              borderRadius="md"
-              borderColor={borderColor}
               bg={highlightColor}
-              mb={4}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="2px solid"
+              borderColor="teal.200"
             >
-              <VStack spacing={4} align="stretch">
+              <VStack spacing={5} align="stretch">
+                <Text fontWeight="bold" color="teal.700" mb={2}>
+                  Destination
+                </Text>
+
                 {/* Destination Ledger (if different ledger) */}
                 {isDifferentLedger && (
-                  <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="medium">
+                  <FormControl isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
                       Destination Ledger
                     </FormLabel>
                     <Select
                       value={destinationLedgerId}
                       onChange={(e) => {
                         const selectedLedger = ledgers.find(
-                          (ledger) => ledger.ledger_id == e.target.value
+                          (ledger) => ledger.ledger_id == e.target.value,
                         );
                         setDestinationLedgerId(e.target.value);
                         if (selectedLedger) {
                           setDestinationCurrencySymbol(
-                            selectedLedger.currency_symbol
+                            selectedLedger.currency_symbol,
                           );
                         }
                         setToAccountId("");
                       }}
-                      borderColor={borderColor}
-                      bg={bgColor}
+                      placeholder="Select destination ledger"
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      size="lg"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
                       data-testid="transferfundsmodal-to-ledger-dropdown"
                     >
-                      <option value="">Select a ledger</option>
                       {getFilteredLedgers(ledgers).map((ledger) => (
                         <option key={ledger.ledger_id} value={ledger.ledger_id}>
                           {ledger.name}
                         </option>
                       ))}
                     </Select>
+                    <FormHelperText mt={2}>
+                      Choose the destination ledger
+                    </FormHelperText>
                   </FormControl>
                 )}
 
                 {/* To Account Selection */}
-                <FormControl>
-                  <FormLabel fontSize="sm" fontWeight="medium" mb={2}>
+                <FormControl isRequired>
+                  <FormLabel fontWeight="semibold" mb={2}>
                     To Account
                   </FormLabel>
                   <Select
                     value={toAccountId}
                     onChange={(e) => setToAccountId(e.target.value)}
-                    borderColor={borderColor}
-                    bg={bgColor}
+                    placeholder="Select destination account"
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
                     data-testid="transferfundsmodal-to-account-dropdown"
                   >
-                    <option value="">Select an account</option>
-                    {/* Group for Asset Accounts */}
                     <optgroup label="Asset Accounts">
                       {getFilteredAccounts(
-                        isDifferentLedger ? destinationAccounts : accounts
+                        isDifferentLedger ? destinationAccounts : accounts,
                       )
                         .filter((account) => account.type === "asset")
                         .map((account) => (
@@ -486,10 +596,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                           </option>
                         ))}
                     </optgroup>
-                    {/* Group for Liability Accounts */}
                     <optgroup label="Liability Accounts">
                       {getFilteredAccounts(
-                        isDifferentLedger ? destinationAccounts : accounts
+                        isDifferentLedger ? destinationAccounts : accounts,
                       )
                         .filter((account) => account.type === "liability")
                         .map((account) => (
@@ -502,19 +611,26 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         ))}
                     </optgroup>
                   </Select>
+                  <FormHelperText mt={2}>
+                    Choose which account to transfer to
+                  </FormHelperText>
                 </FormControl>
 
                 {/* Destination Amount (if different ledger) */}
                 {isDifferentLedger && (
-                  <FormControl>
-                    <FormLabel fontSize="sm" fontWeight="medium">
+                  <FormControl isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
                       Destination Amount
                     </FormLabel>
-                    <InputGroup>
-                      <InputLeftAddon>
-                        {destinationCurrencySymbol
-                          ? destinationCurrencySymbol
-                          : currencySymbol}
+                    <InputGroup size="lg">
+                      <InputLeftAddon
+                        bg={inputBorderColor}
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        color="gray.600"
+                        fontWeight="semibold"
+                      >
+                        {destinationCurrencySymbol || currencySymbol}
                       </InputLeftAddon>
                       <Input
                         type="text"
@@ -528,33 +644,53 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                           handleNumericPaste(e, setDestinationAmount)
                         }
                         placeholder="0.00"
-                        borderColor={borderColor}
-                        bg={bgColor}
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        bg={inputBg}
+                        borderRadius="md"
+                        _hover={{ borderColor: "teal.300" }}
+                        _focus={{
+                          borderColor: focusBorderColor,
+                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                        }}
                       />
                     </InputGroup>
+                    <FormHelperText mt={2}>
+                      Enter amount in destination currency
+                    </FormHelperText>
                   </FormControl>
                 )}
               </VStack>
             </Box>
 
-            {/* Notes */}
-            <FormNotes
-              ledgerId={ledgerId as string}
-              notes={notes}
-              setNotes={setNotes}
+            {/* Notes Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
               borderColor={borderColor}
-            />
+            >
+              <FormNotes
+                ledgerId={ledgerId as string}
+                notes={notes}
+                setNotes={setNotes}
+                borderColor={inputBorderColor}
+              />
+            </Box>
           </VStack>
 
           {/* Mobile-only action buttons that stay at bottom */}
           <Box display={{ base: "block", sm: "none" }} mt={6}>
             <Button
               onClick={handleSubmit}
-              colorScheme={buttonColorScheme}
+              colorScheme="teal"
               size="lg"
               width="100%"
               mb={3}
+              borderRadius="md"
               isLoading={isLoading}
+              loadingText="Transferring..."
               isDisabled={
                 !fromAccountId ||
                 !toAccountId ||
@@ -563,6 +699,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                   (!destinationLedgerId || !destinationAmount))
               }
               leftIcon={<Check />}
+              _hover={{
+                transform: isLoading ? "none" : "translateY(-2px)",
+                boxShadow: isLoading ? "none" : "lg",
+              }}
+              transition="all 0.2s"
             >
               Complete Transfer
             </Button>
@@ -571,8 +712,11 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
               onClick={onClose}
               size="lg"
               width="100%"
+              borderRadius="md"
               isDisabled={isLoading}
               leftIcon={<X />}
+              borderWidth="2px"
+              _hover={{ bg: cardBg }}
             >
               Cancel
             </Button>
@@ -580,13 +724,23 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
         </ModalBody>
 
         {/* Desktop-only footer */}
-        <ModalFooter display={{ base: "none", sm: "flex" }}>
+        <ModalFooter
+          display={{ base: "none", sm: "flex" }}
+          px={8}
+          py={6}
+          bg={cardBg}
+          borderTop="1px solid"
+          borderColor={borderColor}
+        >
           <Button
-            colorScheme={buttonColorScheme}
+            colorScheme="teal"
             mr={3}
-            px={6}
             onClick={handleSubmit}
+            px={8}
+            py={3}
+            borderRadius="md"
             isLoading={isLoading}
+            loadingText="Transferring..."
             isDisabled={
               !fromAccountId ||
               !toAccountId ||
@@ -595,10 +749,25 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                 (!destinationLedgerId || !destinationAmount))
             }
             leftIcon={<Check />}
+            _hover={{
+              transform: isLoading ? "none" : "translateY(-2px)",
+              boxShadow: isLoading ? "none" : "lg",
+            }}
+            transition="all 0.2s"
           >
             Complete Transfer
           </Button>
-          <Button variant="outline" onClick={onClose} leftIcon={<X />}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            isDisabled={isLoading}
+            leftIcon={<X />}
+            px={6}
+            py={3}
+            borderRadius="md"
+            borderWidth="2px"
+            _hover={{ bg: inputBg }}
+          >
             Cancel
           </Button>
         </ModalFooter>
