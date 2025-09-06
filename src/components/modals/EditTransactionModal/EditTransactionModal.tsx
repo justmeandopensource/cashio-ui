@@ -59,6 +59,13 @@ interface Split {
   notes?: string;
 }
 
+interface ApiSplit {
+  debit: number;
+  credit: number;
+  category_id: string;
+  notes?: string;
+}
+
 interface Tag {
   name: string;
 }
@@ -112,7 +119,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   const fetchSplits = useCallback(
     async (transactionId: string): Promise<Split[]> => {
       try {
-        const response = await api.get<Split[]>(
+        const response = await api.get<ApiSplit[]>(
           `/ledger/${ledgerId}/transaction/${transactionId}/splits`,
         );
         const fetchedSplits = response.data.map((split) => ({
@@ -641,19 +648,19 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
             {/* Category or Split Transaction Section */}
             {isSplit ? (
-              <FormSplits
-                splits={splits}
-                calculateRemainingAmount={calculateRemainingAmount}
-                currencySymbol={currencySymbol as string}
-                amount={parseFloat(amount) || 0}
-                type={type}
-                categories={categories}
-                setSplits={setSplits}
-                borderColor={inputBorderColor}
-                bgColor={inputBg}
-                highlightColor={highlightColor}
-                buttonColorScheme="teal"
-              />
+               <FormSplits
+                 splits={splits}
+                 calculateRemainingAmount={calculateRemainingAmount}
+                 currencySymbol={currencySymbol as string}
+                 amount={amount}
+                 type={type}
+                 categories={categories}
+                 setSplits={setSplits}
+                 borderColor={inputBorderColor}
+                 bgColor={inputBg}
+                 highlightColor={highlightColor}
+                 buttonColorScheme="teal"
+               />
             ) : (
               /* Category Dropdown Card */
               <Box

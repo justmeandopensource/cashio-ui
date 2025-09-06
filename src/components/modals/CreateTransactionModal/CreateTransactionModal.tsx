@@ -70,6 +70,17 @@ interface Tag {
   name: string;
 }
 
+interface Transaction {
+  debit: number;
+  credit: number;
+  category_id?: string;
+  notes?: string;
+  account_id?: string;
+  is_split: boolean;
+  splits?: Split[];
+  tags?: Tag[];
+}
+
 const roundToTwoDecimals = (value: number): number => {
   return Math.round((value + Number.EPSILON) * 100) / 100;
 };
@@ -234,7 +245,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     // Validate all splits have categories if split is enabled
     if (isSplit) {
       const invalidSplits = splits.filter(
-        (split) => !split.categoryId && split.amount > 0,
+        (split) => !split.categoryId && (parseFloat(split.amount) || 0) > 0,
       );
       if (invalidSplits.length > 0) {
         toast({
@@ -609,19 +620,19 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
 
             {/* Category or Split Transaction Section */}
             {isSplit ? (
-              <FormSplits
-                splits={splits}
-                calculateRemainingAmount={calculateRemainingAmount}
-                currencySymbol={currencySymbol as string}
-                amount={parseFloat(amount) || 0}
-                type={type}
-                categories={categories}
-                setSplits={setSplits}
-                borderColor={inputBorderColor}
-                bgColor={inputBg}
-                highlightColor={highlightColor}
-                buttonColorScheme="teal"
-              />
+               <FormSplits
+                 splits={splits}
+                 calculateRemainingAmount={calculateRemainingAmount}
+                 currencySymbol={currencySymbol as string}
+                 amount={amount}
+                 type={type}
+                 categories={categories}
+                 setSplits={setSplits}
+                 borderColor={inputBorderColor}
+                 bgColor={inputBg}
+                 highlightColor={highlightColor}
+                 buttonColorScheme="teal"
+               />
             ) : (
               /* Category Dropdown Card */
               <Box
@@ -727,7 +738,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               isDisabled={
                 (isSplit &&
                   splits.some(
-                    (split) => split.amount > 0 && !split.categoryId,
+                    (split) => (parseFloat(split.amount) || 0) > 0 && !split.categoryId,
                   )) ||
                 (!isSplit &&
                   (!categoryId ||
@@ -782,7 +793,7 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             isDisabled={
               (isSplit &&
                 splits.some(
-                  (split) => split.amount > 0 && !split.categoryId,
+                  (split) => (parseFloat(split.amount) || 0) > 0 && !split.categoryId,
                 )) ||
               (!isSplit &&
                 (!categoryId ||
