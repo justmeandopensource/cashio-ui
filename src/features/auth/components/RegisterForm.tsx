@@ -151,23 +151,24 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     <ScaleFade in={true} initialScale={0.95}>
       <Box
         bg={bgColor}
-        borderRadius={{ base: "lg", sm: "xl" }}
-        boxShadow="2xl"
+        borderRadius={{ base: 0, sm: "xl" }}
+        boxShadow={{ base: "none", sm: "2xl" }}
         maxW={{ base: "full", sm: "lg" }}
         w="full"
-        borderWidth="1px"
+        borderWidth={{ base: 0, sm: "1px" }}
         borderColor={borderColor}
         overflow="hidden"
-        mx={{ base: 4, sm: "auto" }}
+        mx={{ base: 0, sm: "auto" }}
+        minH={{ base: "100vh", sm: "auto" }}
       >
         {/* Modern gradient header matching CreateLedgerModal - Left Justified */}
-        <Box
-          bgGradient="linear(135deg, teal.400, teal.600)"
-          color="white"
-          px={{ base: 6, sm: 8 }}
-          py={{ base: 6, sm: 8 }}
-          position="relative"
-        >
+          <Box
+            bgGradient="linear(135deg, teal.400, teal.600)"
+            color="white"
+            px={{ base: 4, sm: 8 }}
+            py={{ base: 6, sm: 8 }}
+            position="relative"
+          >
           <HStack
             spacing={{ base: 3, sm: 4 }}
             align="center"
@@ -203,7 +204,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         </Box>
 
         {/* Form content */}
-        <Box px={{ base: 6, sm: 8 }} py={{ base: 6, sm: 8 }}>
+        <Box px={{ base: 4, sm: 8 }} py={{ base: 4, sm: 8 }}>
           <VStack
             as="form"
             spacing={{ base: 5, md: 6 }}

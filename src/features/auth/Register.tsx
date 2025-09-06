@@ -82,8 +82,8 @@ const Register: React.FC = () => {
       align="center"
       justify="center"
       minH="100vh"
-      bg="gray.50"
-      px={{ base: 4, md: 0 }}
+      bg={{ base: "white", md: "gray.50" }}
+      px={0}
     >
       <RegisterForm
         onSubmit={handleSubmit}
