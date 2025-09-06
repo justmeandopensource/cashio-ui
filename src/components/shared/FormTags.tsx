@@ -11,6 +11,10 @@ import {
   useToast,
   Wrap,
   WrapItem,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
 } from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import api from "@/lib/api";
@@ -43,10 +47,15 @@ const FormTags: React.FC<FormTagsProps> = ({
 }) => {
   const toast = useToast();
   const [tagSuggestions, setTagSuggestions] = useState<TagItem[]>([]);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
   const tagsSuggestionsBoxBgColor = useColorModeValue("gray.50", "gray.700");
   const tagsSuggestionsBoxItemBgColor = useColorModeValue(
     "gray.100",
     "gray.600"
+  );
+  const tagsSuggestionsBoxItemHighlightBgColor = useColorModeValue(
+    "teal.100",
+    "teal.700"
   );
   const [tagInput, setTagInput] = useState<string>("");
 
@@ -97,6 +106,39 @@ const FormTags: React.FC<FormTagsProps> = ({
     [fetchTagSuggestions]
   );
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (tagSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < tagSuggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev > 0 ? prev - 1 : tagSuggestions.length - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (highlightedIndex >= 0 && highlightedIndex < tagSuggestions.length) {
+          addTag(tagSuggestions[highlightedIndex]);
+          setTagInput("");
+          setTagSuggestions([]);
+          setHighlightedIndex(-1);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setTagSuggestions([]);
+        setHighlightedIndex(-1);
+        break;
+    }
+  };
+
   // Ensure all tags have a valid name property
   const normalizedTags: TagItem[] =
     tags?.map((tag) => {
@@ -126,9 +168,13 @@ const FormTags: React.FC<FormTagsProps> = ({
 
   // Handle Enter key press in the tags input field
   const handleTagInputKeyDown = (
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLElement>
   ): void => {
-    if (e.key === "Enter") {
+    // Handle suggestion navigation first
+    handleKeyDown(e);
+
+    // Handle Enter for creating new tag (only if no suggestion is highlighted)
+    if (e.key === "Enter" && highlightedIndex === -1) {
       e.preventDefault();
       const newTagName = tagInput.trim();
 
@@ -173,52 +219,73 @@ const FormTags: React.FC<FormTagsProps> = ({
         </Wrap>
 
         {/* Tag input with suggestions */}
-        <Input
-          value={tagInput}
-          onChange={(e) => {
-            setTagInput(e.target.value);
-            debouncedFetchTagSuggestions(e.target.value);
+        <Popover
+          isOpen={tagSuggestions.length > 0}
+          onClose={() => {
+            setTagSuggestions([]);
+            setHighlightedIndex(-1);
           }}
-          onKeyDown={handleTagInputKeyDown}
-          placeholder="Add tags (press Enter)"
-          borderColor={borderColor}
-          size="md"
-        />
-
-        {/* Display tag suggestions */}
-        {tagSuggestions.length > 0 && (
-          <Box
-            mt={2}
-            borderWidth="1px"
-            borderRadius="md"
+          placement="bottom-start"
+          matchWidth
+          closeOnBlur={false}
+          returnFocusOnClose={false}
+        >
+          <PopoverTrigger>
+            <Input
+              value={tagInput}
+              onChange={(e) => {
+                setTagInput(e.target.value);
+                debouncedFetchTagSuggestions(e.target.value);
+                setHighlightedIndex(-1);
+              }}
+              onKeyDown={(e) => {
+                handleKeyDown(e);
+                handleTagInputKeyDown(e);
+              }}
+              placeholder="Add tags (press Enter)"
+              borderColor={borderColor}
+              size="md"
+            />
+          </PopoverTrigger>
+          <PopoverContent
             borderColor={borderColor}
-            p={2}
             bg={tagsSuggestionsBoxBgColor}
-            maxH="150px"
+            shadow="lg"
+            maxH="200px"
             overflowY="auto"
-            position="relative"
-            zIndex={10}
+            _focus={{ boxShadow: "none" }}
+            autoFocus={false}
+            onKeyDown={(e) => {
+              handleKeyDown(e);
+              e.stopPropagation();
+            }}
           >
-            {tagSuggestions.map((tag) => (
-              <Box
-                key={tag.tag_id}
-                p={2}
-                cursor="pointer"
-                borderRadius="md"
-                _hover={{
-                  bg: tagsSuggestionsBoxItemBgColor,
-                }}
-                onClick={() => {
-                  addTag(tag);
-                  setTagInput("");
-                  setTagSuggestions([]);
-                }}
-              >
-                {tag.name}
-              </Box>
-            ))}
-          </Box>
-        )}
+            <PopoverBody p={1}>
+              {tagSuggestions.map((tag, index) => (
+                <Box
+                  key={tag.tag_id}
+                  p={2}
+                  cursor="pointer"
+                  borderRadius="md"
+                  bg={index === highlightedIndex ? tagsSuggestionsBoxItemHighlightBgColor : "transparent"}
+                  _hover={{
+                    bg: tagsSuggestionsBoxItemBgColor,
+                  }}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    addTag(tag);
+                    setTagInput("");
+                    setTagSuggestions([]);
+                    setHighlightedIndex(-1);
+                  }}
+                  onMouseEnter={() => setHighlightedIndex(index)}
+                >
+                  {tag.name}
+                </Box>
+              ))}
+            </PopoverBody>
+          </PopoverContent>
+        </Popover>
       </Box>
     </FormControl>
   );

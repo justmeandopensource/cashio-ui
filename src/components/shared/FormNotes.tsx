@@ -6,6 +6,10 @@ import {
   Box,
   useColorModeValue,
   useToast,
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+  PopoverBody,
 } from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import api from "@/lib/api";
@@ -33,10 +37,15 @@ const FormNotes: React.FC<FormNotesProps> = ({
 }) => {
   const toast = useToast();
   const [noteSuggestions, setNoteSuggestions] = useState<string[]>([]);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
   const notesSuggestionsBoxBgColor = useColorModeValue("gray.50", "gray.700");
   const notesSuggestionsBoxItemBgColor = useColorModeValue(
     "gray.100",
     "gray.600"
+  );
+  const notesSuggestionsBoxItemHighlightBgColor = useColorModeValue(
+    "teal.100",
+    "teal.700"
   );
 
   // eslint-disable-next-line no-unused-vars
@@ -90,58 +99,115 @@ const FormNotes: React.FC<FormNotesProps> = ({
     [fetchNoteSuggestions]
   );
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (noteSuggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < noteSuggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev > 0 ? prev - 1 : noteSuggestions.length - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (highlightedIndex >= 0 && highlightedIndex < noteSuggestions.length) {
+          setNotes(noteSuggestions[highlightedIndex]);
+          setNoteSuggestions([]);
+          setHighlightedIndex(-1);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setNoteSuggestions([]);
+        setHighlightedIndex(-1);
+        break;
+      case "Tab":
+        if (highlightedIndex >= 0 && highlightedIndex < noteSuggestions.length) {
+          setNotes(noteSuggestions[highlightedIndex]);
+          setNoteSuggestions([]);
+          setHighlightedIndex(-1);
+        }
+        break;
+    }
+  };
+
   return (
     <FormControl mb={4}>
       <FormLabel fontSize="sm" fontWeight="medium">
         Notes
       </FormLabel>
-      <Input
-        value={notes}
-        onChange={(e) => {
-          setNotes(e.target.value);
-          debouncedFetchNoteSuggestions(e.target.value);
-        }}
-        onBlur={() => setNoteSuggestions([])}
-        placeholder="Description (optional)"
-        borderColor={borderColor}
-      />
-      {/* Display note suggestions */}
-      {noteSuggestions.length > 0 && (
-        <Box
-          mt={2}
-          borderWidth="1px"
-          borderRadius="md"
-          borderColor={borderColor}
-          p={2}
-          bg={notesSuggestionsBoxBgColor}
-          maxH="150px"
-          overflowY="auto"
-          position="relative"
-          zIndex={10}
-          pointerEvents="auto"
-          tabIndex={-1}
+        <Popover
+          isOpen={noteSuggestions.length > 0}
+          onClose={() => {
+            setNoteSuggestions([]);
+            setHighlightedIndex(-1);
+          }}
+          placement="bottom-start"
+          matchWidth
+          closeOnBlur={false}
+          returnFocusOnClose={false}
         >
-          {noteSuggestions.map((note, index) => (
-            <Box
-              key={index}
-              p={2}
-              cursor="pointer"
-              borderRadius="md"
-              _hover={{
-                bg: notesSuggestionsBoxItemBgColor,
+          <PopoverTrigger>
+            <Input
+              value={notes}
+              onChange={(e) => {
+                setNotes(e.target.value);
+                debouncedFetchNoteSuggestions(e.target.value);
+                setHighlightedIndex(-1);
               }}
-              tabIndex={-1}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                setNotes(note);
-                setNoteSuggestions([]);
+              onKeyDown={(e) => {
+                handleKeyDown(e);
+                e.stopPropagation();
               }}
-            >
-              {note}
-            </Box>
-          ))}
-        </Box>
-      )}
+              placeholder="Description (optional)"
+              borderColor={borderColor}
+            />
+          </PopoverTrigger>
+        <PopoverContent
+          borderColor={borderColor}
+          bg={notesSuggestionsBoxBgColor}
+          shadow="lg"
+          maxH="200px"
+          overflowY="auto"
+          _focus={{ boxShadow: "none" }}
+          autoFocus={false}
+          onKeyDown={(e) => {
+            handleKeyDown(e);
+            e.stopPropagation();
+          }}
+        >
+          <PopoverBody p={1}>
+            {noteSuggestions.map((note, index) => (
+              <Box
+                key={index}
+                p={2}
+                cursor="pointer"
+                borderRadius="md"
+                bg={index === highlightedIndex ? notesSuggestionsBoxItemHighlightBgColor : "transparent"}
+                _hover={{
+                  bg: notesSuggestionsBoxItemBgColor,
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  setNotes(note);
+                  setNoteSuggestions([]);
+                  setHighlightedIndex(-1);
+                }}
+                onMouseEnter={() => setHighlightedIndex(index)}
+              >
+                {note}
+              </Box>
+            ))}
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
     </FormControl>
   );
 };
