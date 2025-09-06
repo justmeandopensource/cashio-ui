@@ -95,13 +95,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
         borderColor={borderColor}
       >
         <HStack spacing={3}>
-          <Box
-            width="40px"
-            height="40px"
-            borderRadius="md"
-            bg={hoverBg}
-            animate="pulse"
-          />
+          <Box width="40px" height="40px" borderRadius="md" bg={hoverBg} />
           <Box flex="1">
             <Box height="16px" bg={hoverBg} borderRadius="md" mb={1} />
             <Box height="12px" bg={hoverBg} borderRadius="md" width="70%" />

@@ -84,7 +84,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
 
   // Handle Enter key press
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter") {
       handleSubmit();
     }
@@ -268,7 +268,7 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                   }`}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                   borderWidth="2px"
                   borderColor={inputBorderColor}
                   bg={inputBg}

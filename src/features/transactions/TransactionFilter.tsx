@@ -677,11 +677,11 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                   <FormLabel fontWeight="semibold" mb={2}>
                     Transaction Type
                   </FormLabel>
-                  <RadioGroup
-                    value={filters.transaction_type}
-                    onChange={(value) =>
-                      handleInputChange("transaction_type", value)
-                    }
+                   <RadioGroup
+                     value={filters.transaction_type}
+                     onChange={(value) =>
+                       handleInputChange("transaction_type", value as "" | "income" | "expense" | "transfer")
+                     }
                   >
                     <Stack
                       direction={{ base: "column", sm: "row" }}

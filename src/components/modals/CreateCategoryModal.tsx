@@ -108,7 +108,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
   };
 
   // Handle Enter key press
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter") {
       handleSubmit();
     }
@@ -252,7 +252,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                   placeholder={`e.g., ${categoryType === "income" ? "Salary, Freelance" : "Groceries, Utilities"}`}
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                   borderWidth="2px"
                   borderColor={inputBorderColor}
                   bg={inputBg}

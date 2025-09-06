@@ -114,7 +114,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   };
 
   // Handle Enter key press
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter") {
       handleSubmit();
     }
@@ -265,7 +265,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                   placeholder={`e.g., ${accountType === "asset" ? "Cash, Bank Account" : "Credit Card, Mortgage"}`}
                   value={accountName}
                   onChange={(e) => setAccountName(e.target.value)}
-                  onKeyPress={handleKeyPress}
+                  onKeyDown={handleKeyDown}
                   borderWidth="2px"
                   borderColor={inputBorderColor}
                   bg={inputBg}
