@@ -13,6 +13,8 @@ import {
   HStack,
   Select,
   Button,
+  FormHelperText,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { Plus, Trash2 } from "lucide-react";
 import {
@@ -62,10 +64,17 @@ const FormSplits: React.FC<FormSplitsProps> = ({
   categories,
   setSplits,
   borderColor,
-  bgColor,
   highlightColor,
   buttonColorScheme,
 }) => {
+  // Modern theme colors
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
+  const inputBorderColor = useColorModeValue("gray.200", "gray.600");
+  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+  const splitCardBg = useColorModeValue("white", "gray.800");
+  const splitBorderColor = useColorModeValue("gray.100", "gray.600");
+
   // Update splits based on the current amount
   const updateSplitsBasedOnAmount = useCallback((): void => {
     const currentAmount = parseFloat(amount) || 0;
@@ -114,8 +123,9 @@ const FormSplits: React.FC<FormSplitsProps> = ({
 
     if (index < newSplits.length - 1) {
       if (newSplits.length > 1) {
-        newSplits[newSplits.length - 1].amount =
-          (remaining > 0 ? remaining : 0).toString();
+        newSplits[newSplits.length - 1].amount = (
+          remaining > 0 ? remaining : 0
+        ).toString();
       }
     } else if (remaining > 0) {
       newSplits.push({ amount: remaining.toString(), categoryId: "" });
@@ -190,153 +200,290 @@ const FormSplits: React.FC<FormSplitsProps> = ({
 
   return (
     <Box
-      borderWidth="1px"
-      borderRadius="md"
-      borderColor={borderColor}
-      p={4}
       bg={highlightColor}
+      p={{ base: 4, sm: 6 }}
+      borderRadius="md"
+      border="1px solid"
+      borderColor={borderColor}
     >
-      <VStack spacing={4} align="stretch">
+      <VStack spacing={{ base: 4, sm: 5 }} align="stretch">
         <Flex justifyContent="space-between" alignItems="center">
-          <Text fontWeight="medium">Split Details</Text>
+          <Box>
+            <Text fontWeight="semibold" fontSize="lg" mb={1}>
+              Split Details
+            </Text>
+            <Text fontSize="sm" color="gray.600">
+              Allocate amounts across multiple categories
+            </Text>
+          </Box>
         </Flex>
 
-        <Divider />
+        <Divider borderColor={borderColor} />
 
-        {splits.map((split, index) => (
-          <Box
-            key={index}
-            p={3}
-            borderWidth="1px"
-            borderRadius="md"
-            borderColor={borderColor}
-            bg={bgColor}
-          >
-            <VStack spacing={3} align="stretch">
-              <FormControl flex="1">
-                <FormLabel fontSize="sm">Amount</FormLabel>
-                <InputGroup size="sm">
-                  <InputLeftAddon>{currencySymbol}</InputLeftAddon>
+        <VStack spacing={4} align="stretch">
+          {splits.map((split, index) => (
+            <Box
+              key={index}
+              bg={splitCardBg}
+              p={{ base: 4, sm: 5 }}
+              borderRadius="md"
+              border="2px solid"
+              borderColor={splitBorderColor}
+              boxShadow="sm"
+              _hover={{
+                borderColor: "teal.200",
+                boxShadow: "md",
+              }}
+              transition="all 0.2s"
+            >
+              <VStack spacing={4} align="stretch">
+                <HStack spacing={4} align="end">
+                  <FormControl flex="1" isRequired>
+                    <FormLabel fontSize="sm" fontWeight="semibold" mb={2}>
+                      Amount
+                    </FormLabel>
+                    <InputGroup>
+                      <InputLeftAddon
+                        bg={inputBorderColor}
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        color="gray.600"
+                        fontWeight="semibold"
+                        fontSize="sm"
+                      >
+                        {currencySymbol}
+                      </InputLeftAddon>
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        value={(split.amount || "").toString()}
+                        onChange={(e) => {
+                          handleSplitAmountChange(index, e.target.value);
+                        }}
+                        onKeyDown={(e) =>
+                          handleNumericInput(e, (split.amount || "").toString())
+                        }
+                        onPaste={(e) =>
+                          handleNumericPaste(e, (value) => {
+                            handleSplitAmountChange(index, value);
+                          })
+                        }
+                        placeholder="0.00"
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        bg={inputBg}
+                        borderRadius="md"
+                        _hover={{ borderColor: "teal.300" }}
+                        _focus={{
+                          borderColor: focusBorderColor,
+                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                        }}
+                      />
+                    </InputGroup>
+                  </FormControl>
+
+                  {splits.length > 1 && (
+                    <Button
+                      leftIcon={<Trash2 size={16} />}
+                      variant="outline"
+                      colorScheme="red"
+                      size="md"
+                      height="40px"
+                      onClick={() => removeSplit(index)}
+                      borderWidth="2px"
+                      px={4}
+                      _hover={{
+                        bg: "red.50",
+                        borderColor: "red.300",
+                        transform: "translateY(-1px)",
+                      }}
+                      transition="all 0.2s"
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </HStack>
+
+                <FormControl isRequired>
+                  <FormLabel fontSize="sm" fontWeight="semibold" mb={2}>
+                    Category
+                  </FormLabel>
+                  <Select
+                    value={split.categoryId}
+                    onChange={(e) => {
+                      const newSplits = [...splits];
+                      newSplits[index].categoryId = e.target.value;
+                      setSplits(newSplits);
+                    }}
+                    placeholder="Select category"
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                    data-testid="formsplits-category-dropdown"
+                  >
+                    {/* Filter categories based on transaction type */}
+                    <optgroup
+                      label={
+                        type === "income"
+                          ? "Income Categories"
+                          : "Expense Categories"
+                      }
+                    >
+                      {categories
+                        .filter((category) => category.type === type)
+                        .map((category) => (
+                          <option
+                            key={category.category_id}
+                            value={category.category_id}
+                          >
+                            {category.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </Select>
+                  <FormHelperText mt={1} fontSize="xs">
+                    Choose the category for this split
+                  </FormHelperText>
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel fontSize="sm" fontWeight="semibold" mb={2}>
+                    Notes
+                  </FormLabel>
                   <Input
                     type="text"
-                    inputMode="decimal"
-                    value={(split.amount || "").toString()}
+                    value={split.notes || ""}
                     onChange={(e) => {
-                      handleSplitAmountChange(index, e.target.value);
+                      const newSplits = [...splits];
+                      newSplits[index].notes = e.target.value;
+                      setSplits(newSplits);
                     }}
-                    onKeyDown={(e) =>
-                      handleNumericInput(e, (split.amount || "").toString())
-                    }
-                    onPaste={(e) =>
-                      handleNumericPaste(e, (value) => {
-                        handleSplitAmountChange(index, value);
-                      })
-                    }
-                    placeholder="0.00"
-                    borderColor={borderColor}
+                    placeholder="Optional notes for this split"
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
                   />
-                </InputGroup>
-              </FormControl>
-              <FormControl flex="1">
-                <FormLabel fontSize="sm">Category</FormLabel>
-                <Select
-                  size="sm"
-                  value={split.categoryId}
-                  onChange={(e) => {
-                    const newSplits = [...splits];
-                    newSplits[index].categoryId = e.target.value;
-                    setSplits(newSplits);
-                  }}
-                  borderColor={borderColor}
-                  data-testid="formsplits-category-dropdown"
-                >
-                  <option value="">Select category</option>
-                  {/* Filter categories based on transaction type */}
-                  <optgroup
-                    label={
-                      type === "income"
-                        ? "Income Categories"
-                        : "Expense Categories"
-                    }
-                  >
-                    {categories
-                      .filter((category) => category.type === type)
-                      .map((category) => (
-                        <option
-                          key={category.category_id}
-                          value={category.category_id}
-                        >
-                          {category.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                </Select>
-              </FormControl>
-              <FormControl flex="1">
-                <FormLabel fontSize="sm">Notes</FormLabel>
-                <Input
-                  type="text"
-                  value={split.notes || ""}
-                  onChange={(e) => {
-                    const newSplits = [...splits];
-                    newSplits[index].notes = e.target.value;
-                    setSplits(newSplits);
-                  }}
-                  placeholder="Optional notes"
-                  borderColor={borderColor}
-                />
-              </FormControl>
-              {splits.length > 1 && (
-                <Button
-                  leftIcon={<Trash2 size={14} />}
-                  variant="link"
-                  colorScheme="red"
-                  size="sm"
-                  onClick={() => removeSplit(index)}
-                >
-                  Remove Split
-                </Button>
-              )}
-            </VStack>
-          </Box>
-        ))}
+                  <FormHelperText mt={1} fontSize="xs">
+                    Add specific details about this split
+                  </FormHelperText>
+                </FormControl>
+              </VStack>
+            </Box>
+          ))}
+        </VStack>
 
         {/* Add Split Button */}
         <Button
-          leftIcon={<Plus size={14} />}
+          leftIcon={<Plus size={16} />}
           variant="outline"
-          size="sm"
+          size="md"
           onClick={addSplit}
           alignSelf="flex-start"
           colorScheme={buttonColorScheme}
+          borderWidth="2px"
+          px={6}
           isDisabled={
             displayRemainingAmount() <= 0 &&
             splits.some(
               (split) => roundToTwoDecimals(parseFloat(split.amount)) === 0,
             )
           }
+          _hover={{
+            bg: `${buttonColorScheme}.50`,
+            borderColor: `${buttonColorScheme}.300`,
+            transform: "translateY(-1px)",
+          }}
+          transition="all 0.2s"
         >
           Add Split
         </Button>
 
-        {/* Display total allocated and remaining amount */}
-        <HStack justifyContent="space-between" pt={2}>
-          <Text fontSize="sm">
-            Total: {currencySymbol}
-            {roundToTwoDecimals(parseFloat(amount) || 0).toFixed(2)}
-          </Text>
-          {!isEffectivelyEqual(calculateRemainingAmount(), 0) && (
-            <Text
-              fontSize="sm"
-              color={calculateRemainingAmount() < 0 ? "red.500" : "orange.500"}
-              fontWeight="medium"
-            >
-              {calculateRemainingAmount() < 0
-                ? `Over-allocated by ${currencySymbol}${Math.abs(roundToTwoDecimals(calculateRemainingAmount())).toFixed(2)}`
-                : `${currencySymbol}${roundToTwoDecimals(calculateRemainingAmount()).toFixed(2)} unallocated`}
-            </Text>
-          )}
-        </HStack>
+        {/* Enhanced Summary Section */}
+        <Box
+          bg={cardBg}
+          p={4}
+          borderRadius="md"
+          border="1px solid"
+          borderColor={splitBorderColor}
+        >
+          <VStack spacing={3}>
+            <HStack justifyContent="space-between" w="100%">
+              <Text fontSize="sm" fontWeight="medium" color="gray.700">
+                Total Amount:
+              </Text>
+              <Text fontSize="sm" fontWeight="bold" color="gray.900">
+                {currencySymbol}
+                {roundToTwoDecimals(parseFloat(amount) || 0).toFixed(2)}
+              </Text>
+            </HStack>
+
+            <HStack justifyContent="space-between" w="100%">
+              <Text fontSize="sm" fontWeight="medium" color="gray.700">
+                Allocated:
+              </Text>
+              <Text fontSize="sm" fontWeight="semibold" color="green.600">
+                {currencySymbol}
+                {roundToTwoDecimals(
+                  splits.reduce(
+                    (sum, split) =>
+                      sum + roundToTwoDecimals(parseFloat(split.amount) || 0),
+                    0,
+                  ),
+                ).toFixed(2)}
+              </Text>
+            </HStack>
+
+            {!isEffectivelyEqual(calculateRemainingAmount(), 0) && (
+              <HStack justifyContent="space-between" w="100%">
+                <Text fontSize="sm" fontWeight="medium" color="gray.700">
+                  {calculateRemainingAmount() < 0
+                    ? "Over-allocated:"
+                    : "Remaining:"}
+                </Text>
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  color={
+                    calculateRemainingAmount() < 0 ? "red.500" : "orange.500"
+                  }
+                >
+                  {currencySymbol}
+                  {Math.abs(
+                    roundToTwoDecimals(calculateRemainingAmount()),
+                  ).toFixed(2)}
+                </Text>
+              </HStack>
+            )}
+
+            {isEffectivelyEqual(calculateRemainingAmount(), 0) && (
+              <HStack justifyContent="center" w="100%">
+                <Text
+                  fontSize="sm"
+                  fontWeight="bold"
+                  color="green.500"
+                  bg="green.50"
+                  px={3}
+                  py={1}
+                  borderRadius="full"
+                >
+                  ✓ Perfectly Allocated
+                </Text>
+              </HStack>
+            )}
+          </VStack>
+        </Box>
       </VStack>
     </Box>
   );

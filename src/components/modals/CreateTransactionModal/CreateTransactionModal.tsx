@@ -3,7 +3,6 @@ import {
   Modal,
   ModalOverlay,
   ModalContent,
-  ModalHeader,
   ModalFooter,
   ModalBody,
   Button,
@@ -24,7 +23,7 @@ import {
   InputGroup,
   InputLeftAddon,
   Stack,
-  Flex,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import api from "@/lib/api";
@@ -97,10 +96,14 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const toast = useToast();
 
   const { ledgerId, currencySymbol } = useLedgerStore();
-  // Theme colors
-  const buttonColorScheme = "teal";
+
+  // Modern theme colors
   const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
+  const inputBorderColor = useColorModeValue("gray.200", "gray.600");
+  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
   const highlightColor = useColorModeValue("teal.50", "teal.900");
 
   const resetForm = () => {
@@ -278,10 +281,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
           ? splits
               .filter((split) => (parseFloat(split.amount) || 0) > 0)
               .map((split) => ({
-                credit:
-                  type === "income" ? parseFloat(split.amount) || 0 : 0,
-                debit:
-                  type === "expense" ? parseFloat(split.amount) || 0 : 0,
+                credit: type === "income" ? parseFloat(split.amount) || 0 : 0,
+                debit: type === "expense" ? parseFloat(split.amount) || 0 : 0,
                 category_id: parseInt(split.categoryId, 10),
                 notes: split.notes,
               }))
@@ -308,7 +309,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
       const axiosError = error as AxiosError<{ detail: string }>;
       if (axiosError.response?.status !== 401) {
         toast({
-          description: axiosError.response?.data?.detail || "Transaction failed",
+          description:
+            axiosError.response?.data?.detail || "Transaction failed",
           status: "error",
           ...toastDefaults,
         });
@@ -322,191 +324,282 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      size={{ base: "full", sm: "md" }}
+      size={{ base: "full", sm: "xl" }}
       motionPreset="slideInBottom"
     >
-      <ModalOverlay backdropFilter="blur(2px)" />
+      <ModalOverlay backdropFilter="blur(4px)" bg="blackAlpha.300" />
       <ModalContent
+        bg={bgColor}
         borderRadius={{ base: 0, sm: "md" }}
+        boxShadow="2xl"
+        border="1px solid"
+        borderColor={borderColor}
+        overflow="hidden"
         mx={{ base: 0, sm: 4 }}
         my={{ base: 0, sm: "auto" }}
-        maxHeight={{ base: "100%", md: "80vh" }}
+        maxHeight={{ base: "100%", md: "90vh" }}
         display="flex"
         flexDirection="column"
       >
+        {/* Modern gradient header */}
         <Box
-          pt={{ base: 10, sm: 4 }}
-          pb={{ base: 2, sm: 0 }}
-          px={{ base: 4, sm: 0 }}
-          bg={{ base: buttonColorScheme + ".500", sm: "transparent" }}
-          color={{ base: "white", sm: "inherit" }}
-          borderTopRadius={{ base: 0, sm: "md" }}
+          bgGradient="linear(135deg, teal.400, teal.600)"
+          color="white"
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 6, sm: 6 }}
+          pt={{ base: 12, sm: 6 }}
+          position="relative"
         >
-          <ModalHeader
-            fontSize={{ base: "xl", sm: "lg" }}
-            p={{ base: 0, sm: 6 }}
-            pb={{ base: 4, sm: 2 }}
-          >
-            <Flex alignItems="center">
-              <Plus size={24} style={{ marginRight: "8px" }} />
-              Add Transaction
-            </Flex>
-          </ModalHeader>
+          <HStack spacing={{ base: 3, sm: 4 }} align="center">
+            <Box
+              p={{ base: 2, sm: 3 }}
+              bg="whiteAlpha.200"
+              borderRadius="md"
+              backdropFilter="blur(10px)"
+            >
+              <Plus size={24} style={{ margin: 0 }} />
+            </Box>
+
+            <Box>
+              <Box
+                fontSize={{ base: "xl", sm: "2xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+              >
+                Add Transaction
+              </Box>
+              <Box
+                fontSize={{ base: "sm", sm: "md" }}
+                color="whiteAlpha.900"
+                fontWeight="medium"
+                mt={1}
+              >
+                Record your {type === "expense" ? "expense" : "income"}
+              </Box>
+            </Box>
+          </HStack>
         </Box>
 
         <ModalBody
-          px={{ base: 4, sm: 6 }}
-          py={{ base: 4, sm: 4 }}
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 4, sm: 6 }}
           flex="1"
           display="flex"
           flexDirection="column"
           overflow="auto"
-          maxHeight={{ md: "calc(80vh - 140px)" }}
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
-          <VStack spacing={6} align="stretch" w="100%">
-            {/* Basic Info - First Section */}
+          <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
+            {/* Transaction Type Tabs */}
             <Box>
               <Tabs
                 isFitted
                 variant="enclosed"
-                colorScheme={buttonColorScheme}
+                colorScheme="teal"
                 mb={4}
                 index={type === "expense" ? 0 : 1}
               >
-                <TabList>
+                <TabList
+                  borderRadius="md"
+                  bg={cardBg}
+                  border="2px solid"
+                  borderColor={inputBorderColor}
+                >
                   <Tab
                     _selected={{
-                      color: `${buttonColorScheme}.500`,
-                      borderBottomColor: `${buttonColorScheme}.500`,
+                      bg: "red.600",
+                      color: "white",
+                      borderColor: "red.600",
                       fontWeight: "semibold",
                     }}
+                    borderRadius="sm"
                     onClick={() => setType("expense")}
                   >
                     Expense
                   </Tab>
                   <Tab
                     _selected={{
-                      color: `${buttonColorScheme}.500`,
-                      borderBottomColor: `${buttonColorScheme}.500`,
+                      bg: "teal.500",
+                      color: "white",
+                      borderColor: "teal.500",
                       fontWeight: "semibold",
                     }}
+                    borderRadius="sm"
                     onClick={() => setType("income")}
                   >
                     Income
                   </Tab>
                 </TabList>
               </Tabs>
-
-              <Stack
-                direction={{ base: "column", md: "row" }}
-                spacing={4}
-                mb={4}
-              >
-                {/* Date Picker */}
-                <FormControl flex="1">
-                  <FormLabel fontSize="sm" fontWeight="medium">
-                    Date
-                  </FormLabel>
-                  <ChakraDatePicker
-                    selected={date}
-                    onChange={(date: Date | null) => {
-                      if (date) {
-                        setDate(date);
-                      }
-                    }}
-                    shouldCloseOnSelect={true}
-                    data-testid="createtransactionmodal-date-picker"
-                  />
-                </FormControl>
-
-                {/* Amount Input */}
-                <FormControl flex="1">
-                  <FormLabel fontSize="sm" fontWeight="medium">
-                    Amount
-                  </FormLabel>
-                  <InputGroup>
-                    <InputLeftAddon>{currencySymbol}</InputLeftAddon>
-                    <Input
-                      type="text"
-                      inputMode="decimal"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      onKeyDown={(e) => handleNumericInput(e, amount)}
-                      onPaste={(e) => handleNumericPaste(e, setAmount)}
-                      placeholder="0.00"
-                      borderColor={borderColor}
-                      autoFocus
-                    />
-                  </InputGroup>
-                </FormControl>
-              </Stack>
-
-              {/* Account Dropdown (only shown if no accountId is provided) */}
-              {!accountId && accounts.length > 0 && (
-                <FormControl mb={4}>
-                  <FormLabel fontSize="sm" fontWeight="medium">
-                    Account
-                  </FormLabel>
-                  <Select
-                    borderColor={borderColor}
-                    placeholder="Select an account"
-                    onChange={(e) => setSelectedAccountId(e.target.value)}
-                    data-testid="createtransactionmodal-account-dropdown"
-                  >
-                    {/* Group for Asset Accounts */}
-                    <optgroup label="Asset Accounts">
-                      {accounts
-                        .filter((account) => account.type === "asset")
-                        .map((account) => (
-                          <option
-                            key={account.account_id}
-                            value={account.account_id}
-                          >
-                            {account.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    {/* Group for Liability Accounts */}
-                    <optgroup label="Liability Accounts">
-                      {accounts
-                        .filter((account) => account.type === "liability")
-                        .map((account) => (
-                          <option
-                            key={account.account_id}
-                            value={account.account_id}
-                          >
-                            {account.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  </Select>
-                </FormControl>
-              )}
-
-              {/* Notes */}
-              <FormNotes
-                ledgerId={ledgerId as string}
-                notes={notes}
-                setNotes={setNotes}
-                borderColor={borderColor}
-              />
             </Box>
 
-            {/* Split Toggle */}
+            {/* Basic Info Card */}
             <Box
-              p={3}
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
               borderRadius="md"
-              borderWidth="1px"
+              border="1px solid"
               borderColor={borderColor}
-              bg={useColorModeValue("gray.50", "gray.700")}
             >
-              <HStack justifyContent="space-between">
-                <Text fontSize="sm" fontWeight="medium">
-                  Split Transaction
-                </Text>
+              <VStack spacing={5} align="stretch">
+                <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+                  {/* Date Picker */}
+                  <FormControl flex="1" isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Date
+                    </FormLabel>
+                    <Box
+                      sx={{
+                        ".react-datepicker-wrapper": {
+                          width: "100%",
+                        },
+                        ".react-datepicker__input-container input": {
+                          width: "100%",
+                          height: "48px",
+                          borderWidth: "2px",
+                          borderColor: inputBorderColor,
+                          borderRadius: "md",
+                          bg: inputBg,
+                          fontSize: "lg",
+                          _hover: { borderColor: "teal.300" },
+                          _focus: {
+                            borderColor: focusBorderColor,
+                            boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                          },
+                        },
+                      }}
+                    >
+                      <ChakraDatePicker
+                        selected={date}
+                        onChange={(date: Date | null) => {
+                          if (date) {
+                            setDate(date);
+                          }
+                        }}
+                        shouldCloseOnSelect={true}
+                        data-testid="createtransactionmodal-date-picker"
+                      />
+                    </Box>
+                  </FormControl>
+
+                  {/* Amount Input */}
+                  <FormControl flex="1" isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Amount
+                    </FormLabel>
+                    <InputGroup size="lg">
+                      <InputLeftAddon
+                        bg={inputBorderColor}
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        color="gray.600"
+                        fontWeight="semibold"
+                      >
+                        {currencySymbol}
+                      </InputLeftAddon>
+                      <Input
+                        type="text"
+                        inputMode="decimal"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        onKeyDown={(e) => handleNumericInput(e, amount)}
+                        onPaste={(e) => handleNumericPaste(e, setAmount)}
+                        placeholder="0.00"
+                        borderWidth="2px"
+                        borderColor={inputBorderColor}
+                        bg={inputBg}
+                        borderRadius="md"
+                        _hover={{ borderColor: "teal.300" }}
+                        _focus={{
+                          borderColor: focusBorderColor,
+                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                        }}
+                        autoFocus
+                      />
+                    </InputGroup>
+                    <FormHelperText mt={2}>
+                      Enter the transaction amount
+                    </FormHelperText>
+                  </FormControl>
+                </Stack>
+
+                {/* Account Dropdown (only shown if no accountId is provided) */}
+                {!accountId && accounts.length > 0 && (
+                  <FormControl isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Account
+                    </FormLabel>
+                    <Select
+                      value={selectedAccountId}
+                      onChange={(e) => setSelectedAccountId(e.target.value)}
+                      placeholder="Select an account"
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      size="lg"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      data-testid="createtransactionmodal-account-dropdown"
+                    >
+                      {/* Group for Asset Accounts */}
+                      <optgroup label="Asset Accounts">
+                        {accounts
+                          .filter((account) => account.type === "asset")
+                          .map((account) => (
+                            <option
+                              key={account.account_id}
+                              value={account.account_id}
+                            >
+                              {account.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                      {/* Group for Liability Accounts */}
+                      <optgroup label="Liability Accounts">
+                        {accounts
+                          .filter((account) => account.type === "liability")
+                          .map((account) => (
+                            <option
+                              key={account.account_id}
+                              value={account.account_id}
+                            >
+                              {account.name}
+                            </option>
+                          ))}
+                      </optgroup>
+                    </Select>
+                    <FormHelperText mt={2}>
+                      Choose which account this transaction belongs to
+                    </FormHelperText>
+                  </FormControl>
+                )}
+              </VStack>
+            </Box>
+
+            {/* Split Toggle Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+            >
+              <HStack justifyContent="space-between" align="center">
+                <Box>
+                  <Text fontWeight="semibold" mb={1}>
+                    Split Transaction
+                  </Text>
+                  <Text fontSize="sm" color="gray.600">
+                    Divide this transaction across multiple categories
+                  </Text>
+                </Box>
                 <Switch
-                  colorScheme={buttonColorScheme}
+                  colorScheme="teal"
+                  size="lg"
                   isChecked={isSplit}
                   onChange={(e) => handleSplitToggle(e.target.checked)}
                   isDisabled={!amount} // Disable if amount is not entered
@@ -524,72 +617,113 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                 type={type}
                 categories={categories}
                 setSplits={setSplits}
-                borderColor={borderColor}
-                bgColor={bgColor}
+                borderColor={inputBorderColor}
+                bgColor={inputBg}
                 highlightColor={highlightColor}
-                buttonColorScheme={buttonColorScheme}
+                buttonColorScheme="teal"
               />
             ) : (
-              /* Category Dropdown (when not split) */
-              <FormControl>
-                <FormLabel fontSize="sm" fontWeight="medium">
-                  Category
-                </FormLabel>
-                <Select
-                  value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
-                  borderColor={borderColor}
-                  placeholder="Select a category"
-                  data-testid="createtransactionmodal-category-dropdown"
-                >
-                  {/* Group for Income Categories */}
-                  <optgroup label="Income Categories">
-                    {categories
-                      .filter((category) => category.type === "income")
-                      .map((category) => (
-                        <option
-                          key={category.category_id}
-                          value={category.category_id}
-                        >
-                          {category.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                  {/* Group for Expense Categories */}
-                  <optgroup label="Expense Categories">
-                    {categories
-                      .filter((category) => category.type === "expense")
-                      .map((category) => (
-                        <option
-                          key={category.category_id}
-                          value={category.category_id}
-                        >
-                          {category.name}
-                        </option>
-                      ))}
-                  </optgroup>
-                </Select>
-              </FormControl>
+              /* Category Dropdown Card */
+              <Box
+                bg={cardBg}
+                p={{ base: 4, sm: 6 }}
+                borderRadius="md"
+                border="1px solid"
+                borderColor={borderColor}
+              >
+                <FormControl isRequired>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Category
+                  </FormLabel>
+                  <Select
+                    value={categoryId}
+                    onChange={(e) => setCategoryId(e.target.value)}
+                    placeholder="Select a category"
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                    data-testid="createtransactionmodal-category-dropdown"
+                  >
+                    {/* Group for Income Categories */}
+                    <optgroup label="Income Categories">
+                      {categories
+                        .filter((category) => category.type === "income")
+                        .map((category) => (
+                          <option
+                            key={category.category_id}
+                            value={category.category_id}
+                          >
+                            {category.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                    {/* Group for Expense Categories */}
+                    <optgroup label="Expense Categories">
+                      {categories
+                        .filter((category) => category.type === "expense")
+                        .map((category) => (
+                          <option
+                            key={category.category_id}
+                            value={category.category_id}
+                          >
+                            {category.name}
+                          </option>
+                        ))}
+                    </optgroup>
+                  </Select>
+                  <FormHelperText mt={2}>
+                    Choose the category for this {type}
+                  </FormHelperText>
+                </FormControl>
+              </Box>
             )}
 
-            {/* Tags Input */}
-            <FormTags
-              tags={tags}
-              setTags={setTags}
+            {/* Notes and Tags Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
               borderColor={borderColor}
-              buttonColorScheme={buttonColorScheme}
-            />
+            >
+              <VStack spacing={5} align="stretch">
+                {/* Notes */}
+                <FormNotes
+                  ledgerId={ledgerId as string}
+                  notes={notes}
+                  setNotes={setNotes}
+                  borderColor={inputBorderColor}
+                />
+
+                {/* Tags Input */}
+                <FormTags
+                  tags={tags}
+                  setTags={setTags}
+                  borderColor={inputBorderColor}
+                  buttonColorScheme="teal"
+                />
+              </VStack>
+            </Box>
           </VStack>
 
           {/* Mobile-only action buttons that stay at bottom */}
           <Box display={{ base: "block", sm: "none" }} mt={6}>
             <Button
               onClick={handleSubmit}
-              colorScheme={buttonColorScheme}
+              colorScheme="teal"
               size="lg"
               width="100%"
               mb={3}
+              borderRadius="md"
               isLoading={isLoading}
+              loadingText="Saving..."
               isDisabled={
                 (isSplit &&
                   splits.some(
@@ -603,6 +737,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                 (isSplit && !accountId && !selectedAccountId)
               }
               leftIcon={<Check />}
+              _hover={{
+                transform: isLoading ? "none" : "translateY(-2px)",
+                boxShadow: isLoading ? "none" : "lg",
+              }}
+              transition="all 0.2s"
             >
               Save Transaction
             </Button>
@@ -611,8 +750,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               onClick={onClose}
               size="lg"
               width="100%"
+              borderRadius="md"
               isDisabled={isLoading}
               leftIcon={<X />}
+              borderWidth="2px"
+              _hover={{ bg: cardBg }}
             >
               Cancel
             </Button>
@@ -620,13 +762,23 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
         </ModalBody>
 
         {/* Desktop-only footer */}
-        <ModalFooter display={{ base: "none", sm: "flex" }}>
+        <ModalFooter
+          display={{ base: "none", sm: "flex" }}
+          px={8}
+          py={6}
+          bg={cardBg}
+          borderTop="1px solid"
+          borderColor={borderColor}
+        >
           <Button
-            colorScheme={buttonColorScheme}
+            colorScheme="teal"
             mr={3}
-            px={6}
             onClick={handleSubmit}
+            px={8}
+            py={3}
+            borderRadius="md"
             isLoading={isLoading}
+            loadingText="Saving..."
             isDisabled={
               (isSplit &&
                 splits.some(
@@ -640,10 +792,25 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               (isSplit && !accountId && !selectedAccountId)
             }
             leftIcon={<Check />}
+            _hover={{
+              transform: isLoading ? "none" : "translateY(-2px)",
+              boxShadow: isLoading ? "none" : "lg",
+            }}
+            transition="all 0.2s"
           >
             Save Transaction
           </Button>
-          <Button variant="outline" onClick={onClose} leftIcon={<X />}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            isDisabled={isLoading}
+            leftIcon={<X />}
+            px={6}
+            py={3}
+            borderRadius="md"
+            borderWidth="2px"
+            _hover={{ bg: inputBg }}
+          >
             Cancel
           </Button>
         </ModalFooter>
