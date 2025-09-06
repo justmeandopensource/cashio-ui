@@ -11,15 +11,17 @@ import {
   InputLeftElement,
   VStack,
   Text,
-  Image,
   Heading,
-  Flex,
   FormErrorMessage,
   ScaleFade,
   useColorModeValue,
   Progress,
+  HStack,
+  Icon,
+  FormHelperText,
+  Flex,
 } from "@chakra-ui/react";
-import { UserPlus, Eye, EyeOff, Mail, Lock, Info, AtSign } from "lucide-react";
+import { UserPlus, Eye, EyeOff, Mail, Lock, User, AtSign } from "lucide-react";
 
 interface RegisterFormProps {
   // eslint-disable-next-line no-unused-vars
@@ -85,10 +87,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
 
   const passwordStrength = getPasswordStrength(password);
 
-  // Color modes for better theming
+  // Modern color scheme matching CreateLedgerModal
   const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
-  const primaryColor = "teal.500";
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
+  const inputBorderColor = useColorModeValue("gray.200", "gray.600");
+  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
 
   // Validation errors
   const nameError = touched.full_name && !full_name;
@@ -119,6 +124,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     }
   };
 
+  const handleBlur = (field: keyof TouchedState) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
   // Get color for password strength indicator
   const getStrengthColor = (strength: number): string => {
     if (strength < 50) return "red.400";
@@ -126,229 +135,375 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
     return "green.400";
   };
 
+  const getStrengthText = (strength: number): string => {
+    if (strength < 50) return "Weak";
+    if (strength < 75) return "Good";
+    return "Strong";
+  };
+
+  const getStrengthColorScheme = (strength: number): string => {
+    if (strength < 50) return "red";
+    if (strength < 75) return "orange";
+    return "green";
+  };
+
   return (
     <ScaleFade in={true} initialScale={0.95}>
       <Box
         bg={bgColor}
-        p={{ base: 6, md: 8 }}
-        borderRadius="xl"
-        boxShadow="xl"
-        maxW="md"
+        borderRadius={{ base: "lg", sm: "xl" }}
+        boxShadow="2xl"
+        maxW={{ base: "full", sm: "lg" }}
         w="full"
         borderWidth="1px"
         borderColor={borderColor}
+        overflow="hidden"
+        mx={{ base: 4, sm: "auto" }}
       >
-        <VStack as="form" spacing={{ base: 4, md: 5 }} onSubmit={handleSubmit}>
-          {/* Logo/Brand */}
-          <Heading fontSize={{ base: "xl", md: "2xl" }} color={primaryColor} mb="-4">
-            Create your Cashio Account
-          </Heading>
-          <Text textAlign="center" fontSize="sm" color="secondaryTextColor">
-            Start managing your finances today.
-          </Text>
-
-          <FormControl isInvalid={nameError}>
-            <FormLabel fontSize="sm" fontWeight="medium">
-              Full Name
-            </FormLabel>
-            <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                height="100%"
-                display="flex"
-                alignItems="center"
-              >
-                <Info size={18} color="gray" />
-              </InputLeftElement>
-              <Input
-                ref={fullNameRef}
-                type="text"
-                placeholder="Enter your full name"
-                size="lg"
-                value={full_name}
-                onChange={(e) => setFullName(e.target.value)}
-                borderRadius="md"
-                _focus={{
-                  borderColor: primaryColor,
-                  boxShadow: `0 0 0 1px ${primaryColor}`,
-                }}
-                autoComplete="name"
-              />
-            </InputGroup>
-            {nameError && (
-              <FormErrorMessage>Full name is required</FormErrorMessage>
-            )}
-          </FormControl>
-
-          <FormControl isInvalid={usernameError}>
-            <FormLabel fontSize="sm" fontWeight="medium">
-              Username
-            </FormLabel>
-            <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                height="100%"
-                display="flex"
-                alignItems="center"
-              >
-                <AtSign size={18} color="gray" />
-              </InputLeftElement>
-              <Input
-                type="text"
-                placeholder="Create a username"
-                size="lg"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                borderRadius="md"
-                _focus={{
-                  borderColor: primaryColor,
-                  boxShadow: `0 0 0 1px ${primaryColor}`,
-                }}
-                autoComplete="username"
-              />
-            </InputGroup>
-            {usernameError && (
-              <FormErrorMessage>Username is required</FormErrorMessage>
-            )}
-          </FormControl>
-
-          <FormControl isInvalid={emailError}>
-            <FormLabel fontSize="sm" fontWeight="medium">
-              Email Address
-            </FormLabel>
-            <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                height="100%"
-                display="flex"
-                alignItems="center"
-              >
-                <Mail size={18} color="gray" />
-              </InputLeftElement>
-              <Input
-                type="email"
-                placeholder="Enter your email"
-                size="lg"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                borderRadius="md"
-                _focus={{
-                  borderColor: primaryColor,
-                  boxShadow: `0 0 0 1px ${primaryColor}`,
-                }}
-                autoComplete="email"
-              />
-            </InputGroup>
-            {emailError && (
-              <FormErrorMessage>Valid email is required</FormErrorMessage>
-            )}
-          </FormControl>
-
-          <FormControl isInvalid={passwordError}>
-            <FormLabel fontSize="sm" fontWeight="medium">
-              Password
-            </FormLabel>
-            <InputGroup size="lg">
-              <InputLeftElement
-                pointerEvents="none"
-                height="100%"
-                display="flex"
-                alignItems="center"
-              >
-                <Lock size={18} color="gray" />
-              </InputLeftElement>
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="Create a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                borderRadius="md"
-                _focus={{
-                  borderColor: primaryColor,
-                  boxShadow: `0 0 0 1px ${primaryColor}`,
-                }}
-                autoComplete="new-password"
-              />
-              <InputRightElement>
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowPassword(!showPassword)}
-                  _hover={{ bg: "transparent" }}
-                  size="sm"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </Button>
-              </InputRightElement>
-            </InputGroup>
-
-            {/* Password strength indicator */}
-            {password && (
-              <Box mt={2}>
-                <Flex justify="space-between" align="center" mb={1}>
-                  <Text fontSize="xs" color="tertiaryTextColor">
-                    Password strength
-                  </Text>
-                  <Text
-                    fontSize="xs"
-                    fontWeight="medium"
-                    color={getStrengthColor(passwordStrength)}
-                  >
-                    {passwordStrength < 50
-                      ? "Weak"
-                      : passwordStrength < 75
-                        ? "Good"
-                        : "Strong"}
-                  </Text>
-                </Flex>
-                <Progress
-                  value={passwordStrength}
-                  size="xs"
-                  colorScheme={
-                    passwordStrength < 50
-                      ? "red"
-                      : passwordStrength < 75
-                        ? "orange"
-                        : "green"
-                  }
-                  borderRadius="full"
-                />
-              </Box>
-            )}
-
-            {passwordError && (
-              <FormErrorMessage>
-                Password must be at least 8 characters
-              </FormErrorMessage>
-            )}
-          </FormControl>
-
-          <Button
-            type="submit"
-            size="lg"
-            w="full"
-            colorScheme="teal"
-            mt={2}
-            loadingText="Creating account"
-            borderRadius="md"
-            boxShadow="md"
-            _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
-            _active={{ boxShadow: "md", transform: "translateY(0)" }}
-            transition="all 0.2s"
-            leftIcon={<UserPlus size={18} />}
+        {/* Modern gradient header matching CreateLedgerModal - Left Justified */}
+        <Box
+          bgGradient="linear(135deg, teal.400, teal.600)"
+          color="white"
+          px={{ base: 6, sm: 8 }}
+          py={{ base: 6, sm: 8 }}
+          position="relative"
+        >
+          <HStack
+            spacing={{ base: 3, sm: 4 }}
+            align="center"
+            justify="flex-start"
           >
-            Create Account
-          </Button>
+            <Box
+              p={{ base: 2, sm: 3 }}
+              bg="whiteAlpha.200"
+              borderRadius="md"
+              backdropFilter="blur(10px)"
+            >
+              <Icon as={UserPlus} boxSize={{ base: 5, sm: 6 }} />
+            </Box>
 
-          <Text textAlign="center" fontSize="sm" color="secondaryTextColor" mt={1}>
-            Already have an account?{" "}
-            <RouterLink to="/login">
-              <Text as="span" color={primaryColor} fontWeight="semibold">
-                Log In
+            <Box>
+              <Heading
+                fontSize={{ base: "xl", sm: "2xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+              >
+                Join Cashio
+              </Heading>
+              <Text
+                fontSize={{ base: "sm", sm: "md" }}
+                color="whiteAlpha.900"
+                fontWeight="medium"
+                mt={1}
+              >
+                Start managing your finances today
               </Text>
-            </RouterLink>
-          </Text>
-        </VStack>
+            </Box>
+          </HStack>
+        </Box>
+
+        {/* Form content */}
+        <Box px={{ base: 6, sm: 8 }} py={{ base: 6, sm: 8 }}>
+          <VStack
+            as="form"
+            spacing={{ base: 5, md: 6 }}
+            onSubmit={handleSubmit}
+          >
+            {/* Personal Information Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 5, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+              w="100%"
+            >
+              <VStack spacing={5} align="stretch">
+                <FormControl isInvalid={nameError}>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Full Name
+                  </FormLabel>
+                  <InputGroup>
+                    <InputLeftElement
+                      pointerEvents="none"
+                      height="100%"
+                      display="flex"
+                      alignItems="center"
+                    >
+                      <Icon as={User} boxSize={4} color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      ref={fullNameRef}
+                      type="text"
+                      placeholder="Enter your full name"
+                      size="lg"
+                      value={full_name}
+                      onChange={(e) => setFullName(e.target.value)}
+                      onBlur={() => handleBlur("full_name")}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      borderRadius="md"
+                      _hover={!nameError ? { borderColor: "teal.300" } : {}}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      autoComplete="name"
+                    />
+                  </InputGroup>
+                  {nameError ? (
+                    <FormErrorMessage mt={2}>
+                      Full name is required
+                    </FormErrorMessage>
+                  ) : (
+                    <FormHelperText mt={2}>
+                      Your full name for account identification
+                    </FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl isInvalid={usernameError}>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Username
+                  </FormLabel>
+                  <InputGroup>
+                    <InputLeftElement
+                      pointerEvents="none"
+                      height="100%"
+                      display="flex"
+                      alignItems="center"
+                    >
+                      <Icon as={AtSign} boxSize={4} color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      type="text"
+                      placeholder="Create a unique username"
+                      size="lg"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      onBlur={() => handleBlur("username")}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      borderRadius="md"
+                      _hover={!usernameError ? { borderColor: "teal.300" } : {}}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      autoComplete="username"
+                    />
+                  </InputGroup>
+                  {usernameError ? (
+                    <FormErrorMessage mt={2}>
+                      Username is required
+                    </FormErrorMessage>
+                  ) : (
+                    <FormHelperText mt={2}>
+                      Choose a unique username for your account
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </VStack>
+            </Box>
+
+            {/* Account Credentials Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 5, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+              w="100%"
+            >
+              <VStack spacing={5} align="stretch">
+                <FormControl isInvalid={emailError}>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Email Address
+                  </FormLabel>
+                  <InputGroup>
+                    <InputLeftElement
+                      pointerEvents="none"
+                      height="100%"
+                      display="flex"
+                      alignItems="center"
+                    >
+                      <Icon as={Mail} boxSize={4} color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email address"
+                      size="lg"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      onBlur={() => handleBlur("email")}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      borderRadius="md"
+                      _hover={!emailError ? { borderColor: "teal.300" } : {}}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      autoComplete="email"
+                    />
+                  </InputGroup>
+                  {emailError ? (
+                    <FormErrorMessage mt={2}>
+                      Valid email is required
+                    </FormErrorMessage>
+                  ) : (
+                    <FormHelperText mt={2}>
+                      We'll use this for account verification and updates
+                    </FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl isInvalid={passwordError}>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Password
+                  </FormLabel>
+                  <InputGroup size="lg">
+                    <InputLeftElement
+                      pointerEvents="none"
+                      height="100%"
+                      display="flex"
+                      alignItems="center"
+                    >
+                      <Icon as={Lock} boxSize={4} color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Create a strong password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onBlur={() => handleBlur("password")}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      borderRadius="md"
+                      _hover={!passwordError ? { borderColor: "teal.300" } : {}}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      autoComplete="new-password"
+                    />
+                    <InputRightElement height="100%">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setShowPassword(!showPassword)}
+                        _hover={{ bg: "transparent" }}
+                        size="sm"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        <Icon as={showPassword ? EyeOff : Eye} boxSize={4} />
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+
+                  {/* Password strength indicator */}
+                  {password && (
+                    <Box mt={3}>
+                      <Flex justify="space-between" align="center" mb={2}>
+                        <Text
+                          fontSize="sm"
+                          fontWeight="medium"
+                          color="gray.600"
+                        >
+                          Password strength
+                        </Text>
+                        <Text
+                          fontSize="sm"
+                          fontWeight="semibold"
+                          color={getStrengthColor(passwordStrength)}
+                        >
+                          {getStrengthText(passwordStrength)}
+                        </Text>
+                      </Flex>
+                      <Progress
+                        value={passwordStrength}
+                        size="sm"
+                        colorScheme={getStrengthColorScheme(passwordStrength)}
+                        borderRadius="full"
+                        bg="gray.200"
+                      />
+                    </Box>
+                  )}
+
+                  {passwordError ? (
+                    <FormErrorMessage mt={2}>
+                      Password must be at least 8 characters
+                    </FormErrorMessage>
+                  ) : (
+                    <FormHelperText mt={2}>
+                      Use at least 8 characters with a mix of letters, numbers,
+                      and symbols
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </VStack>
+            </Box>
+
+            {/* Action button */}
+            <Button
+              type="submit"
+              size="lg"
+              w="full"
+              colorScheme="teal"
+              loadingText="Creating account"
+              borderRadius="md"
+              boxShadow="md"
+              _hover={{
+                boxShadow: "lg",
+                transform: "translateY(-2px)",
+              }}
+              _active={{
+                boxShadow: "md",
+                transform: "translateY(0)",
+              }}
+              transition="all 0.2s"
+              leftIcon={<Icon as={UserPlus} boxSize={4} />}
+              isDisabled={
+                !full_name ||
+                !username ||
+                !email ||
+                !password ||
+                passwordStrength < 25
+              }
+            >
+              Create Account
+            </Button>
+
+            {/* Footer link */}
+            <Box
+              bg={cardBg}
+              p={4}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+              textAlign="center"
+            >
+              <Text fontSize="sm" color="gray.600">
+                Already have an account?{" "}
+                <RouterLink to="/login">
+                  <Text
+                    as="span"
+                    color="teal.500"
+                    fontWeight="semibold"
+                    _hover={{ color: "teal.600" }}
+                  >
+                    Log In
+                  </Text>
+                </RouterLink>
+              </Text>
+            </Box>
+          </VStack>
+        </Box>
       </Box>
     </ScaleFade>
   );

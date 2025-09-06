@@ -11,12 +11,13 @@ import {
   VStack,
   Text,
   Heading,
-  Flex,
-  Image,
   ScaleFade,
   FormErrorMessage,
   InputLeftElement,
   useColorModeValue,
+  HStack,
+  Icon,
+  FormHelperText,
 } from "@chakra-ui/react";
 import { LogIn, Eye, EyeOff, Mail, Lock } from "lucide-react";
 
@@ -59,10 +60,13 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const usernameError = touched.username && !username;
   const passwordError = touched.password && !password;
 
-  // Color modes for better theming
+  // Modern color scheme matching CreateLedgerModal
   const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
-  const primaryColor = "teal.500";
+  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
+  const inputBorderColor = useColorModeValue("gray.200", "gray.600");
+  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
 
   const handleSubmit = (event: React.FormEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -75,133 +79,237 @@ const LoginForm: React.FC<LoginFormProps> = ({
     }
   };
 
+  const handleBlur = (field: keyof TouchedState) => {
+    setTouched((prev) => ({ ...prev, [field]: true }));
+  };
+
   return (
     <ScaleFade in={true} initialScale={0.95}>
       <Box
         bg={bgColor}
-        p={{ base: 6, md: 8 }}
-        borderRadius="xl"
-        boxShadow="xl"
-        maxW="md"
+        borderRadius={{ base: "lg", sm: "xl" }}
+        boxShadow="2xl"
+        maxW={{ base: "full", sm: "md" }}
         w="full"
         borderWidth="1px"
         borderColor={borderColor}
+        overflow="hidden"
+        mx={{ base: 4, sm: "auto" }}
       >
-        <VStack as="form" spacing={{ base: 5, md: 6 }} onSubmit={handleSubmit}>
-          {/* Logo/Brand */}
-          <Heading fontSize={{ base: "xl", md: "2xl" }} color={primaryColor} mb="-4">
-            Log in to Cashio
-          </Heading>
-          <Text textAlign="center" fontSize="sm" color="secondaryTextColor">
-            Manage your finances with ease.
-          </Text>
-
-          <FormControl isInvalid={usernameError}>
-            <FormLabel fontSize="sm" fontWeight="medium">
-              Username
-            </FormLabel>
-            <InputGroup>
-              <InputLeftElement
-                pointerEvents="none"
-                height="100%"
-                display="flex"
-                alignItems="center"
-              >
-                <Mail size={18} color="gray" />
-              </InputLeftElement>
-              <Input
-                ref={usernameInputRef}
-                type="text"
-                placeholder="Enter your username"
-                size="lg"
-                value={username}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setUsername(e.target.value)
-                }
-                borderRadius="md"
-                _focus={{
-                  borderColor: primaryColor,
-                  boxShadow: `0 0 0 1px ${primaryColor}`,
-                }}
-                autoComplete="username"
-              />
-            </InputGroup>
-            {usernameError && (
-              <FormErrorMessage>Username is required</FormErrorMessage>
-            )}
-          </FormControl>
-
-          <FormControl isInvalid={passwordError}>
-            <FormLabel fontSize="sm" fontWeight="medium">
-              Password
-            </FormLabel>
-            <InputGroup size="lg">
-              <InputLeftElement
-                pointerEvents="none"
-                height="100%"
-                display="flex"
-                alignItems="center"
-              >
-                <Lock size={18} color="gray" />
-              </InputLeftElement>
-              <Input
-                type={showPassword ? "text" : "password"}
-                placeholder="Enter your password"
-                value={password}
-                onChange={(e: ChangeEvent<HTMLInputElement>) =>
-                  setPassword(e.target.value)
-                }
-                borderRadius="md"
-                _focus={{
-                  borderColor: primaryColor,
-                  boxShadow: `0 0 0 1px ${primaryColor}`,
-                }}
-                autoComplete="current-password"
-              />
-              <InputRightElement>
-                <Button
-                  variant="ghost"
-                  onClick={() => setShowPassword(!showPassword)}
-                  _hover={{ bg: "transparent" }}
-                  size="sm"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </Button>
-              </InputRightElement>
-            </InputGroup>
-            {passwordError && (
-              <FormErrorMessage>Password is required</FormErrorMessage>
-            )}
-          </FormControl>
-
-          <Button
-            type="submit"
-            size="lg"
-            w="full"
-            colorScheme="teal"
-            mt={2}
-            isLoading={isLoading}
-            loadingText="Logging in"
-            borderRadius="md"
-            boxShadow="md"
-            _hover={{ boxShadow: "lg", transform: "translateY(-2px)" }}
-            _active={{ boxShadow: "md", transform: "translateY(0)" }}
-            transition="all 0.2s"
-            leftIcon={<LogIn size={18} />}
+        {/* Modern gradient header matching CreateLedgerModal */}
+        <Box
+          bgGradient="linear(135deg, teal.400, teal.600)"
+          color="white"
+          px={{ base: 6, sm: 8 }}
+          py={{ base: 6, sm: 8 }}
+          position="relative"
+        >
+          <HStack
+            spacing={{ base: 3, sm: 4 }}
+            align="center"
+            justify="flex-start"
           >
-            Log In
-          </Button>
+            <Box
+              p={{ base: 2, sm: 3 }}
+              bg="whiteAlpha.200"
+              borderRadius="md"
+              backdropFilter="blur(10px)"
+            >
+              <Icon as={LogIn} boxSize={{ base: 5, sm: 6 }} />
+            </Box>
 
-          <Text textAlign="center" fontSize="sm" color="secondaryTextColor" mt={2}>
-            New user?{" "}
-            <RouterLink to="/register">
-              <Text as="span" color={primaryColor} fontWeight="semibold">
-                Create an account
+            <Box>
+              <Heading
+                fontSize={{ base: "xl", sm: "2xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+              >
+                Welcome Back
+              </Heading>
+              <Text
+                fontSize={{ base: "sm", sm: "md" }}
+                color="whiteAlpha.900"
+                fontWeight="medium"
+                mt={1}
+              >
+                Log in to your Cashio account
               </Text>
-            </RouterLink>
-          </Text>
-        </VStack>
+            </Box>
+          </HStack>
+        </Box>
+
+        {/* Form content */}
+        <Box px={{ base: 6, sm: 8 }} py={{ base: 6, sm: 8 }}>
+          <VStack
+            as="form"
+            spacing={{ base: 5, md: 6 }}
+            onSubmit={handleSubmit}
+          >
+            {/* Form fields in modern card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 5, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+              w="100%"
+            >
+              <VStack spacing={5} align="stretch">
+                <FormControl isInvalid={usernameError}>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Username
+                  </FormLabel>
+                  <InputGroup>
+                    <InputLeftElement
+                      pointerEvents="none"
+                      height="100%"
+                      display="flex"
+                      alignItems="center"
+                    >
+                      <Icon as={Mail} boxSize={4} color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      ref={usernameInputRef}
+                      type="text"
+                      placeholder="Enter your username"
+                      size="lg"
+                      value={username}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setUsername(e.target.value)
+                      }
+                      onBlur={() => handleBlur("username")}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      borderRadius="md"
+                      _hover={!usernameError ? { borderColor: "teal.300" } : {}}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      autoComplete="username"
+                    />
+                  </InputGroup>
+                  {usernameError ? (
+                    <FormErrorMessage mt={2}>
+                      Username is required
+                    </FormErrorMessage>
+                  ) : (
+                    <FormHelperText mt={2}>
+                      Enter your registered username
+                    </FormHelperText>
+                  )}
+                </FormControl>
+
+                <FormControl isInvalid={passwordError}>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Password
+                  </FormLabel>
+                  <InputGroup size="lg">
+                    <InputLeftElement
+                      pointerEvents="none"
+                      height="100%"
+                      display="flex"
+                      alignItems="center"
+                    >
+                      <Icon as={Lock} boxSize={4} color="gray.400" />
+                    </InputLeftElement>
+                    <Input
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Enter your password"
+                      value={password}
+                      onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                        setPassword(e.target.value)
+                      }
+                      onBlur={() => handleBlur("password")}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      borderRadius="md"
+                      _hover={!passwordError ? { borderColor: "teal.300" } : {}}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      autoComplete="current-password"
+                    />
+                    <InputRightElement height="100%">
+                      <Button
+                        variant="ghost"
+                        onClick={() => setShowPassword(!showPassword)}
+                        _hover={{ bg: "transparent" }}
+                        size="sm"
+                        aria-label={
+                          showPassword ? "Hide password" : "Show password"
+                        }
+                      >
+                        <Icon as={showPassword ? EyeOff : Eye} boxSize={4} />
+                      </Button>
+                    </InputRightElement>
+                  </InputGroup>
+                  {passwordError ? (
+                    <FormErrorMessage mt={2}>
+                      Password is required
+                    </FormErrorMessage>
+                  ) : (
+                    <FormHelperText mt={2}>
+                      Enter your account password
+                    </FormHelperText>
+                  )}
+                </FormControl>
+              </VStack>
+            </Box>
+
+            {/* Action button */}
+            <Button
+              type="submit"
+              size="lg"
+              w="full"
+              colorScheme="teal"
+              isLoading={isLoading}
+              loadingText="Logging in"
+              borderRadius="md"
+              boxShadow="md"
+              _hover={{
+                boxShadow: "lg",
+                transform: "translateY(-2px)",
+              }}
+              _active={{
+                boxShadow: "md",
+                transform: "translateY(0)",
+              }}
+              transition="all 0.2s"
+              leftIcon={<Icon as={LogIn} boxSize={4} />}
+              isDisabled={!username || !password}
+            >
+              Log In
+            </Button>
+
+            {/* Footer link */}
+            <Box
+              bg={cardBg}
+              p={4}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+              textAlign="center"
+            >
+              <Text fontSize="sm" color="gray.600">
+                New to Cashio?{" "}
+                <RouterLink to="/register">
+                  <Text
+                    as="span"
+                    color="teal.500"
+                    fontWeight="semibold"
+                    _hover={{ color: "teal.600" }}
+                  >
+                    Create an account
+                  </Text>
+                </RouterLink>
+              </Text>
+            </Box>
+          </VStack>
+        </Box>
       </Box>
     </ScaleFade>
   );
