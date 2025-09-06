@@ -56,7 +56,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
 
   // Modern color scheme
   const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.600");
+  const borderColor = useColorModeValue("gray.100", "gray.700");
   const hoverBg = useColorModeValue("gray.50", "gray.700");
   const textColor = useColorModeValue("gray.800", "gray.100");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.400");
@@ -122,27 +122,30 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
   }
 
   return (
-    <Popover placement="top" isLazy>
-      <PopoverTrigger>
-        <Button
-          ref={triggerRef}
-          variant="ghost"
-          p={3}
-          height="auto"
-          borderRadius="md"
-          bg="transparent"
-          border="1px solid"
-          borderColor={borderColor}
-          _hover={{
-            bg: hoverBg,
-            transform: "translateY(-2px)",
-            boxShadow: "lg",
-          }}
-          _active={{ transform: "translateY(0)" }}
-          transition="all 0.2s ease"
-          width="full"
-          justifyContent="flex-start"
-        >
+      <Popover placement="top" isLazy onOpen={() => setTimeout(() => (document.activeElement as HTMLElement)?.blur(), 0)}>
+        <PopoverTrigger>
+          <Button
+            ref={triggerRef}
+            variant="ghost"
+            p={3}
+            height="auto"
+            borderRadius="md"
+            bg="transparent"
+            border="1px solid"
+            borderColor={borderColor}
+            _hover={{
+              bg: hoverBg,
+              transform: "translateY(-2px)",
+              boxShadow: "lg",
+            }}
+            _active={{ transform: "translateY(0)" }}
+            _focus={{ outline: "none", ring: 0, borderColor: borderColor }}
+            transition="all 0.2s ease"
+            width="full"
+            justifyContent="flex-start"
+            tabIndex={-1}
+            sx={{ "&:focus": { outline: "none" } }}
+          >
           <HStack spacing={3} width="full">
             <Avatar
               size="sm"
@@ -189,41 +192,16 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
         width={triggerWidth > 0 ? `${triggerWidth}px` : "240px"}
         maxWidth="none"
         overflow="hidden"
+        autoFocus={false}
+        tabIndex={-1}
         _focus={{ outline: "none" }}
+        style={{ outline: "none" }}
         css={{
           "--popper-arrow-shadow-color": "transparent",
         }}
+        sx={{ "&:focus": { outline: "none" } }}
       >
         <PopoverArrow bg={bgColor} shadow="none" border="none" />
-
-        {/* Header */}
-        <Box p={4} pb={0}>
-          <HStack spacing={3}>
-            <Avatar
-              size="md"
-              name={userProfile.full_name}
-              src=""
-              getInitials={getInitials}
-              bg={avatarBg}
-              borderRadius="md"
-              color="white"
-              fontWeight="bold"
-            />
-            <Box flex="1" minWidth="0">
-              <Text
-                fontWeight="bold"
-                fontSize="md"
-                color={textColor}
-                noOfLines={1}
-              >
-                {userProfile.full_name}
-              </Text>
-              <Text fontSize="sm" color={secondaryTextColor} noOfLines={1}>
-                {userProfile.email}
-              </Text>
-            </Box>
-          </HStack>
-        </Box>
 
         <PopoverBody p={0} pt={4}>
           <VStack align="stretch" spacing={0}>
@@ -236,6 +214,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
               color={textColor}
               fontWeight="medium"
               fontSize="sm"
+              tabIndex={-1}
               _hover={{ bg: hoverBg }}
               transition="all 0.2s"
             >
@@ -254,6 +233,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
               color="red.500"
               fontWeight="medium"
               fontSize="sm"
+              tabIndex={-1}
               _hover={{ bg: "red.50", color: "red.600" }}
               transition="all 0.2s"
             >
