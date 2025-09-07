@@ -19,7 +19,7 @@ import {
   Stack,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
-import { Plus, Repeat, Eye, EyeOff, TrendingUp, ShieldAlert } from "lucide-react";
+import { Plus, Repeat, Eye, EyeOff, Building, ShieldAlert } from "lucide-react";
 import CreateAccountModal from "@components/modals/CreateAccountModal";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import useLedgerStore from "@/components/shared/store";
@@ -469,7 +469,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
             flexWrap={{ base: "wrap", sm: "nowrap" }}
           >
             <Flex align="center" gap={2}>
-              <Icon as={TrendingUp} size={20} color="teal.500" />
+              <Icon as={Building} size={20} color="teal.500" />
               <Heading size="md" color="teal.500" mb={{ base: 1, sm: 0 }}>
                 Assets
               </Heading>

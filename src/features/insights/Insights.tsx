@@ -110,10 +110,10 @@ const Insights = () => {
                   onChange={handleLedgerChange}
                   isDisabled={isLoading}
                   icon={<ChevronDown />}
-                  variant="outline"
-                  color="whiteAlpha.800"
-                  borderColor="whiteAlpha.400"
-                  _hover={{ borderColor: "whiteAlpha.600" }}
+                  variant="ghost"
+                  color="white"
+                  bg="whiteAlpha.100"
+                  _hover={{ bg: "whiteAlpha.300" }}
                   size="md"
                 >
                   <option value="">Select Ledger</option>
@@ -132,10 +132,10 @@ const Insights = () => {
                   value={selectedVisualization}
                   onChange={(e) => setSelectedVisualization(e.target.value)}
                   icon={<ChevronDown />}
-                  variant="outline"
-                  color="whiteAlpha.800"
-                  borderColor="whiteAlpha.400"
-                  _hover={{ borderColor: "whiteAlpha.600" }}
+                  variant="ghost"
+                  color="white"
+                  bg="whiteAlpha.100"
+                  _hover={{ bg: "whiteAlpha.300" }}
                   size="md"
                 >
                   {visualizationOptions.map((option) => (

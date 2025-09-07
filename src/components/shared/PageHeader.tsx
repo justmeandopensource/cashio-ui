@@ -15,9 +15,11 @@ interface PageHeaderProps {
   icon?: React.ElementType;
   actions?: ReactNode;
   headerContent?: ReactNode;
+  backIcon?: React.ElementType;
+  backOnClick?: () => void;
 }
 
-const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, headerContent }) => {
+const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, headerContent, backIcon, backOnClick }) => {
   const gradientBg = useColorModeValue(
     "linear(135deg, teal.500, teal.600)",
     "linear(135deg, teal.600, teal.700)",
@@ -41,19 +43,29 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, heade
         width="100%"
       >
         <HStack spacing={3} align="center" flex={1}>
-          {icon && (
-            <Box
-              p={3}
-              bg="whiteAlpha.200"
-              borderRadius="md"
-              backdropFilter="blur(20px)"
-              border="1px solid whiteAlpha.300"
-              boxShadow="xl"
-            >
-              <Icon as={icon} boxSize={6} />
-            </Box>
-          )}
-          <Box>
+           {backIcon && (
+             <Icon
+               as={backIcon}
+               boxSize={5}
+               onClick={backOnClick}
+               cursor="pointer"
+               color="whiteAlpha.800"
+               _hover={{ color: "white" }}
+             />
+           )}
+           {icon && (
+             <Box
+               p={3}
+               bg="whiteAlpha.200"
+               borderRadius="md"
+               backdropFilter="blur(20px)"
+               border="1px solid whiteAlpha.300"
+               boxShadow="xl"
+             >
+               <Icon as={icon} boxSize={6} />
+             </Box>
+           )}
+           <Box>
             <Heading
               as="h1"
               size="lg"

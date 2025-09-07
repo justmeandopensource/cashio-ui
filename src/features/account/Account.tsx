@@ -6,7 +6,7 @@ import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
 import { Button, Box, Text, HStack, IconButton } from "@chakra-ui/react";
-import { Settings, Wallet, Edit } from "lucide-react";
+import { Building, ShieldAlert, Edit, ChevronLeft } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
@@ -106,7 +106,9 @@ const Account: React.FC = () => {
       <PageHeader
         title={account?.name || "Account"}
         subtitle={`Type: ${account?.type}`}
-        icon={Wallet}
+        icon={account?.type === "asset" ? Building : ShieldAlert}
+        backIcon={ChevronLeft}
+        backOnClick={() => navigate("/ledger")}
         actions={
           <HStack>
             <IconButton
@@ -120,16 +122,18 @@ const Account: React.FC = () => {
             <Button
               color="white"
               variant="ghost"
+              bg="whiteAlpha.100"
               onClick={() => setIsCreateModalOpen(true)}
-              _hover={{ bg: "whiteAlpha.200" }}
+              _hover={{ bg: "whiteAlpha.300" }}
             >
               Add Transaction
             </Button>
             <Button
               color="white"
               variant="ghost"
+              bg="whiteAlpha.100"
               onClick={() => setIsTransferModalOpen(true)}
-              _hover={{ bg: "whiteAlpha.200" }}
+              _hover={{ bg: "whiteAlpha.300" }}
             >
               Transfer Funds
             </Button>

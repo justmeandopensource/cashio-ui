@@ -6,7 +6,7 @@ import useLedgerStore from "@/components/shared/store";
 import UpdateLedgerModal from "@components/modals/UpdateLedgerModal";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { BookText, Edit, Info } from "lucide-react";
+import { BookText, Edit, Info, ChevronLeft } from "lucide-react";
 import LedgerDetailsModal from "@components/modals/LedgerDetailsModal";
 import { useState } from "react";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
@@ -68,6 +68,8 @@ const Ledger = () => {
         title={ledgerName || "Ledger"}
         subtitle={description || "Manage your ledger accounts and transactions"}
         icon={BookText}
+        backIcon={ChevronLeft}
+        backOnClick={() => navigate("/")}
         actions={
           <HStack>
             <IconButton
@@ -89,16 +91,18 @@ const Ledger = () => {
             <Button
               color="white"
               variant="ghost"
+              bg="whiteAlpha.100"
               onClick={() => handleAddTransaction(undefined)}
-              _hover={{ bg: "whiteAlpha.200" }}
+              _hover={{ bg: "whiteAlpha.300" }}
             >
               Add Transaction
             </Button>
             <Button
               color="white"
               variant="ghost"
+              bg="whiteAlpha.100"
               onClick={() => setIsTransferModalOpen(true)}
-              _hover={{ bg: "whiteAlpha.200" }}
+              _hover={{ bg: "whiteAlpha.300" }}
             >
               Transfer Funds
             </Button>

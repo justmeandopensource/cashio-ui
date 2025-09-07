@@ -67,9 +67,10 @@ const HomeMainHeader: FC<HomeMainHeaderProps> = ({ onCreateLedger }) => {
         <Button
           color="white"
           variant="ghost"
+          bg="whiteAlpha.100"
           onClick={onCreateLedger}
           w={{ base: "100%", md: "auto" }}
-          _hover={{ bg: "whiteAlpha.200" }}
+          _hover={{ bg: "whiteAlpha.300" }}
           flexShrink={0}
         >
           Create New Ledger
