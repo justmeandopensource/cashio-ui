@@ -4,11 +4,12 @@ import Layout from "@components/Layout";
 import CategoriesMain from "@features/categories/components/CategoriesMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { Bookmark } from "lucide-react";
-import { Box } from "@chakra-ui/react";
+import { Bookmark, Plus } from "lucide-react";
+import { Box, Button, Flex, useColorModeValue } from "@chakra-ui/react";
 
 const Categories: React.FC = () => {
   const navigate = useNavigate();
+  const buttonColorScheme = useColorModeValue("teal", "blue");
 
   // handle logout
   const handleLogout = (): void => {
@@ -16,9 +17,49 @@ const Categories: React.FC = () => {
     navigate("/login");
   };
 
+  // Handle create category
+  const handleCreateCategory = (type: "income" | "expense") => {
+    // This will be passed down to CategoriesMain
+    const event = new CustomEvent('createCategory', { detail: { type } });
+    window.dispatchEvent(event);
+  };
+
+  // Create category buttons for the header
+  const categoryButtons = (
+    <Flex
+      gap={3}
+      flexDirection={{ base: "column", md: "column", lg: "row" }}
+      w={{ base: "100%", md: "100%", lg: "auto" }}
+    >
+      <Button
+        leftIcon={<Plus />}
+        colorScheme={buttonColorScheme}
+        variant="solid"
+        onClick={() => handleCreateCategory("income")}
+        w={{ base: "100%", md: "100%", lg: "auto" }}
+      >
+        Create Income Category
+      </Button>
+      <Button
+        leftIcon={<Plus />}
+        colorScheme={buttonColorScheme}
+        variant="outline"
+        onClick={() => handleCreateCategory("expense")}
+        w={{ base: "100%", md: "100%", lg: "auto" }}
+      >
+        Create Expense Category
+      </Button>
+    </Flex>
+  );
+
   return (
     <Layout handleLogout={handleLogout}>
-      <PageHeader title="Categories" subtitle="Manage your expense categories" icon={Bookmark} />
+      <PageHeader
+        title="Categories"
+        subtitle="Manage your expense categories"
+        icon={Bookmark}
+        actions={categoryButtons}
+      />
       <Box flex={1} overflowY="auto">
         <PageContainer>
           <CategoriesMain />

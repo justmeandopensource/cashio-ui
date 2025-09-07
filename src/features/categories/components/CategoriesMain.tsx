@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
@@ -22,7 +22,6 @@ import { Plus,
   ArrowDownCircle,
 } from "lucide-react";
 import CreateCategoryModal from "@components/modals/CreateCategoryModal";
-import CategoriesMainHeader from "./CategoriesMainHeader";
 import config from "@/config";
 import { toastDefaults } from "@/components/shared/utils";
 
@@ -43,6 +42,20 @@ const CategoriesMain: React.FC = () => {
   const [parentCategoryId, setParentCategoryId] = useState<string | null>(null);
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  // Listen for create category events from the header
+  useEffect(() => {
+    const handleCreateCategoryEvent = (event: CustomEvent) => {
+      const { type } = event.detail;
+      handleCreateCategoryClick(type);
+    };
+
+    window.addEventListener('createCategory', handleCreateCategoryEvent as EventListener);
+
+    return () => {
+      window.removeEventListener('createCategory', handleCreateCategoryEvent as EventListener);
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch categories using React Query
   const {
@@ -175,7 +188,6 @@ const CategoriesMain: React.FC = () => {
 
   return (
     <Box>
-      <CategoriesMainHeader onCreateCategory={handleCreateCategoryClick} />
       <Box bg="gray.50" p={6} borderRadius="lg">
       {/* Responsive Grid for Income and Expense Categories */}
       <SimpleGrid columns={{ base: 1, md: 1, lg: 2 }} spacing={6}>
