@@ -37,7 +37,7 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, heade
     >
       <Flex
         justifyContent="space-between"
-        align="center"
+        align={{ base: "flex-start", md: "center" }}
         flexDirection={{ base: "column", md: "row" }}
         gap={4}
         width="100%"

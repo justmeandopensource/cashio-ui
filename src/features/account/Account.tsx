@@ -5,8 +5,25 @@ import Layout from "@components/Layout";
 import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { Button, Box, Text, HStack, IconButton, Icon, Badge } from "@chakra-ui/react";
-import { Building, ShieldAlert, Edit, ChevronLeft, Info, TrendingUp, TrendingDown } from "lucide-react";
+import {
+  Button,
+  Box,
+  Text,
+  HStack,
+  IconButton,
+  Icon,
+  Badge,
+  Flex,
+} from "@chakra-ui/react";
+import {
+  Building,
+  ShieldAlert,
+  Edit,
+  ChevronLeft,
+  Info,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
@@ -141,13 +158,20 @@ const Account: React.FC = () => {
         title={
           account ? (
             <HStack spacing={3} align="center">
-              <Text>{account.name}</Text>
+              <Text fontSize={{ base: "md", md: "lg" }}>{account.name}</Text>
               <Badge
                 variant="subtle"
-                bg={getBalanceStyling(account.net_balance, account.type).bgColor}
-                color={getBalanceStyling(account.net_balance, account.type).color}
+                bg={
+                  getBalanceStyling(account.net_balance, account.type).bgColor
+                }
+                color={
+                  getBalanceStyling(account.net_balance, account.type).color
+                }
                 border="1px solid"
-                borderColor={getBalanceStyling(account.net_balance, account.type).borderColor}
+                borderColor={
+                  getBalanceStyling(account.net_balance, account.type)
+                    .borderColor
+                }
                 borderRadius="md"
                 px={2}
                 py={1}
@@ -157,52 +181,63 @@ const Account: React.FC = () => {
                 {formatNumberAsCurrency(account.net_balance, currencySymbol)}
               </Badge>
             </HStack>
-          ) : "Account"
+          ) : (
+            "Account"
+          )
         }
         subtitle={
           account?.description ||
-          `Track your ${account?.type === "asset" ? "assets" : "liabilities"} and manage transactions`
+          `${account?.type === "asset" ? "Asset" : "Liability"} account`
         }
         icon={account?.type === "asset" ? Building : ShieldAlert}
         backIcon={ChevronLeft}
         backOnClick={() => navigate("/ledger")}
         actions={
-          <HStack>
-            <IconButton
-              aria-label="View account details"
-              icon={<Info size={20} />}
-              variant="ghost"
-              color="white"
-              onClick={onDetailsModalOpen}
-              _hover={{ bg: "whiteAlpha.200" }}
-            />
-            <IconButton
-              aria-label="Update account"
-              icon={<Edit size={20} />}
-              variant="ghost"
-              color="white"
-              onClick={() => setIsUpdateModalOpen(true)}
-              _hover={{ bg: "whiteAlpha.200" }}
-            />
-            <Button
-              color="white"
-              variant="ghost"
-              bg="whiteAlpha.100"
-              onClick={() => setIsCreateModalOpen(true)}
-              _hover={{ bg: "whiteAlpha.300" }}
-            >
-              Add Transaction
-            </Button>
-            <Button
-              color="white"
-              variant="ghost"
-              bg="whiteAlpha.100"
-              onClick={() => setIsTransferModalOpen(true)}
-              _hover={{ bg: "whiteAlpha.300" }}
-            >
-              Transfer Funds
-            </Button>
-          </HStack>
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            alignItems={{ base: "flex-start", md: "center" }}
+            gap={2}
+            width="100%"
+          >
+            <HStack spacing={2}>
+              <IconButton
+                aria-label="View account details"
+                icon={<Info size={20} />}
+                variant="ghost"
+                color="white"
+                onClick={onDetailsModalOpen}
+                _hover={{ bg: "whiteAlpha.200" }}
+              />
+              <IconButton
+                aria-label="Update account"
+                icon={<Edit size={20} />}
+                variant="ghost"
+                color="white"
+                onClick={() => setIsUpdateModalOpen(true)}
+                _hover={{ bg: "whiteAlpha.200" }}
+              />
+            </HStack>
+            <HStack spacing={2}>
+              <Button
+                color="white"
+                variant="ghost"
+                bg="whiteAlpha.100"
+                onClick={() => setIsCreateModalOpen(true)}
+                _hover={{ bg: "whiteAlpha.300" }}
+              >
+                Add Transaction
+              </Button>
+              <Button
+                color="white"
+                variant="ghost"
+                bg="whiteAlpha.100"
+                onClick={() => setIsTransferModalOpen(true)}
+                _hover={{ bg: "whiteAlpha.300" }}
+              >
+                Transfer Funds
+              </Button>
+            </HStack>
+          </Flex>
         }
       />
       <Box flex={1} overflowY="auto">

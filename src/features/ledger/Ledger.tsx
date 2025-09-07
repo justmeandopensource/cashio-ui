@@ -5,6 +5,7 @@ import {
   Box,
   HStack,
   IconButton,
+  Flex,
 } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import LedgerMain from "@features/ledger/components/LedgerMain";
@@ -103,47 +104,56 @@ const Ledger = () => {
     <Layout handleLogout={handleLogout}>
       <PageHeader
         title={ledgerName || "Ledger"}
-        subtitle={description || "Manage your ledger accounts and transactions"}
+        subtitle={description || "Ledger"}
         icon={BookText}
         backIcon={ChevronLeft}
         backOnClick={() => navigate("/")}
         actions={
-          <HStack>
-            <IconButton
-              aria-label="Ledger details"
-              icon={<Info size={20} />}
-              variant="ghost"
-              color="white"
-              onClick={onLedgerDetailsModalOpen}
-              _hover={{ bg: "whiteAlpha.200" }}
-            />
-            <IconButton
-              aria-label="Update ledger"
-              icon={<Edit size={20} />}
-              variant="ghost"
-              color="white"
-              onClick={onUpdateLedgerModalOpen}
-              _hover={{ bg: "whiteAlpha.200" }}
-            />
-            <Button
-              color="white"
-              variant="ghost"
-              bg="whiteAlpha.100"
-              onClick={() => handleAddTransaction(undefined)}
-              _hover={{ bg: "whiteAlpha.300" }}
-            >
-              Add Transaction
-            </Button>
-            <Button
-              color="white"
-              variant="ghost"
-              bg="whiteAlpha.100"
-              onClick={() => setIsTransferModalOpen(true)}
-              _hover={{ bg: "whiteAlpha.300" }}
-            >
-              Transfer Funds
-            </Button>
-          </HStack>
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            alignItems={{ base: "flex-start", md: "center" }}
+            gap={2}
+            width="100%"
+          >
+            <HStack spacing={2}>
+              <IconButton
+                aria-label="Ledger details"
+                icon={<Info size={20} />}
+                variant="ghost"
+                color="white"
+                onClick={onLedgerDetailsModalOpen}
+                _hover={{ bg: "whiteAlpha.200" }}
+              />
+              <IconButton
+                aria-label="Update ledger"
+                icon={<Edit size={20} />}
+                variant="ghost"
+                color="white"
+                onClick={onUpdateLedgerModalOpen}
+                _hover={{ bg: "whiteAlpha.200" }}
+              />
+            </HStack>
+            <HStack spacing={2}>
+              <Button
+                color="white"
+                variant="ghost"
+                bg="whiteAlpha.100"
+                onClick={() => handleAddTransaction(undefined)}
+                _hover={{ bg: "whiteAlpha.300" }}
+              >
+                Add Transaction
+              </Button>
+              <Button
+                color="white"
+                variant="ghost"
+                bg="whiteAlpha.100"
+                onClick={() => setIsTransferModalOpen(true)}
+                _hover={{ bg: "whiteAlpha.300" }}
+              >
+                Transfer Funds
+              </Button>
+            </HStack>
+          </Flex>
         }
       />
       <Box flex={1} overflowY="auto">

@@ -33,7 +33,7 @@ const HomeMainHeader: FC<HomeMainHeaderProps> = ({ onCreateLedger }) => {
     >
       <Flex
         justifyContent="space-between"
-        align="center"
+        align={{ base: "flex-start", md: "center" }}
         flexDirection={{ base: "column", md: "row" }}
         gap={4}
         width="100%"
