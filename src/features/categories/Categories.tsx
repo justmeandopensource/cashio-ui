@@ -33,18 +33,20 @@ const Categories: React.FC = () => {
       <Button
         color="white"
         variant="ghost"
+        bg="whiteAlpha.100"
         onClick={() => handleCreateCategory("income")}
         w={{ base: "100%", md: "100%", lg: "auto" }}
-        _hover={{ bg: "whiteAlpha.200" }}
+        _hover={{ bg: "whiteAlpha.300" }}
       >
         Create Income Category
       </Button>
       <Button
         color="white"
         variant="ghost"
+        bg="whiteAlpha.100"
         onClick={() => handleCreateCategory("expense")}
         w={{ base: "100%", md: "100%", lg: "auto" }}
-        _hover={{ bg: "whiteAlpha.200" }}
+        _hover={{ bg: "whiteAlpha.300" }}
       >
         Create Expense Category
       </Button>

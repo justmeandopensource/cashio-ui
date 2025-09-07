@@ -147,7 +147,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         bg={isActive ? activeBg : "transparent"}
         color={isActive ? activeColor : sidebarColor}
         fontWeight={isActive ? "semibold" : "medium"}
-        fontSize={{ base: "md", md: "sm" }}
+        fontSize={{ base: "md", md: "md" }}
         _hover={{
           bg: isActive ? activeBg : hoverBg,
           transform: "translateX(4px)",

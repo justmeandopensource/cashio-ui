@@ -46,14 +46,24 @@ const Ledger = () => {
     });
   };
 
-  const handleUpdateCompleted = (
-    updatedName: string,
-    updatedCurrencySymbol: string,
-    updatedDescription: string,
-    updatedNotes: string
-  ) => {
+  const handleUpdateCompleted = (data: {
+    name: string;
+    currency_symbol: string;
+    description: string;
+    notes: string;
+    created_at: string;
+    updated_at: string;
+  }) => {
     if (ledgerId) {
-      setLedger(ledgerId, updatedName, updatedCurrencySymbol, updatedDescription, updatedNotes, createdAt || "", updatedAt || "");
+      setLedger(
+        ledgerId,
+        data.name,
+        data.currency_symbol,
+        data.description,
+        data.notes,
+        data.created_at,
+        data.updated_at
+      );
     }
   };
 

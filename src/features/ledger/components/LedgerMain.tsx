@@ -96,12 +96,16 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
                 px={{ base: 3, md: 6 }}
                 py={3}
                 fontWeight="medium"
+                borderRadius="md"
                 _selected={{
                   color: "teal.700",
                   bg: "teal.50",
                   fontWeight: "semibold",
                   border: "1px solid",
                   borderColor: "teal.400",
+                }}
+                _hover={{
+                  bg: "teal.25",
                 }}
               >
                 <Flex align="center">
@@ -118,12 +122,16 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
                 px={{ base: 3, md: 6 }}
                 py={3}
                 fontWeight="medium"
+                borderRadius="md"
                 _selected={{
                   color: "teal.700",
                   bg: "teal.50",
                   fontWeight: "semibold",
                   border: "1px solid",
                   borderColor: "teal.400",
+                }}
+                _hover={{
+                  bg: "teal.25",
                 }}
               >
                 <Flex align="center">

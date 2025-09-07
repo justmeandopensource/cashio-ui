@@ -44,12 +44,14 @@ interface UpdateLedgerModalProps {
   currentCurrencySymbol: string;
   currentDescription: string;
   currentNotes: string;
-  onUpdateCompleted: (
-    updatedName: string,
-    updatedCurrencySymbol: string,
-    updatedDescription: string,
-    updatedNotes: string,
-  ) => void;
+  onUpdateCompleted: (data: {
+    name: string;
+    currency_symbol: string;
+    description: string;
+    notes: string;
+    created_at: string;
+    updated_at: string;
+  }) => void;
 }
 
 interface UpdateLedgerPayload {
@@ -138,12 +140,7 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
         ...toastDefaults,
       });
       onClose();
-      onUpdateCompleted(
-        response.data.name,
-        response.data.currency_symbol,
-        response.data.description,
-        response.data.notes,
-      );
+      onUpdateCompleted(response.data);
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       if (axiosError.response?.status !== 401) {
