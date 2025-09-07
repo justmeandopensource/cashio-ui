@@ -8,7 +8,7 @@ import {
   Text,
   Flex,
 } from "@chakra-ui/react";
-import { Plus, BookText } from "lucide-react";
+import { BookText } from "lucide-react";
 import { FC } from "react";
 
 interface HomeMainHeaderProps {
@@ -65,7 +65,6 @@ const HomeMainHeader: FC<HomeMainHeaderProps> = ({ onCreateLedger }) => {
         </HStack>
 
         <Button
-          leftIcon={<Plus />}
           color="white"
           variant="ghost"
           onClick={onCreateLedger}

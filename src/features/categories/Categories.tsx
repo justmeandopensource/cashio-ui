@@ -4,12 +4,11 @@ import Layout from "@components/Layout";
 import CategoriesMain from "@features/categories/components/CategoriesMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { Bookmark, Plus } from "lucide-react";
-import { Box, Button, Flex, useColorModeValue } from "@chakra-ui/react";
+import { Bookmark } from "lucide-react";
+import { Box, Button, Flex } from "@chakra-ui/react";
 
 const Categories: React.FC = () => {
   const navigate = useNavigate();
-  const buttonColorScheme = useColorModeValue("teal", "blue");
 
   // handle logout
   const handleLogout = (): void => {
@@ -32,20 +31,20 @@ const Categories: React.FC = () => {
       w={{ base: "100%", md: "100%", lg: "auto" }}
     >
       <Button
-        leftIcon={<Plus />}
-        colorScheme={buttonColorScheme}
-        variant="solid"
+        color="white"
+        variant="ghost"
         onClick={() => handleCreateCategory("income")}
         w={{ base: "100%", md: "100%", lg: "auto" }}
+        _hover={{ bg: "whiteAlpha.200" }}
       >
         Create Income Category
       </Button>
       <Button
-        leftIcon={<Plus />}
-        colorScheme={buttonColorScheme}
-        variant="outline"
+        color="white"
+        variant="ghost"
         onClick={() => handleCreateCategory("expense")}
         w={{ base: "100%", md: "100%", lg: "auto" }}
+        _hover={{ bg: "whiteAlpha.200" }}
       >
         Create Expense Category
       </Button>

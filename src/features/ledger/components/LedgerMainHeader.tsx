@@ -7,7 +7,7 @@ import {
   IconButton,
   useDisclosure,
 } from "@chakra-ui/react";
-import { Plus, ArrowRight, ArrowLeft, Edit, Info } from "lucide-react";
+import { ArrowLeft, Edit, Info } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { FC, useState } from "react";
 import useLedgerStore from "@/components/shared/store";
@@ -170,7 +170,6 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
           >
             {/* Button to Add a New Transaction */}
             <Button
-              leftIcon={<Plus />}
               colorScheme={buttonColorScheme}
               variant="solid"
               onClick={onAddTransaction}
@@ -182,7 +181,6 @@ const LedgerMainHeader: FC<LedgerMainHeaderProps> = ({
 
             {/* Button to Transfer Funds */}
             <Button
-              rightIcon={<ArrowRight />}
               colorScheme={buttonColorScheme}
               variant="outline"
               onClick={onTransferFunds}

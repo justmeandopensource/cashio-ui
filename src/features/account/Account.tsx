@@ -6,7 +6,7 @@ import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
 import { Button, Box, Text, HStack, IconButton } from "@chakra-ui/react";
-import { Settings, Wallet, Plus, ArrowRightLeft, Edit } from "lucide-react";
+import { Settings, Wallet, Edit } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
@@ -118,7 +118,6 @@ const Account: React.FC = () => {
               _hover={{ bg: "whiteAlpha.200" }}
             />
             <Button
-              leftIcon={<Plus size={20} />}
               color="white"
               variant="ghost"
               onClick={() => setIsCreateModalOpen(true)}
@@ -127,7 +126,6 @@ const Account: React.FC = () => {
               Add Transaction
             </Button>
             <Button
-              leftIcon={<ArrowRightLeft size={20} />}
               color="white"
               variant="ghost"
               onClick={() => setIsTransferModalOpen(true)}

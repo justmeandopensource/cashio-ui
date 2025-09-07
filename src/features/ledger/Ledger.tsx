@@ -6,7 +6,7 @@ import useLedgerStore from "@/components/shared/store";
 import UpdateLedgerModal from "@components/modals/UpdateLedgerModal";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { BookText, Edit, Info, Plus, ArrowRightLeft } from "lucide-react";
+import { BookText, Edit, Info } from "lucide-react";
 import LedgerDetailsModal from "@components/modals/LedgerDetailsModal";
 import { useState } from "react";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
@@ -87,7 +87,6 @@ const Ledger = () => {
               _hover={{ bg: "whiteAlpha.200" }}
             />
             <Button
-              leftIcon={<Plus size={20} />}
               color="white"
               variant="ghost"
               onClick={() => handleAddTransaction(undefined)}
@@ -96,10 +95,9 @@ const Ledger = () => {
               Add Transaction
             </Button>
             <Button
-              leftIcon={<ArrowRightLeft size={20} />}
               color="white"
               variant="ghost"
-              onClick={() => handleTransferFunds(undefined)}
+              onClick={() => setIsTransferModalOpen(true)}
               _hover={{ bg: "whiteAlpha.200" }}
             >
               Transfer Funds

@@ -10,7 +10,7 @@ import {
   VStack,
   Icon,
 } from "@chakra-ui/react";
-import { Plus, ArrowRight, ArrowLeft, Edit, CreditCard } from "lucide-react";
+import { ArrowLeft, Edit, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import useLedgerStore from "@/components/shared/store";
@@ -132,27 +132,25 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
           flexDirection={{ base: "column", md: "column", lg: "row" }}
           w={{ base: "100%", md: "100%", lg: "auto" }}
         >
-          {/* Button to Add a New Transaction */}
-          <Button
-            leftIcon={<Plus />}
-            colorScheme={buttonColorScheme}
-            variant="solid"
-            onClick={onAddTransaction}
-            w={{ base: "100%", md: "100%", lg: "auto" }}
-          >
-            Add Transaction
-          </Button>
+           {/* Button to Add a New Transaction */}
+           <Button
+             colorScheme={buttonColorScheme}
+             variant="solid"
+             onClick={onAddTransaction}
+             w={{ base: "100%", md: "100%", lg: "auto" }}
+           >
+             Add Transaction
+           </Button>
 
-          {/* Button to Transfer Funds */}
-          <Button
-            rightIcon={<ArrowRight />}
-            colorScheme={buttonColorScheme}
-            variant="outline"
-            onClick={onTransferFunds}
-            w={{ base: "100%", md: "100%", lg: "auto" }}
-          >
-            Transfer Funds
-          </Button>
+           {/* Button to Transfer Funds */}
+           <Button
+             colorScheme={buttonColorScheme}
+             variant="outline"
+             onClick={onTransferFunds}
+             w={{ base: "100%", md: "100%", lg: "auto" }}
+           >
+             Transfer Funds
+           </Button>
         </Flex>
       </Flex>
     </Box>
