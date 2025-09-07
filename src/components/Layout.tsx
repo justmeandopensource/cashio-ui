@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({
       <Sidebar handleLogout={handleLogout} currentLedgerId={currentLedgerId} />
 
       {/* Main Content */}
-      <Box flex={1} p={{ base: 4, md: 8 }}>
+      <Box flex={1} as="main" display="flex" flexDirection="column" maxH="100vh">
         {children}
       </Box>
     </Flex>

@@ -13,6 +13,9 @@ import Layout from "../../components/Layout";
 import UpdateProfileForm from "./UpdateProfileForm";
 import ChangePasswordForm from "./ChangePasswordForm";
 import { useNavigate } from "react-router-dom";
+import PageContainer from "@components/shared/PageContainer";
+import PageHeader from "@components/shared/PageHeader";
+import { User } from "lucide-react";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
@@ -25,22 +28,26 @@ const Profile: React.FC = () => {
 
   return (
     <Layout handleLogout={handleLogout}>
-      <Box>
-        <Heading mb={4}>User Profile</Heading>
-        <Tabs>
-          <TabList>
-            <Tab>Account Details</Tab>
-            <Tab>Security</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <UpdateProfileForm />
-            </TabPanel>
-            <TabPanel>
-              <ChangePasswordForm />
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
+      <PageHeader title="User Profile" subtitle="Manage your account details and security" icon={User} />
+      <Box flex={1} overflowY="auto">
+        <PageContainer>
+          <Box>
+            <Tabs>
+              <TabList>
+                <Tab>Account Details</Tab>
+                <Tab>Security</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <UpdateProfileForm />
+                </TabPanel>
+                <TabPanel>
+                  <ChangePasswordForm />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
+          </Box>
+        </PageContainer>
       </Box>
     </Layout>
   );

@@ -221,7 +221,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         boxShadow="xl"
       >
         {/* Modern Header */}
-        <Box bgGradient={gradientBg} color="white" p={6} mb={2}>
+        <Box bgGradient={gradientBg} color="white" p={6}>
           <HStack spacing={3} align="center">
             <Box
               p={3}

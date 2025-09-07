@@ -1,6 +1,8 @@
 import HomeLedgerCards from "@features/home/components/HomeLedgerCards";
 import CreateLedgerModal from "@components/modals/CreateLedgerModal";
+import PageContainer from "@components/shared/PageContainer";
 import HomeMainHeader from "./HomeMainHeader";
+import { Box } from "@chakra-ui/react";
 
 interface HomeMainProps {
   ledgers?: Array<{ ledger_id: string; name: string; currency_symbol: string }>;
@@ -21,7 +23,11 @@ const HomeMain = ({
   return (
     <>
       <HomeMainHeader onCreateLedger={onOpen} />
-      <HomeLedgerCards ledgers={ledgers} onOpen={onOpen} />
+      <Box flex={1} overflowY="auto">
+        <PageContainer>
+          <HomeLedgerCards ledgers={ledgers} onOpen={onOpen} />
+        </PageContainer>
+      </Box>
       <CreateLedgerModal
         isOpen={isOpen}
         onClose={onClose}

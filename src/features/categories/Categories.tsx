@@ -2,6 +2,10 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Layout from "@components/Layout";
 import CategoriesMain from "@features/categories/components/CategoriesMain";
+import PageContainer from "@components/shared/PageContainer";
+import PageHeader from "@components/shared/PageHeader";
+import { Bookmark } from "lucide-react";
+import { Box } from "@chakra-ui/react";
 
 const Categories: React.FC = () => {
   const navigate = useNavigate();
@@ -14,7 +18,12 @@ const Categories: React.FC = () => {
 
   return (
     <Layout handleLogout={handleLogout}>
-      <CategoriesMain />
+      <PageHeader title="Categories" subtitle="Manage your expense categories" icon={Bookmark} />
+      <Box flex={1} overflowY="auto">
+        <PageContainer>
+          <CategoriesMain />
+        </PageContainer>
+      </Box>
     </Layout>
   );
 };

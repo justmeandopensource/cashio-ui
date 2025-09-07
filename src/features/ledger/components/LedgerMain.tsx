@@ -12,16 +12,14 @@ import {
   TabPanels,
   Tabs,
   useToast,
+  Button,
 } from "@chakra-ui/react";
-import LedgerMainHeader from "./LedgerMainHeader";
-import LedgerMainHeaderSkeleton from "./LedgerMainHeaderSkeleton";
 import LedgerMainAccounts from "./LedgerMainAccounts";
 import LedgerMainTransactions from "./LedgerMainTransactions";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
-import config from "@/config";
 import api from "@/lib/api";
-import { AlignLeft, CreditCard } from "lucide-react";
+import { AlignLeft, CreditCard, Plus, ArrowRightLeft } from "lucide-react";
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "@/components/shared/utils";
 
@@ -32,11 +30,7 @@ interface Account {
   is_group: boolean;
 }
 
-interface LedgerMainProps {
-  onUpdateLedger: () => void;
-}
-
-const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
+const LedgerMain: FC = () => {
   const { ledgerId } = useLedgerStore();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -97,14 +91,6 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
     });
   };
 
-  if (isAccountsLoading) {
-    return (
-      <Box>
-        <LedgerMainHeaderSkeleton />
-      </Box>
-    );
-  }
-
   if (isAccountsError) {
     return null;
   }
@@ -120,65 +106,86 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
 
   return (
     <Box>
-      {/* Ledger Details Section */}
-      <LedgerMainHeader
-        onAddTransaction={() => handleAddTransaction(undefined)}
-        onTransferFunds={() => handleTransferFunds(undefined)}
-        onUpdateLedger={onUpdateLedger}
-        hasAccounts={accounts ? accounts.length > 0 : false}
-      />
-
       {/* Tabs for Accounts and Transactions */}
-      <Box mt={6} borderRadius="lg" boxShadow="lg" bg="white" overflow="hidden">
+      <Box borderRadius="lg" boxShadow="lg" bg="white" overflow="hidden">
         <Tabs
           variant="soft-rounded"
           colorScheme="teal"
           size={{ base: "sm", md: "md" }}
-          p={{ base: 2, md: 4 }}
           index={tabIndex}
           onChange={handleTabChange}
         >
-          <TabList>
-            <Tab
-              px={{ base: 3, md: 6 }}
-              py={3}
-              fontWeight="medium"
-              _selected={{
-                color: "teal.700",
-                bg: "teal.50",
-                fontWeight: "semibold",
-                border: "1px solid",
-                borderColor: "teal.400",
-              }}
-            >
-              <Flex align="center">
-                <Icon as={CreditCard} mr={2} />
-                <Text>Accounts</Text>
-                {accountsCount > 0 && (
-                  <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
-                    {accountsCount}
-                  </Badge>
-                )}
-              </Flex>
-            </Tab>
-            <Tab
-              px={{ base: 3, md: 6 }}
-              py={3}
-              fontWeight="medium"
-              _selected={{
-                color: "teal.700",
-                bg: "teal.50",
-                fontWeight: "semibold",
-                border: "1px solid",
-                borderColor: "teal.400",
-              }}
-            >
-              <Flex align="center">
-                <Icon as={AlignLeft} mr={2} />
-                <Text>Transactions</Text>
-              </Flex>
-            </Tab>
-          </TabList>
+          <Flex
+            justifyContent="space-between"
+            alignItems="center"
+            p={{ base: 2, md: 4 }}
+            borderBottom="1px solid"
+            borderColor="gray.200"
+          >
+            <TabList>
+              <Tab
+                px={{ base: 3, md: 6 }}
+                py={3}
+                fontWeight="medium"
+                _selected={{
+                  color: "teal.700",
+                  bg: "teal.50",
+                  fontWeight: "semibold",
+                  border: "1px solid",
+                  borderColor: "teal.400",
+                }}
+              >
+                <Flex align="center">
+                  <Icon as={CreditCard} mr={2} />
+                  <Text>Accounts</Text>
+                  {accountsCount > 0 && (
+                    <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
+                      {accountsCount}
+                    </Badge>
+                  )}
+                </Flex>
+              </Tab>
+              <Tab
+                px={{ base: 3, md: 6 }}
+                py={3}
+                fontWeight="medium"
+                _selected={{
+                  color: "teal.700",
+                  bg: "teal.50",
+                  fontWeight: "semibold",
+                  border: "1px solid",
+                  borderColor: "teal.400",
+                }}
+              >
+                <Flex align="center">
+                  <Icon as={AlignLeft} mr={2} />
+                  <Text>Transactions</Text>
+                </Flex>
+              </Tab>
+            </TabList>
+            <Flex gap={2}>
+              <Button
+                leftIcon={<Plus />}
+                size="sm"
+                variant="outline"
+                colorScheme="teal"
+                onClick={() => handleAddTransaction(undefined)}
+                display={{ base: "none", md: "flex" }}
+              >
+                Add Transaction
+              </Button>
+              <Button
+                leftIcon={<ArrowRightLeft />}
+                size="sm"
+                variant="outline"
+                colorScheme="teal"
+                onClick={() => handleTransferFunds(undefined)}
+                display={{ base: "none", md: "flex" }}
+              >
+                Transfer Funds
+              </Button>
+            </Flex>
+          </Flex>
           <TabPanels>
             {/* Accounts Tab */}
             <TabPanel p={{ base: 2, md: 4 }}>
@@ -194,7 +201,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onUpdateLedger }) => {
                 onAddTransaction={() => handleAddTransaction(undefined)}
                 onTransactionDeleted={() =>
                   queryClient.invalidateQueries({
-                    queryKey: ["transactions-count", ledgerId],
+                    queryKey: [`transactions-count`, ledgerId],
                   })
                 }
                 onTransactionUpdated={refreshAccountsData}
