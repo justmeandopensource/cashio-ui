@@ -23,14 +23,22 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions }) => 
   );
 
   return (
-    <Box bgGradient={gradientBg} color="white" p={6} position="sticky" top={0} zIndex={10}>
+    <Box
+      bgGradient={gradientBg}
+      color="white"
+      p={6}
+      position="sticky"
+      top={0}
+      zIndex={10}
+    >
       <Flex
         justifyContent="space-between"
         align="center"
         flexDirection={{ base: "column", md: "row" }}
         gap={4}
+        width="100%"
       >
-        <HStack spacing={3} align="center">
+        <HStack spacing={3} align="center" flex={1}>
           {icon && (
             <Box
               p={3}
@@ -52,11 +60,9 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions }) => 
             >
               {title}
             </Heading>
-            {subtitle && (
-              <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
-                {subtitle}
-              </Text>
-            )}
+            <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
+              {subtitle || <span>&nbsp;</span>}
+            </Text>
           </Box>
         </HStack>
         {actions && <Box>{actions}</Box>}

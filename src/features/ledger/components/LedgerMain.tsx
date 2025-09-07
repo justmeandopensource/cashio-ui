@@ -12,16 +12,12 @@ import {
   TabPanels,
   Tabs,
   useToast,
-  Button,
 } from "@chakra-ui/react";
 import LedgerMainAccounts from "./LedgerMainAccounts";
 import LedgerMainTransactions from "./LedgerMainTransactions";
-import CreateTransactionModal from "@components/modals/CreateTransactionModal";
-import TransferFundsModal from "@components/modals/TransferFundsModal";
 import api from "@/lib/api";
-import { AlignLeft, CreditCard, Plus, ArrowRightLeft } from "lucide-react";
+import { AlignLeft, CreditCard } from "lucide-react";
 import useLedgerStore from "@/components/shared/store";
-import { toastDefaults } from "@/components/shared/utils";
 
 interface Account {
   account_id: string;
@@ -30,40 +26,31 @@ interface Account {
   is_group: boolean;
 }
 
-const LedgerMain: FC = () => {
+interface LedgerMainProps {
+  onAddTransaction: (accountId?: string) => void;
+  onTransferFunds: (accountId?: string) => void;
+}
+
+const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) => {
   const { ledgerId } = useLedgerStore();
   const toast = useToast();
   const queryClient = useQueryClient();
 
-  // Add state to track the active tab index
   const [tabIndex, setTabIndex] = useState(0);
-
-  // State for modals and selected account
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  const [selectedAccountId, setSelectedAccountId] = useState<
-    string | undefined
-  >(undefined);
   const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(
     undefined,
   );
 
   const handleCopyTransaction = (transaction: any) => {
     setTransactionToCopy(transaction);
-    setSelectedAccountId(transaction.account_id);
     if (transaction.is_transfer) {
-      setIsTransferModalOpen(true);
+      onTransferFunds(transaction.account_id);
     } else {
-      setIsCreateModalOpen(true);
+      onAddTransaction(transaction.account_id);
     }
   };
 
-  // Fetch accounts for the ledger
-  const {
-    data: accounts,
-    isLoading: isAccountsLoading,
-    isError: isAccountsError,
-  } = useQuery<Account[]>({
+  const { data: accounts, isError } = useQuery<Account[]>({
     queryKey: ["accounts", ledgerId],
     queryFn: async () => {
       const response = await api.get(`/ledger/${ledgerId}/accounts`);
@@ -71,31 +58,14 @@ const LedgerMain: FC = () => {
     },
   });
 
-  const handleAddTransaction = (accountId: string | undefined = undefined) => {
-    setSelectedAccountId(accountId);
-    setIsCreateModalOpen(true);
-  };
-
-  const handleTransferFunds = (accountId: string | undefined = undefined) => {
-    setSelectedAccountId(accountId);
-    setIsTransferModalOpen(true);
-  };
-
   const refreshAccountsData = async (): Promise<void> => {
     await queryClient.invalidateQueries({ queryKey: ["accounts", ledgerId] });
   };
 
-  const refreshTransactionsData = async (): Promise<void> => {
-    await queryClient.invalidateQueries({
-      queryKey: ["transactions"],
-    });
-  };
-
-  if (isAccountsError) {
+  if (isError) {
     return null;
   }
 
-  // Handle tab change
   const handleTabChange = (index: number) => {
     setTabIndex(index);
   };
@@ -106,7 +76,6 @@ const LedgerMain: FC = () => {
 
   return (
     <Box>
-      {/* Tabs for Accounts and Transactions */}
       <Box borderRadius="lg" boxShadow="lg" bg="white" overflow="hidden">
         <Tabs
           variant="soft-rounded"
@@ -163,42 +132,18 @@ const LedgerMain: FC = () => {
                 </Flex>
               </Tab>
             </TabList>
-            <Flex gap={2}>
-              <Button
-                leftIcon={<Plus />}
-                size="sm"
-                variant="outline"
-                colorScheme="teal"
-                onClick={() => handleAddTransaction(undefined)}
-                display={{ base: "none", md: "flex" }}
-              >
-                Add Transaction
-              </Button>
-              <Button
-                leftIcon={<ArrowRightLeft />}
-                size="sm"
-                variant="outline"
-                colorScheme="teal"
-                onClick={() => handleTransferFunds(undefined)}
-                display={{ base: "none", md: "flex" }}
-              >
-                Transfer Funds
-              </Button>
-            </Flex>
           </Flex>
           <TabPanels>
-            {/* Accounts Tab */}
             <TabPanel p={{ base: 2, md: 4 }}>
               <LedgerMainAccounts
                 accounts={accounts || []}
-                onAddTransaction={handleAddTransaction}
-                onTransferFunds={handleTransferFunds}
+                onAddTransaction={onAddTransaction}
+                onTransferFunds={onTransferFunds}
               />
             </TabPanel>
-            {/* Transactions Tab */}
             <TabPanel p={{ base: 2, md: 4 }}>
               <LedgerMainTransactions
-                onAddTransaction={() => handleAddTransaction(undefined)}
+                onAddTransaction={onAddTransaction}
                 onTransactionDeleted={() =>
                   queryClient.invalidateQueries({
                     queryKey: [`transactions-count`, ledgerId],
@@ -212,36 +157,6 @@ const LedgerMain: FC = () => {
           </TabPanels>
         </Tabs>
       </Box>
-
-      {/* Create Transaction Modal */}
-      <CreateTransactionModal
-        isOpen={isCreateModalOpen}
-        onClose={() => {
-          setIsCreateModalOpen(false);
-          setTransactionToCopy(undefined);
-        }}
-        accountId={selectedAccountId}
-        onTransactionAdded={() => {
-          refreshAccountsData();
-          refreshTransactionsData();
-        }}
-        initialData={transactionToCopy}
-      />
-
-      {/* Transfer Funds Modal */}
-      <TransferFundsModal
-        isOpen={isTransferModalOpen}
-        onClose={() => {
-          setIsTransferModalOpen(false);
-          setTransactionToCopy(undefined);
-        }}
-        accountId={selectedAccountId}
-        onTransferCompleted={() => {
-          refreshAccountsData();
-          refreshTransactionsData();
-        }}
-        initialData={transactionToCopy}
-      />
     </Box>
   );
 };

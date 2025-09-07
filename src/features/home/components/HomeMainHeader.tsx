@@ -35,8 +35,9 @@ const HomeMainHeader: FC<HomeMainHeaderProps> = ({ onCreateLedger }) => {
         align="center"
         flexDirection={{ base: "column", md: "row" }}
         gap={4}
+        width="100%"
       >
-        <HStack spacing={3} align="center">
+        <HStack spacing={3} align="center" flex={1}>
           <Box
             p={3}
             bg="whiteAlpha.200"
