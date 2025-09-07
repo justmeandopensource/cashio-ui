@@ -65,24 +65,24 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, heade
                <Icon as={icon} boxSize={6} />
              </Box>
            )}
-           <Box>
-            <Heading
-              as="h1"
-              size="lg"
-              fontWeight="bold"
-              letterSpacing="-0.02em"
-            >
-              {title}
-            </Heading>
-            <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
-              {subtitle || <span>&nbsp;</span>}
-            </Text>
-          </Box>
+            <Box flex={1}>
+             <Heading
+               as="h1"
+               size="lg"
+               fontWeight="bold"
+               letterSpacing="-0.02em"
+             >
+               {title}
+             </Heading>
+             <Text fontSize="sm" color="whiteAlpha.900" fontWeight="medium">
+               {subtitle || <span>&nbsp;</span>}
+             </Text>
+           </Box>
         </HStack>
-        <HStack>
-          {headerContent}
-          {actions && <Box>{actions}</Box>}
-        </HStack>
+         <HStack justifyContent={{ base: "center", md: "flex-end" }} flexShrink={1}>
+           {headerContent}
+           {actions && <Box>{actions}</Box>}
+         </HStack>
       </Flex>
     </Box>
   );

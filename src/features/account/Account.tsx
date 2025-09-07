@@ -5,25 +5,8 @@ import Layout from "@components/Layout";
 import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import {
-  Button,
-  Box,
-  Text,
-  HStack,
-  IconButton,
-  Icon,
-  Badge,
-  Flex,
-} from "@chakra-ui/react";
-import {
-  Building,
-  ShieldAlert,
-  Edit,
-  ChevronLeft,
-  Info,
-  TrendingUp,
-  TrendingDown,
-} from "lucide-react";
+import { Button, Box, Text, HStack, Badge, Flex } from "@chakra-ui/react";
+import { Building, ShieldAlert, ChevronLeft } from "lucide-react";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
@@ -157,8 +140,16 @@ const Account: React.FC = () => {
       <PageHeader
         title={
           account ? (
-            <HStack spacing={3} align="center">
-              <Text fontSize={{ base: "md", md: "lg" }}>{account.name}</Text>
+            <HStack
+              spacing={3}
+              align="center"
+              onClick={onDetailsModalOpen}
+              cursor="pointer"
+              flexWrap="nowrap"
+            >
+              <Text fontSize={{ base: "md", md: "inherit" }}>
+                {account.name}
+              </Text>
               <Badge
                 variant="subtle"
                 bg={
@@ -195,29 +186,16 @@ const Account: React.FC = () => {
         actions={
           <Flex
             direction={{ base: "column", md: "row" }}
-            alignItems={{ base: "flex-start", md: "center" }}
+            alignItems={{ base: "center", md: "center" }}
             gap={2}
             width="100%"
           >
-            <HStack spacing={2}>
-              <IconButton
-                aria-label="View account details"
-                icon={<Info size={20} />}
-                variant="ghost"
-                color="white"
-                onClick={onDetailsModalOpen}
-                _hover={{ bg: "whiteAlpha.200" }}
-              />
-              <IconButton
-                aria-label="Update account"
-                icon={<Edit size={20} />}
-                variant="ghost"
-                color="white"
-                onClick={() => setIsUpdateModalOpen(true)}
-                _hover={{ bg: "whiteAlpha.200" }}
-              />
-            </HStack>
-            <HStack spacing={2}>
+            <HStack spacing={2}></HStack>
+            <HStack
+              spacing={2}
+              justifyContent={{ base: "center", md: "flex-start" }}
+              width={{ base: "100%", md: "auto" }}
+            >
               <Button
                 color="white"
                 variant="ghost"
@@ -300,7 +278,8 @@ const Account: React.FC = () => {
             description={account.description}
             notes={account.notes}
             createdAt={account.created_at}
-            updatedAt={account.updated_at}
+            updatedAt={account.updatedAt}
+            onEditAccount={() => setIsUpdateModalOpen(true)}
           />
         </>
       )}

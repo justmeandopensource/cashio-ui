@@ -14,8 +14,10 @@ import {
   Divider,
   useColorModeValue,
   Icon,
+  IconButton,
+  Button,
 } from "@chakra-ui/react";
-import { BookText, FileText } from "lucide-react";
+import { BookText, FileText, Edit } from "lucide-react";
 
 interface LedgerDetailsModalProps {
   isOpen: boolean;
@@ -26,6 +28,7 @@ interface LedgerDetailsModalProps {
   notes: string | undefined;
   createdAt: string | undefined;
   updatedAt: string | undefined;
+  onEditLedger?: () => void;
 }
 
 const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
@@ -37,6 +40,7 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
   notes,
   createdAt,
   updatedAt,
+  onEditLedger,
 }) => {
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.100", "gray.700");
@@ -98,6 +102,8 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
             top={{ base: 4, sm: 6 }}
             right={{ base: 4, sm: 6 }}
           />
+
+          
 
           <HStack spacing={{ base: 3, sm: 4 }} align="start">
             <Box
@@ -230,6 +236,20 @@ const LedgerDetailsModal: React.FC<LedgerDetailsModalProps> = ({
                 </Flex>
               </VStack>
             </Box>
+            {onEditLedger && (
+              <Button
+                leftIcon={<Edit size={20} />}
+                colorScheme="teal"
+                size="lg"
+                width="full"
+                onClick={() => {
+                  onEditLedger();
+                  onClose();
+                }}
+              >
+                Edit Ledger
+              </Button>
+            )}
           </VStack>
         </ModalBody>
       </ModalContent>

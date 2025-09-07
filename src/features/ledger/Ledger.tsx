@@ -6,6 +6,7 @@ import {
   HStack,
   IconButton,
   Flex,
+  Text,
 } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import LedgerMain from "@features/ledger/components/LedgerMain";
@@ -103,7 +104,16 @@ const Ledger = () => {
   return (
     <Layout handleLogout={handleLogout}>
       <PageHeader
-        title={ledgerName || "Ledger"}
+        title={
+          <HStack
+            spacing={2}
+            onClick={onLedgerDetailsModalOpen}
+            cursor="pointer"
+            role="group"
+          >
+            <Text>{ledgerName || "Ledger"}</Text>
+          </HStack>
+        }
         subtitle={description || "Ledger"}
         icon={BookText}
         backIcon={ChevronLeft}
@@ -111,29 +121,11 @@ const Ledger = () => {
         actions={
           <Flex
             direction={{ base: "column", md: "row" }}
-            alignItems={{ base: "flex-start", md: "center" }}
+            alignItems={{ base: "center", md: "center" }}
             gap={2}
             width="100%"
           >
-            <HStack spacing={2}>
-              <IconButton
-                aria-label="Ledger details"
-                icon={<Info size={20} />}
-                variant="ghost"
-                color="white"
-                onClick={onLedgerDetailsModalOpen}
-                _hover={{ bg: "whiteAlpha.200" }}
-              />
-              <IconButton
-                aria-label="Update ledger"
-                icon={<Edit size={20} />}
-                variant="ghost"
-                color="white"
-                onClick={onUpdateLedgerModalOpen}
-                _hover={{ bg: "whiteAlpha.200" }}
-              />
-            </HStack>
-            <HStack spacing={2}>
+            <HStack spacing={2} justifyContent={{ base: "center", md: "flex-start" }} width={{ base: "100%", md: "auto" }}>
               <Button
                 color="white"
                 variant="ghost"
@@ -186,6 +178,7 @@ const Ledger = () => {
         notes={notes || ""}
         createdAt={createdAt}
         updatedAt={updatedAt}
+        onEditLedger={onUpdateLedgerModalOpen}
       />
 
       <CreateTransactionModal

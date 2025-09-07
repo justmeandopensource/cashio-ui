@@ -14,8 +14,9 @@ import {
   Divider,
   useColorModeValue,
   Icon,
+  Button,
 } from "@chakra-ui/react";
-import { Building, ShieldAlert, FileText } from "lucide-react";
+import { Building, ShieldAlert, FileText, Edit } from "lucide-react";
 
 interface AccountDetailsModalProps {
   isOpen: boolean;
@@ -29,6 +30,7 @@ interface AccountDetailsModalProps {
   notes: string | undefined;
   createdAt: string | undefined;
   updatedAt: string | undefined;
+  onEditAccount?: () => void;
 }
 
 const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
@@ -43,6 +45,7 @@ const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
   notes,
   createdAt,
   updatedAt,
+  onEditAccount,
 }) => {
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.100", "gray.700");
@@ -303,6 +306,20 @@ const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
                 </Flex>
               </VStack>
             </Box>
+            {onEditAccount && (
+              <Button
+                leftIcon={<Edit size={20} />}
+                colorScheme="teal"
+                size="lg"
+                width="full"
+                onClick={() => {
+                  onEditAccount();
+                  onClose();
+                }}
+              >
+                Edit Account
+              </Button>
+            )}
           </VStack>
         </ModalBody>
       </ModalContent>
