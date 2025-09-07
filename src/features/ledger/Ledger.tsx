@@ -1,5 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { Button, useDisclosure, Box, HStack, IconButton } from "@chakra-ui/react";
+import {
+  Button,
+  useDisclosure,
+  Box,
+  HStack,
+  IconButton,
+} from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import LedgerMain from "@features/ledger/components/LedgerMain";
 import useLedgerStore from "@/components/shared/store";
@@ -15,16 +21,37 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const Ledger = () => {
   const navigate = useNavigate();
-  const { ledgerId, ledgerName, currencySymbol, description, notes, createdAt, updatedAt, setLedger } = useLedgerStore();
+  const {
+    ledgerId,
+    ledgerName,
+    currencySymbol,
+    description,
+    notes,
+    createdAt,
+    updatedAt,
+    setLedger,
+  } = useLedgerStore();
   const queryClient = useQueryClient();
 
-  const { isOpen: isUpdateLedgerModalOpen, onOpen: onUpdateLedgerModalOpen, onClose: onUpdateLedgerModalClose } = useDisclosure();
-  const { isOpen: isLedgerDetailsModalOpen, onOpen: onLedgerDetailsModalOpen, onClose: onLedgerDetailsModalClose } = useDisclosure();
+  const {
+    isOpen: isUpdateLedgerModalOpen,
+    onOpen: onUpdateLedgerModalOpen,
+    onClose: onUpdateLedgerModalClose,
+  } = useDisclosure();
+  const {
+    isOpen: isLedgerDetailsModalOpen,
+    onOpen: onLedgerDetailsModalOpen,
+    onClose: onLedgerDetailsModalClose,
+  } = useDisclosure();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isTransferModalOpen, setIsTransferModalOpen] = useState(false);
-  const [selectedAccountId, setSelectedAccountId] = useState<string | undefined>(undefined);
-  const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(undefined);
+  const [selectedAccountId, setSelectedAccountId] = useState<
+    string | undefined
+  >(undefined);
+  const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(
+    undefined,
+  );
 
   const handleAddTransaction = (accountId: string | undefined = undefined) => {
     setSelectedAccountId(accountId);
@@ -62,7 +89,7 @@ const Ledger = () => {
         data.description,
         data.notes,
         data.created_at,
-        data.updated_at
+        data.updated_at,
       );
     }
   };
@@ -121,7 +148,10 @@ const Ledger = () => {
       />
       <Box flex={1} overflowY="auto">
         <PageContainer>
-          <LedgerMain onAddTransaction={handleAddTransaction} onTransferFunds={handleTransferFunds} />
+          <LedgerMain
+            onAddTransaction={handleAddTransaction}
+            onTransferFunds={handleTransferFunds}
+          />
         </PageContainer>
       </Box>
 
