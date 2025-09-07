@@ -150,6 +150,7 @@ const Transactions: React.FC<TransactionsProps> = ({
     queryFn: async () => {
       const params = new URLSearchParams();
       params.append("page", pagination.current_page.toString());
+      params.append("per_page", "50");
 
       if (accountId) {
         params.append("account_id", accountId);
