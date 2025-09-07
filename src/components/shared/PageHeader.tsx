@@ -37,12 +37,12 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, heade
     >
       <Flex
         justifyContent="space-between"
-        align={{ base: "flex-start", md: "center" }}
+        align={{ base: "center", md: "center" }}
         flexDirection={{ base: "column", md: "row" }}
         gap={4}
         width="100%"
       >
-        <HStack spacing={3} align="center" flex={1}>
+        <HStack spacing={3} align="center" flex={1} justifyContent={{ base: "flex-start", md: "flex-start" }} width={{ base: "100%", md: "auto" }}>
            {backIcon && (
              <Icon
                as={backIcon}
@@ -79,9 +79,9 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, heade
              </Text>
            </Box>
         </HStack>
-         <HStack justifyContent={{ base: "center", md: "flex-end" }} flexShrink={1}>
+         <HStack justifyContent={{ base: "center", md: "flex-end" }} flexShrink={1} width={{ base: "100%", md: "auto" }}>
            {headerContent}
-           {actions && <Box>{actions}</Box>}
+           {actions && <Box w="100%">{actions}</Box>}
          </HStack>
       </Flex>
     </Box>

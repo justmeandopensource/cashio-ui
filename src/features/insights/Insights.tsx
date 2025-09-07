@@ -106,8 +106,9 @@ const Insights = () => {
           <Flex
             direction={{ base: "column", lg: "row" }}
             gap={4}
+            w="100%"
           >
-            <Box>
+            <Box w="100%">
               <FormControl>
                 <Select
                   value={selectedLedgerId || ""}
@@ -119,6 +120,7 @@ const Insights = () => {
                   bg="whiteAlpha.100"
                   _hover={{ bg: "whiteAlpha.300" }}
                   size="md"
+                  w="100%"
                 >
                   <option value="">Select Ledger</option>
                   {ledgers?.map((ledger) => (
@@ -130,7 +132,7 @@ const Insights = () => {
               </FormControl>
             </Box>
 
-            <Box>
+            <Box w="100%">
               <FormControl>
                 <Select
                   value={selectedVisualization}
@@ -141,6 +143,7 @@ const Insights = () => {
                   bg="whiteAlpha.100"
                   _hover={{ bg: "whiteAlpha.300" }}
                   size="md"
+                  w="100%"
                 >
                   {visualizationOptions.map((option) => (
                     <option key={option.value} value={option.value}>

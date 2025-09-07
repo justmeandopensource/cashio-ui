@@ -33,12 +33,12 @@ const HomeMainHeader: FC<HomeMainHeaderProps> = ({ onCreateLedger }) => {
     >
       <Flex
         justifyContent="space-between"
-        align={{ base: "flex-start", md: "center" }}
+        align={{ base: "center", md: "center" }}
         flexDirection={{ base: "column", md: "row" }}
         gap={4}
         width="100%"
       >
-        <HStack spacing={3} align="center" flex={1}>
+        <HStack spacing={3} align="center" flex={1} justifyContent={{ base: "flex-start", md: "flex-start" }} width={{ base: "100%", md: "auto" }}>
           <Box
             p={3}
             bg="whiteAlpha.200"

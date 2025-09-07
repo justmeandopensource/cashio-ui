@@ -279,8 +279,6 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         <DrawerContent
           bg={sidebarBg}
           maxW="85vw"
-          borderTopRightRadius="3xl"
-          borderBottomRightRadius="3xl"
           boxShadow="2xl"
           border="1px solid"
           borderColor={borderColor}
@@ -288,7 +286,6 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
           <DrawerHeader
             bgGradient={gradientBg}
             color="white"
-            borderTopRightRadius="3xl"
             pb={6}
             position="relative"
             boxShadow="lg"
@@ -376,7 +373,6 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
                 borderTop="1px solid"
                 borderColor={borderColor}
                 bg={cardBg}
-                borderBottomRightRadius="3xl"
               >
                 <UserProfileDisplay handleLogout={handleLogout} />
               </Box>

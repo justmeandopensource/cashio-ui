@@ -29,6 +29,7 @@ const Categories: React.FC = () => {
       gap={3}
       flexDirection={{ base: "column", md: "column", lg: "row" }}
       w={{ base: "100%", md: "100%", lg: "auto" }}
+      alignItems={{ base: "center", md: "center", lg: "flex-start" }}
     >
       <Button
         color="white"
