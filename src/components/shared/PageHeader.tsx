@@ -31,6 +31,7 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, heade
       position="sticky"
       top={0}
       zIndex={10}
+      boxShadow="lg"
     >
       <Flex
         justifyContent="space-between"

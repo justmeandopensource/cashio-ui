@@ -49,7 +49,7 @@ export const MobileHeader: React.FC<{
       borderBottom="1px solid"
       borderColor={borderColor}
       backdropFilter="blur(10px)"
-      boxShadow="sm"
+      boxShadow="lg"
     >
       <Flex align="center" justify="space-between" px={4} py={3}>
         <Button
@@ -221,7 +221,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         boxShadow="xl"
       >
         {/* Modern Header */}
-        <Box bgGradient={gradientBg} color="white" p={6}>
+        <Box bgGradient={gradientBg} color="white" p={6} boxShadow="lg">
           <HStack spacing={3} align="center">
             <Box
               p={3}
@@ -250,7 +250,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         </Box>
 
         {/* Navigation */}
-        <Box flex="1" px={4} py={2}>
+        <Box flex="1" px={4} py={6}>
           <VStack align="stretch" spacing={2}>
             {menuItems.map((item) => (
               <NavItem

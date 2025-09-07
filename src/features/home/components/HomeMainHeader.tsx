@@ -29,6 +29,7 @@ const HomeMainHeader: FC<HomeMainHeaderProps> = ({ onCreateLedger }) => {
       position="sticky"
       top={0}
       zIndex={10}
+      boxShadow="lg"
     >
       <Flex
         justifyContent="space-between"
