@@ -5,13 +5,16 @@ import Layout from "@components/Layout";
 import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { Button, Box, Text, HStack, IconButton } from "@chakra-ui/react";
-import { Building, ShieldAlert, Edit, ChevronLeft } from "lucide-react";
+import { Button, Box, Text, HStack, IconButton, Icon, Badge } from "@chakra-ui/react";
+import { Building, ShieldAlert, Edit, ChevronLeft, Info, TrendingUp, TrendingDown } from "lucide-react";
+import { formatNumberAsCurrency } from "@components/shared/utils";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 import TransferFundsModal from "@components/modals/TransferFundsModal";
+import AccountDetailsModal from "@components/modals/AccountDetailsModal";
+import { useDisclosure } from "@chakra-ui/react";
 
 interface AccountData {
   ledger_id: string;
@@ -21,18 +24,49 @@ interface AccountData {
   net_balance: number;
   opening_balance: number;
   parent_account_id: string;
+  balance: number;
+  description?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const Account: React.FC = () => {
   const navigate = useNavigate();
   const { accountId } = useParams<{ accountId: string }>();
-  const { ledgerId } = useLedgerStore();
+  const { ledgerId, currencySymbol } = useLedgerStore();
   const queryClient = useQueryClient();
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
   const [isTransferModalOpen, setIsTransferModalOpen] =
     useState<boolean>(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
+
+  // Function to get balance color based on balance value and account type
+  const getBalanceStyling = (balance: number, accountType?: string) => {
+    // For asset accounts: Positive = Good (green), Negative = Bad (red)
+    // For liability accounts: Positive = Bad (red), Negative = Good (green)
+    const isPositiveGood = accountType !== "liability";
+
+    if (balance > 0) {
+      return isPositiveGood
+        ? { color: "green.500", bgColor: "green.50", borderColor: "green.200" }
+        : { color: "red.500", bgColor: "red.50", borderColor: "red.200" };
+    } else if (balance < 0) {
+      return isPositiveGood
+        ? { color: "red.500", bgColor: "red.50", borderColor: "red.200" }
+        : { color: "green.500", bgColor: "green.50", borderColor: "green.200" };
+    } else {
+      return { color: "gray.500", bgColor: "gray.50", borderColor: "gray.200" };
+    }
+  };
+
+  // Modal state for account details
+  const {
+    isOpen: isDetailsModalOpen,
+    onOpen: onDetailsModalOpen,
+    onClose: onDetailsModalClose,
+  } = useDisclosure();
   const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(
     undefined,
   );
@@ -104,13 +138,44 @@ const Account: React.FC = () => {
   return (
     <Layout handleLogout={handleLogout}>
       <PageHeader
-        title={account?.name || "Account"}
-        subtitle={`Type: ${account?.type}`}
+        title={
+          account ? (
+            <HStack spacing={3} align="center">
+              <Text>{account.name}</Text>
+              <Badge
+                variant="subtle"
+                bg={getBalanceStyling(account.net_balance, account.type).bgColor}
+                color={getBalanceStyling(account.net_balance, account.type).color}
+                border="1px solid"
+                borderColor={getBalanceStyling(account.net_balance, account.type).borderColor}
+                borderRadius="md"
+                px={2}
+                py={1}
+                fontSize="sm"
+                fontWeight="semibold"
+              >
+                {formatNumberAsCurrency(account.net_balance, currencySymbol)}
+              </Badge>
+            </HStack>
+          ) : "Account"
+        }
+        subtitle={
+          account?.description ||
+          `Track your ${account?.type === "asset" ? "assets" : "liabilities"} and manage transactions`
+        }
         icon={account?.type === "asset" ? Building : ShieldAlert}
         backIcon={ChevronLeft}
         backOnClick={() => navigate("/ledger")}
         actions={
           <HStack>
+            <IconButton
+              aria-label="View account details"
+              icon={<Info size={20} />}
+              variant="ghost"
+              color="white"
+              onClick={onDetailsModalOpen}
+              _hover={{ bg: "whiteAlpha.200" }}
+            />
             <IconButton
               aria-label="Update account"
               icon={<Edit size={20} />}
@@ -187,6 +252,20 @@ const Account: React.FC = () => {
             onClose={() => setIsUpdateModalOpen(false)}
             account={account}
             onUpdateCompleted={refreshAccountData}
+          />
+
+          <AccountDetailsModal
+            isOpen={isDetailsModalOpen}
+            onClose={onDetailsModalClose}
+            accountName={account.name}
+            accountType={account.type}
+            openingBalance={account.opening_balance}
+            netBalance={account.net_balance}
+            currencySymbol={currencySymbol}
+            description={account.description}
+            notes={account.notes}
+            createdAt={account.created_at}
+            updatedAt={account.updated_at}
           />
         </>
       )}

@@ -103,6 +103,10 @@ const InsightsMainHeader: React.FC<InsightsMainHeaderProps> = ({
         selectedLedger.ledger_id,
         selectedLedger.name,
         selectedLedger.currency_symbol,
+        selectedLedger.description,
+        selectedLedger.notes,
+        selectedLedger.created_at,
+        selectedLedger.updated_at,
       );
     }
     setLocalSelectedLedger(ledgerId);

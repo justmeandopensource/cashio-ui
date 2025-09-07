@@ -82,6 +82,10 @@ const Insights = () => {
         selectedLedger.ledger_id,
         selectedLedger.name,
         selectedLedger.currency_symbol,
+        selectedLedger.description,
+        selectedLedger.notes,
+        selectedLedger.created_at,
+        selectedLedger.updated_at,
       );
     }
     setSelectedLedgerId(newLedgerId);

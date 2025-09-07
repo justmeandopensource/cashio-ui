@@ -5,12 +5,12 @@ import HomeMainHeader from "./HomeMainHeader";
 import { Box } from "@chakra-ui/react";
 
 interface HomeMainProps {
-  ledgers?: Array<{ ledger_id: string; name: string; currency_symbol: string }>;
+  ledgers?: Array<{ ledger_id: string; name: string; currency_symbol: string; description: string; notes: string; created_at: string; updated_at: string }>;
   onOpen: () => void;
   isOpen: boolean;
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
-  handleCreateLedger: (name: string, currency: string) => void;
+  handleCreateLedger: (name: string, currency: string, description: string, notes: string) => void;
 }
 
 const HomeMain = ({

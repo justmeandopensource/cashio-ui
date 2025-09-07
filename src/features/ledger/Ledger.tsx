@@ -15,7 +15,7 @@ import { useQueryClient } from "@tanstack/react-query";
 
 const Ledger = () => {
   const navigate = useNavigate();
-  const { ledgerId, ledgerName, currencySymbol, description, notes, setLedger } = useLedgerStore();
+  const { ledgerId, ledgerName, currencySymbol, description, notes, createdAt, updatedAt, setLedger } = useLedgerStore();
   const queryClient = useQueryClient();
 
   const { isOpen: isUpdateLedgerModalOpen, onOpen: onUpdateLedgerModalOpen, onClose: onUpdateLedgerModalClose } = useDisclosure();
@@ -53,7 +53,7 @@ const Ledger = () => {
     updatedNotes: string
   ) => {
     if (ledgerId) {
-      setLedger(ledgerId, updatedName, updatedCurrencySymbol, updatedDescription, updatedNotes, "", "");
+      setLedger(ledgerId, updatedName, updatedCurrencySymbol, updatedDescription, updatedNotes, createdAt || "", updatedAt || "");
     }
   };
 
@@ -134,6 +134,8 @@ const Ledger = () => {
         currencySymbol={currencySymbol || ""}
         description={description || ""}
         notes={notes || ""}
+        createdAt={createdAt}
+        updatedAt={updatedAt}
       />
 
       <CreateTransactionModal

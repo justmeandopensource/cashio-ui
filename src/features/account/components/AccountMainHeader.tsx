@@ -10,16 +10,23 @@ import {
   VStack,
   Icon,
 } from "@chakra-ui/react";
-import { ArrowLeft, Edit, CreditCard } from "lucide-react";
+import { ArrowLeft, Edit, Info, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import useLedgerStore from "@/components/shared/store";
+import { useDisclosure } from "@chakra-ui/react";
+import AccountDetailsModal from "@/components/modals/AccountDetailsModal";
 
 interface Account {
   name: string;
   type: "asset" | "liability" | string;
   net_balance: number;
   ledger_id: string | number;
+  balance: number;
+  description?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface AccountMainHeaderProps {
@@ -37,6 +44,13 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
 }) => {
   const navigate = useNavigate();
   const { currencySymbol } = useLedgerStore();
+
+  // Modal state for account details
+  const {
+    isOpen: isDetailsModalOpen,
+    onOpen: onDetailsModalOpen,
+    onClose: onDetailsModalClose,
+  } = useDisclosure();
 
   // Determine the color for the balance based on its value
   const balanceColor =
@@ -106,6 +120,15 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
                 </Heading>
               </Flex>
               <IconButton
+                aria-label="View Account Details"
+                icon={<Info />}
+                variant="ghost"
+                color="teal.500"
+                size="sm"
+                onClick={onDetailsModalOpen}
+                className="edit-icon"
+              />
+              <IconButton
                 aria-label="Edit Account"
                 icon={<Edit />}
                 variant="ghost"
@@ -153,6 +176,20 @@ const AccountMainHeader: React.FC<AccountMainHeaderProps> = ({
            </Button>
         </Flex>
       </Flex>
+
+      {/* Account Details Modal */}
+      <AccountDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={onDetailsModalClose}
+        accountName={account.name}
+        accountType={account.type}
+        openingBalance={account.opening_balance}
+        currencySymbol={currencySymbol}
+        description={account.description}
+        notes={account.notes}
+        createdAt={account.created_at}
+        updatedAt={account.updated_at}
+      />
     </Box>
   );
 };

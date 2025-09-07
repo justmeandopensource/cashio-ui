@@ -10,6 +10,11 @@ interface Account {
   net_balance: number;
   opening_balance: number;
   parent_account_id: string;
+  balance: number;
+  description?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 interface AccountMainProps {
@@ -18,7 +23,11 @@ interface AccountMainProps {
   onAddTransaction: () => void;
 }
 
-const AccountMain: React.FC<AccountMainProps> = ({ account, onCopyTransaction, onAddTransaction }) => {
+const AccountMain: React.FC<AccountMainProps> = ({
+  account,
+  onCopyTransaction,
+  onAddTransaction
+}) => {
   return (
     <Box>
       {/* Transactions Section */}

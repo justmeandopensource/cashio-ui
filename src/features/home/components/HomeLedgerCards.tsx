@@ -12,7 +12,7 @@ import { FileText, Plus } from 'lucide-react';
 import useLedgerStore from "@/components/shared/store";
 
 interface HomeLedgerCardsProps {
-  ledgers?: Array<{ ledger_id: string; name: string; currency_symbol: string; description: string; notes: string }>;
+  ledgers?: Array<{ ledger_id: string; name: string; currency_symbol: string; description: string; notes: string; created_at: string; updated_at: string }>;
   onOpen: () => void;
 }
 
@@ -26,8 +26,10 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
     currencySymbol: string,
     description: string,
     notes: string,
+    createdAt: string,
+    updatedAt: string,
   ) => {
-    setLedger(ledgerId, ledgerName, currencySymbol, description, notes, "", "");
+    setLedger(ledgerId, ledgerName, currencySymbol, description, notes, createdAt, updatedAt);
     navigate(`/ledger`);
   };
 
@@ -71,6 +73,8 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
                     ledger.currency_symbol,
                     ledger.description,
                     ledger.notes,
+                    ledger.created_at,
+                    ledger.updated_at,
                   )
                 }
               >
