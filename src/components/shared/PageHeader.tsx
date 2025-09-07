@@ -10,13 +10,14 @@ import {
 import { FC, ReactNode } from "react";
 
 interface PageHeaderProps {
-  title: string;
+  title: ReactNode;
   subtitle?: string;
   icon?: React.ElementType;
   actions?: ReactNode;
+  headerContent?: ReactNode;
 }
 
-const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions }) => {
+const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions, headerContent }) => {
   const gradientBg = useColorModeValue(
     "linear(135deg, teal.500, teal.600)",
     "linear(135deg, teal.600, teal.700)",
@@ -65,7 +66,10 @@ const PageHeader: FC<PageHeaderProps> = ({ title, subtitle, icon, actions }) => 
             </Text>
           </Box>
         </HStack>
-        {actions && <Box>{actions}</Box>}
+        <HStack>
+          {headerContent}
+          {actions && <Box>{actions}</Box>}
+        </HStack>
       </Flex>
     </Box>
   );

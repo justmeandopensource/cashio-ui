@@ -5,8 +5,8 @@ import Layout from "@components/Layout";
 import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { Button, Box, Text } from "@chakra-ui/react";
-import { Settings, Wallet } from "lucide-react";
+import { Button, Box, Text, HStack, IconButton } from "@chakra-ui/react";
+import { Settings, Wallet, Plus, ArrowRightLeft, Edit } from "lucide-react";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
@@ -108,15 +108,34 @@ const Account: React.FC = () => {
         subtitle={`Type: ${account?.type}`}
         icon={Wallet}
         actions={
-          <Button
-            leftIcon={<Settings size={20} />}
-            color="white"
-            variant="ghost"
-            onClick={() => setIsUpdateModalOpen(true)}
-            _hover={{ bg: "whiteAlpha.200" }}
-          >
-            Update
-          </Button>
+          <HStack>
+            <IconButton
+              aria-label="Update account"
+              icon={<Edit size={20} />}
+              variant="ghost"
+              color="white"
+              onClick={() => setIsUpdateModalOpen(true)}
+              _hover={{ bg: "whiteAlpha.200" }}
+            />
+            <Button
+              leftIcon={<Plus size={20} />}
+              color="white"
+              variant="ghost"
+              onClick={() => setIsCreateModalOpen(true)}
+              _hover={{ bg: "whiteAlpha.200" }}
+            >
+              Add Transaction
+            </Button>
+            <Button
+              leftIcon={<ArrowRightLeft size={20} />}
+              color="white"
+              variant="ghost"
+              onClick={() => setIsTransferModalOpen(true)}
+              _hover={{ bg: "whiteAlpha.200" }}
+            >
+              Transfer Funds
+            </Button>
+          </HStack>
         }
       />
       <Box flex={1} overflowY="auto">

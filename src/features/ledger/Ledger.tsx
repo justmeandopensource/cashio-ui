@@ -6,7 +6,7 @@ import useLedgerStore from "@/components/shared/store";
 import UpdateLedgerModal from "@components/modals/UpdateLedgerModal";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { BookText, Settings, Info, Plus, ArrowRightLeft } from "lucide-react";
+import { BookText, Edit, Info, Plus, ArrowRightLeft } from "lucide-react";
 import LedgerDetailsModal from "@components/modals/LedgerDetailsModal";
 import { useState } from "react";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
@@ -80,7 +80,7 @@ const Ledger = () => {
             />
             <IconButton
               aria-label="Update ledger"
-              icon={<Settings size={20} />}
+              icon={<Edit size={20} />}
               variant="ghost"
               color="white"
               onClick={onUpdateLedgerModalOpen}
