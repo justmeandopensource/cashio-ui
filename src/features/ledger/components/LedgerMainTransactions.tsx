@@ -2,7 +2,7 @@ import React from "react";
 import Transactions from "@/features/transactions/Transactions";
 
 interface LedgerMainTransactionsProps {
-  onAddTransaction: () => void;
+  onAddTransaction: (accountId?: string, transaction?: any) => void;
   onTransactionDeleted: () => void;
   onTransactionUpdated: () => void;
   onCopyTransaction: (transaction: any) => void;
@@ -19,7 +19,7 @@ const LedgerMainTransactions: React.FC<LedgerMainTransactionsProps> = ({
   return (
     <Transactions
       accountId={undefined}
-      onAddTransaction={onAddTransaction}
+      onAddTransaction={() => onAddTransaction(undefined, undefined)}
       onTransactionDeleted={onTransactionDeleted}
       onTransactionUpdated={onTransactionUpdated}
       onCopyTransaction={onCopyTransaction}

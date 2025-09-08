@@ -27,8 +27,8 @@ interface Account {
 }
 
 interface LedgerMainProps {
-  onAddTransaction: (accountId?: string) => void;
-  onTransferFunds: (accountId?: string) => void;
+  onAddTransaction: (accountId?: string, transaction?: any) => void;
+  onTransferFunds: (accountId?: string, transaction?: any) => void;
 }
 
 const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) => {
@@ -44,9 +44,9 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
   const handleCopyTransaction = (transaction: any) => {
     setTransactionToCopy(transaction);
     if (transaction.is_transfer) {
-      onTransferFunds(transaction.account_id);
+      onTransferFunds(transaction.account_id, transaction);
     } else {
-      onAddTransaction(transaction.account_id);
+      onAddTransaction(transaction.account_id, transaction);
     }
   };
 

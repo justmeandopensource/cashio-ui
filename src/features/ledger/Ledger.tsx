@@ -55,13 +55,15 @@ const Ledger = () => {
     undefined,
   );
 
-  const handleAddTransaction = (accountId: string | undefined = undefined) => {
+  const handleAddTransaction = (accountId: string | undefined = undefined, transaction?: any) => {
     setSelectedAccountId(accountId);
+    setTransactionToCopy(transaction);
     setIsCreateModalOpen(true);
   };
 
-  const handleTransferFunds = (accountId: string | undefined = undefined) => {
+  const handleTransferFunds = (accountId: string | undefined = undefined, transaction?: any) => {
     setSelectedAccountId(accountId);
+    setTransactionToCopy(transaction);
     setIsTransferModalOpen(true);
   };
 

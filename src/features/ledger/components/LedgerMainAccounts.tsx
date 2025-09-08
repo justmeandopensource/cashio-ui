@@ -36,9 +36,9 @@ interface Account {
 interface LedgerMainAccountsProps {
   accounts: Account[];
   // eslint-disable-next-line no-unused-vars
-  onAddTransaction: (accountId: string) => void;
+  onAddTransaction: (accountId?: string, transaction?: any) => void;
   // eslint-disable-next-line no-unused-vars
-  onTransferFunds: (accountId: string) => void;
+  onTransferFunds: (accountId?: string, transaction?: any) => void;
 }
 
 const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
@@ -226,7 +226,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       className="action-icons"
                     >
                       <ChakraLink
-                        onClick={() => onAddTransaction(account.account_id)}
+                        onClick={() => onAddTransaction(account.account_id, undefined)}
                         _hover={{ textDecoration: "none" }}
                       >
                         <Icon
@@ -360,7 +360,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       <ChakraLink
                         onClick={(e) => {
                           e.stopPropagation();
-                          onAddTransaction(account.account_id);
+                          onAddTransaction(account.account_id, undefined);
                         }}
                         _hover={{ textDecoration: "none" }}
                       >
