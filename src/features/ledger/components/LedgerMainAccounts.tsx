@@ -17,6 +17,7 @@ import {
   Card,
   CardHeader,
   Stack,
+  Spinner,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { Plus, Repeat, Eye, EyeOff, Building, ShieldAlert } from "lucide-react";
@@ -35,6 +36,7 @@ interface Account {
 
 interface LedgerMainAccountsProps {
   accounts: Account[];
+  isLoading: boolean;
   // eslint-disable-next-line no-unused-vars
   onAddTransaction: (accountId?: string, transaction?: any) => void;
   // eslint-disable-next-line no-unused-vars
@@ -43,6 +45,7 @@ interface LedgerMainAccountsProps {
 
 const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   accounts,
+  isLoading,
   onAddTransaction,
   onTransferFunds,
 }) => {
@@ -448,6 +451,21 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
       </Button>
     </Box>
   );
+
+  // Loading state component
+  const LoadingState: React.FC = () => (
+    <Box textAlign="center" py={10}>
+      <Spinner size="xl" color="teal.500" />
+    </Box>
+  );
+
+  if (isLoading) {
+    return (
+      <Box bg="gray.50" p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+        <LoadingState />
+      </Box>
+    );
+  }
 
   return (
     <Box bg="gray.50" p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">

@@ -50,7 +50,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
     }
   };
 
-  const { data: accounts, isError } = useQuery<Account[]>({
+  const { data: accounts, isError, isLoading } = useQuery<Account[]>({
     queryKey: ["accounts", ledgerId],
     queryFn: async () => {
       const response = await api.get(`/ledger/${ledgerId}/accounts`);
@@ -145,6 +145,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
             <TabPanel p={{ base: 2, md: 4 }}>
               <LedgerMainAccounts
                 accounts={accounts || []}
+                isLoading={isLoading}
                 onAddTransaction={onAddTransaction}
                 onTransferFunds={onTransferFunds}
               />
