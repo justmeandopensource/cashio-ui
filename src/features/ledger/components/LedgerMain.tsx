@@ -11,7 +11,6 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
-  useToast,
 } from "@chakra-ui/react";
 import LedgerMainAccounts from "./LedgerMainAccounts";
 import LedgerMainTransactions from "./LedgerMainTransactions";
@@ -27,22 +26,19 @@ interface Account {
 }
 
 interface LedgerMainProps {
+  // eslint-disable-next-line no-unused-vars
   onAddTransaction: (accountId?: string, transaction?: any) => void;
+  // eslint-disable-next-line no-unused-vars
   onTransferFunds: (accountId?: string, transaction?: any) => void;
 }
 
 const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) => {
   const { ledgerId } = useLedgerStore();
-  const toast = useToast();
   const queryClient = useQueryClient();
 
   const [tabIndex, setTabIndex] = useState(0);
-  const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(
-    undefined,
-  );
 
   const handleCopyTransaction = (transaction: any) => {
-    setTransactionToCopy(transaction);
     if (transaction.is_transfer) {
       onTransferFunds(transaction.account_id, transaction);
     } else {

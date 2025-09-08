@@ -7,7 +7,7 @@ import {
   Flex,
   Icon,
 } from "@chakra-ui/react";
-import { FC, ReactNode } from "react";
+import React, { FC, ReactNode } from "react";
 
 interface PageHeaderProps {
   title: ReactNode;

@@ -4,7 +4,7 @@ import InsightsMain from "./components/InsightsMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
 import { PieChart, ChevronDown } from "lucide-react";
-import { Box, Flex, FormControl, FormLabel, Select, useColorModeValue, HStack } from "@chakra-ui/react";
+import { Box, Flex, FormControl, Select } from "@chakra-ui/react";
 import React, { useState, useEffect } from "react";
 import useLedgerStore from "@/components/shared/store";
 import { useQuery } from "@tanstack/react-query";
@@ -14,6 +14,10 @@ interface Ledger {
   ledger_id: string;
   name: string;
   currency_symbol: string;
+  description?: string;
+  notes?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 const visualizationOptions = [
@@ -45,8 +49,7 @@ const Insights = () => {
     "current-month-overview",
   );
 
-  const cardBg = useColorModeValue("gray.50", "gray.700");
-  const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
+
 
   const { data: ledgers, isLoading } = useQuery<Ledger[]>({
     queryKey: ["ledgers"],
@@ -82,10 +85,10 @@ const Insights = () => {
         selectedLedger.ledger_id,
         selectedLedger.name,
         selectedLedger.currency_symbol,
-        selectedLedger.description,
-        selectedLedger.notes,
-        selectedLedger.created_at,
-        selectedLedger.updated_at,
+        selectedLedger.description || "",
+        selectedLedger.notes || "",
+        selectedLedger.created_at || "",
+        selectedLedger.updated_at || "",
       );
     }
     setSelectedLedgerId(newLedgerId);

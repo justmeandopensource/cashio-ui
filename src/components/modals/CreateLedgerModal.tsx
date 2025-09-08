@@ -37,13 +37,16 @@ const currencies: Currency[] = [
 interface CreateLedgerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  // eslint-disable-next-line no-unused-vars
-  handleCreateLedger: (
-    newLedgerName: string,
-    currencySymbol: string,
-    description: string,
-    notes: string,
-  ) => void;
+   handleCreateLedger: (
+     // eslint-disable-next-line no-unused-vars
+     newLedgerName: string,
+     // eslint-disable-next-line no-unused-vars
+     currencySymbol: string,
+     // eslint-disable-next-line no-unused-vars
+     description: string,
+     // eslint-disable-next-line no-unused-vars
+     notes: string,
+   ) => void;
 }
 
 const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
@@ -183,7 +186,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                     value={newLedgerName}
                     onChange={(e) => setNewLedgerName(e.target.value)}
                     autoFocus
-                    onKeyPress={handleKeyPress}
+                     onKeyDown={handleKeyPress}
                     borderWidth="2px"
                     borderColor={inputBorderColor}
                     bg={inputBg}
@@ -260,9 +263,9 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
                     }}
                   />
-                  <FormHelperText mt={2}>
-                    A brief overview of this ledger's purpose
-                  </FormHelperText>
+                   <FormHelperText mt={2}>
+                     A brief overview of this ledger&apos;s purpose
+                   </FormHelperText>
                 </FormControl>
 
                 <FormControl>

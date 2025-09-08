@@ -44,14 +44,15 @@ interface UpdateLedgerModalProps {
   currentCurrencySymbol: string;
   currentDescription: string;
   currentNotes: string;
-  onUpdateCompleted: (data: {
-    name: string;
-    currency_symbol: string;
-    description: string;
-    notes: string;
-    created_at: string;
-    updated_at: string;
-  }) => void;
+   // eslint-disable-next-line no-unused-vars
+   onUpdateCompleted: (data: {
+     name: string;
+     currency_symbol: string;
+     description: string;
+     notes: string;
+     created_at: string;
+     updated_at: string;
+   }) => void;
 }
 
 interface UpdateLedgerPayload {
@@ -257,7 +258,7 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
                     value={ledgerName}
                     onChange={(e) => setLedgerName(e.target.value)}
                     autoFocus
-                    onKeyPress={handleKeyPress}
+                     onKeyDown={handleKeyPress}
                     borderWidth="2px"
                     borderColor={inputBorderColor}
                     bg={inputBg}
@@ -337,9 +338,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
                     }}
                     isDisabled={isLoading}
                   />
-                  <FormHelperText mt={2}>
-                    A brief overview of this ledger's purpose
-                  </FormHelperText>
+                   <FormHelperText mt={2}>
+                     A brief overview of this ledger&apos;s purpose
+                   </FormHelperText>
                 </FormControl>
 
                 <FormControl>

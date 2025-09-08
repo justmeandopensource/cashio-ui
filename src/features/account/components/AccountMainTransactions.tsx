@@ -11,7 +11,8 @@ interface AccountMainTransactionsProps {
   onAddTransaction: () => void;
   onTransactionDeleted: () => void;
   onTransactionUpdated: () => void;
-  onCopyTransaction: (transaction: any) => void;
+   // eslint-disable-next-line no-unused-vars
+   onCopyTransaction: (transaction: any) => void;
 }
 
 const AccountMainTransactions: React.FC<AccountMainTransactionsProps> = ({
@@ -33,4 +34,3 @@ const AccountMainTransactions: React.FC<AccountMainTransactionsProps> = ({
 };
 
 export default AccountMainTransactions;
-Transactions;

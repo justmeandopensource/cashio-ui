@@ -87,6 +87,7 @@ interface TransactionTableProps {
   onDeleteTransaction: (transactionId: string) => Promise<void>;
   // eslint-disable-next-line no-unused-vars
   onEditTransaction: (transaction: Transaction) => void;
+  // eslint-disable-next-line no-unused-vars
   onCopyTransaction: (transaction: Transaction) => void;
   showAccountName?: boolean;
 }

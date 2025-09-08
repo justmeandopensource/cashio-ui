@@ -12,7 +12,7 @@ import {
   Icon,
 } from "@chakra-ui/react";
 import { Plus, ChevronLeft, ChevronRight, Filter, AlignLeft } from "lucide-react";
-import config from "@/config";
+
 import api from "@/lib/api";
 import TransactionCard from "./TransactionCard";
 import TransactionTable from "./TransactionTable";
@@ -61,7 +61,8 @@ interface TransactionsProps {
   onAddTransaction: () => void;
   onTransactionDeleted?: () => void;
   onTransactionUpdated?: () => void;
-  onCopyTransaction: (transaction: Transaction) => void;
+  // eslint-disable-next-line no-unused-vars
+  onCopyTransaction: (tx: Transaction) => void;
   shouldFetch?: boolean;
 }
 
@@ -231,7 +232,7 @@ const Transactions: React.FC<TransactionsProps> = ({
       );
 
       if (onTransactionDeleted) {
-        await onTransactionDeleted();
+        onTransactionDeleted();
       }
 
       queryClient.invalidateQueries({

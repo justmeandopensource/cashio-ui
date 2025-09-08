@@ -14,7 +14,6 @@ import {
   Divider,
   useColorModeValue,
   Icon,
-  IconButton,
   Button,
 } from "@chakra-ui/react";
 import { BookText, FileText, Edit } from "lucide-react";

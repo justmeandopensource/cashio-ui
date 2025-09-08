@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Flex, Spinner, useDisclosure, useToast, Text } from "@chakra-ui/react";
+import { Flex, useDisclosure, useToast, Text } from "@chakra-ui/react";
 import Layout from "@components/Layout";
 import HomeMain from "@features/home/components/HomeMain";
 import api from "@/lib/api";

@@ -356,9 +356,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                       Valid email is required
                     </FormErrorMessage>
                   ) : (
-                    <FormHelperText mt={2}>
-                      We'll use this for account verification and updates
-                    </FormHelperText>
+                     <FormHelperText mt={2}>
+                       We&apos;ll use this for account verification and updates
+                     </FormHelperText>
                   )}
                 </FormControl>
 

@@ -4,7 +4,6 @@ import {
   useDisclosure,
   Box,
   HStack,
-  IconButton,
   Flex,
   Text,
 } from "@chakra-ui/react";
@@ -14,7 +13,7 @@ import useLedgerStore from "@/components/shared/store";
 import UpdateLedgerModal from "@components/modals/UpdateLedgerModal";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { BookText, Edit, Info, ChevronLeft } from "lucide-react";
+import { BookText, ChevronLeft } from "lucide-react";
 import LedgerDetailsModal from "@components/modals/LedgerDetailsModal";
 import { useState } from "react";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
@@ -163,10 +162,10 @@ const Ledger = () => {
         <UpdateLedgerModal
           isOpen={isUpdateLedgerModalOpen}
           onClose={onUpdateLedgerModalClose}
-          currentLedgerName={ledgerName}
-          currentCurrencySymbol={currencySymbol}
-          currentDescription={description}
-          currentNotes={notes}
+          currentLedgerName={ledgerName as string}
+          currentCurrencySymbol={currencySymbol as string}
+          currentDescription={description || ""}
+          currentNotes={notes || ""}
           onUpdateCompleted={handleUpdateCompleted}
         />
       )}
