@@ -304,7 +304,7 @@ const Account: React.FC = () => {
             description={account.description}
             notes={account.notes}
             createdAt={account.created_at}
-            updatedAt={account.updatedAt}
+             updatedAt={account.updated_at}
             onEditAccount={() => setIsUpdateModalOpen(true)}
           />
         </>
