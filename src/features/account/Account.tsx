@@ -119,6 +119,19 @@ const Account: React.FC = () => {
     await queryClient.invalidateQueries({
       queryKey: ["transactions"],
     });
+    // Invalidate insights queries to refresh charts after transaction changes
+    await queryClient.invalidateQueries({
+      queryKey: ["current-month-overview"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["insights"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["categoryTrend"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["tag-trend"],
+    });
   };
 
   if (isError) {
