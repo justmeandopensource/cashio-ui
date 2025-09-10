@@ -54,6 +54,22 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
     await queryClient.invalidateQueries({ queryKey: ["accounts", ledgerId] });
   };
 
+  const refreshInsightsData = async (): Promise<void> => {
+    // Invalidate insights queries to refresh charts after transaction changes
+    await queryClient.invalidateQueries({
+      queryKey: ["current-month-overview"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["insights"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["categoryTrend"],
+    });
+    await queryClient.invalidateQueries({
+      queryKey: ["tag-trend"],
+    });
+  };
+
   if (isError) {
     return null;
   }
@@ -143,17 +159,21 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
               />
             </TabPanel>
             <TabPanel p={{ base: 2, md: 4 }}>
-              <LedgerMainTransactions
-                onAddTransaction={onAddTransaction}
-                onTransactionDeleted={() =>
-                  queryClient.invalidateQueries({
-                    queryKey: [`transactions-count`, ledgerId],
-                  })
-                }
-                onTransactionUpdated={refreshAccountsData}
-                onCopyTransaction={handleCopyTransaction}
-                shouldFetch={tabIndex === 1}
-              />
+               <LedgerMainTransactions
+                 onAddTransaction={onAddTransaction}
+                 onTransactionDeleted={async () => {
+                   await queryClient.invalidateQueries({
+                     queryKey: [`transactions-count`, ledgerId],
+                   });
+                   await refreshInsightsData();
+                 }}
+                 onTransactionUpdated={async () => {
+                   await refreshAccountsData();
+                   await refreshInsightsData();
+                 }}
+                 onCopyTransaction={handleCopyTransaction}
+                 shouldFetch={tabIndex === 1}
+               />
             </TabPanel>
           </TabPanels>
         </Tabs>

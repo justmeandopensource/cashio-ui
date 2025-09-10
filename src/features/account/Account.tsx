@@ -134,6 +134,15 @@ const Account: React.FC = () => {
     });
   };
 
+  const handleTransactionDeleted = async (): Promise<void> => {
+    await refreshTransactionsData();
+  };
+
+  const handleTransactionUpdated = async (): Promise<void> => {
+    await refreshAccountData();
+    await refreshTransactionsData();
+  };
+
   if (isError) {
     return (
       <Layout handleLogout={handleLogout}>
@@ -233,13 +242,15 @@ const Account: React.FC = () => {
       />
       <Box flex={1} overflowY="auto">
         <PageContainer>
-          {account && (
-            <AccountMain
-              account={account}
-              onCopyTransaction={handleCopyTransaction}
-              onAddTransaction={() => setIsCreateModalOpen(true)}
-            />
-          )}
+           {account && (
+             <AccountMain
+               account={account}
+               onCopyTransaction={handleCopyTransaction}
+               onAddTransaction={() => setIsCreateModalOpen(true)}
+               onTransactionDeleted={handleTransactionDeleted}
+               onTransactionUpdated={handleTransactionUpdated}
+             />
+           )}
         </PageContainer>
       </Box>
 
