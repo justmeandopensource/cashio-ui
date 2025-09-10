@@ -39,11 +39,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
   const [tabIndex, setTabIndex] = useState(0);
 
   const handleCopyTransaction = (transaction: any) => {
-    if (transaction.is_transfer) {
-      onTransferFunds(transaction.account_id, transaction);
-    } else {
-      onAddTransaction(transaction.account_id, transaction);
-    }
+    onAddTransaction(undefined, transaction);
   };
 
   const { data: accounts, isError, isLoading } = useQuery<Account[]>({
