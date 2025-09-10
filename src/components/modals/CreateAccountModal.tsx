@@ -22,6 +22,7 @@ import {
   Text,
   InputGroup,
   InputLeftAddon,
+  Textarea,
 } from "@chakra-ui/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import api from "@/lib/api";
@@ -48,6 +49,8 @@ interface CreateAccountPayload {
   parent_account_id: string | null;
   type: string;
   opening_balance?: number;
+  description?: string;
+  notes?: string;
 }
 
 const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
@@ -65,6 +68,8 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
     parentAccountId || "",
   );
   const [openingBalance, setOpeningBalance] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
+  const [notes, setNotes] = useState<string>("");
 
   // Modern theme colors - matching CreateTransactionModal
   const bgColor = useColorModeValue("white", "gray.800");
@@ -111,6 +116,8 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
     setIsGroupAccount(false);
     setParentAccount(parentAccountId || "");
     setOpeningBalance("");
+    setDescription("");
+    setNotes("");
   };
 
   // Handle Enter key press
@@ -174,6 +181,14 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
     // Add opening_balance only if it's provided and the account is not a group account
     if (!isGroupAccount && openingBalance) {
       payload.opening_balance = parseFloat(openingBalance);
+    }
+
+    // Add description and notes if provided
+    if (description) {
+      payload.description = description;
+    }
+    if (notes) {
+      payload.notes = notes;
     }
 
     createAccountMutation.mutate(payload);
@@ -453,9 +468,71 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                       </Box>
                     )}
                 </FormControl>
-              </Box>
-            )}
-          </VStack>
+               </Box>
+             )}
+
+             {/* Optional fields card */}
+             <Box
+               bg={cardBg}
+               p={{ base: 4, sm: 6 }}
+               borderRadius="md"
+               border="1px solid"
+               borderColor={borderColor}
+             >
+               <VStack spacing={5} align="stretch">
+                 <FormControl>
+                   <FormLabel fontWeight="semibold" mb={2}>
+                     Description
+                   </FormLabel>
+                   <Input
+                     placeholder="e.g., My main checking account"
+                     value={description}
+                     onChange={(e) => setDescription(e.target.value)}
+                     borderWidth="2px"
+                     borderColor={inputBorderColor}
+                     bg={inputBg}
+                     size="lg"
+                     borderRadius="md"
+                     _hover={{ borderColor: "teal.300" }}
+                     _focus={{
+                       borderColor: focusBorderColor,
+                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                     }}
+                     isDisabled={createAccountMutation.isPending}
+                   />
+                   <FormHelperText mt={2}>
+                     A brief overview of this account&apos;s purpose (optional)
+                   </FormHelperText>
+                 </FormControl>
+
+                 <FormControl>
+                   <FormLabel fontWeight="semibold" mb={2}>
+                     Notes
+                   </FormLabel>
+                   <Textarea
+                     placeholder="Any additional notes or details"
+                     value={notes}
+                     onChange={(e) => setNotes(e.target.value)}
+                     borderWidth="2px"
+                     borderColor={inputBorderColor}
+                     bg={inputBg}
+                     size="lg"
+                     borderRadius="md"
+                     rows={4}
+                     _hover={{ borderColor: "teal.300" }}
+                     _focus={{
+                       borderColor: focusBorderColor,
+                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                     }}
+                     isDisabled={createAccountMutation.isPending}
+                   />
+                   <FormHelperText mt={2}>
+                     Detailed notes for this account (optional)
+                   </FormHelperText>
+                 </FormControl>
+               </VStack>
+             </Box>
+           </VStack>
 
           {/* Mobile-only action buttons that stay at bottom */}
           <Box display={{ base: "block", sm: "none" }} mt={6}>

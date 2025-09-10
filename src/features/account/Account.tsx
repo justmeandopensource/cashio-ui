@@ -289,6 +289,8 @@ const Account: React.FC = () => {
             onClose={() => setIsUpdateModalOpen(false)}
             account={account}
             onUpdateCompleted={refreshAccountData}
+            currentDescription={account.description}
+            currentNotes={account.notes}
           />
 
           <AccountDetailsModal

@@ -21,6 +21,7 @@ import {
   HStack,
   useColorModeValue,
   Text,
+  Textarea,
 } from "@chakra-ui/react";
 import { AxiosError } from "axios";
 import api from "@/lib/api";
@@ -40,6 +41,8 @@ interface Account {
   parent_account_id: string | number | null;
   type: "asset" | "liability";
   ledger_id: string | number;
+  description?: string;
+  notes?: string;
 }
 
 interface UpdateAccountModalProps {
@@ -47,12 +50,16 @@ interface UpdateAccountModalProps {
   onClose: () => void;
   account: Account;
   onUpdateCompleted: () => void;
+  currentDescription?: string;
+  currentNotes?: string;
 }
 
 interface UpdateAccountPayload {
   name?: string;
   opening_balance?: number;
   parent_account_id?: string | number | null;
+  description?: string;
+  notes?: string;
 }
 
 const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
@@ -60,6 +67,8 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   onClose,
   account,
   onUpdateCompleted,
+  currentDescription,
+  currentNotes,
 }) => {
   const [name, setName] = useState<string>(account.name);
   const [openingBalance, setOpeningBalance] = useState<string>(
@@ -68,6 +77,12 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
   const [parentAccountId, setParentAccountId] = useState<
     string | number | null
   >(account.parent_account_id);
+  const [description, setDescription] = useState<string>(
+    currentDescription ?? account.description ?? ""
+  );
+  const [notes, setNotes] = useState<string>(
+    currentNotes ?? account.notes ?? ""
+  );
   const [groupAccounts, setGroupAccounts] = useState<GroupAccount[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFetchingGroups, setIsFetchingGroups] = useState<boolean>(false);
@@ -120,6 +135,12 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
     }
   }, [isOpen, account.ledger_id, account.type, toast]);
 
+  // Update state when props change
+  React.useEffect(() => {
+    setDescription(currentDescription ?? account.description ?? "");
+    setNotes(currentNotes ?? account.notes ?? "");
+  }, [currentDescription, currentNotes, account.description, account.notes]);
+
   const handleSubmit = async (): Promise<void> => {
     if (!name) {
       toast({
@@ -138,6 +159,10 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
       payload.opening_balance = parseFloat(openingBalance) || 0;
     if (parentAccountId !== account.parent_account_id)
       payload.parent_account_id = parentAccountId;
+    if (description !== (currentDescription ?? account.description ?? ""))
+      payload.description = description;
+    if (notes !== (currentNotes ?? account.notes ?? ""))
+      payload.notes = notes;
 
     // If no fields have changed, show an error toast
     if (Object.keys(payload).length === 0) {
@@ -411,6 +436,68 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
                 )}
               </FormControl>
             </Box>
+
+            {/* Optional fields card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+            >
+              <VStack spacing={5} align="stretch">
+                <FormControl>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Description
+                  </FormLabel>
+                  <Input
+                    placeholder="e.g., My main checking account"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                    isDisabled={isLoading}
+                  />
+                  <FormHelperText mt={2}>
+                    A brief overview of this account&apos;s purpose
+                  </FormHelperText>
+                </FormControl>
+
+                <FormControl>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Notes
+                  </FormLabel>
+                  <Textarea
+                    placeholder="Any additional notes or details"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    rows={4}
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                    isDisabled={isLoading}
+                  />
+                  <FormHelperText mt={2}>
+                    Detailed notes for this account
+                  </FormHelperText>
+                </FormControl>
+              </VStack>
+            </Box>
           </VStack>
 
           {/* Mobile-only action buttons that stay at bottom */}
@@ -424,12 +511,14 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
               borderRadius="md"
               isLoading={isLoading}
               loadingText="Updating..."
-              isDisabled={
-                !name ||
-                (name === account.name &&
-                  openingBalance === account.opening_balance.toString() &&
-                  parentAccountId === account.parent_account_id)
-              }
+               isDisabled={
+                 !name ||
+                 (name === account.name &&
+                   openingBalance === account.opening_balance.toString() &&
+                   parentAccountId === account.parent_account_id &&
+                   description === (currentDescription ?? account.description ?? "") &&
+                   notes === (currentNotes ?? account.notes ?? ""))
+               }
               leftIcon={<Check />}
               _hover={{
                 transform: isLoading ? "none" : "translateY(-2px)",
@@ -473,12 +562,14 @@ const UpdateAccountModal: React.FC<UpdateAccountModalProps> = ({
             borderRadius="md"
             isLoading={isLoading}
             loadingText="Updating..."
-            isDisabled={
-              !name ||
-              (name === account.name &&
-                openingBalance === account.opening_balance.toString() &&
-                parentAccountId === account.parent_account_id)
-            }
+             isDisabled={
+               !name ||
+               (name === account.name &&
+                 openingBalance === account.opening_balance.toString() &&
+                 parentAccountId === account.parent_account_id &&
+                 description === (currentDescription ?? account.description ?? "") &&
+                 notes === (currentNotes ?? account.notes ?? ""))
+             }
             leftIcon={<Check />}
             _hover={{
               transform: isLoading ? "none" : "translateY(-2px)",
