@@ -135,6 +135,7 @@ const Account: React.FC = () => {
   };
 
   const handleTransactionDeleted = async (): Promise<void> => {
+    await refreshAccountData();
     await refreshTransactionsData();
   };
 
@@ -191,7 +192,7 @@ const Account: React.FC = () => {
                 fontSize="sm"
                 fontWeight="semibold"
               >
-                {formatNumberAsCurrency(account.net_balance, currencySymbol)}
+                {formatNumberAsCurrency(account.net_balance, currencySymbol || "$")}
               </Badge>
             </HStack>
           ) : (
@@ -300,7 +301,7 @@ const Account: React.FC = () => {
             accountType={account.type}
             openingBalance={account.opening_balance}
             netBalance={account.net_balance}
-            currencySymbol={currencySymbol}
+            currencySymbol={currencySymbol || "$"}
             description={account.description}
             notes={account.notes}
             createdAt={account.created_at}

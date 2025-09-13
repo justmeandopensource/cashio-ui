@@ -237,12 +237,13 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
             <TabPanel p={{ base: 2, md: 4 }}>
                 <LedgerMainTransactions
                   onAddTransaction={onAddTransaction}
-                  onTransactionDeleted={async () => {
-                    await queryClient.invalidateQueries({
-                      queryKey: [`transactions-count`, ledgerId],
-                    });
-                    await refreshInsightsData();
-                  }}
+                   onTransactionDeleted={async () => {
+                     await refreshAccountsData();
+                     await queryClient.invalidateQueries({
+                       queryKey: [`transactions-count`, ledgerId],
+                     });
+                     await refreshInsightsData();
+                   }}
                   onTransactionUpdated={async () => {
                     await refreshAccountsData();
                     await refreshInsightsData();

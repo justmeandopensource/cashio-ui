@@ -245,6 +245,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           { ...filters },
         ],
       });
+      queryClient.refetchQueries({ queryKey: ["account", accountId] });
 
       toast({
         description: "Transaction deleted",
