@@ -30,6 +30,7 @@ interface Transaction {
   account_name?: string;
   is_split: boolean;
   is_transfer: boolean;
+  is_asset_transaction: boolean;
   notes?: string;
   credit: number;
   debit: number;

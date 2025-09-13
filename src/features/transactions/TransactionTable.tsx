@@ -18,7 +18,6 @@ import {
   Box,
   Text,
   PopoverTrigger,
-  Square,
   PopoverArrow,
   Flex,
   PopoverHeader,
@@ -32,6 +31,7 @@ import {
   ModalBody,
   ModalCloseButton,
   Button,
+  Badge,
   Link as ChakraLink,
 } from "@chakra-ui/react";
 import { CreditCard, Trash2, Edit, X, Copy } from "lucide-react";
@@ -67,6 +67,7 @@ interface Transaction {
   tags?: TagItem[];
   is_split: boolean;
   is_transfer: boolean;
+  is_asset_transaction: boolean;
   notes?: string;
   credit: number;
   debit: number;
@@ -131,9 +132,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             <Th width="8%">Date</Th>
             <Th width="15%">Category</Th>
             {showAccountName && <Th width="12%">Account</Th>}
-            <Th width="20%">Tags</Th>
-            <Th width="3%">Type</Th>
             <Th>Notes</Th>
+            <Th width="3%">Type</Th>
             <Th width="10%" isNumeric>
               Credit
             </Th>
@@ -165,43 +165,51 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   )}
                 </Td>
               )}
-              <Td width="20%">
-                <Wrap spacing={2}>
-                  {transaction.tags?.map((tag) => (
-                    <WrapItem key={tag.tag_id}>
-                      <Tag
-                        size="sm"
-                        borderRadius="md"
-                        variant="subtle"
-                        colorScheme="teal"
-                      >
-                        <TagLabel>{tag.name}</TagLabel>
-                      </Tag>
-                    </WrapItem>
-                  ))}
-                </Wrap>
+              <Td>
+                <Box>
+                  {transaction.notes && <Text mb={transaction.tags && transaction.tags.length > 0 ? 2 : 0}>{transaction.notes}</Text>}
+                  {transaction.tags && transaction.tags.length > 0 && (
+                    <Wrap spacing={2}>
+                      {transaction.tags.map((tag) => (
+                        <WrapItem key={tag.tag_id}>
+                          <Tag
+                            size="sm"
+                            borderRadius="md"
+                            bg="gray.200"
+                            color="gray.800"
+                          >
+                            <TagLabel>{tag.name}</TagLabel>
+                          </Tag>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  )}
+                </Box>
               </Td>
-              <Td width="3%">
-                {transaction.is_split && (
-                  <Popover
-                    onOpen={() =>
-                      fetchSplitTransactions(transaction.transaction_id)
-                    }
-                    strategy="fixed"
-                    placement="right"
-                    gutter={10}
-                  >
-                    <PopoverTrigger>
-                      <Box display="inline-block" p={1}>
-                        <Square
-                          size="10px"
-                          bg="purple.400"
-                          cursor="pointer"
-                          borderRadius="md"
-                          data-testid="transactiontable-split-indicator"
-                        />
-                      </Box>
-                    </PopoverTrigger>
+               <Td width="3%">
+                 <Flex gap={1} flexWrap="wrap">
+                   {transaction.is_split && (
+                     <Popover
+                       onOpen={() =>
+                         fetchSplitTransactions(transaction.transaction_id)
+                       }
+                       strategy="fixed"
+                       placement="right"
+                       gutter={10}
+                     >
+                       <PopoverTrigger>
+                         <Badge
+                           colorScheme="purple"
+                           variant="subtle"
+                           cursor="pointer"
+                           px={1}
+                           borderRadius="md"
+                           fontSize="0.65em"
+                           data-testid="transactiontable-split-indicator"
+                         >
+                           SPLIT
+                         </Badge>
+                       </PopoverTrigger>
                     <PopoverContent
                       bg="teal.100"
                       color="white"
@@ -268,25 +276,38 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                           </Box>
                         )}
                       </PopoverBody>
-                    </PopoverContent>
-                  </Popover>
-                )}
-                {transaction.is_transfer && (
+                     </PopoverContent>
+                     </Popover>
+                   )}
+                    {transaction.is_asset_transaction && (
+                      <Badge
+                        colorScheme="orange"
+                        variant="subtle"
+                        px={1}
+                        borderRadius="md"
+                        fontSize="0.65em"
+                      >
+                        ASSET
+                      </Badge>
+                    )}
+                   {transaction.is_transfer && (
                   <Popover
                     onOpen={() =>
                       fetchTransferDetails(transaction.transfer_id!)
                     }
                   >
                     <PopoverTrigger>
-                      <Box display="inline-block" p={1}>
-                        <Square
-                          size="10px"
-                          bg="blue.400"
-                          cursor="pointer"
-                          borderRadius="md"
-                          data-testid="transactiontable-transfer-indicator"
-                        />
-                      </Box>
+                      <Badge
+                        colorScheme="blue"
+                        variant="subtle"
+                        cursor="pointer"
+                        px={1}
+                        borderRadius="md"
+                        fontSize="0.65em"
+                        data-testid="transactiontable-transfer-indicator"
+                      >
+                        TRANS
+                      </Badge>
                     </PopoverTrigger>
                     <PopoverContent bg="teal.100" color="white" maxW="300px">
                       <PopoverArrow bg="teal.100" />
@@ -347,11 +368,11 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                           </Text>
                         )}
                       </PopoverBody>
-                    </PopoverContent>
-                  </Popover>
-                )}
-              </Td>
-              <Td>{transaction.notes}</Td>
+                     </PopoverContent>
+                     </Popover>
+                   )}
+                 </Flex>
+               </Td>
               <Td width="10%" isNumeric>
                 {transaction.credit !== 0 && (
                   <Text color="teal.500">
@@ -379,52 +400,54 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   transition="opacity 0.2s"
                   className="action-icons"
                 >
-                  {!transaction.is_transfer && (
-                    <>
-                      <ChakraLink
-                        onClick={() => onEditTransaction(transaction)}
-                        _hover={{ textDecoration: "none" }}
-                      >
-                        <Icon
-                          as={Edit}
-                          boxSize={4}
-                          color="blue.500"
-                          _hover={{ color: "blue.600" }}
-                          transition="opacity 0.2s"
-                          data-testid="transactiontable-edit-icon"
-                        />
-                      </ChakraLink>
-                      <ChakraLink
-                        onClick={() => onCopyTransaction(transaction)}
-                        _hover={{ textDecoration: "none" }}
-                      >
-                        <Icon
-                          as={Copy}
-                          boxSize={4}
-                          color="gray.500"
-                          _hover={{ color: "gray.600" }}
-                          transition="opacity 0.2s"
-                          data-testid="transactiontable-copy-icon"
-                        />
-                      </ChakraLink>
-                    </>
-                  )}
-                  <ChakraLink
-                    onClick={() => {
-                      setSelectedTransactionId(transaction.transaction_id);
-                      onOpen();
-                    }}
-                    _hover={{ textDecoration: "none" }}
-                  >
-                    <Icon
-                      as={Trash2}
-                      boxSize={4}
-                      color="red.500"
-                      _hover={{ color: "red.600" }}
-                      transition="opacity 0.2s"
-                      data-testid="transactiontable-trash-icon"
-                    />
-                  </ChakraLink>
+                   {!transaction.is_transfer && !transaction.is_asset_transaction && (
+                     <>
+                       <ChakraLink
+                         onClick={() => onEditTransaction(transaction)}
+                         _hover={{ textDecoration: "none" }}
+                       >
+                         <Icon
+                           as={Edit}
+                           boxSize={4}
+                           color="blue.500"
+                           _hover={{ color: "blue.600" }}
+                           transition="opacity 0.2s"
+                           data-testid="transactiontable-edit-icon"
+                         />
+                       </ChakraLink>
+                       <ChakraLink
+                         onClick={() => onCopyTransaction(transaction)}
+                         _hover={{ textDecoration: "none" }}
+                       >
+                         <Icon
+                           as={Copy}
+                           boxSize={4}
+                           color="gray.500"
+                           _hover={{ color: "gray.600" }}
+                           transition="opacity 0.2s"
+                           data-testid="transactiontable-copy-icon"
+                         />
+                       </ChakraLink>
+                     </>
+                   )}
+                   {!transaction.is_asset_transaction && (
+                     <ChakraLink
+                       onClick={() => {
+                         setSelectedTransactionId(transaction.transaction_id);
+                         onOpen();
+                       }}
+                       _hover={{ textDecoration: "none" }}
+                     >
+                       <Icon
+                         as={Trash2}
+                         boxSize={4}
+                         color="red.500"
+                         _hover={{ color: "red.600" }}
+                         transition="opacity 0.2s"
+                         data-testid="transactiontable-trash-icon"
+                       />
+                     </ChakraLink>
+                   )}
                 </Flex>
               </Td>
             </Tr>

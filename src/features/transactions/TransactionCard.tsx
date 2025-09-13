@@ -62,6 +62,7 @@ interface Transaction {
   account_name?: string;
   is_split: boolean;
   is_transfer: boolean;
+  is_asset_transaction: boolean;
   credit: number;
   debit: number;
   tags?: TagItem[];
@@ -154,7 +155,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               </Text>
 
               {/* Transaction type indicators */}
-              {(transaction.is_split || transaction.is_transfer) && (
+              {(transaction.is_split || transaction.is_transfer || transaction.is_asset_transaction) && (
                 <HStack spacing={1}>
                   {transaction.is_split && (
                     <Tooltip label="Split Transaction">
@@ -166,6 +167,11 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                       <Square size="8px" bg="blue.400" borderRadius="md" />
                     </Tooltip>
                   )}
+                   {transaction.is_asset_transaction && (
+                     <Tooltip label="Asset Transaction">
+                       <Square size="8px" bg="orange.400" borderRadius="md" />
+                     </Tooltip>
+                   )}
                 </HStack>
               )}
             </HStack>
@@ -187,13 +193,12 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             )}
           </VStack>
 
-          {/* Right side with amount */}
-          <Box textAlign="right">
-            <Text fontWeight="bold" fontSize="lg" color={amount.color}>
-              {amount.prefix}
-              {amount.value}
-            </Text>
-          </Box>
+           {/* Right side with amount */}
+           <Box textAlign="right">
+             <Text fontWeight="bold" fontSize="lg" color={amount.color}>
+               {amount.value}
+             </Text>
+           </Box>
         </Flex>
 
         {/* Expandable section */}
@@ -345,45 +350,47 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               </Box>
             )}
             {/* Action Icons */}
-            <Flex justify="flex-end" mt={3} gap={2}>
-              {!transaction.is_transfer && (
-                <>
-                  <Button
-                    size="md"
-                    variant="ghost"
-                    colorScheme="blue"
-                    leftIcon={<Edit size={18} />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onEditTransaction(transaction);
-                    }}
-                    data-testid="transactioncard-edit-icon"
-                  />
-                  <Button
-                    size="md"
-                    variant="ghost"
-                    colorScheme="gray"
-                    leftIcon={<Copy size={18} />}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCopyTransaction(transaction);
-                    }}
-                    data-testid="transactioncard-copy-icon"
-                  />
-                </>
-              )}
-              <Button
-                size="md"
-                variant="ghost"
-                colorScheme="red"
-                leftIcon={<Trash2 size={18} />}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onOpen();
-                }}
-                data-testid="transactioncard-delete-icon"
-              />
-            </Flex>
+             <Flex justify="flex-end" mt={3} gap={2}>
+               {!transaction.is_transfer && !transaction.is_asset_transaction && (
+                 <>
+                   <Button
+                     size="md"
+                     variant="ghost"
+                     colorScheme="blue"
+                     leftIcon={<Edit size={18} />}
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       onEditTransaction(transaction);
+                     }}
+                     data-testid="transactioncard-edit-icon"
+                   />
+                   <Button
+                     size="md"
+                     variant="ghost"
+                     colorScheme="gray"
+                     leftIcon={<Copy size={18} />}
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       onCopyTransaction(transaction);
+                     }}
+                     data-testid="transactioncard-copy-icon"
+                   />
+                 </>
+               )}
+               {!transaction.is_asset_transaction && (
+                 <Button
+                   size="md"
+                   variant="ghost"
+                   colorScheme="red"
+                   leftIcon={<Trash2 size={18} />}
+                   onClick={(e) => {
+                     e.stopPropagation();
+                     onOpen();
+                   }}
+                   data-testid="transactioncard-delete-icon"
+                 />
+               )}
+             </Flex>
           </Box>
         )}
       </Box>
@@ -407,10 +414,9 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             <Box mt={4} p={3} bg="gray.50" borderRadius="md">
               <Text fontWeight="bold">{transaction.category_name}</Text>
               <Text>{formatDate(transaction.date)}</Text>
-              <Text fontWeight="bold" color={amount.color}>
-                {amount.prefix}
-                {amount.value}
-              </Text>
+               <Text fontWeight="bold" color={amount.color}>
+                 {amount.value}
+               </Text>
             </Box>
           </ModalBody>
           <ModalFooter>
