@@ -44,6 +44,7 @@ import {
   Coins,
 } from "lucide-react";
 import api from "@/lib/api";
+import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import { BuySellAssetModalProps, AssetTransactionCreate } from "../types";
 import { useBuyAsset, useSellAsset } from "../api";
 import useLedgerStore from "@/components/shared/store";
@@ -60,7 +61,7 @@ interface TransactionFormData {
   quantity: string;
   price_per_unit: string;
   account_id: string;
-  transaction_date: string;
+  transaction_date: Date;
   notes: string;
 }
 
@@ -76,7 +77,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
     quantity: "",
     price_per_unit: "",
     account_id: "",
-    transaction_date: format(new Date(), "yyyy-MM-dd"),
+    transaction_date: new Date(),
     notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -112,7 +113,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
         quantity: "",
         price_per_unit: "",
         account_id: "",
-        transaction_date: format(new Date(), "yyyy-MM-dd"),
+        transaction_date: new Date(),
         notes: "",
       });
       setErrors({});
@@ -133,7 +134,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
       newErrors.price_per_unit = "Price must be greater than 0.";
     if (!formData.account_id)
       newErrors.account_id = "Please select an account.";
-    if (!formData.transaction_date)
+    if (!formData.transaction_date || isNaN(formData.transaction_date.getTime()))
       newErrors.transaction_date = "Transaction date is required.";
 
     if (
@@ -157,7 +158,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
       quantity: parseFloat(formData.quantity) || 0,
       price_per_unit: parseFloat(formData.price_per_unit) || 0,
       account_id: Number(formData.account_id) as number,
-      transaction_date: formData.transaction_date,
+      transaction_date: format(formData.transaction_date, "yyyy-MM-dd"),
       notes: formData.notes as string,
     };
 
@@ -182,41 +183,48 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
 
   const handleInputChange = (
     field: keyof TransactionFormData,
-    value: string,
+    value: string | Date,
   ) => {
-    let processedValue = value;
+    let processedValue: string | Date = value;
 
-    // For quantity field, limit to 4 decimal places
-    if (field === "quantity") {
-      // Allow empty string, numbers, and decimal point
-      if (value === "" || /^\d*\.?\d*$/.test(value)) {
-        // Check if there are more than 4 decimal places
-        const decimalPart = value.split(".")[1];
-        if (decimalPart && decimalPart.length > 4) {
-          // Truncate to 4 decimal places
-          const integerPart = value.split(".")[0];
-          processedValue = `${integerPart}.${decimalPart.substring(0, 4)}`;
+    // For transaction_date field, value is Date
+    if (field === "transaction_date") {
+      processedValue = value as Date;
+    } else {
+      // For quantity field, limit to 4 decimal places
+      if (field === "quantity") {
+        const stringValue = value as string;
+        // Allow empty string, numbers, and decimal point
+        if (stringValue === "" || /^\d*\.?\d*$/.test(stringValue)) {
+          // Check if there are more than 4 decimal places
+          const decimalPart = stringValue.split(".")[1];
+          if (decimalPart && decimalPart.length > 4) {
+            // Truncate to 4 decimal places
+            const integerPart = stringValue.split(".")[0];
+            processedValue = `${integerPart}.${decimalPart.substring(0, 4)}`;
+          }
+        } else {
+          // If invalid characters, don't update
+          return;
         }
-      } else {
-        // If invalid characters, don't update
-        return;
       }
-    }
 
-    // For price_per_unit field, limit to 2 decimal places
-    if (field === "price_per_unit") {
-      // Allow empty string, numbers, and decimal point
-      if (value === "" || /^\d*\.?\d*$/.test(value)) {
-        // Check if there are more than 2 decimal places
-        const decimalPart = value.split(".")[1];
-        if (decimalPart && decimalPart.length > 2) {
-          // Truncate to 2 decimal places
-          const integerPart = value.split(".")[0];
-          processedValue = `${integerPart}.${decimalPart.substring(0, 2)}`;
+      // For price_per_unit field, limit to 2 decimal places
+      if (field === "price_per_unit") {
+        const stringValue = value as string;
+        // Allow empty string, numbers, and decimal point
+        if (stringValue === "" || /^\d*\.?\d*$/.test(stringValue)) {
+          // Check if there are more than 2 decimal places
+          const decimalPart = stringValue.split(".")[1];
+          if (decimalPart && decimalPart.length > 2) {
+            // Truncate to 2 decimal places
+            const integerPart = stringValue.split(".")[0];
+            processedValue = `${integerPart}.${decimalPart.substring(0, 2)}`;
+          }
+        } else {
+          // If invalid characters, don't update
+          return;
         }
-      } else {
-        // If invalid characters, don't update
-        return;
       }
     }
 
@@ -410,38 +418,52 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
               </FormHelperText>
             </FormControl>
 
-            <FormControl flex={1} isInvalid={!!errors.transaction_date}>
-              <FormLabel fontWeight="semibold" mb={2}>
-                <HStack spacing={2}>
-                  <Calendar size={16} />
-                  <Text>
-                    Date{" "}
-                    <Text as="span" color="red.500">
-                      *
-                    </Text>
-                  </Text>
-                </HStack>
-              </FormLabel>
-              <Input
-                type="date"
-                value={formData.transaction_date}
-                onChange={(e) =>
-                  handleInputChange("transaction_date", e.target.value)
-                }
-                bg={inputBg}
-                borderColor={inputBorderColor}
-                borderWidth="2px"
-                size="lg"
-                borderRadius="md"
-                _hover={{ borderColor: "teal.300" }}
-                _focus={{
-                  borderColor: focusBorderColor,
-                  boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                }}
-              />
-              <FormErrorMessage>{errors.transaction_date}</FormErrorMessage>
-              <FormHelperText>Transaction date</FormHelperText>
-            </FormControl>
+             <FormControl flex={1} isInvalid={!!errors.transaction_date}>
+               <FormLabel fontWeight="semibold" mb={2}>
+                 <HStack spacing={2}>
+                   <Calendar size={16} />
+                   <Text>
+                     Date{" "}
+                     <Text as="span" color="red.500">
+                       *
+                     </Text>
+                   </Text>
+                 </HStack>
+               </FormLabel>
+               <Box
+                 sx={{
+                   ".react-datepicker-wrapper": {
+                     width: "100%",
+                   },
+                   ".react-datepicker__input-container input": {
+                     width: "100%",
+                     height: "48px",
+                     borderWidth: "2px",
+                     borderColor: inputBorderColor,
+                     borderRadius: "md",
+                     bg: inputBg,
+                     fontSize: "lg",
+                     _hover: { borderColor: "teal.300" },
+                     _focus: {
+                       borderColor: focusBorderColor,
+                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                     },
+                   },
+                 }}
+               >
+                 <ChakraDatePicker
+                   selected={formData.transaction_date}
+                   onChange={(date: Date | null) => {
+                     if (date) {
+                       handleInputChange("transaction_date", date);
+                     }
+                   }}
+                   shouldCloseOnSelect={true}
+                 />
+               </Box>
+               <FormErrorMessage>{errors.transaction_date}</FormErrorMessage>
+               <FormHelperText>Transaction date</FormHelperText>
+             </FormControl>
           </Stack>
 
           <FormControl>
