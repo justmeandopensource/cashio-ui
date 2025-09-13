@@ -33,7 +33,7 @@ import {
   InputLeftAddon,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
-import { format } from "date-fns";
+
 import {
   TrendingUp,
   TrendingDown,
@@ -158,7 +158,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
       quantity: parseFloat(formData.quantity) || 0,
       price_per_unit: parseFloat(formData.price_per_unit) || 0,
       account_id: Number(formData.account_id) as number,
-      transaction_date: format(formData.transaction_date, "yyyy-MM-dd"),
+       transaction_date: formData.transaction_date.toISOString(),
       notes: formData.notes as string,
     };
 

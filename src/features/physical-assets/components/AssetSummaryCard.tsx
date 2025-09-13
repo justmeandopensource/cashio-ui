@@ -41,6 +41,7 @@ import {
   splitPercentageForDisplay,
   getPnLColor,
   getAssetTypeDisplayName,
+  formatDate,
 } from "../utils";
 import { useAssetTransactions } from "../api";
 
@@ -511,10 +512,10 @@ const AssetSummaryCard: FC<AssetSummaryCardProps> = ({
                 {asset.last_price_update && (
                   <HStack>
                     <Icon as={Calendar} boxSize={3} color={textTertiary} />
-                     <Text fontSize="xs" color={textTertiary}>
-                       Last updated:{" "}
-                       {new Date(asset.last_price_update).toISOString().split('T')[0].replace(/-/g, '/')}
-                     </Text>
+                      <Text fontSize="xs" color={textTertiary}>
+                        Last updated:{" "}
+                        {formatDate(asset.last_price_update)}
+                      </Text>
                   </HStack>
                 )}
               </VStack>
