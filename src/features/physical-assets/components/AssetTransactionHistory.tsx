@@ -435,6 +435,14 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
                       transition="opacity 0.2s"
                       className="action-icons"
                     >
+                      <AssetTransactionNotesPopover
+                        transaction={transaction}
+                        isOpen={openPopoverId === transaction.asset_transaction_id}
+                        onOpen={() =>
+                          handlePopoverOpen(transaction.asset_transaction_id)
+                        }
+                        onClose={handlePopoverClose}
+                      />
                       <ChakraLink
                         onClick={() => {
                           setSelectedTransactionId(
@@ -453,14 +461,6 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
                           data-testid="asset-transaction-delete-icon"
                         />
                       </ChakraLink>
-                      <AssetTransactionNotesPopover
-                        transaction={transaction}
-                        isOpen={openPopoverId === transaction.asset_transaction_id}
-                        onOpen={() =>
-                          handlePopoverOpen(transaction.asset_transaction_id)
-                        }
-                        onClose={handlePopoverClose}
-                      />
                     </Flex>
                   </Td>
                 </Tr>

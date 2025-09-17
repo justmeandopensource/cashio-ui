@@ -214,18 +214,6 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       return;
     }
 
-    let transactionNotes = formData.notes.trim();
-    if (!transactionNotes && selectedFund) {
-      const mfName = selectedFund.name;
-      const units = parseFloat(formData.units);
-      const nav = parseFloat(formData.nav_per_unit);
-      if (tabIndex === 0) {
-        transactionNotes = `MF Buy: ${mfName} ${units} units at NAV ${nav}`;
-      } else {
-        transactionNotes = `MF Sell: ${mfName} ${units} units at NAV ${nav}`;
-      }
-    }
-
     const transactionData: MfTransactionCreate = {
       mutual_fund_id: fund!.mutual_fund_id,
       transaction_type: tabIndex === 0 ? "buy" : "sell",
@@ -233,7 +221,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       nav_per_unit: parseFloat(formData.nav_per_unit),
       account_id: parseInt(formData.account_id),
       transaction_date: formData.transaction_date.toISOString(),
-      notes: transactionNotes || undefined,
+      notes: formData.notes.trim() || undefined,
     };
 
     transactionMutation.mutate(transactionData);

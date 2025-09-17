@@ -43,6 +43,7 @@ import { formatDate } from "../../physical-assets/utils";
 import { deleteMfTransaction } from "../api";
 import { getPnLColor } from "../../physical-assets/utils";
 import useLedgerStore from "@/components/shared/store";
+import MfTransactionNotesPopover from "./MfTransactionNotesPopover";
 
 
 interface MfTransactionsProps {
@@ -82,6 +83,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   // Responsive breakpoint
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
+  const [openPopoverId, setOpenPopoverId] = useState<number | null>(null);
 
   // Filter transactions (sorted by date descending by default)
   const filteredTransactions = transactions
@@ -135,6 +137,19 @@ const MfTransactions: FC<MfTransactionsProps> = ({
       case 'switch_in': return 'orange';
       default: return 'gray';
     }
+  };
+
+  // Handle popover functions (for desktop table)
+  const handlePopoverOpen = (transactionId: number) => {
+    setOpenPopoverId(transactionId);
+  };
+
+  const handlePopoverClose = () => {
+    setOpenPopoverId(null);
+  };
+
+  const handleRowMouseLeave = () => {
+    setOpenPopoverId(null);
   };
 
   // Render mobile card view
@@ -253,9 +268,28 @@ const MfTransactions: FC<MfTransactionsProps> = ({
 
             {/* Expandable section */}
             {isExpanded && (
-              <Box mt={4} pt={3} borderTopWidth="1px">
+              <Box
+                mt={4}
+                pt={3}
+                pb={2}
+                borderTopWidth="1px"
+              >
+                {/* Notes section */}
+                <Box mb={2}>
+                  <Text
+                    fontSize="sm"
+                    color="gray.700"
+                    bg="gray.50"
+                    p={2}
+                    borderRadius="md"
+                    whiteSpace="pre-wrap"
+                  >
+                    {transaction.notes || "No notes for this transaction."}
+                  </Text>
+                </Box>
+
                 {/* Action buttons */}
-                <Flex justify="flex-end" gap={2}>
+                <Flex justify="flex-end" mt={1} gap={2} mb={-1}>
                   <Button
                     size="sm"
                     variant="ghost"
@@ -277,126 +311,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
     </VStack>
   );
 
-  const TransactionRow: FC<{ transaction: MfTransaction }> = ({ transaction }) => (
-    <Tr
-      _hover={{ bg: "gray.100" }}
-      sx={{
-        "&:hover .action-icons": {
-          opacity: 1,
-        },
-      }}
-    >
-      <Td>
-        <Text fontSize="sm">
-          {formatDate(transaction.transaction_date)}
-        </Text>
-      </Td>
-      <Td>
-        <Text fontSize="sm" fontWeight="medium">
-          {transaction.mutual_fund?.name}
-        </Text>
-      </Td>
-      <Td>
-        <Text fontSize="sm" fontWeight="medium">
-          {transaction.mutual_fund?.amc?.name}
-        </Text>
-      </Td>
-      <Td>
-        <Badge colorScheme={getTransactionTypeColor(transaction.transaction_type)} size="sm">
-          {getTransactionTypeText(transaction.transaction_type)}
-        </Badge>
-      </Td>
-      <Td isNumeric>
-        <Text fontSize="sm">{formatUnits(transaction.units)}</Text>
-      </Td>
-      <Td isNumeric>
-        <Text fontSize="sm">₹{formatNav(transaction.nav_per_unit)}</Text>
-      </Td>
-        <Td isNumeric>
-          <HStack spacing={0} align="baseline" justify="flex-end">
-            <Text
-              fontSize="sm"
-              fontWeight="semibold"
-              color={getPnLColor(
-                transaction.transaction_type === 'buy'
-                  ? -transaction.total_amount
-                  : transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
-                  ? transaction.realized_gain || 0
-                  : 0 // switch_in = neutral
-              )}
-            >
-              {splitCurrencyForDisplay(
-                transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
-                  ? transaction.total_amount
-                  : transaction.total_amount,
-                "₹"
-              ).main}
-            </Text>
-            <Text
-              fontSize="xs"
-              fontWeight="semibold"
-              opacity={0.7}
-              color={getPnLColor(
-                transaction.transaction_type === 'buy'
-                  ? -transaction.total_amount
-                  : transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
-                  ? transaction.realized_gain || 0
-                  : 0 // switch_in = neutral
-              )}
-            >
-              {splitCurrencyForDisplay(
-                transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
-                  ? transaction.total_amount
-                  : transaction.total_amount,
-                "₹"
-              ).decimals}
-            </Text>
-          </HStack>
-        </Td>
-        <Td>
-          {transaction.transaction_type === 'switch_out' || transaction.transaction_type === 'switch_in' ? (
-            <Text fontSize="sm" color={mutedColor}>
-              {transaction.target_fund_name}
-            </Text>
-          ) : (
-            <ChakraLink
-              as={Link}
-              to={`/account/${transaction.account_id}`}
-              color="blue.500"
-              fontSize="sm"
-              fontWeight="medium"
-              _hover={{ textDecoration: "underline" }}
-            >
-              {transaction.account_name || `Account ${transaction.account_id}`}
-            </ChakraLink>
-          )}
-        </Td>
-        <Td width="2%">
-          <Flex
-            gap={2}
-            opacity={0}
-            transition="opacity 0.2s"
-            className="action-icons"
-          >
-            <ChakraLink
-              onClick={() => {
-                setTransactionToDelete(transaction);
-                onDeleteOpen();
-              }}
-              _hover={{ textDecoration: "none" }}
-            >
-              <Icon
-                as={Trash2}
-                boxSize={4}
-                color="red.500"
-                _hover={{ color: "red.600" }}
-                transition="opacity 0.2s"
-              />
-            </ChakraLink>
-          </Flex>
-        </Td>
-    </Tr>
-  );
+
 
   return (
     <Box>
@@ -480,7 +395,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                </Flex>
 
 
-            </Box>
+           </Box>
           )}
         </Box>
 
@@ -561,11 +476,136 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                           <Th width="2%">Actions</Th>
                         </Tr>
                       </Thead>
-                     <Tbody>
-                       {filteredTransactions.map(transaction => (
-                         <TransactionRow key={transaction.mf_transaction_id} transaction={transaction} />
-                       ))}
-                     </Tbody>
+                      <Tbody>
+                        {filteredTransactions.map(transaction => (
+                          <Tr
+                            key={transaction.mf_transaction_id}
+                            _hover={{ bg: "gray.100" }}
+                            onMouseLeave={handleRowMouseLeave}
+                            sx={{
+                              "&:hover .action-icons": {
+                                opacity: 1,
+                              },
+                            }}
+                          >
+                            <Td>
+                              <Text fontSize="sm">
+                                {formatDate(transaction.transaction_date)}
+                              </Text>
+                            </Td>
+                            <Td>
+                              <Text fontSize="sm" fontWeight="medium">
+                                {transaction.mutual_fund?.name}
+                              </Text>
+                            </Td>
+                            <Td>
+                              <Text fontSize="sm" fontWeight="medium">
+                                {transaction.mutual_fund?.amc?.name}
+                              </Text>
+                            </Td>
+                            <Td>
+                              <Badge colorScheme={getTransactionTypeColor(transaction.transaction_type)} size="sm">
+                                {getTransactionTypeText(transaction.transaction_type)}
+                              </Badge>
+                            </Td>
+                            <Td isNumeric>
+                              <Text fontSize="sm">{formatUnits(transaction.units)}</Text>
+                            </Td>
+                            <Td isNumeric>
+                              <Text fontSize="sm">₹{formatNav(transaction.nav_per_unit)}</Text>
+                            </Td>
+                              <Td isNumeric>
+                                <HStack spacing={0} align="baseline" justify="flex-end">
+                                  <Text
+                                    fontSize="sm"
+                                    fontWeight="semibold"
+                                    color={getPnLColor(
+                                      transaction.transaction_type === 'buy'
+                                        ? -transaction.total_amount
+                                        : transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
+                                        ? transaction.realized_gain || 0
+                                        : 0 // switch_in = neutral
+                                    )}
+                                  >
+                                    {splitCurrencyForDisplay(
+                                      transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
+                                        ? transaction.total_amount
+                                        : transaction.total_amount,
+                                      "₹"
+                                    ).main}
+                                  </Text>
+                                  <Text
+                                    fontSize="xs"
+                                    fontWeight="semibold"
+                                    opacity={0.7}
+                                    color={getPnLColor(
+                                      transaction.transaction_type === 'buy'
+                                        ? -transaction.total_amount
+                                        : transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
+                                        ? transaction.realized_gain || 0
+                                        : 0 // switch_in = neutral
+                                    )}
+                                  >
+                                    {splitCurrencyForDisplay(
+                                      transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
+                                        ? transaction.total_amount
+                                        : transaction.total_amount,
+                                      "₹"
+                                    ).decimals}
+                                  </Text>
+                                </HStack>
+                              </Td>
+                              <Td>
+                                {transaction.transaction_type === 'switch_out' || transaction.transaction_type === 'switch_in' ? (
+                                  <Text fontSize="sm" color={mutedColor}>
+                                    {transaction.target_fund_name}
+                                  </Text>
+                                ) : (
+                                  <ChakraLink
+                                    as={Link}
+                                    to={`/account/${transaction.account_id}`}
+                                    color="blue.500"
+                                    fontSize="sm"
+                                    fontWeight="medium"
+                                    _hover={{ textDecoration: "underline" }}
+                                  >
+                                    {transaction.account_name || `Account ${transaction.account_id}`}
+                                  </ChakraLink>
+                                )}
+                              </Td>
+                              <Td width="2%">
+                                <Flex
+                                  gap={2}
+                                  opacity={0}
+                                  transition="opacity 0.2s"
+                                  className="action-icons"
+                                >
+                                  <MfTransactionNotesPopover
+                                    transaction={transaction}
+                                    isOpen={openPopoverId === transaction.mf_transaction_id}
+                                    onOpen={() => handlePopoverOpen(transaction.mf_transaction_id)}
+                                    onClose={handlePopoverClose}
+                                  />
+                                  <ChakraLink
+                                    onClick={() => {
+                                      setTransactionToDelete(transaction);
+                                      onDeleteOpen();
+                                    }}
+                                    _hover={{ textDecoration: "none" }}
+                                  >
+                                    <Icon
+                                      as={Trash2}
+                                      boxSize={4}
+                                      color="red.500"
+                                      _hover={{ color: "red.600" }}
+                                      transition="opacity 0.2s"
+                                    />
+                                  </ChakraLink>
+                                </Flex>
+                              </Td>
+                          </Tr>
+                        ))}
+                      </Tbody>
                    </Table>
                  </Box>
                )}
