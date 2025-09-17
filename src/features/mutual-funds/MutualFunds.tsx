@@ -48,7 +48,11 @@ const subTabMap = {
   transactions: 1,
 };
 
-const MutualFunds: FC = () => {
+interface MutualFundsProps {
+  onAccountDataChange?: () => void;
+}
+
+const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   const { ledgerId } = useLedgerStore();
   const [subTabIndex, setSubTabIndex] = useState(0);
 
@@ -167,6 +171,10 @@ const MutualFunds: FC = () => {
     refetchAmcs();
     refetchFunds();
     refetchTransactions();
+    // Also refresh account data if callback is provided
+    if (onAccountDataChange) {
+      onAccountDataChange();
+    }
   };
 
   const handleCloseFund = (fundId: number) => {
@@ -306,14 +314,15 @@ const MutualFunds: FC = () => {
                 <Spinner size="xl" />
               </Box>
             ) : (
-              <MfTransactions
-                amcs={amcs}
-                mutualFunds={mutualFunds}
-                transactions={transactions}
-                onDataChange={handleDataChange}
-                onCreateAmc={handleCreateAmc}
-                onCreateFund={handleCreateFund}
-              />
+               <MfTransactions
+                 amcs={amcs}
+                 mutualFunds={mutualFunds}
+                 transactions={transactions}
+                 onDataChange={handleDataChange}
+                 onAccountDataChange={onAccountDataChange}
+                 onCreateAmc={handleCreateAmc}
+                 onCreateFund={handleCreateFund}
+               />
             )}
           </TabPanel>
         </TabPanels>

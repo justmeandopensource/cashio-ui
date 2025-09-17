@@ -236,9 +236,9 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
              <TabPanel p={{ base: 2, md: 4 }}>
                <PhysicalAssets />
              </TabPanel>
-             <TabPanel p={{ base: 2, md: 4 }}>
-               <MutualFunds />
-             </TabPanel>
+              <TabPanel p={{ base: 2, md: 4 }}>
+                <MutualFunds onAccountDataChange={refreshAccountsData} />
+              </TabPanel>
            </TabPanels>
         </Tabs>
       </Box>

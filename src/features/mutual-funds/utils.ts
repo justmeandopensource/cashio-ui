@@ -18,7 +18,7 @@ export const formatAmount = (amount: number): string => {
 
 // Calculate P&L for a fund
 export const calculateFundPnL = (fund: MutualFund): { pnl: number; pnlPercentage: number; unrealizedPnl: number; realizedPnl: number } => {
-  const totalInvested = fund.total_units * fund.average_cost_per_unit;
+  const totalInvested = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
   const currentValue = fund.current_value;
   const realizedPnl = fund.total_realized_gain || 0;
   const unrealizedPnl = currentValue - totalInvested;
@@ -32,10 +32,10 @@ export const calculateFundPnL = (fund: MutualFund): { pnl: number; pnlPercentage
 export const calculateAmcSummary = (amcFunds: MutualFund[]): AmcSummary => {
   const totalFunds = amcFunds.length;
   const totalUnits = amcFunds.reduce((sum, fund) => sum + fund.total_units, 0);
-  const totalInvested = amcFunds.reduce((sum, fund) => sum + (fund.total_invested_cash || 0), 0);
+  const totalInvested = amcFunds.reduce((sum, fund) => sum + (fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit)), 0);
   const currentValue = amcFunds.reduce((sum, fund) => sum + fund.current_value, 0);
   const totalRealizedGain = amcFunds.reduce((sum, fund) => sum + (fund.total_realized_gain || 0), 0);
-  const costBasis = amcFunds.reduce((sum, fund) => sum + (fund.total_units * fund.average_cost_per_unit), 0);
+  const costBasis = amcFunds.reduce((sum, fund) => sum + (fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit)), 0);
   const unrealizedPnl = currentValue - costBasis;
   const unrealizedPnlPercentage = costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
@@ -56,8 +56,8 @@ export const calculateAmcSummary = (amcFunds: MutualFund[]): AmcSummary => {
 
 // Calculate summary for individual fund
 export const calculateFundSummary = (fund: MutualFund): MutualFundSummary => {
-  const costBasis = fund.total_units * fund.average_cost_per_unit;
-  const totalInvested = fund.total_invested_cash || 0;
+  const costBasis = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
+  const totalInvested = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
   const unrealizedPnl = fund.current_value - costBasis;
   const unrealizedPnlPercentage = costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 

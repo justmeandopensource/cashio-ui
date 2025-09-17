@@ -70,7 +70,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
 
   // Calculate overall portfolio metrics
   const totalInvested = mutualFunds.reduce(
-    (sum, fund) => sum + (fund.total_invested_cash || 0),
+    (sum, fund) => sum + fund.external_cash_invested,
     0,
   );
   const totalCurrentValue = mutualFunds.reduce(
@@ -121,8 +121,8 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   const FundCard: FC<{ fund: MutualFund }> = ({ fund }) => {
     const { unrealizedPnl, realizedPnl } = calculateFundPnL(fund);
     const isExpanded = expandedFunds.has(fund.mutual_fund_id);
-    const costBasis = fund.total_units * fund.average_cost_per_unit;
-    const invested = fund.total_invested_cash || 0;
+    const costBasis = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
+    const invested = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
     const unrealizedPercentage =
       costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
@@ -765,10 +765,10 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                 const amcFunds = mutualFunds.filter(
                   (fund) => fund.amc_id === amc.amc_id,
                 );
-                const amcInvested = amcFunds.reduce(
-                  (sum, fund) => sum + (fund.total_invested_cash || 0),
-                  0,
-                );
+                 const amcInvested = amcFunds.reduce(
+                   (sum, fund) => sum + fund.external_cash_invested,
+                   0,
+                 );
                 const amcCurrentValue = amcFunds.reduce(
                   (sum, fund) => sum + fund.current_value,
                   0,

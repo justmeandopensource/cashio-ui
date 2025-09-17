@@ -50,6 +50,7 @@ interface MfTransactionsProps {
   mutualFunds: MutualFund[];
   transactions?: MfTransaction[];
   onDataChange: () => void;
+  onAccountDataChange?: () => void;
   onCreateAmc?: () => void;
   onCreateFund?: () => void;
 }
@@ -59,6 +60,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   mutualFunds,
   transactions = [],
   onDataChange,
+  onAccountDataChange,
   onCreateAmc,
   onCreateFund,
 }) => {
@@ -109,6 +111,10 @@ const MfTransactions: FC<MfTransactionsProps> = ({
     try {
       await deleteMfTransaction(Number(ledgerId), transactionToDelete.mf_transaction_id);
       onDataChange();
+      // Also refresh account data if callback is provided
+      if (onAccountDataChange) {
+        onAccountDataChange();
+      }
       onDeleteClose();
       setTransactionToDelete(null);
     } catch (error) {
