@@ -30,11 +30,6 @@ import {
   FileText,
   Tag,
   Coins,
-  CheckCircle,
-  TrendingUp,
-  BarChart3,
-  Clock,
-  DollarSign,
 } from "lucide-react";
 import { CreatePhysicalAssetModalProps, PhysicalAssetCreate } from "../types";
 import { useCreatePhysicalAsset, useAssetTypes } from "../api";
@@ -255,99 +250,97 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
               borderColor={borderColor}
             >
               <VStack spacing={5} align="stretch">
-                <Stack direction={{ base: "column", md: "row" }} spacing={4}>
-                  {/* Asset Name */}
-                  <FormControl flex={1} isInvalid={!!errors.name}>
-                    <FormLabel fontWeight="semibold" mb={2}>
-                      <HStack spacing={2}>
-                        <Tag size={16} />
-                        <Text>
-                          Asset Name{" "}
-                          <Text as="span" color="red.500">
-                            *
-                          </Text>
-                        </Text>
-                      </HStack>
-                    </FormLabel>
-                    <Input
-                      value={formData.name}
-                      onChange={(e) =>
-                        handleInputChange("name", e.target.value)
-                      }
-                      placeholder="e.g., Gold 22CT, ETH"
-                      maxLength={100}
-                      size="lg"
-                      bg={inputBg}
-                      borderColor={inputBorderColor}
-                      borderWidth="2px"
-                      borderRadius="md"
-                      _hover={{ borderColor: "teal.300" }}
-                      _focus={{
-                        borderColor: focusBorderColor,
-                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                      }}
-                    />
-                    <FormErrorMessage>{errors.name}</FormErrorMessage>
-                    <FormHelperText>Choose a unique name</FormHelperText>
-                  </FormControl>
+                 {/* Asset Name */}
+                 <FormControl isInvalid={!!errors.name}>
+                   <FormLabel fontWeight="semibold" mb={2}>
+                     <HStack spacing={2}>
+                       <Tag size={16} />
+                       <Text>
+                         Asset Name{" "}
+                         <Text as="span" color="red.500">
+                           *
+                         </Text>
+                       </Text>
+                     </HStack>
+                   </FormLabel>
+                   <Input
+                     value={formData.name}
+                     onChange={(e) =>
+                       handleInputChange("name", e.target.value)
+                     }
+                     placeholder="e.g., Gold 22CT, ETH"
+                     maxLength={100}
+                     size="lg"
+                     bg={inputBg}
+                     borderColor={inputBorderColor}
+                     borderWidth="2px"
+                     borderRadius="md"
+                     _hover={{ borderColor: "teal.300" }}
+                     _focus={{
+                       borderColor: focusBorderColor,
+                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                     }}
+                   />
+                   <FormErrorMessage>{errors.name}</FormErrorMessage>
+                   <FormHelperText>Choose a unique name</FormHelperText>
+                 </FormControl>
 
-                  {/* Asset Type Selection */}
-                  <FormControl flex={1} isInvalid={!!errors.asset_type_id}>
-                    <FormLabel fontWeight="semibold" mb={2}>
-                      <HStack spacing={2}>
-                        <Coins size={16} />
-                        <Text>Asset Type</Text>
-                        <Text as="span" color="red.500">
-                          *
-                        </Text>
-                      </HStack>
-                    </FormLabel>
-                    {assetTypesLoading ? (
-                      <HStack justify="center" p={4}>
-                        <Spinner size="sm" />
-                        <Text fontSize="sm" color="gray.500">
-                          Loading asset types...
-                        </Text>
-                      </HStack>
-                    ) : (
-                      <Select
-                        value={formData.asset_type_id}
-                        onChange={(e) =>
-                          handleInputChange("asset_type_id", e.target.value)
-                        }
-                        placeholder="Select an asset type"
-                        size="lg"
-                        bg={inputBg}
-                        borderColor={inputBorderColor}
-                        borderWidth="2px"
-                        borderRadius="md"
-                        _hover={{ borderColor: "teal.300" }}
-                        _focus={{
-                          borderColor: focusBorderColor,
-                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                        }}
-                      >
-                        {assetTypes?.map((assetType) => (
-                          <option
-                            key={assetType.asset_type_id}
-                            value={assetType.asset_type_id}
-                          >
-                            {assetType.name} ({assetType.unit_symbol})
-                          </option>
-                        ))}
-                      </Select>
-                    )}
-                    <FormErrorMessage>{errors.asset_type_id}</FormErrorMessage>
-                    <FormHelperText>
-                      Type of asset you&apos;re tracking
-                      {selectedAssetType && (
-                        <Badge ml={2} colorScheme="teal" size="sm">
-                          {selectedAssetType.unit_symbol}
-                        </Badge>
-                      )}
-                    </FormHelperText>
-                  </FormControl>
-                </Stack>
+                 {/* Asset Type Selection */}
+                 <FormControl isInvalid={!!errors.asset_type_id}>
+                   <FormLabel fontWeight="semibold" mb={2}>
+                     <HStack spacing={2}>
+                       <Coins size={16} />
+                       <Text>Asset Type</Text>
+                       <Text as="span" color="red.500">
+                         *
+                       </Text>
+                     </HStack>
+                   </FormLabel>
+                   {assetTypesLoading ? (
+                     <HStack justify="center" p={4}>
+                       <Spinner size="sm" />
+                       <Text fontSize="sm" color="gray.500">
+                         Loading asset types...
+                       </Text>
+                     </HStack>
+                   ) : (
+                     <Select
+                       value={formData.asset_type_id}
+                       onChange={(e) =>
+                         handleInputChange("asset_type_id", e.target.value)
+                       }
+                       placeholder="Select an asset type"
+                       size="lg"
+                       bg={inputBg}
+                       borderColor={inputBorderColor}
+                       borderWidth="2px"
+                       borderRadius="md"
+                       _hover={{ borderColor: "teal.300" }}
+                       _focus={{
+                         borderColor: focusBorderColor,
+                         boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                       }}
+                     >
+                       {assetTypes?.map((assetType) => (
+                         <option
+                           key={assetType.asset_type_id}
+                           value={assetType.asset_type_id}
+                         >
+                           {assetType.name} ({assetType.unit_symbol})
+                         </option>
+                       ))}
+                     </Select>
+                   )}
+                   <FormErrorMessage>{errors.asset_type_id}</FormErrorMessage>
+                   <FormHelperText>
+                     Type of asset you&apos;re tracking
+                     {selectedAssetType && (
+                       <Badge ml={2} colorScheme="teal" size="sm">
+                         {selectedAssetType.unit_symbol}
+                       </Badge>
+                     )}
+                   </FormHelperText>
+                 </FormControl>
 
                 {/* Notes */}
                 <FormControl isInvalid={!!errors.notes}>
@@ -383,50 +376,7 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
               </VStack>
             </Box>
 
-            {/* What's Next Card */}
-            <Box
-              bg="blue.50"
-              borderColor="blue.200"
-              border="1px solid"
-              borderRadius="md"
-              p={{ base: 4, sm: 6 }}
-            >
-              <HStack spacing={3} mb={4}>
-                <CheckCircle size={20} color="#3182ce" />
-                <Text fontWeight="semibold" color="blue.700">
-                  What happens next?
-                </Text>
-              </HStack>
-              <Text fontSize="sm" color="blue.600" mb={3}>
-                After creating this asset, you&apos;ll be able to:
-              </Text>
-              <VStack align="start" spacing={2}>
-                <HStack spacing={3}>
-                  <TrendingUp size={16} color="#3182ce" />
-                  <Text fontSize="sm" color="blue.600">
-                    Buy and sell this asset
-                  </Text>
-                </HStack>
-                <HStack spacing={3}>
-                  <BarChart3 size={16} color="#3182ce" />
-                  <Text fontSize="sm" color="blue.600">
-                    Track your holdings and performance
-                  </Text>
-                </HStack>
-                <HStack spacing={3}>
-                  <Clock size={16} color="#3182ce" />
-                  <Text fontSize="sm" color="blue.600">
-                    View transaction history
-                  </Text>
-                </HStack>
-                <HStack spacing={3}>
-                  <DollarSign size={16} color="#3182ce" />
-                  <Text fontSize="sm" color="blue.600">
-                    Update prices manually
-                  </Text>
-                </HStack>
-              </VStack>
-            </Box>
+
 
             {/* Error Display */}
             {createPhysicalAssetMutation.isError && (

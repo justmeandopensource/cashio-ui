@@ -43,6 +43,7 @@ import {
   formatDate,
   getPnLColor,
   formatQuantity,
+  splitCurrencyForDisplay,
 } from "../utils";
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "@/components/shared/utils";
@@ -187,18 +188,27 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
 
               {/* Right side with amount and quantity */}
               <VStack align="flex-end" spacing={1}>
-                <Text
-                  fontWeight="bold"
-                  fontSize="lg"
-                  color={getPnLColor(
-                    isBuy ? -transaction.total_amount : transaction.total_amount
-                  )}
-                >
-                  {formatCurrencyWithSymbol(
-                    transaction.total_amount,
-                    currencySymbol || "$"
-                  )}
-                </Text>
+                 <HStack spacing={0} align="baseline" justify="flex-end">
+                   <Text
+                     fontSize="sm"
+                     fontWeight="semibold"
+                     color={getPnLColor(
+                       isBuy ? -transaction.total_amount : transaction.total_amount
+                     )}
+                   >
+                     {splitCurrencyForDisplay(transaction.total_amount, currencySymbol || "$").main}
+                   </Text>
+                   <Text
+                     fontSize="xs"
+                     fontWeight="semibold"
+                     opacity={0.7}
+                     color={getPnLColor(
+                       isBuy ? -transaction.total_amount : transaction.total_amount
+                     )}
+                   >
+                     {splitCurrencyForDisplay(transaction.total_amount, currencySymbol || "$").decimals}
+                   </Text>
+                 </HStack>
                 <Text fontSize="sm" color="gray.600" fontWeight="medium">
                   {formatQuantity(transaction.quantity)}{" "}
                   {transaction.physical_asset?.asset_type?.unit_symbol || ""}
@@ -380,21 +390,33 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
                       )}
                     </Text>
                   </Td>
-                  <Td isNumeric>
-                    <Text
-                      fontWeight="bold"
-                      color={getPnLColor(
-                        transaction.transaction_type === "buy"
-                          ? -transaction.total_amount
-                          : transaction.total_amount,
-                      )}
-                    >
-                      {formatCurrencyWithSymbol(
-                        transaction.total_amount,
-                        currencySymbol || "$",
-                      )}
-                    </Text>
-                  </Td>
+                   <Td isNumeric>
+                     <HStack spacing={0} align="baseline" justify="flex-end">
+                       <Text
+                         fontSize="sm"
+                         fontWeight="semibold"
+                         color={getPnLColor(
+                           transaction.transaction_type === "buy"
+                             ? -transaction.total_amount
+                             : transaction.total_amount,
+                         )}
+                       >
+                         {splitCurrencyForDisplay(transaction.total_amount, currencySymbol || "$").main}
+                       </Text>
+                       <Text
+                         fontSize="xs"
+                         fontWeight="semibold"
+                         opacity={0.7}
+                         color={getPnLColor(
+                           transaction.transaction_type === "buy"
+                             ? -transaction.total_amount
+                             : transaction.total_amount,
+                         )}
+                       >
+                         {splitCurrencyForDisplay(transaction.total_amount, currencySymbol || "$").decimals}
+                       </Text>
+                     </HStack>
+                   </Td>
                   <Td>
                     <ChakraLink
                       as={Link}
@@ -478,16 +500,28 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
                     sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_date || ""
                   )}
                 </Text>
-                <Text fontSize="sm" fontWeight="bold" color={
-                  sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_type === "buy"
-                    ? "red.500"
-                    : "green.500"
-                }>
-                  {selectedTransactionId && formatCurrencyWithSymbol(
-                    sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.total_amount || 0,
-                    currencySymbol || "$"
-                  )}
-                </Text>
+                 <HStack spacing={0} align="baseline">
+                   <Text fontSize="sm" fontWeight="semibold" color={
+                     sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_type === "buy"
+                       ? "red.500"
+                       : "green.500"
+                   }>
+                     {selectedTransactionId && splitCurrencyForDisplay(
+                       sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.total_amount || 0,
+                       currencySymbol || "$"
+                     ).main}
+                   </Text>
+                   <Text fontSize="xs" fontWeight="semibold" opacity={0.7} color={
+                     sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_type === "buy"
+                       ? "red.500"
+                       : "green.500"
+                   }>
+                     {selectedTransactionId && splitCurrencyForDisplay(
+                       sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.total_amount || 0,
+                       currencySymbol || "$"
+                     ).decimals}
+                   </Text>
+                 </HStack>
               </Box>
             )}
           </ModalBody>

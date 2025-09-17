@@ -26,10 +26,6 @@ import {
   Plus,
   FileText,
   Tag,
-  Hash,
-  Type,
-  CheckCircle,
-  Package,
   Ruler,
   Hash as HashIcon,
 } from "lucide-react";
@@ -393,44 +389,7 @@ const CreateAssetTypeModal: FC<CreateAssetTypeModalProps> = ({
 
 
 
-            {/* What's Next Card */}
-            <Box
-              bg="green.50"
-              borderColor="green.200"
-              border="1px solid"
-              borderRadius="md"
-              p={{ base: 4, sm: 6 }}
-            >
-              <HStack spacing={3} mb={4}>
-                <CheckCircle size={20} color="#38A169" />
-                <Text fontWeight="semibold" color="green.700">
-                  After Creation
-                </Text>
-              </HStack>
-              <Text fontSize="sm" color="green.600" mb={3}>
-                Once this asset type is created, you can:
-              </Text>
-              <VStack align="start" spacing={2}>
-                <HStack spacing={3}>
-                  <Package size={16} color="#38A169" />
-                  <Text fontSize="sm" color="green.600">
-                    Create physical assets of this type
-                  </Text>
-                </HStack>
-                <HStack spacing={3}>
-                  <Type size={16} color="#38A169" />
-                  <Text fontSize="sm" color="green.600">
-                    Use consistent units across all assets
-                  </Text>
-                </HStack>
-                <HStack spacing={3}>
-                  <Hash size={16} color="#38A169" />
-                  <Text fontSize="sm" color="green.600">
-                    Track quantities with proper symbols
-                  </Text>
-                </HStack>
-              </VStack>
-            </Box>
+
 
             {/* Error Display */}
             {createAssetTypeMutation.isError && (

@@ -499,30 +499,38 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   border="2px solid"
                   borderColor={inputBorderColor}
                 >
-                  <Tab
-                    isDisabled={type !== "expense"}
-                    _selected={{
-                      bg: "red.600",
-                      color: "white",
-                      borderColor: "red.600",
-                      fontWeight: "semibold",
-                    }}
-                    borderRadius="sm"
-                  >
-                    Expense
-                  </Tab>
-                  <Tab
-                    isDisabled={type !== "income"}
-                    _selected={{
-                      bg: "teal.500",
-                      color: "white",
-                      borderColor: "teal.500",
-                      fontWeight: "semibold",
-                    }}
-                    borderRadius="sm"
-                  >
-                    Income
-                  </Tab>
+                   <Tab
+                     _selected={{
+                       bg: "red.400",
+                       color: "white",
+                       borderColor: "red.400",
+                       fontWeight: "semibold",
+                     }}
+                     _hover={{
+                       bg: "red.50",
+                       _selected: { bg: "red.300" }
+                     }}
+                     borderRadius="sm"
+                     onClick={() => setType("expense")}
+                   >
+                     Expense
+                   </Tab>
+                   <Tab
+                     _selected={{
+                       bg: "teal.500",
+                       color: "white",
+                       borderColor: "teal.500",
+                       fontWeight: "semibold",
+                     }}
+                     _hover={{
+                       bg: "teal.50",
+                       _selected: { bg: "teal.400" }
+                     }}
+                     borderRadius="sm"
+                     onClick={() => setType("income")}
+                   >
+                     Income
+                   </Tab>
                 </TabList>
               </Tabs>
             </Box>

@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import { FC, useState } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -6,47 +6,56 @@ import {
   ModalBody,
   ModalFooter,
   Button,
+  VStack,
   FormControl,
   FormLabel,
   Input,
-  VStack,
   Text,
-  Box,
   HStack,
+  Box,
   Badge,
   Stack,
   useColorModeValue,
   FormHelperText,
   FormErrorMessage,
-  InputGroup,
-  InputLeftAddon,
   Alert,
   AlertIcon,
   AlertTitle,
   AlertDescription,
+  InputGroup,
+  InputLeftAddon,
 } from "@chakra-ui/react";
-import { TrendingUp, Clock, Info, RefreshCw } from "lucide-react";
-import { useUpdatePhysicalAssetPrice } from "../api";
-import { PhysicalAsset } from "../types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { TrendingUp, Calculator, Info, RefreshCw, Clock, X } from "lucide-react";
+
+import { updateMutualFundNav } from "../../api";
+import { MutualFund } from "../../types";
+import { formatAmount, formatNav } from "../../utils";
+import { splitCurrencyForDisplay } from "../../../physical-assets/utils";
 import useLedgerStore from "@/components/shared/store";
 import { format } from "date-fns";
-import { formatCurrencyWithSymbol, splitCurrencyForDisplay } from "../utils";
 
-interface UpdatePriceModalProps {
+interface UpdateNavModalProps {
   isOpen: boolean;
   onClose: () => void;
-  asset: PhysicalAsset | undefined;
-  onPriceUpdated?: () => void;
+  fund: MutualFund | null;
+  onSuccess: () => void;
 }
 
-const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
+interface FormData {
+  nav: string;
+}
+
+const UpdateNavModal: FC<UpdateNavModalProps> = ({
   isOpen,
   onClose,
-  asset,
-  onPriceUpdated,
+  fund,
+  onSuccess,
 }) => {
-  const { ledgerId, currencySymbol } = useLedgerStore();
-  const [newPrice, setNewPrice] = useState("");
+  const { ledgerId } = useLedgerStore();
+  const queryClient = useQueryClient();
+
+  const [formData, setFormData] = useState<FormData>({ nav: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   // Modern theme colors
@@ -57,49 +66,58 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
 
-  const updatePriceMutation = useUpdatePhysicalAssetPrice();
+  const updateNavMutation = useMutation({
+    mutationFn: (navData: { latest_nav: number }) =>
+      updateMutualFundNav(Number(ledgerId), fund!.mutual_fund_id, navData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["mutual-funds", ledgerId] });
+      queryClient.invalidateQueries({
+        queryKey: ["mf-transactions", ledgerId],
+      });
+      onSuccess();
+      handleClose();
+    },
+    onError: (error: any) => {
+      // Error will be displayed in the Alert component below
+      console.error("NAV update failed:", error);
+    },
+  });
 
-  useEffect(() => {
-    if (asset && isOpen) {
-      setNewPrice(
-        asset.latest_price_per_unit
-          ? asset.latest_price_per_unit.toFixed(2)
-          : "",
-      );
-      setErrors({});
-    }
-  }, [asset, isOpen]);
+  const handleClose = () => {
+    updateNavMutation.reset();
+    setFormData({ nav: "" });
+    setErrors({});
+    onClose();
+  };
 
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
-    const price = parseFloat(newPrice) || 0;
+    const navValue = parseFloat(formData.nav);
 
-    if (!newPrice.trim()) {
-      newErrors.price = "Price is required";
-    } else if (price < 0) {
-      newErrors.price = "Price must be greater than or equal to 0";
-    } else if (isNaN(price)) {
-      newErrors.price = "Please enter a valid number";
+    if (!formData.nav.trim()) {
+      newErrors.nav = "NAV is required";
+    } else if (isNaN(navValue) || navValue <= 0) {
+      newErrors.nav = "NAV must be a positive number";
+    } else if (navValue > 10000) {
+      newErrors.nav = "NAV seems too high. Please verify the value.";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleUpdate = async () => {
-    if (!asset || !ledgerId || !validateForm()) return;
+  const handleSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setErrors({});
+
+    if (!fund || !validateForm()) return;
 
     try {
-      await updatePriceMutation.mutateAsync({
-        ledgerId: Number(ledgerId),
-        assetId: asset.physical_asset_id,
-        data: { latest_price_per_unit: parseFloat(newPrice) },
+      await updateNavMutation.mutateAsync({
+        latest_nav: parseFloat(formData.nav),
       });
-
-      onPriceUpdated?.();
-      onClose();
     } catch (error) {
-      console.error("Price update failed:", error);
+      console.error("NAV update failed:", error);
     }
   };
 
@@ -111,14 +129,17 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
       if (decimalPart && decimalPart.length > 2) {
         // Truncate to 2 decimal places
         const integerPart = value.split(".")[0];
-        setNewPrice(`${integerPart}.${decimalPart.substring(0, 2)}`);
+        setFormData((prev) => ({
+          ...prev,
+          nav: `${integerPart}.${decimalPart.substring(0, 2)}`,
+        }));
       } else {
-        setNewPrice(value);
+        setFormData((prev) => ({ ...prev, nav: value }));
       }
 
       // Clear error when user starts typing
-      if (errors.price) {
-        setErrors((prev) => ({ ...prev, price: "" }));
+      if (errors.nav) {
+        setErrors((prev) => ({ ...prev, nav: "" }));
       }
     }
   };
@@ -126,23 +147,15 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
   // Handle Enter key press
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter") {
-      handleUpdate();
+      handleSubmit();
     }
   };
 
-  const handleClose = () => {
-    updatePriceMutation.reset();
-    onClose();
-  };
+  if (!fund) return null;
 
-  if (!asset) return null;
-
-  const isLoading = updatePriceMutation.isPending;
-  const currentPrice = asset.latest_price_per_unit || 0;
-  const newPriceValue = parseFloat(newPrice) || 0;
-  const priceChange = newPriceValue - currentPrice;
-  const priceChangePercent =
-    currentPrice > 0 ? (priceChange / currentPrice) * 100 : 0;
+  const newNavValue = parseFloat(formData.nav) || fund.latest_nav;
+  const newCurrentValue = fund.total_units * newNavValue;
+  const currentValueChange = newCurrentValue - fund.current_value;
 
   return (
     <Modal
@@ -185,31 +198,20 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
             </Box>
 
             <Box>
-              <HStack spacing={3} mb={2}>
-                <Text
-                  fontSize={{ base: "xl", sm: "2xl" }}
-                  fontWeight="bold"
-                  lineHeight="1.2"
-                >
-                  Update Price
-                </Text>
-                <Badge
-                  bg="whiteAlpha.200"
-                  color="white"
-                  fontSize="sm"
-                  borderRadius="full"
-                  px={3}
-                  py={1}
-                >
-                  {asset.asset_type?.name}
-                </Badge>
-              </HStack>
+              <Text
+                fontSize={{ base: "xl", sm: "2xl" }}
+                fontWeight="bold"
+                lineHeight="1.2"
+                mb={2}
+              >
+                Update NAV
+              </Text>
               <Text
                 fontSize={{ base: "sm", sm: "md" }}
                 color="whiteAlpha.900"
                 fontWeight="medium"
               >
-                {asset.name}
+                {fund.name}
               </Text>
             </Box>
           </HStack>
@@ -225,7 +227,7 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
           <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
-            {/* Current Price Info Card */}
+            {/* Current Fund Info Card */}
             <Box
               bg={cardBg}
               p={{ base: 4, sm: 6 }}
@@ -249,18 +251,18 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                   </HStack>
                   <HStack spacing={0} align="baseline">
                     <Text fontSize="xl" fontWeight="bold">
-                      {splitCurrencyForDisplay(currentPrice, currencySymbol).main}
+                      {splitCurrencyForDisplay(fund.latest_nav, "₹").main}
                     </Text>
                     <Text fontSize="lg" fontWeight="bold" opacity={0.7}>
-                      {splitCurrencyForDisplay(currentPrice, currencySymbol).decimals}
+                      {splitCurrencyForDisplay(fund.latest_nav, "₹").decimals}
                     </Text>
                   </HStack>
                   <Text fontSize="sm" color="gray.500">
-                    per {asset.asset_type?.unit_symbol}
+                    per unit
                   </Text>
                 </Box>
 
-                {asset.last_price_update && (
+                {fund.last_nav_update && (
                   <Box flex={1}>
                     <HStack spacing={2} mb={2}>
                       <Clock size={16} />
@@ -269,20 +271,17 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                       </Text>
                     </HStack>
                     <Text fontSize="md" fontWeight="semibold">
-                      {format(
-                        new Date(asset.last_price_update),
-                        "MMM dd, yyyy",
-                      )}
+                      {format(new Date(fund.last_nav_update), "MMM dd, yyyy")}
                     </Text>
                     <Text fontSize="sm" color="gray.500">
-                      {format(new Date(asset.last_price_update), "h:mm a")}
+                      {format(new Date(fund.last_nav_update), "h:mm a")}
                     </Text>
                   </Box>
                 )}
               </Stack>
             </Box>
 
-            {/* Price Update Form */}
+            {/* NAV Update Form */}
             <Box
               bg={cardBg}
               p={{ base: 4, sm: 6 }}
@@ -291,11 +290,11 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
               borderColor={borderColor}
             >
               <VStack spacing={5} align="stretch">
-                <FormControl isInvalid={!!errors.price}>
+                <FormControl isInvalid={!!errors.nav}>
                   <FormLabel fontWeight="semibold" mb={2}>
                     <HStack spacing={2}>
-                      <TrendingUp size={16} />
-                      <Text>New Price per Unit</Text>
+                      <Calculator size={16} />
+                      <Text>New NAV per Unit</Text>
                       <Text as="span" color="red.500">
                         *
                       </Text>
@@ -309,11 +308,11 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                       color="gray.600"
                       fontWeight="semibold"
                     >
-                      {currencySymbol}
+                      ₹
                     </InputLeftAddon>
                     <Input
                       type="text"
-                      value={newPrice}
+                      value={formData.nav}
                       onChange={(e) => handleInputChange(e.target.value)}
                       onKeyDown={handleKeyDown}
                       placeholder="0.00"
@@ -329,84 +328,103 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                       }}
                     />
                   </InputGroup>
-                  <FormErrorMessage>{errors.price}</FormErrorMessage>
+                  <FormErrorMessage>{errors.nav}</FormErrorMessage>
                   <FormHelperText>
-                    Enter the new price per {asset.asset_type?.unit_symbol}
+                    Enter the latest NAV per unit from your fund statement
                   </FormHelperText>
                 </FormControl>
 
-                {/* Price Change Preview */}
-                {newPrice &&
-                  !errors.price &&
-                  newPriceValue !== currentPrice && (
-                    <Box
-                      p={4}
-                      bg={priceChange >= 0 ? "green.50" : "red.50"}
-                      borderRadius="md"
-                      border="1px solid"
-                      borderColor={priceChange >= 0 ? "green.200" : "red.200"}
-                    >
-                      <HStack spacing={3} mb={2}>
-                        <TrendingUp
-                          size={18}
-                          color={priceChange >= 0 ? "#38A169" : "#E53E3E"}
-                          style={{
-                            transform:
-                              priceChange < 0 ? "rotate(180deg)" : "none",
-                          }}
-                        />
-                        <Text
-                          fontWeight="semibold"
-                          color={priceChange >= 0 ? "green.700" : "red.700"}
-                        >
-                          Price Change Preview
+                {/* Preview of changes */}
+                {formData.nav && !isNaN(parseFloat(formData.nav)) && (
+                  <Box
+                    p={4}
+                    bg={currentValueChange >= 0 ? "green.50" : "red.50"}
+                    borderRadius="md"
+                    border="1px solid"
+                    borderColor={
+                      currentValueChange >= 0 ? "green.200" : "red.200"
+                    }
+                  >
+                    <HStack spacing={3} mb={2}>
+                      <TrendingUp
+                        size={18}
+                        color={currentValueChange >= 0 ? "#38A169" : "#E53E3E"}
+                        style={{
+                          transform:
+                            currentValueChange < 0 ? "rotate(180deg)" : "none",
+                        }}
+                      />
+                      <Text
+                        fontWeight="semibold"
+                        color={
+                          currentValueChange >= 0 ? "green.700" : "red.700"
+                        }
+                      >
+                        NAV Change Preview
+                      </Text>
+                    </HStack>
+                    <HStack justify="space-between" align="center">
+                      <VStack align="start" spacing={1}>
+                        <Text fontSize="sm" color="gray.600">
+                          New NAV
                         </Text>
-                      </HStack>
-                      <HStack justify="space-between" align="center">
-                        <VStack align="start" spacing={1}>
-                          <Text fontSize="sm" color="gray.600">
-                            Change Amount
+                        <HStack spacing={0} align="baseline">
+                          <Text
+                            fontSize="lg"
+                            fontWeight="bold"
+                            color={currentValueChange >= 0 ? "green.600" : "red.600"}
+                          >
+                            {splitCurrencyForDisplay(newNavValue, "₹").main}
                           </Text>
+                          <Text
+                            fontSize="md"
+                            fontWeight="bold"
+                            color={currentValueChange >= 0 ? "green.600" : "red.600"}
+                            opacity={0.7}
+                          >
+                            {splitCurrencyForDisplay(newNavValue, "₹").decimals}
+                          </Text>
+                        </HStack>
+                      </VStack>
+                      <VStack align="end" spacing={1}>
+                        <Text fontSize="sm" color="gray.600">
+                          Value Change
+                        </Text>
+                        <Badge
+                          colorScheme={
+                            currentValueChange >= 0 ? "green" : "red"
+                          }
+                          fontSize="md"
+                          px={3}
+                          py={1}
+                        >
                           <HStack spacing={0} align="baseline">
-                            <Text
-                              fontSize="lg"
-                              fontWeight="bold"
-                              color={priceChange >= 0 ? "green.600" : "red.600"}
-                            >
-                              {splitCurrencyForDisplay(Math.abs(priceChange), currencySymbol || "$").main}
+                            <Text fontSize="sm" fontWeight="bold">
+                              {currentValueChange >= 0 ? "+" : ""}{
+                                splitCurrencyForDisplay(
+                                  Math.abs(currentValueChange),
+                                  "₹",
+                                ).main
+                              }
                             </Text>
-                            <Text
-                              fontSize="md"
-                              fontWeight="bold"
-                              color={priceChange >= 0 ? "green.600" : "red.600"}
-                              opacity={0.7}
-                            >
-                              {splitCurrencyForDisplay(Math.abs(priceChange), currencySymbol || "$").decimals}
+                            <Text fontSize="xs" fontWeight="bold" opacity={0.7}>
+                              {splitCurrencyForDisplay(
+                                Math.abs(currentValueChange),
+                                "₹",
+                              ).decimals
+                            }
                             </Text>
                           </HStack>
-                        </VStack>
-                        <VStack align="end" spacing={1}>
-                          <Text fontSize="sm" color="gray.600">
-                            Percentage
-                          </Text>
-                          <Badge
-                            colorScheme={priceChange >= 0 ? "green" : "red"}
-                            fontSize="md"
-                            px={3}
-                            py={1}
-                          >
-                            {priceChange >= 0 ? "+" : ""}
-                            {priceChangePercent.toFixed(1)}%
-                          </Badge>
-                        </VStack>
-                      </HStack>
-                    </Box>
-                  )}
+                        </Badge>
+                      </VStack>
+                    </HStack>
+                  </Box>
+                )}
               </VStack>
             </Box>
 
             {/* Error Display */}
-            {updatePriceMutation.isError && (
+            {updateNavMutation.isError && (
               <Alert
                 status="error"
                 borderRadius="md"
@@ -417,10 +435,9 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                 <Box>
                   <AlertTitle fontWeight="bold">Update Failed!</AlertTitle>
                   <AlertDescription>
-                    {(updatePriceMutation.error as any)?.response?.data
-                      ?.detail ||
-                      (updatePriceMutation.error as any)?.message ||
-                      "An error occurred while updating the price."}
+                    {(updateNavMutation.error as any)?.response?.data?.detail ||
+                      (updateNavMutation.error as any)?.message ||
+                      "An error occurred while updating the NAV."}
                   </AlertDescription>
                 </Box>
               </Alert>
@@ -434,25 +451,27 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
               color="white"
               _hover={{
                 bg: "teal.600",
-                transform: isLoading ? "none" : "translateY(-2px)",
-                boxShadow: isLoading ? "none" : "lg",
+                transform: updateNavMutation.isPending
+                  ? "none"
+                  : "translateY(-2px)",
+                boxShadow: updateNavMutation.isPending ? "none" : "lg",
               }}
-              onClick={handleUpdate}
+              onClick={handleSubmit}
               size="lg"
               width="100%"
               mb={3}
               borderRadius="md"
-              isLoading={isLoading}
-              loadingText="Updating Price..."
+              isLoading={updateNavMutation.isPending}
+              loadingText="Updating NAV..."
               isDisabled={
-                !newPrice.trim() ||
-                !!errors.price ||
-                newPriceValue === currentPrice
+                !formData.nav.trim() ||
+                !!errors.nav ||
+                parseFloat(formData.nav) === fund.latest_nav
               }
               leftIcon={<RefreshCw />}
               transition="all 0.2s"
             >
-              Update Price
+              Update NAV
             </Button>
             <Button
               variant="outline"
@@ -468,8 +487,9 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                 borderColor: "gray.400",
                 transform: "translateY(-2px)",
               }}
-              isDisabled={isLoading}
+              isDisabled={updateNavMutation.isPending}
               transition="all 0.2s"
+              leftIcon={<X />}
             >
               Cancel
             </Button>
@@ -491,29 +511,32 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
             mr={3}
             _hover={{
               bg: "teal.600",
-              transform: isLoading ? "none" : "translateY(-2px)",
-              boxShadow: isLoading ? "none" : "lg",
+              transform: updateNavMutation.isPending
+                ? "none"
+                : "translateY(-2px)",
+              boxShadow: updateNavMutation.isPending ? "none" : "lg",
             }}
-            onClick={handleUpdate}
+            onClick={handleSubmit}
             px={8}
             py={3}
             borderRadius="md"
-            isLoading={isLoading}
-            loadingText="Updating Price..."
+            isLoading={updateNavMutation.isPending}
+            loadingText="Updating NAV..."
             isDisabled={
-              !newPrice.trim() ||
-              !!errors.price ||
-              newPriceValue === currentPrice
+              !formData.nav.trim() ||
+              !!errors.nav ||
+              parseFloat(formData.nav) === fund.latest_nav
             }
             leftIcon={<RefreshCw />}
             transition="all 0.2s"
           >
-            Update Price
+            Update NAV
           </Button>
           <Button
             variant="outline"
             onClick={handleClose}
-            isDisabled={isLoading}
+            isDisabled={updateNavMutation.isPending}
+            leftIcon={<X />}
             px={6}
             py={3}
             borderRadius="md"
@@ -528,4 +551,4 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
   );
 };
 
-export default UpdatePriceModal;
+export default UpdateNavModal;

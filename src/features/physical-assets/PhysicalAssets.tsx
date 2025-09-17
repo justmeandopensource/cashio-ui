@@ -1,6 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
-import { FC, useState, useRef, RefObject, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { FC, useState, useRef, RefObject } from "react";
+
 import {
   Alert,
   AlertDescription,
@@ -60,7 +60,7 @@ import { PhysicalAsset, AssetType } from "./types";
 
 // Map subtab names to indices for physical assets
 const subTabMap = {
-  assets: 0,
+  overview: 0,
   transactions: 1,
 };
 
@@ -68,27 +68,8 @@ const PhysicalAssets: FC = () => {
   const queryClient = useQueryClient();
   const toast = useToast();
   const { ledgerId, currencySymbol } = useLedgerStore();
-  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedAsset, setSelectedAsset] = useState<PhysicalAsset | undefined>();
-
-  // Get initial subtab from URL params, default to assets (0)
-  const getInitialSubTab = () => {
-    const subTabParam = searchParams.get('subtab');
-    return subTabParam && subTabMap[subTabParam as keyof typeof subTabMap] !== undefined
-      ? subTabMap[subTabParam as keyof typeof subTabMap]
-      : 0;
-  };
-
-  const [tabIndex, setTabIndex] = useState(getInitialSubTab);
-
-  // Update tabIndex when URL changes
-  useEffect(() => {
-    const subTabParam = searchParams.get('subtab');
-    const newTabIndex = subTabParam && subTabMap[subTabParam as keyof typeof subTabMap] !== undefined
-      ? subTabMap[subTabParam as keyof typeof subTabMap]
-      : 0;
-    setTabIndex(newTabIndex);
-  }, [searchParams]);
+  const [tabIndex, setTabIndex] = useState(0);
 
   // Modal states
   const {
@@ -223,11 +204,6 @@ const PhysicalAssets: FC = () => {
 
   const handleTabChange = (index: number) => {
     setTabIndex(index);
-    // Update URL with the selected subtab
-    const subTabNames = ['assets', 'transactions'];
-    const newSearchParams = new URLSearchParams(searchParams);
-    newSearchParams.set('subtab', subTabNames[index]);
-    setSearchParams(newSearchParams);
   };
 
   if (assetsError) {
@@ -250,163 +226,158 @@ const PhysicalAssets: FC = () => {
 
   return (
     <Box>
-      {/* Portfolio Summary Header */}
-      <Box mb={6} p={{ base: 3, md: 4 }} bg="white" borderRadius="lg" boxShadow="sm">
-        <Flex
-          direction={{ base: "column", md: "row" }}
-          justify="space-between"
-          align={{ base: "start", md: "center" }}
-          mb={4}
-          gap={{ base: 3, md: 0 }}
-        >
-          <Flex align="center" mb={{ base: 2, md: 0 }}>
-            <Icon as={Coins} mr={2} color="teal.500" />
-            <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
-              Physical Assets Portfolio
-            </Text>
-          </Flex>
-          <Flex gap={2} width={{ base: "full", md: "auto" }}>
-            <Button
-              leftIcon={<Plus />}
-              colorScheme="teal"
-              variant="outline"
-              size={{ base: "md", md: "sm" }}
-              onClick={handleCreateAssetType}
-              flex={{ base: 1, md: "none" }}
+      <Tabs variant="soft-rounded" colorScheme="teal" size={{ base: "sm", md: "md" }} index={tabIndex} onChange={handleTabChange}>
+        <Box p={{ base: 2, md: 4 }}>
+          <TabList borderBottom="none">
+            <Tab
+              px={{ base: 3, md: 6 }}
+              py={3}
+              fontWeight="medium"
+              borderRadius="md"
+              whiteSpace="nowrap"
+              _selected={{
+                color: "teal.700",
+                bg: "teal.50",
+                fontWeight: "semibold",
+                border: "1px solid",
+                borderColor: "teal.400",
+              }}
+              _hover={{
+                bg: "teal.25",
+              }}
             >
-              Asset Type
-            </Button>
-            <Button
-              leftIcon={<Plus />}
-              colorScheme="teal"
-              variant={assetTypes.length === 0 ? "outline" : "solid"}
-              size={{ base: "md", md: "sm" }}
-              onClick={handleCreateAsset}
-              title={assetTypes.length === 0 ? "Create an asset type first" : "Create a new physical asset"}
-              flex={{ base: 1, md: "none" }}
+              <Flex align="center">
+                <Text>Overview</Text>
+                {assetsWithHoldings.length > 0 && (
+                  <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
+                    {assetsWithHoldings.length}
+                  </Badge>
+                )}
+              </Flex>
+            </Tab>
+            <Tab
+              px={{ base: 3, md: 6 }}
+              py={3}
+              fontWeight="medium"
+              borderRadius="md"
+              whiteSpace="nowrap"
+              _selected={{
+                color: "teal.700",
+                bg: "teal.50",
+                fontWeight: "semibold",
+                border: "1px solid",
+                borderColor: "teal.400",
+              }}
+              _hover={{
+                bg: "teal.25",
+              }}
             >
-              Physical Asset
-            </Button>
-          </Flex>
-        </Flex>
+              <Flex align="center">
+                <Text>Transactions</Text>
+              </Flex>
+            </Tab>
+          </TabList>
+        </Box>
 
-        {/* Portfolio Stats */}
-        <Flex
-          direction={{ base: "column", md: "row" }}
-          gap={{ base: 4, md: 6 }}
-          wrap="wrap"
-        >
-            <Box>
-              <Text fontSize="sm" color="gray.600">Current Value</Text>
-              <HStack spacing={0} align="baseline">
-                <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="teal.600">
-                  {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
-                </Text>
-                <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="teal.600" opacity={0.7}>
-                  {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
-                </Text>
-              </HStack>
-            </Box>
-            <Box>
-              <Text fontSize="sm" color="gray.600">Unrealized P&L</Text>
-              <HStack spacing={0} align="baseline">
-                 <Text
-                 fontSize={{ base: "xl", md: "2xl" }}
-                 fontWeight="bold"
-                 color={getPnLColor(totalPnL)}
-                 >
-                 {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
-                 </Text>
-                 <Text
-                 fontSize={{ base: "md", md: "lg" }}
-                 fontWeight="bold"
-                 color={getPnLColor(totalPnL)}
-                 opacity={0.7}
-                 >
-                 {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
-                 </Text>
-              </HStack>
-               <HStack>
-                 <HStack spacing={0} align="baseline">
-                   <Text
-                       fontSize="sm"
+        <TabPanels>
+          <TabPanel p={{ base: 2, md: 4 }}>
+            {/* Portfolio Summary Header */}
+            <Box mb={6} p={{ base: 3, md: 4 }} bg="white" borderRadius="lg" boxShadow="sm">
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                justify="space-between"
+                align={{ base: "start", md: "center" }}
+                mb={4}
+                gap={{ base: 3, md: 0 }}
+              >
+                <Flex align="center" mb={{ base: 2, md: 0 }}>
+                  <Icon as={Coins} mr={2} color="teal.500" />
+                  <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
+                    Physical Assets Portfolio
+                  </Text>
+                </Flex>
+                <Flex gap={2} width={{ base: "full", md: "auto" }}>
+                  <Button
+                    leftIcon={<Plus />}
+                    colorScheme="teal"
+                    variant="outline"
+                    size={{ base: "md", md: "sm" }}
+                    onClick={handleCreateAssetType}
+                    flex={{ base: 1, md: "none" }}
+                  >
+                    Asset Type
+                  </Button>
+                  <Button
+                    leftIcon={<Plus />}
+                    colorScheme="teal"
+                    variant={assetTypes.length === 0 ? "outline" : "solid"}
+                    size={{ base: "md", md: "sm" }}
+                    onClick={handleCreateAsset}
+                    title={assetTypes.length === 0 ? "Create an asset type first" : "Create a new physical asset"}
+                    flex={{ base: 1, md: "none" }}
+                  >
+                    Physical Asset
+                  </Button>
+                </Flex>
+              </Flex>
+
+              {/* Portfolio Stats */}
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                gap={{ base: 4, md: 6 }}
+                wrap="wrap"
+              >
+                  <Box>
+                    <Text fontSize="sm" color="gray.600">Current Value</Text>
+                    <HStack spacing={0} align="baseline">
+                      <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="teal.600">
+                        {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
+                      </Text>
+                      <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="teal.600" opacity={0.7}>
+                        {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
+                      </Text>
+                    </HStack>
+                  </Box>
+                  <Box>
+                    <Text fontSize="sm" color="gray.600">Unrealized P&L</Text>
+                    <HStack spacing={0} align="baseline">
+                       <Text
+                       fontSize={{ base: "xl", md: "2xl" }}
+                       fontWeight="bold"
                        color={getPnLColor(totalPnL)}
-                   >
-                       {splitPercentageForDisplay(totalPnLPercentage).main}
-                   </Text>
-                   <Text
-                       fontSize="xs"
+                       >
+                       {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
+                       </Text>
+                       <Text
+                       fontSize={{ base: "md", md: "lg" }}
+                       fontWeight="bold"
                        color={getPnLColor(totalPnL)}
                        opacity={0.7}
-                   >
-                       {splitPercentageForDisplay(totalPnLPercentage).decimals}%
-                   </Text>
-                 </HStack>
-               </HStack>
-            </Box>
-          </Flex>
-       </Box>
-
-        {/* Main Content */}
-       <Box bg="white" overflow="hidden">
-        <Tabs variant="soft-rounded" colorScheme="teal" index={tabIndex} onChange={handleTabChange}>
-           <Flex
-            justifyContent="space-between"
-            alignItems="center"
-            p={{ base: 2, md: 4 }}
-          >
-            <TabList>
-              <Tab
-                px={{ base: 3, md: 6 }}
-                py={3}
-                fontWeight="medium"
-                borderRadius="md"
-                _selected={{
-                  color: "teal.700",
-                  bg: "teal.50",
-                  fontWeight: "semibold",
-                  border: "1px solid",
-                  borderColor: "teal.400",
-                }}
-                _hover={{
-                  bg: "teal.25",
-                }}
-              >
-                <Flex align="center">
-                  <Text>Assets</Text>
-                  {assetsWithHoldings.length > 0 && (
-                    <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
-                      {assetsWithHoldings.length}
-                    </Badge>
-                  )}
+                       >
+                       {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
+                       </Text>
+                    </HStack>
+                     <HStack>
+                       <HStack spacing={0} align="baseline">
+                         <Text
+                             fontSize="sm"
+                             color={getPnLColor(totalPnL)}
+                         >
+                             {splitPercentageForDisplay(totalPnLPercentage).main}
+                         </Text>
+                         <Text
+                             fontSize="xs"
+                             color={getPnLColor(totalPnL)}
+                             opacity={0.7}
+                         >
+                             {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                         </Text>
+                       </HStack>
+                     </HStack>
+                  </Box>
                 </Flex>
-              </Tab>
-              <Tab
-                px={{ base: 3, md: 6 }}
-                py={3}
-                fontWeight="medium"
-                borderRadius="md"
-                _selected={{
-                  color: "teal.700",
-                  bg: "teal.50",
-                  fontWeight: "semibold",
-                  border: "1px solid",
-                  borderColor: "teal.400",
-                }}
-                _hover={{
-                  bg: "teal.25",
-                }}
-              >
-                <Flex align="center">
-                  <Text>Transactions</Text>
-                </Flex>
-              </Tab>
-            </TabList>
-          </Flex>
+              </Box>
 
-          <TabPanels>
-            {/* Assets Tab */}
-            <TabPanel p={{ base: 2, md: 4 }}>
               {assetsLoading ? (
                 <Box p={8} textAlign="center">
                   <VStack spacing={4}>
@@ -610,10 +581,9 @@ const PhysicalAssets: FC = () => {
               )}
             </TabPanel>
           </TabPanels>
-        </Tabs>
-      </Box>
+         </Tabs>
 
-      {/* Modals */}
+       {/* Modals */}
       <BuySellAssetModal
         isOpen={isBuySellModalOpen}
         onClose={onBuySellModalClose}

@@ -33,8 +33,9 @@ import {
   Button,
   Badge,
   Link as ChakraLink,
+  useBreakpointValue,
 } from "@chakra-ui/react";
-import { CreditCard, Trash2, Edit, X, Copy } from "lucide-react";
+import { CreditCard, Trash2, Edit, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 import useLedgerStore from "@/components/shared/store";
@@ -68,6 +69,7 @@ interface Transaction {
   is_split: boolean;
   is_transfer: boolean;
   is_asset_transaction: boolean;
+  is_mf_transaction: boolean;
   notes?: string;
   credit: number;
   debit: number;
@@ -113,6 +115,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
 
   const { currencySymbol } = useLedgerStore();
 
+  // Responsive modal settings
+  const modalSize = useBreakpointValue({ base: "full", md: "md" });
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   // Handle delete confirmation
   const handleDelete = async () => {
     if (!selectedTransactionId) return;
@@ -144,7 +150,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           </Tr>
         </Thead>
         <Tbody>
-          {transactions.map((transaction) => (
+          {transactions
+            .sort((a, b) => {
+              const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
+              if (dateComparison === 0) {
+                return b.transaction_id - a.transaction_id;
+              }
+              return dateComparison;
+            })
+            .map((transaction) => (
             <Tr
               key={transaction.transaction_id}
               _hover={{ bg: "gray.100" }}
@@ -288,6 +302,17 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         fontSize="0.65em"
                       >
                         ASSET
+                      </Badge>
+                    )}
+                    {transaction.is_mf_transaction && (
+                      <Badge
+                        colorScheme="green"
+                        variant="subtle"
+                        px={1}
+                        borderRadius="md"
+                        fontSize="0.65em"
+                      >
+                        FUND
                       </Badge>
                     )}
                    {transaction.is_transfer && (
@@ -455,16 +480,24 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
         </Tbody>
       </Table>
       {/* Confirmation Modal */}
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal
+        isOpen={isOpen}
+        onClose={onClose}
+        size={modalSize}
+        motionPreset="slideInBottom"
+      >
         <ModalOverlay />
-        <ModalContent>
+        <ModalContent
+          margin={isMobile ? 0 : "auto"}
+          borderRadius={isMobile ? 0 : "md"}
+        >
           <ModalHeader>Delete Transaction</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             Are you sure you want to delete this transaction?
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onClose} leftIcon={<X size={18} />}>
+            <Button variant="ghost" mr={3} onClick={onClose}>
               Cancel
             </Button>
             <Button colorScheme="red" onClick={handleDelete} leftIcon={<Trash2 size={18} />}>

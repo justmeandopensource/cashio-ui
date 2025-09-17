@@ -24,7 +24,7 @@ import {
   useBreakpointValue,
   Link as ChakraLink,
 } from "@chakra-ui/react";
-import { Calendar, Tag as TagIcon, Info, CreditCard, Trash2, MessageSquare, Edit, X, Copy } from "lucide-react";
+import { Calendar, Tag as TagIcon, Info, CreditCard, Trash2, MessageSquare, Edit, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
 import {
   formatAmount,
@@ -420,13 +420,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             </Box>
           </ModalBody>
           <ModalFooter>
-            <Button
-              variant="outline"
-              mr={3}
-              onClick={onClose}
-              isDisabled={isDeleting}
-              leftIcon={<X size={18} />}
-            >
+            <Button variant="ghost" mr={3} onClick={onClose} isDisabled={isDeleting}>
               Cancel
             </Button>
             <Button
