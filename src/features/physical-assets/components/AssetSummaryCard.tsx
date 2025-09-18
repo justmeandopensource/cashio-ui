@@ -1,10 +1,8 @@
-import { FC, useRef } from "react";
+import { FC, useState } from "react";
 import {
   Box,
   Button,
   Text,
-  Icon,
-  Badge,
   VStack,
   HStack,
   useColorModeValue,
@@ -12,38 +10,37 @@ import {
   SkeletonText,
   Stack,
   Divider,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogContent,
-  AlertDialogOverlay,
   useDisclosure,
-  IconButton,
+  Card,
+  CardBody,
+  Collapse,
+  SimpleGrid,
+  Stat,
+  StatLabel,
+  StatNumber,
+  Badge,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
+  useBreakpointValue,
 } from "@chakra-ui/react";
-import {
-  Package,
-  TrendingUp,
-  TrendingDown,
-  BarChart3,
-  Calendar,
-  Coins,
-  Trash2,
-} from "lucide-react";
+
 import { AssetSummaryCardProps } from "../types";
+import { useAssetTransactions } from "../api";
 import {
   calculateUnrealizedPnL,
   calculateUnrealizedPnLPercentage,
-  calculateHighestPurchasePrice,
-  calculateLowestPurchasePrice,
   splitCurrencyForDisplay,
   splitQuantityForDisplay,
   splitPercentageForDisplay,
-  getPnLColor,
-  getAssetTypeDisplayName,
-  formatDate,
+  calculateHighestPurchasePrice,
+  calculateLowestPurchasePrice,
 } from "../utils";
-import { useAssetTransactions } from "../api";
+
 
 interface AssetSummaryCardSkeletonProps {
   // No props needed for skeleton
@@ -138,431 +135,329 @@ export const AssetSummaryCardSkeleton: FC<
 const AssetSummaryCard: FC<AssetSummaryCardProps> = ({
   asset,
   currencySymbol,
-  ledgerId,
   onBuySell,
   onUpdatePrice,
   onDelete,
 }) => {
-  const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.600");
-  const cardBg = useColorModeValue("gray.50", "gray.700");
-  const textSecondary = useColorModeValue("gray.600", "gray.400");
-  const textTertiary = useColorModeValue("gray.500", "gray.500");
+  const cardBg = useColorModeValue("white", "gray.800");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const mutedColor = useColorModeValue("gray.600", "gray.400");
+
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  // Responsive modal settings
+  const modalSize = useBreakpointValue({ base: "full", md: "md" });
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   const unrealizedPnL = calculateUnrealizedPnL(asset);
   const unrealizedPnLPercentage = calculateUnrealizedPnLPercentage(asset);
   const hasHoldings = asset.total_quantity > 0;
+  const costBasis = asset.total_quantity * asset.average_cost_per_unit;
 
-  // Delete confirmation dialog
-   const {
-     isOpen: isDeleteDialogOpen,
-     onOpen: onDeleteDialogOpen,
-     onClose: onDeleteDialogClose,
-   } = useDisclosure();
-   const cancelRef = useRef<any>(null);
-
-  // Fetch transaction data for purchase price calculations
-  const { data: transactions = [] } = useAssetTransactions(
-    ledgerId,
-    asset.physical_asset_id,
-  );
-
-  // Calculate highest and lowest purchase prices from buy transactions only
+  // Fetch transactions for cost calculations
+  const { data: transactions = [] } = useAssetTransactions(asset.ledger_id, asset.physical_asset_id);
   const highestPurchasePrice = calculateHighestPurchasePrice(transactions);
   const lowestPurchasePrice = calculateLowestPurchasePrice(transactions);
 
-  const pnlColor = getPnLColor(unrealizedPnL);
-  const isPositive = unrealizedPnL >= 0;
+  // Delete confirmation dialog
+  const {
+    isOpen: isDeleteDialogOpen,
+    onOpen: onDeleteDialogOpen,
+    onClose: onDeleteDialogClose,
+  } = useDisclosure();
+
+
+
+  const handleCardClick = (e: React.MouseEvent) => {
+    // Prevent expansion if clicking on interactive elements
+    if ((e.target as HTMLElement).closest("button")) {
+      return;
+    }
+    setIsExpanded(!isExpanded);
+  };
 
   return (
-    <Box
-      bg={bgColor}
-      border="2px solid"
+    <Card
+      bg={cardBg}
       borderColor={borderColor}
-      borderRadius="xl"
-      overflow="hidden"
-      minW="320px"
-      maxW="400px"
-      boxShadow="lg"
-       _hover={{
-         boxShadow: "lg",
-         borderColor: "teal.300",
-       }}
-       transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
-     >
-       {/* Modern Gradient Header */}
-      <Box
-        bgGradient={hasHoldings ? "linear(135deg, teal.400, teal.600)" : "linear(135deg, gray.400, gray.600)"}
-        p={4}
-        color="white"
-        position="relative"
-        _before={{
-          content: '""',
-          position: "absolute",
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          bgGradient: "linear(45deg, transparent, whiteAlpha.100)",
-          pointerEvents: "none",
-        }}
-      >
-         <HStack spacing={3} mb={3} position="relative">
-           <Box
-             p={2}
-             bg="whiteAlpha.200"
-             borderRadius="lg"
-             backdropFilter="blur(10px)"
-           >
-             <Icon as={Package} boxSize={6} />
-           </Box>
-
-           <VStack align="start" spacing={1} flex={1}>
-             <Text fontSize="xl" fontWeight="bold" lineHeight="1.2">
-               {asset.name}
-             </Text>
-             {asset.asset_type && (
-               <Badge
-                 bg="whiteAlpha.200"
-                 color="white"
-                 fontSize="xs"
-                 borderRadius="full"
-                 px={3}
-                 py={1}
-                 fontWeight="semibold"
-               >
-                 {getAssetTypeDisplayName(asset.asset_type)}
-               </Badge>
-             )}
-           </VStack>
-
-           <HStack spacing={2}>
-              <Badge
-                bg="whiteAlpha.200"
-                color="white"
-                variant="solid"
-                borderRadius="full"
-                px={3}
-                py={2}
-                fontSize="sm"
-                fontWeight="bold"
-              >
-               {hasHoldings ? "Holding" : "Available"}
-             </Badge>
-             {!hasHoldings && onDelete && (
-               <IconButton
-                 aria-label="Delete asset"
-                 icon={<Trash2 />}
-                 size="sm"
-                 colorScheme="red"
-                 variant="ghost"
-                 color="whiteAlpha.700"
-                 _hover={{
-                   color: "red.300",
-                   bg: "whiteAlpha.100",
-                 }}
-                 onClick={onDeleteDialogOpen}
-               />
-             )}
-           </HStack>
-         </HStack>
-      </Box>
-
-      {/* Content */}
-      <Box p={4}>
-        <VStack spacing={4} align="stretch">
-          {/* Current Value - Only show for assets with holdings */}
-          {hasHoldings && (
-            <Box
-              bg={cardBg}
-              p={4}
-              borderRadius="lg"
-              border="1px solid"
-              borderColor={borderColor}
+      borderWidth={1}
+      size="sm"
+      cursor="pointer"
+      onClick={handleCardClick}
+      shadow="sm"
+      _hover={{ shadow: "md", borderColor: "teal.300" }}
+      transition="all 0.2s"
+    >
+      <CardBody>
+        <HStack justify="space-between" align="start" mb={3}>
+          <VStack align="start" spacing={1} flex={1}>
+            <Text
+              fontSize="md"
+              fontWeight="semibold"
+              color="gray.700"
+              noOfLines={1}
             >
-             <VStack align="center" spacing={1}>
-               <Text fontSize="sm" color={textSecondary} fontWeight="medium">
-                 Current Value
-               </Text>
-               <HStack spacing={0} align="baseline">
-                 <Text fontSize="2xl" fontWeight="bold" color="teal.600">
-                   {splitCurrencyForDisplay(asset.current_value, currencySymbol).main}
+              {asset.name}
+            </Text>
+            <HStack spacing={{ base: 4, md: 6 }} color={mutedColor} align="start">
+               <VStack align="start" spacing={0}>
+                 <Text fontSize="sm" color={mutedColor}>
+                   Quantity
                  </Text>
-                 <Text fontSize="lg" fontWeight="bold" color="teal.600" opacity={0.7}>
-                   {splitCurrencyForDisplay(asset.current_value, currencySymbol).decimals}
-                 </Text>
-               </HStack>
-             </VStack>
-            </Box>
-          )}
-
-           {/* Price Information */}
-           <Box
-             bg={cardBg}
-             p={4}
-             borderRadius="lg"
-             border="1px solid"
-             borderColor={borderColor}
-           >
-             <HStack justify="space-between" align="center">
-               <VStack align="start" spacing={1}>
-                 <HStack>
-                   <Icon as={BarChart3} boxSize={3} color={textSecondary} />
-                   <Text fontSize="xs" color={textTertiary}>
-                     Latest Price
-                   </Text>
-                 </HStack>
                  <HStack spacing={0} align="baseline">
-                   <Text fontSize="sm" fontWeight="medium">
-                     {splitCurrencyForDisplay(asset.latest_price_per_unit, currencySymbol).main}
+                   <Text fontSize="md">
+                     {splitQuantityForDisplay(asset.total_quantity).main}
                    </Text>
-                   <Text fontSize="xs" fontWeight="medium" opacity={0.7}>
-                     {splitCurrencyForDisplay(asset.latest_price_per_unit, currencySymbol).decimals}
+                   <Text fontSize="sm" opacity={0.7}>
+                     {splitQuantityForDisplay(asset.total_quantity).decimals}
                    </Text>
-                   <Text as="span" fontSize="xs" color={textSecondary}>
-                     /{asset.asset_type?.unit_symbol || ""}
+                   <Text fontSize="sm" opacity={0.7} ml={1}>
+                     {asset.asset_type?.unit_symbol || ""}
                    </Text>
                  </HStack>
                </VStack>
-
-               {hasHoldings && (
-                 <VStack align="end" spacing={1}>
-                   <HStack justify="end">
-                     <Icon as={Coins} boxSize={3} color={textSecondary} />
-                     <Text fontSize="xs" color={textTertiary}>
-                       Holdings
-                     </Text>
-                   </HStack>
-                   <HStack spacing={0} align="baseline">
-                     <Text fontSize="sm" fontWeight="medium">
-                       {splitQuantityForDisplay(asset.total_quantity).main}
-                     </Text>
-                     <Text fontSize="xs" fontWeight="medium" opacity={0.6}>
-                       {splitQuantityForDisplay(asset.total_quantity).decimals}
-                     </Text>
-                     <Text as="span" fontSize="xs" color={textSecondary} ml={1}>
-                       {asset.asset_type?.unit_symbol || ""}
-                     </Text>
-                   </HStack>
-                 </VStack>
-               )}
-             </HStack>
-           </Box>
-
-          {/* Price Range - Only show if we have transaction data */}
-          {(highestPurchasePrice !== null || lowestPurchasePrice !== null) && (
-            <Box
-              bg={cardBg}
-              p={4}
-              borderRadius="lg"
-              border="1px solid"
-              borderColor={borderColor}
-            >
-              <HStack justify="space-between" align="center">
-                {lowestPurchasePrice !== null && (
-                  <VStack align="start" spacing={1}>
-                    <Text fontSize="xs" color={textTertiary}>
-                      Lowest Price
-                    </Text>
-                    <HStack spacing={0} align="baseline">
-                      <Text fontSize="sm" fontWeight="medium">
-                        {splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).main}
-                      </Text>
-                      <Text fontSize="xs" fontWeight="medium" opacity={0.7}>
-                        {splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).decimals}
-                      </Text>
-                      <Text as="span" fontSize="xs" color={textSecondary}>
-                        /{asset.asset_type?.unit_symbol || ""}
-                      </Text>
-                    </HStack>
-                  </VStack>
-                )}
-
-                {highestPurchasePrice !== null && (
-                  <VStack align="end" spacing={1}>
-                    <Text fontSize="xs" color={textTertiary}>
-                      Highest Price
-                    </Text>
-                    <HStack spacing={0} align="baseline">
-                      <Text fontSize="sm" fontWeight="medium">
-                        {splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).main}
-                      </Text>
-                      <Text fontSize="xs" fontWeight="medium" opacity={0.7}>
-                        {splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).decimals}
-                      </Text>
-                      <Text as="span" fontSize="xs" color={textSecondary}>
-                        /{asset.asset_type?.unit_symbol || ""}
-                      </Text>
-                    </HStack>
-                  </VStack>
-                )}
-              </HStack>
-             </Box>
-           )}
-
-           {/* P&L Section - Enhanced */}
-           {hasHoldings && (
-             <Box
-               bg={isPositive ? "green.50" : "red.50"}
-               border="1px solid"
-               borderColor={isPositive ? "green.200" : "red.200"}
-               p={3}
-               borderRadius="lg"
-             >
-               <HStack justify="space-between" align="center">
-                 <VStack align="start" spacing={1}>
-                   <HStack>
-                     <Icon
-                       as={isPositive ? TrendingUp : TrendingDown}
-                       boxSize={4}
-                       color={pnlColor}
-                     />
-                     <Text
-                       fontSize="sm"
-                       color={textSecondary}
-                       fontWeight="medium"
-                     >
-                       Unrealized P&L
-                     </Text>
-                   </HStack>
-                    <HStack spacing={0} align="baseline">
-                      <Text fontWeight="bold" fontSize="lg" color={pnlColor}>
-                        {splitCurrencyForDisplay(Math.abs(unrealizedPnL), currencySymbol).main}
-                      </Text>
-                      <Text fontWeight="bold" fontSize="md" color={pnlColor} opacity={0.7}>
-                        {splitCurrencyForDisplay(Math.abs(unrealizedPnL), currencySymbol).decimals}
-                      </Text>
-                    </HStack>
-                 </VStack>
-
-                 <Box
-                   bg={isPositive ? "green.500" : "red.500"}
-                   color="white"
-                   px={3}
-                   py={2}
-                   borderRadius="full"
-                 >
-                    <HStack spacing={0} align="baseline">
-                      <Text fontSize="sm" fontWeight="bold">
-                        {splitPercentageForDisplay(unrealizedPnLPercentage).main}
-                      </Text>
-                      <Text fontSize="xs" fontWeight="bold" opacity={0.7}>
-                        {splitPercentageForDisplay(unrealizedPnLPercentage).decimals}%
-                      </Text>
-                    </HStack>
-                 </Box>
-               </HStack>
-             </Box>
-           )}
-
-           {/* Modern Action Buttons */}
-           <Stack direction="row" spacing={3}>
-              <Button
-                colorScheme="teal"
-                size="md"
-                flex={1}
-                borderRadius="lg"
-                onClick={() => onBuySell(asset)}
-                leftIcon={hasHoldings ? <Coins /> : <TrendingUp />}
-                _hover={{
-                  bg: "teal.600",
-                }}
-                transition="all 0.2s"
-                fontWeight="semibold"
-              >
-               {hasHoldings ? "Buy/Sell" : "Buy"}
-             </Button>
-
-               <Button
-                 variant="outline"
-                 size="md"
-                 flex={1}
-                 borderRadius="lg"
-                 borderWidth="1px"
-                 borderColor="gray.200"
-                 color={textSecondary}
-                 onClick={() => onUpdatePrice(asset)}
-                 _hover={{
-                   bg: "gray.50",
-                   borderColor: "gray.300",
-                 }}
-                 transition="all 0.2s"
-                 fontWeight="medium"
-               >
-               Update Price
-             </Button>
-           </Stack>
-
-          {/* Additional Info */}
-          {(asset.notes || asset.last_price_update) && (
-            <>
-              <Divider />
-              <VStack align="start" spacing={2}>
-                {asset.notes && (
-                  <Box>
-                    <Text fontSize="xs" color={textTertiary} mb={1}>
-                      Notes
-                    </Text>
-                    <Text fontSize="sm" color={textSecondary} noOfLines={2}>
-                      {asset.notes}
-                    </Text>
-                  </Box>
-                )}
-
-                {asset.last_price_update && (
-                  <HStack>
-                    <Icon as={Calendar} boxSize={3} color={textTertiary} />
-                      <Text fontSize="xs" color={textTertiary}>
-                        Last updated:{" "}
-                        {formatDate(asset.last_price_update)}
-                      </Text>
-                  </HStack>
-                )}
+              <VStack align="start" spacing={0}>
+                <Text fontSize="sm" color={mutedColor}>
+                  Invested
+                </Text>
+                <HStack spacing={0} align="baseline">
+                  <Text fontSize="md">
+                    {splitCurrencyForDisplay(costBasis, currencySymbol).main}
+                  </Text>
+                  <Text fontSize="sm" opacity={0.7}>
+                    {splitCurrencyForDisplay(costBasis, currencySymbol).decimals}
+                  </Text>
+                </HStack>
               </VStack>
-            </>
-           )}
-         </VStack>
-       </Box>
+              <VStack align="start" spacing={0}>
+                <Text fontSize="sm" color={mutedColor}>
+                  Value
+                </Text>
+                <HStack spacing={0} align="baseline">
+                  <Text fontSize="md">
+                    {splitCurrencyForDisplay(asset.current_value, currencySymbol).main}
+                  </Text>
+                  <Text fontSize="sm" opacity={0.7}>
+                    {
+                      splitCurrencyForDisplay(asset.current_value, currencySymbol)
+                        .decimals
+                    }
+                  </Text>
+                </HStack>
+              </VStack>
+            </HStack>
+          </VStack>
+          <Badge
+            colorScheme={unrealizedPnL >= 0 ? "green" : "red"}
+            size="sm"
+            fontWeight="medium"
+            px={2}
+            py={0.5}
+            borderRadius="md"
+          >
+            <HStack spacing={0} align="baseline">
+              <Text fontSize="sm" fontWeight="semibold">
+                {splitPercentageForDisplay(unrealizedPnLPercentage).main}
+              </Text>
+              <Text fontSize="xs" fontWeight="semibold" opacity={0.7}>
+                {splitPercentageForDisplay(unrealizedPnLPercentage).decimals}%
+              </Text>
+            </HStack>
+          </Badge>
+        </HStack>
 
-       {/* Delete Confirmation Dialog */}
-       {!hasHoldings && onDelete && (
-         <AlertDialog
-           isOpen={isDeleteDialogOpen}
-           onClose={onDeleteDialogClose}
-            leastDestructiveRef={cancelRef}
-         >
-           <AlertDialogOverlay>
-             <AlertDialogContent>
-               <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                 Delete Physical Asset
-               </AlertDialogHeader>
+        <Collapse in={isExpanded} animateOpacity>
+          <Box pt={2}>
+            <Divider mb={3} />
+             <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4} mb={3}>
+               <Stat size="sm">
+                 <StatLabel fontSize="xs" color={mutedColor}>
+                   Latest Price
+                 </StatLabel>
+                 <HStack spacing={0} align="baseline">
+                   <StatNumber fontSize="sm" color="gray.600">
+                     {splitCurrencyForDisplay(asset.latest_price_per_unit, currencySymbol).main}
+                   </StatNumber>
+                   <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                     {splitCurrencyForDisplay(asset.latest_price_per_unit, currencySymbol).decimals}
+                   </Text>
+                   <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                     /{asset.asset_type?.unit_symbol || ""}
+                   </Text>
+                 </HStack>
+               </Stat>
+               <Stat size="sm">
+                 <StatLabel fontSize="xs" color={mutedColor}>
+                   Unrealized P&L
+                 </StatLabel>
+                 <HStack spacing={0} align="baseline">
+                   <StatNumber
+                     fontSize="sm"
+                     color={unrealizedPnL >= 0 ? "green.500" : "red.500"}
+                   >
+                     {splitCurrencyForDisplay(Math.abs(unrealizedPnL), currencySymbol).main}
+                   </StatNumber>
+                   <Text
+                     fontSize="xs"
+                     color={unrealizedPnL >= 0 ? "green.500" : "red.500"}
+                     opacity={0.7}
+                   >
+                     {
+                       splitCurrencyForDisplay(Math.abs(unrealizedPnL), currencySymbol)
+                         .decimals
+                     }
+                   </Text>
+                 </HStack>
+               </Stat>
+             </SimpleGrid>
+             <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4} mb={3}>
+               <Stat size="sm">
+                 <StatLabel fontSize="xs" color={mutedColor}>
+                   Avg. Cost
+                 </StatLabel>
+                 <HStack spacing={0} align="baseline">
+                   <StatNumber fontSize="sm" color="gray.600">
+                     {
+                       splitCurrencyForDisplay(asset.average_cost_per_unit, currencySymbol)
+                         .main
+                     }
+                   </StatNumber>
+                   <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                     {
+                       splitCurrencyForDisplay(asset.average_cost_per_unit, currencySymbol)
+                         .decimals
+                     }
+                   </Text>
+                 </HStack>
+               </Stat>
+               <Stat size="sm">
+                 <StatLabel fontSize="xs" color={mutedColor}>
+                   Lowest Cost
+                 </StatLabel>
+                 <HStack spacing={0} align="baseline">
+                   <StatNumber fontSize="sm" color="gray.600">
+                     {lowestPurchasePrice !== null
+                       ? splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).main
+                       : "--"}
+                   </StatNumber>
+                   <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                     {lowestPurchasePrice !== null
+                       ? splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).decimals
+                       : ""}
+                   </Text>
+                 </HStack>
+               </Stat>
+               <Stat size="sm">
+                 <StatLabel fontSize="xs" color={mutedColor}>
+                   Highest Cost
+                 </StatLabel>
+                 <HStack spacing={0} align="baseline">
+                   <StatNumber fontSize="sm" color="gray.600">
+                     {highestPurchasePrice !== null
+                       ? splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).main
+                       : "--"}
+                   </StatNumber>
+                   <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                     {highestPurchasePrice !== null
+                       ? splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).decimals
+                       : ""}
+                   </Text>
+                 </HStack>
+               </Stat>
+             </SimpleGrid>
 
-              <AlertDialogBody>
-                Are you sure you want to delete &ldquo;{asset.name}&rdquo;? This action cannot be undone.
-                This will permanently remove the asset from your portfolio.
-              </AlertDialogBody>
+            <Divider mb={3} />
 
-                <AlertDialogFooter>
-                  <Button ref={cancelRef} onClick={onDeleteDialogClose}>
-                    Cancel
-                  </Button>
-                 <Button
-                   colorScheme="red"
-                   onClick={() => {
-                     onDelete(asset);
-                     onDeleteDialogClose();
-                   }}
-                   ml={3}
-                 >
-                   Delete
-                 </Button>
-               </AlertDialogFooter>
-             </AlertDialogContent>
-           </AlertDialogOverlay>
-         </AlertDialog>
-       )}
-     </Box>
-   );
- };
+            <SimpleGrid columns={{ base: 2, md: 4 }} spacing={2} w="full">
+              <Button
+                size="sm"
+                colorScheme="teal"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onBuySell(asset);
+                }}
+                sx={{ fontSize: "xs" }}
+                w="full"
+              >
+                Buy/Sell
+              </Button>
+              <Button
+                size="sm"
+                colorScheme="purple"
+                variant="outline"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onUpdatePrice(asset);
+                }}
+                sx={{ fontSize: "xs" }}
+                w="full"
+              >
+                Update Price
+              </Button>
+              {!hasHoldings && onDelete && (
+                <Button
+                  size="sm"
+                  colorScheme="red"
+                  variant="outline"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDeleteDialogOpen();
+                  }}
+                  sx={{ fontSize: "xs" }}
+                  w="full"
+                >
+                  Delete
+                </Button>
+              )}
+            </SimpleGrid>
+          </Box>
+        </Collapse>
+      </CardBody>
+
+      {/* Delete Confirmation Modal */}
+      {!hasHoldings && onDelete && (
+        <Modal
+          isOpen={isDeleteDialogOpen}
+          onClose={onDeleteDialogClose}
+          size={modalSize}
+          motionPreset="slideInBottom"
+        >
+          <ModalOverlay />
+          <ModalContent
+            margin={isMobile ? 0 : "auto"}
+            borderRadius={isMobile ? 0 : "md"}
+          >
+            <ModalHeader>Delete Physical Asset</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              Are you sure you want to delete &ldquo;{asset.name}&rdquo;?
+              <br />
+              This action cannot be undone.
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant="ghost"
+                mr={3}
+                onClick={onDeleteDialogClose}
+              >
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={() => {
+                  onDelete(asset);
+                  onDeleteDialogClose();
+                }}
+              >
+                Delete
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
+      )}
+    </Card>
+  );
+};
 
 export default AssetSummaryCard;

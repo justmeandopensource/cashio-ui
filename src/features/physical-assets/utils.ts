@@ -186,7 +186,11 @@ export const getAssetTypeDisplayName = (assetType: { name: string; unit_symbol: 
  * Format date for display
  */
 export const formatDate = (dateString: string): string => {
+  if (!dateString) return "N/A";
+
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Invalid Date";
+
   return format(date, "yyyy/MM/dd");
 };
 
@@ -194,7 +198,11 @@ export const formatDate = (dateString: string): string => {
  * Format date and time for display
  */
 export const formatDateTime = (dateString: string): string => {
+  if (!dateString) return "N/A";
+
   const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "Invalid Date";
+
   return date.toLocaleString();
 };
 

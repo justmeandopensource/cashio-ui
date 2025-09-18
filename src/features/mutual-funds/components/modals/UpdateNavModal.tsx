@@ -53,6 +53,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
   onSuccess,
 }) => {
   const { ledgerId } = useLedgerStore();
+  const { currencySymbol } = useLedgerStore();
   const queryClient = useQueryClient();
 
   const [formData, setFormData] = useState<FormData>({ nav: "" });
@@ -251,10 +252,10 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                   </HStack>
                   <HStack spacing={0} align="baseline">
                     <Text fontSize="xl" fontWeight="bold">
-                      {splitCurrencyForDisplay(fund.latest_nav, "₹").main}
+                      {splitCurrencyForDisplay(fund.latest_nav, currencySymbol || "₹").main}
                     </Text>
                     <Text fontSize="lg" fontWeight="bold" opacity={0.7}>
-                      {splitCurrencyForDisplay(fund.latest_nav, "₹").decimals}
+                      {splitCurrencyForDisplay(fund.latest_nav, currencySymbol || "₹").decimals}
                     </Text>
                   </HStack>
                   <Text fontSize="sm" color="gray.500">
@@ -374,7 +375,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                             fontWeight="bold"
                             color={currentValueChange >= 0 ? "green.600" : "red.600"}
                           >
-                            {splitCurrencyForDisplay(newNavValue, "₹").main}
+                            {splitCurrencyForDisplay(newNavValue, currencySymbol || "₹").main}
                           </Text>
                           <Text
                             fontSize="md"
@@ -382,7 +383,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                             color={currentValueChange >= 0 ? "green.600" : "red.600"}
                             opacity={0.7}
                           >
-                            {splitCurrencyForDisplay(newNavValue, "₹").decimals}
+                            {splitCurrencyForDisplay(newNavValue, currencySymbol || "₹").decimals}
                           </Text>
                         </HStack>
                       </VStack>
@@ -403,14 +404,14 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                               {currentValueChange >= 0 ? "+" : ""}{
                                 splitCurrencyForDisplay(
                                   Math.abs(currentValueChange),
-                                  "₹",
+                                  currencySymbol || "₹",
                                 ).main
                               }
                             </Text>
                             <Text fontSize="xs" fontWeight="bold" opacity={0.7}>
                               {splitCurrencyForDisplay(
                                 Math.abs(currentValueChange),
-                                "₹",
+                                currencySymbol || "₹",
                               ).decimals
                             }
                             </Text>

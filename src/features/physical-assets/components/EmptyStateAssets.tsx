@@ -10,10 +10,10 @@ import {
 import { Coins, Plus } from "lucide-react";
 
 interface EmptyStateAssetsProps {
-  onCreateAsset: () => void;
+  onCreateAssetType: () => void;
 }
 
-const EmptyStateAssets: FC<EmptyStateAssetsProps> = ({ onCreateAsset }) => {
+const EmptyStateAssets: FC<EmptyStateAssetsProps> = ({ onCreateAssetType }) => {
   const bgColor = useColorModeValue("gray.50", "gray.800");
   const textColor = useColorModeValue("gray.600", "gray.400");
 
@@ -33,20 +33,18 @@ const EmptyStateAssets: FC<EmptyStateAssetsProps> = ({ onCreateAsset }) => {
             No Physical Assets Yet
           </Text>
           <Text fontSize="md" color={textColor} maxW="400px">
-            Start building your physical assets portfolio by creating your first asset.
-            Track gold, silver, and other precious metals with real-time valuations.
+            Start building your physical assets portfolio by creating your first
+            asset type.
           </Text>
         </VStack>
-        <Button
-          leftIcon={<Plus />}
-          colorScheme="teal"
-          size="lg"
-          onClick={onCreateAsset}
-          mt={4}
-          w={{ base: "full", md: "auto" }}
-          fontSize={{ base: "md", md: "lg" }}
-        >
-          Create Your First Asset
+          <Button
+            colorScheme="teal"
+            size="lg"
+            onClick={onCreateAssetType}
+            w={{ base: "full", md: "auto" }}
+            fontSize={{ base: "md", md: "lg" }}
+          >
+          Create Your First Asset Type
         </Button>
       </VStack>
     </Box>
@@ -54,3 +52,4 @@ const EmptyStateAssets: FC<EmptyStateAssetsProps> = ({ onCreateAsset }) => {
 };
 
 export default EmptyStateAssets;
+

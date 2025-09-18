@@ -80,7 +80,8 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
   fund,
   onSuccess,
 }) => {
-  const { ledgerId, currencySymbol } = useLedgerStore();
+  const { ledgerId } = useLedgerStore();
+  const { currencySymbol } = useLedgerStore();
   const queryClient = useQueryClient();
   const [tabIndex, setTabIndex] = useState(0);
 
@@ -167,8 +168,8 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
     onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     setErrors({});
 
     // Validation
@@ -371,7 +372,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                   color="gray.600"
                   fontWeight="semibold"
                 >
-                  {currencySymbol}
+                  {currencySymbol || "₹"}
                 </InputLeftAddon>
                 <Input
                   type="number"
@@ -395,7 +396,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
               </InputGroup>
               <FormErrorMessage>{errors.nav_per_unit}</FormErrorMessage>
               <FormHelperText>
-                Total: {currencySymbol}
+                Total: {currencySymbol || "₹"}
                 {formatAmount(totalAmount)}
               </FormHelperText>
             </FormControl>
@@ -570,10 +571,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
 
       {/* Mobile-only action buttons that stay at bottom */}
       <Box display={{ base: "block", sm: "none" }}>
-         <Button
-           type="submit"
-           form="buy-sell-mf-form"
-           bg={type === "buy" ? "teal.500" : "red.400"}
+          <Button
+            onClick={() => handleSubmit({} as React.FormEvent)}
+            bg={type === "buy" ? "teal.500" : "red.400"}
            color="white"
            _hover={{
              bg: type === "buy" ? "teal.600" : "red.500",
@@ -705,8 +705,15 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
            flexDirection="column"
            justifyContent={{ base: "space-between", sm: "flex-start" }}
          >
-           <form id="buy-sell-mf-form" onSubmit={handleSubmit}>
-             <Tabs
+            <Box
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !transactionMutation.isPending) {
+                  e.preventDefault();
+                  handleSubmit(e as any);
+                }
+              }}
+            >
+              <Tabs
                isFitted
                variant="enclosed"
                index={tabIndex}
@@ -769,8 +776,8 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                <TabPanel p={0}>{renderForm("buy")}</TabPanel>
                <TabPanel p={0}>{renderForm("sell")}</TabPanel>
              </TabPanels>
-           </Tabs>
-           </form>
+            </Tabs>
+            </Box>
          </ModalBody>
 
         {/* Desktop-only footer */}
@@ -782,10 +789,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           borderTop="1px solid"
           borderColor={borderColor}
         >
-           <Button
-             type="submit"
-             form="buy-sell-mf-form"
-             bg={currentType === "buy" ? "teal.500" : "red.400"}
+            <Button
+              onClick={() => handleSubmit({} as React.FormEvent)}
+              bg={currentType === "buy" ? "teal.500" : "red.400"}
              color="white"
              _hover={{
                bg: currentType === "buy" ? "teal.600" : "red.500",

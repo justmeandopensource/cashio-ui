@@ -92,19 +92,18 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
   // Reset form when modal opens/closes
   useEffect(() => {
     if (isOpen) {
+      const validPreselected = preselectedAmcId &&
+        preselectedAmcId > 0 &&
+        amcs.find((amc) => amc.amc_id === preselectedAmcId);
+
       setFormData({
         name: "",
-        amc_id:
-          preselectedAmcId &&
-          preselectedAmcId > 0 &&
-          amcs.find((amc) => amc.amc_id === preselectedAmcId)
-            ? preselectedAmcId.toString()
-            : "",
+        amc_id: validPreselected ? preselectedAmcId.toString() : "",
         notes: "",
       });
       setErrors({});
     }
-  }, [isOpen, preselectedAmcId, amcs]);
+  }, [isOpen, preselectedAmcId]); // Remove amcs from dependencies
 
   // Form validation
   const validateForm = (): boolean => {
@@ -311,72 +310,70 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
                   </FormControl>
 
                   {/* AMC Selection */}
-                  {selectedAmc ? (
-                    <FormControl>
-                      <FormLabel fontWeight="semibold" mb={2}>
-                        <HStack spacing={2}>
-                          <Building2 size={16} />
-                          <Text>Asset Management Company</Text>
-                        </HStack>
-                      </FormLabel>
-                      <Input
-                        value={selectedAmc.name}
-                        isReadOnly
-                        size="lg"
-                        bg={useColorModeValue("gray.100", "gray.600")}
-                        borderColor={inputBorderColor}
-                        borderWidth="2px"
-                        borderRadius="md"
-                        opacity={0.8}
-                        cursor="not-allowed"
-                      />
-                      <FormHelperText>
-                        This fund will be created under {selectedAmc.name}
-                      </FormHelperText>
-                    </FormControl>
-                  ) : (
-                    <FormControl isInvalid={!!errors.amc_id}>
-                      <FormLabel fontWeight="semibold" mb={2}>
-                        <HStack spacing={2}>
-                          <Building2 size={16} />
-                          <Text>Asset Management Company</Text>
-                          <Text as="span" color="red.500">
-                            *
-                          </Text>
-                        </HStack>
-                      </FormLabel>
-                      <Select
-                        value={formData.amc_id}
-                        onChange={(e) =>
-                          handleInputChange("amc_id", e.target.value)
-                        }
-                        placeholder="Select the AMC"
-                        size="lg"
-                        bg={inputBg}
-                        borderColor={inputBorderColor}
-                        borderWidth="2px"
-                        borderRadius="md"
-                        _hover={{ borderColor: "teal.300" }}
-                        _focus={{
-                          borderColor: focusBorderColor,
-                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                        }}
-                      >
-                        {amcs.map((amc) => (
-                          <option
-                            key={amc.amc_id}
-                            value={amc.amc_id.toString()}
-                          >
-                            {amc.name}
-                          </option>
-                        ))}
-                      </Select>
-                      <FormErrorMessage>{errors.amc_id}</FormErrorMessage>
-                      <FormHelperText>
-                        Choose the AMC that manages this mutual fund
-                      </FormHelperText>
-                    </FormControl>
-                  )}
+                  <FormControl isInvalid={!!errors.amc_id} display={selectedAmc ? "block" : "none"}>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      <HStack spacing={2}>
+                        <Building2 size={16} />
+                        <Text>Asset Management Company</Text>
+                      </HStack>
+                    </FormLabel>
+                    <Input
+                      value={selectedAmc?.name || ""}
+                      isReadOnly
+                      size="lg"
+                      bg={useColorModeValue("gray.100", "gray.600")}
+                      borderColor={inputBorderColor}
+                      borderWidth="2px"
+                      borderRadius="md"
+                      opacity={0.8}
+                      cursor="not-allowed"
+                    />
+                    <FormHelperText>
+                      This fund will be created under {selectedAmc?.name}
+                    </FormHelperText>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.amc_id} display={selectedAmc ? "none" : "block"}>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      <HStack spacing={2}>
+                        <Building2 size={16} />
+                        <Text>Asset Management Company</Text>
+                        <Text as="span" color="red.500">
+                          *
+                        </Text>
+                      </HStack>
+                    </FormLabel>
+                    <Select
+                      value={formData.amc_id}
+                      onChange={(e) =>
+                        handleInputChange("amc_id", e.target.value)
+                      }
+                      placeholder="Select the AMC"
+                      size="lg"
+                      bg={inputBg}
+                      borderColor={inputBorderColor}
+                      borderWidth="2px"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                    >
+                      {amcs.map((amc) => (
+                        <option
+                          key={amc.amc_id}
+                          value={amc.amc_id.toString()}
+                        >
+                          {amc.name}
+                        </option>
+                      ))}
+                    </Select>
+                    <FormErrorMessage>{errors.amc_id}</FormErrorMessage>
+                    <FormHelperText>
+                      Choose the AMC that manages this mutual fund
+                    </FormHelperText>
+                  </FormControl>
 
                   {/* Notes */}
                   <FormControl isInvalid={!!errors.notes}>

@@ -112,7 +112,6 @@ export interface PhysicalAssetsMainProps {
 export interface AssetSummaryCardProps {
   asset: PhysicalAsset;
   currencySymbol: string;
-  ledgerId: number;
   // eslint-disable-next-line no-unused-vars
   onBuySell: (_asset: PhysicalAsset) => void;
   // eslint-disable-next-line no-unused-vars
@@ -140,6 +139,7 @@ export interface CreatePhysicalAssetModalProps {
   onClose: () => void;
   // eslint-disable-next-line no-unused-vars
   onAssetCreated: (_asset: PhysicalAsset) => void;
+  assetTypeId?: number;
 }
 
 export interface UpdatePriceModalProps {

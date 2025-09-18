@@ -122,7 +122,7 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
   }
 
   return (
-      <Popover placement="top" isLazy onOpen={() => setTimeout(() => (document.activeElement as HTMLElement)?.blur(), 0)}>
+      <Popover placement="top" isLazy>
         <PopoverTrigger>
           <Button
             ref={triggerRef}
@@ -143,7 +143,6 @@ const UserProfileDisplay: React.FC<UserProfileDisplayProps> = ({
             transition="all 0.2s ease"
             width="full"
             justifyContent="flex-start"
-            tabIndex={-1}
             sx={{ "&:focus": { outline: "none" } }}
           >
           <HStack spacing={3} width="full">

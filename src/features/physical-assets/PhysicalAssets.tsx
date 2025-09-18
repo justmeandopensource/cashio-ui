@@ -15,6 +15,8 @@ import {
   Badge,
   Box,
   Button,
+  Card,
+  CardBody,
   Flex,
   HStack,
   Icon,
@@ -24,6 +26,7 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  ModalCloseButton,
   Spinner,
   Tab,
   TabList,
@@ -34,13 +37,14 @@ import {
   useDisclosure,
   useToast,
   VStack,
-  IconButton,
+  useBreakpointValue,
 } from "@chakra-ui/react";
-import { Plus, Coins, Package, Trash2, AlertTriangle } from "lucide-react";
+import { Plus, Coins, Package, AlertTriangle } from "lucide-react";
 import useLedgerStore from "@/components/shared/store";
 import { usePhysicalAssets, useAssetTypes, useDeletePhysicalAsset, useDeleteAssetType } from "./api";
 import { toastDefaults } from "@/components/shared/utils";
-import AssetSummaryCard, { AssetSummaryCardSkeleton } from "./components/AssetSummaryCard";
+import { AssetSummaryCardSkeleton } from "./components/AssetSummaryCard";
+import AssetTypeCard from "./components/AssetTypeCard";
 import BuySellAssetModal from "./components/BuySellAssetModal";
 import CreateAssetTypeModal from "./components/CreateAssetTypeModal";
 import CreatePhysicalAssetModal from "./components/CreatePhysicalAssetModal";
@@ -58,11 +62,7 @@ import {
 } from "./utils";
 import { PhysicalAsset, AssetType } from "./types";
 
-// Map subtab names to indices for physical assets
-const subTabMap = {
-  overview: 0,
-  transactions: 1,
-};
+
 
 const PhysicalAssets: FC = () => {
   const queryClient = useQueryClient();
@@ -70,6 +70,10 @@ const PhysicalAssets: FC = () => {
   const { ledgerId, currencySymbol } = useLedgerStore();
   const [selectedAsset, setSelectedAsset] = useState<PhysicalAsset | undefined>();
   const [tabIndex, setTabIndex] = useState(0);
+
+  // Responsive modal settings
+  const modalSize = useBreakpointValue({ base: "full", md: "md" });
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   // Modal states
   const {
@@ -112,6 +116,7 @@ const PhysicalAssets: FC = () => {
   const deleteAssetTypeMutation = useDeleteAssetType();
 
   // Calculate portfolio summary
+  const totalInvested = assets.reduce((total, asset) => total + (asset.total_quantity * asset.average_cost_per_unit), 0);
   const totalCurrentValue = calculateTotalPortfolioValue(assets);
   const totalPnL = calculateTotalUnrealizedPnL(assets);
   const totalPnLPercentage = calculateTotalUnrealizedPnLPercentage(assets);
@@ -221,8 +226,7 @@ const PhysicalAssets: FC = () => {
     );
   }
 
-  const assetsWithHoldings = assets.filter(asset => asset.total_quantity > 0);
-  const assetsWithoutHoldings = assets.filter(asset => asset.total_quantity === 0);
+
 
   return (
     <Box>
@@ -248,9 +252,9 @@ const PhysicalAssets: FC = () => {
             >
               <Flex align="center">
                 <Text>Overview</Text>
-                {assetsWithHoldings.length > 0 && (
+                {assets.length > 0 && (
                   <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
-                    {assetsWithHoldings.length}
+                    {assets.length}
                   </Badge>
                 )}
               </Flex>
@@ -280,103 +284,131 @@ const PhysicalAssets: FC = () => {
         </Box>
 
         <TabPanels>
-          <TabPanel p={{ base: 2, md: 4 }}>
-            {/* Portfolio Summary Header */}
-            <Box mb={6} p={{ base: 3, md: 4 }} bg="white" borderRadius="lg" boxShadow="sm">
-              <Flex
-                direction={{ base: "column", md: "row" }}
-                justify="space-between"
-                align={{ base: "start", md: "center" }}
-                mb={4}
-                gap={{ base: 3, md: 0 }}
-              >
-                <Flex align="center" mb={{ base: 2, md: 0 }}>
-                  <Icon as={Coins} mr={2} color="teal.500" />
-                  <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
-                    Physical Assets Portfolio
-                  </Text>
+           <TabPanel p={{ base: 2, md: 4 }}>
+                {/* Portfolio Summary Header - Only show if there are asset types */}
+                {assetTypes.length > 0 && (
+                <Box mb={6} p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" boxShadow="sm">
+                <Flex
+                  direction={{ base: "column", md: "row" }}
+                  justify="space-between"
+                  align={{ base: "start", md: "center" }}
+                  mb={4}
+                  gap={{ base: 3, md: 0 }}
+                >
+                  <Flex align="center" mb={{ base: 2, md: 0 }}>
+                    <Icon as={Coins} mr={2} color="teal.500" />
+                    <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
+                      Physical Assets Portfolio
+                    </Text>
+                  </Flex>
+                  <Flex gap={2} width={{ base: "full", md: "auto" }}>
+                    <Button
+                      leftIcon={<Plus />}
+                      colorScheme="teal"
+                      variant="outline"
+                      size={{ base: "md", md: "sm" }}
+                      onClick={handleCreateAssetType}
+                      flex={{ base: 1, md: "none" }}
+                    >
+                      Asset Type
+                    </Button>
+                    <Button
+                      leftIcon={<Plus />}
+                      colorScheme="teal"
+                      variant={assetTypes.length === 0 ? "outline" : "solid"}
+                      size={{ base: "md", md: "sm" }}
+                      onClick={handleCreateAsset}
+                      title={assetTypes.length === 0 ? "Create an asset type first" : "Create a new physical asset"}
+                      flex={{ base: 1, md: "none" }}
+                    >
+                      Physical Asset
+                    </Button>
+                  </Flex>
                 </Flex>
-                <Flex gap={2} width={{ base: "full", md: "auto" }}>
-                  <Button
-                    leftIcon={<Plus />}
-                    colorScheme="teal"
-                    variant="outline"
-                    size={{ base: "md", md: "sm" }}
-                    onClick={handleCreateAssetType}
-                    flex={{ base: 1, md: "none" }}
-                  >
-                    Asset Type
-                  </Button>
-                  <Button
-                    leftIcon={<Plus />}
-                    colorScheme="teal"
-                    variant={assetTypes.length === 0 ? "outline" : "solid"}
-                    size={{ base: "md", md: "sm" }}
-                    onClick={handleCreateAsset}
-                    title={assetTypes.length === 0 ? "Create an asset type first" : "Create a new physical asset"}
-                    flex={{ base: 1, md: "none" }}
-                  >
-                    Physical Asset
-                  </Button>
-                </Flex>
-              </Flex>
 
-              {/* Portfolio Stats */}
-              <Flex
-                direction={{ base: "column", md: "row" }}
-                gap={{ base: 4, md: 6 }}
-                wrap="wrap"
-              >
-                  <Box>
-                    <Text fontSize="sm" color="gray.600">Current Value</Text>
-                    <HStack spacing={0} align="baseline">
-                      <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="teal.600">
-                        {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
-                      </Text>
-                      <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="teal.600" opacity={0.7}>
-                        {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
-                      </Text>
-                    </HStack>
-                  </Box>
-                  <Box>
-                    <Text fontSize="sm" color="gray.600">Unrealized P&L</Text>
-                    <HStack spacing={0} align="baseline">
-                       <Text
-                       fontSize={{ base: "xl", md: "2xl" }}
-                       fontWeight="bold"
-                       color={getPnLColor(totalPnL)}
-                       >
-                       {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
-                       </Text>
-                       <Text
-                       fontSize={{ base: "md", md: "lg" }}
-                       fontWeight="bold"
-                       color={getPnLColor(totalPnL)}
-                       opacity={0.7}
-                       >
-                       {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
-                       </Text>
-                    </HStack>
-                     <HStack>
-                       <HStack spacing={0} align="baseline">
-                         <Text
-                             fontSize="sm"
-                             color={getPnLColor(totalPnL)}
-                         >
-                             {splitPercentageForDisplay(totalPnLPercentage).main}
-                         </Text>
-                         <Text
-                             fontSize="xs"
-                             color={getPnLColor(totalPnL)}
-                             opacity={0.7}
-                         >
-                             {splitPercentageForDisplay(totalPnLPercentage).decimals}%
-                         </Text>
-                       </HStack>
+                 {/* Portfolio Stats */}
+                <Flex
+                  direction={{ base: "column", md: "row" }}
+                  gap={{ base: 4, md: 6 }}
+                  wrap="wrap"
+                >
+                    <Box>
+                      <Text fontSize="sm" color="gray.600">Total Invested</Text>
+                      <HStack spacing={0} align="baseline">
+                        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="gray.600">
+                          {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
+                        </Text>
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="gray.600" opacity={0.7}>
+                          {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
+                        </Text>
+                      </HStack>
+                    </Box>
+                    <Box>
+                      <Text fontSize="sm" color="gray.600">Total Value</Text>
+                      <HStack spacing={0} align="baseline">
+                        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="teal.600">
+                          {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
+                        </Text>
+                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="teal.600" opacity={0.7}>
+                          {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
+                        </Text>
+                      </HStack>
+                    </Box>
+                    <Box>
+                      <Text fontSize="sm" color="gray.600">Total Unrealized P&L</Text>
+                     <HStack spacing={0} align="baseline">
+                        <Text
+                        fontSize={{ base: "xl", md: "2xl" }}
+                        fontWeight="bold"
+                        color={getPnLColor(totalPnL)}
+                        >
+                        {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
+                        </Text>
+                        <Text
+                        fontSize={{ base: "md", md: "lg" }}
+                        fontWeight="bold"
+                        color={getPnLColor(totalPnL)}
+                        opacity={0.7}
+                        >
+                        {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
+                        </Text>
                      </HStack>
-                  </Box>
-                </Flex>
-              </Box>
+                      <HStack>
+                        <HStack spacing={0} align="baseline">
+                          <Text
+                              fontSize="sm"
+                              color={getPnLColor(totalPnL)}
+                          >
+                              {splitPercentageForDisplay(totalPnLPercentage).main}
+                          </Text>
+                          <Text
+                              fontSize="xs"
+                              color={getPnLColor(totalPnL)}
+                              opacity={0.7}
+                          >
+                              {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                          </Text>
+                        </HStack>
+                       </HStack>
+                    </Box>
+                    <Box>
+                      <Text fontSize="sm" color="gray.600">Total Assets</Text>
+                      <VStack align="start" spacing={0}>
+                        <Text
+                          fontSize={{ base: "xl", md: "2xl" }}
+                          fontWeight="bold"
+                          color="blue.600"
+                        >
+                          {assets.length}
+                        </Text>
+                        <Text fontSize="xs" color="gray.500">
+                          Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
+                        </Text>
+                      </VStack>
+                    </Box>
+                    </Flex>
+                </Box>
+                )}
 
               {assetsLoading ? (
                 <Box p={8} textAlign="center">
@@ -390,174 +422,85 @@ const PhysicalAssets: FC = () => {
                     </Text>
                   </VStack>
                 </Box>
-              ) : assets.length === 0 ? (
-                <EmptyStateAssets onCreateAsset={handleCreateAsset} />
-              ) : (
-                 <Box>
-                    {/* Assets Layout - Dynamic based on content */}
-                    <VStack spacing={8} align="stretch">
-                      {/* Assets with holdings */}
-                      {assetsWithHoldings.length > 0 && (
-                        <Box>
-                          <Text fontSize="lg" fontWeight="semibold" mb={4}>
-                            Current Holdings
-                          </Text>
-                            <Flex
-                              gap={{ base: 3, md: 4 }}
-                              wrap="wrap"
-                              direction={{ base: "column", md: "row" }}
-                            >
-                                {assetsWithHoldings.map((asset) => (
-                                  <AssetSummaryCard
-                                    key={asset.physical_asset_id}
-                                    asset={asset}
-                                    currencySymbol={currencySymbol || "$"}
-                                    ledgerId={Number(ledgerId)}
-                                    onBuySell={handleBuySell}
-                                    onUpdatePrice={handleUpdatePrice}
-                                  />
-                                ))}
-                            </Flex>
-                        </Box>
+                ) : assetTypes.length === 0 ? (
+                  <EmptyStateAssets onCreateAssetType={handleCreateAssetType} />
+               ) : (
+                  <Box>
+                    {/* Asset Types and Assets Layout */}
+                    <VStack spacing={6} align="stretch">
+                      {assetTypes.length === 0 ? (
+                        <Card
+                          bg="white"
+                          borderColor="gray.200"
+                          borderWidth={1}
+                          shadow="sm"
+                        >
+                          <CardBody textAlign="center" py={12}>
+                            <VStack spacing={4}>
+                              <Icon as={Package} boxSize={12} color="gray.400" />
+                              <Text fontSize="lg" color="gray.500">
+                                No asset types created yet
+                              </Text>
+                              <Text color="gray.400">
+                                Create your first asset type to start tracking physical assets.
+                              </Text>
+                              <Button colorScheme="teal" onClick={handleCreateAssetType} size="lg">
+                                Create Your First Asset Type
+                              </Button>
+                            </VStack>
+                          </CardBody>
+                        </Card>
+                      ) : (
+                        assetTypes
+                          .map((assetType) => {
+                            const typeAssets = assets.filter(asset => asset.asset_type_id === assetType.asset_type_id);
+                            return {
+                              ...assetType,
+                              typeAssets,
+                            };
+                          })
+                          .sort((a, b) => b.typeAssets.length - a.typeAssets.length)
+                          .map((assetType) => (
+                            <AssetTypeCard
+                              key={assetType.asset_type_id}
+                              assetType={assetType}
+                              assets={assetType.typeAssets}
+                              currencySymbol={currencySymbol || "$"}
+                              onCreateAsset={() => {
+                                // Create asset for this type
+                                setSelectedAssetType(assetType);
+                                onCreateAssetModalOpen();
+                              }}
+                              onDeleteAssetType={handleDeleteAssetType}
+                              onBuySell={handleBuySell}
+                              onUpdatePrice={handleUpdatePrice}
+                              onDeleteAsset={handleDeleteAsset}
+                            />
+                          ))
                       )}
 
-                      {/* Assets without holdings */}
-                      {assetsWithoutHoldings.length > 0 && (
+                      {/* Loading skeletons when data is being fetched */}
+                      {assetsLoading && assets.length === 0 && (
                         <Box>
                           <Text fontSize="lg" fontWeight="semibold" mb={4}>
-                            Available Assets
+                            Loading Assets...
                           </Text>
-                             <Flex
-                               gap={{ base: 3, md: 4 }}
-                               wrap="wrap"
-                               direction={{ base: "column", md: "row" }}
-                             >
-                                 {assetsWithoutHoldings.map((asset) => (
-                                   <AssetSummaryCard
-                                     key={asset.physical_asset_id}
-                                     asset={asset}
-                                     currencySymbol={currencySymbol || "$"}
-                                     ledgerId={Number(ledgerId)}
-                                     onBuySell={handleBuySell}
-                                     onUpdatePrice={handleUpdatePrice}
-                                     onDelete={handleDeleteAsset}
-                                   />
-                                 ))}
-                             </Flex>
+                          <Flex
+                            gap={{ base: 3, md: 4 }}
+                            wrap="wrap"
+                            direction={{ base: "column", md: "row" }}
+                          >
+                            {Array.from({ length: 3 }).map((_, index) => (
+                              <AssetSummaryCardSkeleton key={`skeleton-${index}`} />
+                            ))}
+                          </Flex>
                         </Box>
                       )}
                     </VStack>
-
-                    {/* Loading skeletons when data is being fetched */}
-                    {assetsLoading && assets.length === 0 && (
-                      <Box>
-                        <Text fontSize="lg" fontWeight="semibold" mb={4}>
-                          Loading Assets...
-                        </Text>
-                         <Flex
-                           gap={{ base: 3, md: 4 }}
-                           wrap="wrap"
-                           direction={{ base: "column", md: "row" }}
-                         >
-                           {Array.from({ length: 3 }).map((_, index) => (
-                             <AssetSummaryCardSkeleton key={`skeleton-${index}`} />
-                           ))}
-                         </Flex>
-                      </Box>
-                    )}
                   </Box>
                )}
 
-                {/* Asset Types Section */}
-                {assetTypes.length > 0 && (
-                  <Box mt={6} p={{ base: 3, md: 4 }} bg="white" borderRadius="lg" boxShadow="sm">
-                    <Flex justify="space-between" align="center" mb={4}>
-                      <Flex align="center">
-                        <Icon as={Package} mr={2} color="teal.500" />
-                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold">
-                          Asset Types
-                        </Text>
-                      </Flex>
-                    </Flex>
 
-                    <Flex
-                      gap={{ base: 3, md: 4 }}
-                      wrap="wrap"
-                      direction={{ base: "column", md: "row" }}
-                    >
-                      {assetTypes.map((assetType) => {
-                        const assetsUsingType = assets.filter(asset => asset.asset_type_id === assetType.asset_type_id);
-                        const assetCount = assetsUsingType.length;
-
-                        return (
-                          <Box
-                            key={assetType.asset_type_id}
-                            bg="gray.50"
-                            border="1px solid"
-                            borderColor="gray.200"
-                            borderRadius="lg"
-                            p={{ base: 3, md: 4 }}
-                            minW={{ base: "full", md: "250px" }}
-                            width={{ base: "full", md: "auto" }}
-                            position="relative"
-                            _hover={{
-                              borderColor: "teal.300",
-                              boxShadow: "md",
-                            }}
-                            transition="all 0.2s"
-                          >
-                           <Flex justify="space-between" align="start" mb={3}>
-                             <VStack align="start" spacing={1} flex={1}>
-                               <Text fontSize="lg" fontWeight="semibold" color="gray.800">
-                                 {assetType.name}
-                               </Text>
-                               <Text fontSize="sm" color="gray.600">
-                                 Unit: {assetType.unit_name} ({assetType.unit_symbol})
-                               </Text>
-                             </VStack>
-                             <IconButton
-                               aria-label="Delete asset type"
-                               icon={<Trash2 />}
-                               size="sm"
-                               colorScheme="red"
-                               variant="ghost"
-                               color="gray.500"
-                               _hover={{
-                                 color: "red.500",
-                                 bg: "red.50",
-                               }}
-                               onClick={() => handleDeleteAssetType(assetType)}
-                               isDisabled={assetCount > 0}
-                               title={assetCount > 0 ? "Cannot delete: assets exist" : "Delete asset type"}
-                              />
-                            </Flex>
-
-                           <HStack justify="space-between" align="center">
-                             <Text fontSize="sm" color="gray.600">
-                               Assets using this type:
-                             </Text>
-                             <Badge
-                               colorScheme={assetCount > 0 ? "teal" : "gray"}
-                               variant="subtle"
-                               borderRadius="full"
-                               px={3}
-                               py={1}
-                             >
-                               {assetCount}
-                             </Badge>
-                           </HStack>
-
-                           {assetType.description && (
-                             <Text fontSize="xs" color="gray.500" mt={2} noOfLines={2}>
-                               {assetType.description}
-                             </Text>
-                           )}
-                         </Box>
-                       );
-                     })}
-                   </Flex>
-                 </Box>
-               )}
              </TabPanel>
 
             {/* Transactions Tab */}
@@ -574,7 +517,7 @@ const PhysicalAssets: FC = () => {
                     </Text>
                   </VStack>
                 </Box>
-              ) : assetsWithHoldings.length === 0 ? (
+              ) : assets.length === 0 ? (
                 <EmptyStateTransactions />
               ) : (
                  <AssetTransactionHistory />
@@ -667,48 +610,49 @@ const PhysicalAssets: FC = () => {
            </ModalContent>
          </Modal>
 
-        {/* Delete Asset Type Confirmation Dialog */}
-        <AlertDialog
+        {/* Delete Asset Type Confirmation Modal */}
+        <Modal
           isOpen={isDeleteAssetTypeDialogOpen}
-          leastDestructiveRef={cancelRef}
           onClose={() => {
             setIsDeleteAssetTypeDialogOpen(false);
             setSelectedAssetType(null);
           }}
+          size={modalSize}
+          motionPreset="slideInBottom"
         >
-          <AlertDialogOverlay>
-            <AlertDialogContent>
-              <AlertDialogHeader fontSize="lg" fontWeight="bold">
-                Delete Asset Type
-              </AlertDialogHeader>
-
-              <AlertDialogBody>
-                Are you sure you want to delete the asset type &ldquo;{selectedAssetType?.name}&rdquo;?
-                This action cannot be undone.
-              </AlertDialogBody>
-
-              <AlertDialogFooter>
-                <Button
-                  ref={cancelRef}
-                  onClick={() => {
-                    setIsDeleteAssetTypeDialogOpen(false);
-                    setSelectedAssetType(null);
-                  }}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  colorScheme="red"
-                  onClick={confirmDeleteAssetType}
-                  ml={3}
-                  isLoading={deleteAssetTypeMutation.isPending}
-                >
-                  Delete
-                </Button>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialogOverlay>
-        </AlertDialog>
+          <ModalOverlay />
+          <ModalContent
+            margin={isMobile ? 0 : "auto"}
+            borderRadius={isMobile ? 0 : "md"}
+          >
+            <ModalHeader>Delete Asset Type</ModalHeader>
+            <ModalCloseButton />
+            <ModalBody>
+              Are you sure you want to delete the asset type &ldquo;{selectedAssetType?.name}&rdquo;?
+              This action cannot be undone.
+            </ModalBody>
+            <ModalFooter>
+              <Button
+                variant="ghost"
+                mr={3}
+                onClick={() => {
+                  setIsDeleteAssetTypeDialogOpen(false);
+                  setSelectedAssetType(null);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={confirmDeleteAssetType}
+                isLoading={deleteAssetTypeMutation.isPending}
+                loadingText="Deleting..."
+              >
+                Delete
+              </Button>
+            </ModalFooter>
+          </ModalContent>
+        </Modal>
 
         {/* Delete Asset Type Error Dialog */}
         <AlertDialog
@@ -744,8 +688,50 @@ const PhysicalAssets: FC = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialogOverlay>
-         </AlertDialog>
+          </AlertDialog>
 
+        {/* Modals */}
+        <BuySellAssetModal
+          isOpen={isBuySellModalOpen}
+          onClose={onBuySellModalClose}
+          asset={selectedAsset}
+          onTransactionCompleted={() => {
+            onBuySellModalClose();
+            setSelectedAsset(undefined);
+          }}
+        />
+
+        <CreateAssetTypeModal
+          isOpen={isCreateAssetTypeModalOpen}
+          onClose={onCreateAssetTypeModalClose}
+          onAssetTypeCreated={() => {
+            onCreateAssetTypeModalClose();
+            // Refresh asset types data
+            queryClient.invalidateQueries({
+              queryKey: ["asset-types", Number(ledgerId)],
+            });
+          }}
+        />
+
+        <CreatePhysicalAssetModal
+          isOpen={isCreateAssetModalOpen}
+          onClose={onCreateAssetModalClose}
+          onAssetCreated={() => {
+            onCreateAssetModalClose();
+            setSelectedAssetType(null);
+            // Refresh assets data
+            queryClient.invalidateQueries({
+              queryKey: ["physical-assets", Number(ledgerId)],
+            });
+          }}
+          assetTypeId={selectedAssetType?.asset_type_id}
+        />
+
+        <UpdatePriceModal
+          isOpen={isUpdatePriceModalOpen}
+          onClose={onUpdatePriceModalClose}
+          asset={selectedAsset}
+        />
 
       </Box>
     );

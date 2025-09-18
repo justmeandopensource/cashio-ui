@@ -15,7 +15,6 @@ import {
   Tr,
   Th,
   Td,
-  useColorModeValue,
   Select,
   Input,
   InputGroup,
@@ -34,8 +33,9 @@ import {
   useBreakpointValue,
   Tooltip,
   Square,
+  useColorModeValue,
 } from "@chakra-ui/react";
-import { Receipt, Search, Trash2, Calendar } from "lucide-react";
+import { Search, Trash2, Calendar } from "lucide-react";
 
 import { Amc, MutualFund, MfTransaction } from "../types";
 import { formatUnits, formatNav, getTransactionTypeText, splitCurrencyForDisplay } from "../utils";
@@ -52,8 +52,6 @@ interface MfTransactionsProps {
   transactions?: MfTransaction[];
   onDataChange: () => void;
   onAccountDataChange?: () => void;
-  onCreateAmc?: () => void;
-  onCreateFund?: () => void;
 }
 
 const MfTransactions: FC<MfTransactionsProps> = ({
@@ -62,10 +60,8 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   transactions = [],
   onDataChange,
   onAccountDataChange,
-  onCreateAmc,
-  onCreateFund,
 }) => {
-  const { ledgerId } = useLedgerStore();
+  const { ledgerId, currencySymbol } = useLedgerStore();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
@@ -231,7 +227,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                         : 0 // switch_in = neutral
                     )}
                   >
-                    {splitCurrencyForDisplay(transaction.total_amount, "₹").main}
+                    {splitCurrencyForDisplay(transaction.total_amount, currencySymbol || "₹").main}
                   </Text>
                   <Text
                     fontSize="xs"
@@ -245,7 +241,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                         : 0 // switch_in = neutral
                     )}
                   >
-                    {splitCurrencyForDisplay(transaction.total_amount, "₹").decimals}
+                    {splitCurrencyForDisplay(transaction.total_amount, currencySymbol || "₹").decimals}
                   </Text>
                 </HStack>
                 <Text fontSize="sm" color="gray.600" fontWeight="medium">
@@ -261,7 +257,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                   fontWeight="medium"
                   display="inline-block"
                 >
-                  ₹{formatNav(transaction.nav_per_unit)}/unit
+                  {currencySymbol || "₹"}{formatNav(transaction.nav_per_unit)}/unit
                 </Box>
               </VStack>
             </Flex>
@@ -322,8 +318,8 @@ const MfTransactions: FC<MfTransactionsProps> = ({
             direction={{ base: "column", md: "row" }}
             justify="space-between"
             align={{ base: "start", md: "center" }}
-            gap={{ base: 4, md: 0 }}
-            mb={transactions.length > 0 ? 4 : 0}
+             gap={{ base: 4, md: 0 }}
+             mb={4}
           >
             <Flex align="center" mb={{ base: 2, md: 0 }}>
                <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color="gray.700">
@@ -332,128 +328,134 @@ const MfTransactions: FC<MfTransactionsProps> = ({
             </Flex>
           </Flex>
 
-          {/* Search and Filters */}
-          {transactions.length > 0 && (
-            <Box>
-              <Flex
-                direction={{ base: "column", md: "row" }}
-                gap={{ base: 3, md: 4 }}
-                align={{ base: "stretch", md: "center" }}
-                wrap="wrap"
-                mb={4}
-              >
-                <InputGroup maxW={{ base: "full", md: "300px" }}>
-                  <InputLeftElement>
-                    <Search size={16} />
-                  </InputLeftElement>
-                  <Input
-                    placeholder="Search transactions..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </InputGroup>
+           {/* Search and Filters */}
+           <Box>
+             <Flex
+               direction={{ base: "column", md: "row" }}
+               gap={{ base: 3, md: 4 }}
+               align={{ base: "stretch", md: "center" }}
+               wrap="wrap"
+               mb={4}
+             >
+               <InputGroup maxW={{ base: "full", md: "300px" }}>
+                 <InputLeftElement>
+                   <Search size={16} />
+                 </InputLeftElement>
+                 <Input
+                   placeholder="Search transactions..."
+                   value={searchTerm}
+                   onChange={(e) => setSearchTerm(e.target.value)}
+                 />
+               </InputGroup>
 
-                 <Select
-                   maxW={{ base: "full", md: "150px" }}
-                   value={typeFilter}
-                   onChange={(e) => setTypeFilter(e.target.value)}
-                 >
-                   <option value="all">All Types</option>
-                   <option value="buy">Buy</option>
-                   <option value="sell">Sell</option>
-                   <option value="switch_out">Switch Out</option>
-                   <option value="switch_in">Switch In</option>
-                 </Select>
+                <Select
+                  maxW={{ base: "full", md: "150px" }}
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value)}
+                >
+                  <option value="all">All Types</option>
+                  <option value="buy">Buy</option>
+                  <option value="sell">Sell</option>
+                  <option value="switch_out">Switch Out</option>
+                  <option value="switch_in">Switch In</option>
+                </Select>
 
-                 <Select
-                   maxW={{ base: "full", md: "200px" }}
-                   value={amcFilter}
-                   onChange={(e) => setAmcFilter(e.target.value)}
-                 >
-                   <option value="all">All AMCs</option>
-                   {amcs.map(amc => (
-                     <option key={amc.amc_id} value={amc.amc_id.toString()}>
-                       {amc.name}
-                     </option>
-                   ))}
-                 </Select>
+                <Select
+                  maxW={{ base: "full", md: "200px" }}
+                  value={amcFilter}
+                  onChange={(e) => setAmcFilter(e.target.value)}
+                >
+                  <option value="all">All AMCs</option>
+                  {amcs.map(amc => (
+                    <option key={amc.amc_id} value={amc.amc_id.toString()}>
+                      {amc.name}
+                    </option>
+                  ))}
+                </Select>
 
-                 <Select
-                   maxW={{ base: "full", md: "200px" }}
-                   value={fundFilter}
-                   onChange={(e) => setFundFilter(e.target.value)}
-                 >
-                   <option value="all">All Funds</option>
-                   {mutualFunds.map(fund => (
-                     <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
-                       {fund.name}
-                     </option>
-                   ))}
-                 </Select>
-
-
-               </Flex>
+                <Select
+                  maxW={{ base: "full", md: "200px" }}
+                  value={fundFilter}
+                  onChange={(e) => setFundFilter(e.target.value)}
+                >
+                  <option value="all">All Funds</option>
+                  {mutualFunds.map(fund => (
+                    <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
+                      {fund.name}
+                    </option>
+                  ))}
+                </Select>
 
 
-           </Box>
-          )}
+              </Flex>
+
+
+          </Box>
         </Box>
 
 
 
         {/* Empty State */}
         {amcs.length === 0 ? (
-          <Card bg={cardBg} borderColor={borderColor} borderWidth={1}>
-            <CardBody textAlign="center" py={12}>
-              <VStack spacing={4}>
-                <Receipt size={48} color="gray" />
-                <Text fontSize="lg" color="gray.500">
-                  No transactions yet
+          <Box
+            p={8}
+            textAlign="center"
+            bg={useColorModeValue("gray.50", "gray.800")}
+            borderRadius="lg"
+            border="2px dashed"
+            borderColor="gray.300"
+          >
+            <VStack spacing={4}>
+              <VStack spacing={2}>
+                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                  No Transactions Yet
                 </Text>
-                <Text color="gray.400">
+                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} maxW="300px">
                   Create your first Asset Management Company to start recording transactions
                 </Text>
-                {onCreateAmc && (
-                  <Button colorScheme="teal" onClick={onCreateAmc} size="md">
-                    Create Your First AMC
-                  </Button>
-                )}
               </VStack>
-            </CardBody>
-          </Card>
+            </VStack>
+          </Box>
         ) : mutualFunds.length === 0 ? (
-          <Card bg={cardBg} borderColor={borderColor} borderWidth={1}>
-            <CardBody textAlign="center" py={12}>
-              <VStack spacing={4}>
-                <Receipt size={48} color="gray" />
-                <Text fontSize="lg" color="gray.500">
-                  No transactions yet
+          <Box
+            p={8}
+            textAlign="center"
+            bg={useColorModeValue("gray.50", "gray.800")}
+            borderRadius="lg"
+            border="2px dashed"
+            borderColor="gray.300"
+          >
+            <VStack spacing={4}>
+              <VStack spacing={2}>
+                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                  No Transactions Yet
                 </Text>
-                <Text color="gray.400">
+                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} maxW="300px">
                   Create your first mutual fund to start recording transactions
                 </Text>
-                {onCreateFund && (
-                  <Button colorScheme="blue" onClick={onCreateFund} size="md">
-                    Create Your First Fund
-                  </Button>
-                )}
               </VStack>
-            </CardBody>
-          </Card>
+            </VStack>
+          </Box>
         ) : transactions.length === 0 ? (
-          <Card bg={cardBg} borderColor={borderColor} borderWidth={1}>
-            <CardBody textAlign="center" py={12}>
-              <VStack spacing={4}>
-                <Receipt size={48} color="gray" />
-                <Text fontSize="lg" color="gray.500">
-                  No transactions recorded yet
+          <Box
+            p={8}
+            textAlign="center"
+            bg={useColorModeValue("gray.50", "gray.800")}
+            borderRadius="lg"
+            border="2px dashed"
+            borderColor="gray.300"
+          >
+            <VStack spacing={4}>
+              <VStack spacing={2}>
+                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                  No Transactions Recorded Yet
                 </Text>
-                <Text color="gray.400">
+                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} maxW="300px">
                   Start by buying units in one of your mutual funds
                 </Text>
               </VStack>
-            </CardBody>
-          </Card>
+            </VStack>
+          </Box>
          ) : (
            /* Transactions Table/Cards */
            <Card bg={cardBg} borderColor={borderColor} borderWidth={1}>
@@ -512,7 +514,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                               <Text fontSize="sm">{formatUnits(transaction.units)}</Text>
                             </Td>
                             <Td isNumeric>
-                              <Text fontSize="sm">₹{formatNav(transaction.nav_per_unit)}</Text>
+                              <Text fontSize="sm">{currencySymbol || "₹"}{formatNav(transaction.nav_per_unit)}</Text>
                             </Td>
                               <Td isNumeric>
                                 <HStack spacing={0} align="baseline" justify="flex-end">
@@ -531,7 +533,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                                       transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
                                         ? transaction.total_amount
                                         : transaction.total_amount,
-                                      "₹"
+                                      currencySymbol || "₹"
                                     ).main}
                                   </Text>
                                   <Text
@@ -550,7 +552,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                                       transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
                                         ? transaction.total_amount
                                         : transaction.total_amount,
-                                      "₹"
+                                      currencySymbol || "₹"
                                     ).decimals}
                                   </Text>
                                 </HStack>
@@ -652,7 +654,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                          : 0
                      )}
                    >
-                     {splitCurrencyForDisplay(transactionToDelete.total_amount, "₹").main}
+                      {splitCurrencyForDisplay(transactionToDelete.total_amount, currencySymbol || "₹").main}
                    </Text>
                    <Text
                      fontSize="xs"
@@ -666,7 +668,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                          : 0
                      )}
                    >
-                     {splitCurrencyForDisplay(transactionToDelete.total_amount, "₹").decimals}
+                      {splitCurrencyForDisplay(transactionToDelete.total_amount, currencySymbol || "₹").decimals}
                    </Text>
                  </HStack>
                </Box>

@@ -150,8 +150,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleTransaction = async (transactionType: "buy" | "sell", e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleTransaction = async (transactionType: "buy" | "sell") => {
     if (!asset || !ledgerId || !validateForm(transactionType)) return;
 
     const transactionData: AssetTransactionCreate = {
@@ -271,26 +270,26 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                   </Text>
                 </HStack>
               </FormLabel>
-               <Input
-                 type="number"
-                 value={formData.quantity}
-                 onChange={(e) => handleInputChange("quantity", e.target.value)}
-                 placeholder="0.0000"
-                 min={0}
-                 max={type === "sell" ? asset.total_quantity : undefined}
-                 step={0.0001}
-                 size="lg"
-                 bg={inputBg}
-                 borderColor={inputBorderColor}
-                 borderWidth="2px"
-                 borderRadius="md"
-                 autoFocus
-                 _hover={{ borderColor: "teal.300" }}
-                 _focus={{
-                   borderColor: focusBorderColor,
-                   boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                 }}
-               />
+                <Input
+                  type="number"
+                  value={formData.quantity}
+                  onChange={(e) => handleInputChange("quantity", e.target.value)}
+                  placeholder="0.0000"
+                  min={0}
+                  max={type === "sell" ? asset.total_quantity : undefined}
+                  step={0.0001}
+                  size="lg"
+                  bg={inputBg}
+                  borderColor={inputBorderColor}
+                  borderWidth="2px"
+                  borderRadius="md"
+                  autoFocus
+                  _hover={{ borderColor: "teal.300" }}
+                  _focus={{
+                    borderColor: focusBorderColor,
+                    boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                  }}
+                />
               <FormErrorMessage>{errors.quantity}</FormErrorMessage>
               <FormHelperText>
                 {type === "buy" ? "Current Holdings" : "Available to Sell"}:{" "}
@@ -521,30 +520,30 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
 
       {/* Action Buttons */}
       <Stack direction="row" spacing={3} width="full">
-         <Button
-           type="submit"
-           bg={type === "buy" ? "teal.500" : "red.400"}
-           color="white"
-           _hover={{
-             bg: type === "buy" ? "teal.600" : "red.500",
-             transform: isLoading ? "none" : "translateY(-2px)",
-             boxShadow: isLoading ? "none" : "lg",
-           }}
-           size="lg"
-           flex={1}
-           borderRadius="md"
-           isLoading={isLoading}
-           loadingText={`Processing ${type === "buy" ? "Purchase" : "Sale"}...`}
-           isDisabled={
-             !formData.account_id ||
-             (parseFloat(formData.quantity) || 0) <= 0 ||
-             (parseFloat(formData.price_per_unit) || 0) <= 0 ||
-             (type === "sell" && asset.total_quantity === 0) ||
-             Object.keys(errors).length > 0
-           }
-           leftIcon={type === "buy" ? <TrendingUp /> : <TrendingDown />}
-           transition="all 0.2s"
-         >
+          <Button
+            onClick={() => handleTransaction(type)}
+            bg={type === "buy" ? "teal.500" : "red.400"}
+            color="white"
+            _hover={{
+              bg: type === "buy" ? "teal.600" : "red.500",
+              transform: isLoading ? "none" : "translateY(-2px)",
+              boxShadow: isLoading ? "none" : "lg",
+            }}
+            size="lg"
+            flex={1}
+            borderRadius="md"
+            isLoading={isLoading}
+            loadingText={`Processing ${type === "buy" ? "Purchase" : "Sale"}...`}
+            isDisabled={
+              !formData.account_id ||
+              (parseFloat(formData.quantity) || 0) <= 0 ||
+              (parseFloat(formData.price_per_unit) || 0) <= 0 ||
+              (type === "sell" && asset.total_quantity === 0) ||
+              Object.keys(errors).length > 0
+            }
+            leftIcon={type === "buy" ? <TrendingUp /> : <TrendingDown />}
+            transition="all 0.2s"
+          >
            {type === "buy" ? "Buy Asset" : "Sell Asset"}
          </Button>
 
@@ -647,9 +646,16 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
            py={{ base: 4, sm: 6 }}
            flex="1"
            overflow="auto"
-         >
-           <form id="buy-sell-asset-form" onSubmit={(e) => handleTransaction(tabIndex === 0 ? "buy" : "sell", e)}>
-             <Tabs
+          >
+             <Box
+               onKeyDown={(e) => {
+                 if (e.key === "Enter" && !isLoading) {
+                   e.preventDefault();
+                   handleTransaction(tabIndex === 0 ? "buy" : "sell");
+                 }
+               }}
+             >
+              <Tabs
                isFitted
                variant="enclosed"
                index={tabIndex}
@@ -712,7 +718,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                <TabPanel p={0}>{renderForm("sell")}</TabPanel>
              </TabPanels>
            </Tabs>
-           </form>
+            </Box>
          </ModalBody>
       </ModalContent>
     </Modal>

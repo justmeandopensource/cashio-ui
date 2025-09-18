@@ -14,12 +14,13 @@ import {
   Card,
   CardBody,
   CardHeader,
-  useColorModeValue,
   Collapse,
   IconButton,
   Divider,
   SimpleGrid,
   Flex,
+  Icon,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import {
   TrendingUp,
@@ -30,15 +31,12 @@ import {
 } from "lucide-react";
 import { Amc, MutualFund } from "../types";
 import {
-  formatUnits,
-  formatNav,
   calculateFundPnL,
   splitCurrencyForDisplay,
   splitPercentageForDisplay,
-  calculateHighestPurchaseCost,
-  calculateLowestPurchaseCost,
 } from "../utils";
-import { useFundTransactions } from "../api";
+import useLedgerStore from "../../../components/shared/store";
+import FundCard from "./FundCard";
 
 interface MutualFundsOverviewProps {
   amcs: Amc[];
@@ -63,6 +61,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   onCloseFund,
   onDeleteAmc,
 }) => {
+  const { currencySymbol } = useLedgerStore();
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
@@ -73,7 +72,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
 
   // Calculate overall portfolio metrics
   const totalInvested = mutualFunds.reduce(
-    (sum, fund) => sum + fund.external_cash_invested,
+    (sum, fund) => sum + fund.total_invested_cash,
     0,
   );
   const totalCurrentValue = mutualFunds.reduce(
@@ -121,358 +120,70 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
     setExpandedFunds(newExpanded);
   };
 
-  const FundCard: FC<{ fund: MutualFund }> = ({ fund }) => {
-    const { unrealizedPnl, realizedPnl } = calculateFundPnL(fund);
-    const isExpanded = expandedFunds.has(fund.mutual_fund_id);
-    const costBasis = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
-    const invested = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
-    const unrealizedPercentage =
-      costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
-    // Fetch transactions for cost calculations
-    const { data: transactions = [] } = useFundTransactions(fund.ledger_id, fund.mutual_fund_id);
-    const highestPurchaseCost = calculateHighestPurchaseCost(transactions);
-    const lowestPurchaseCost = calculateLowestPurchaseCost(transactions);
 
-    const handleCardClick = (e: MouseEvent) => {
-      // Prevent expansion if clicking on interactive elements
-      if ((e.target as HTMLElement).closest("button")) {
-        return;
-      }
-      toggleFundExpansion(fund.mutual_fund_id);
-    };
 
-    return (
-      <Card
-        bg={cardBg}
-        borderColor={borderColor}
-        borderWidth={1}
-        size="sm"
-        cursor="pointer"
-        onClick={handleCardClick}
-        shadow="sm"
-        _hover={{ shadow: "md", borderColor: "teal.300" }}
-        transition="all 0.2s"
-      >
-        <CardBody>
-          <HStack justify="space-between" align="start" mb={3}>
-            <VStack align="start" spacing={1} flex={1}>
-              <Text
-                fontSize="md"
-                fontWeight="semibold"
-                color="gray.700"
-                noOfLines={1}
-              >
-                {fund.name}
-              </Text>
-              <HStack spacing={{ base: 4, md: 6 }} color={mutedColor} align="start">
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" color={mutedColor}>
-                    Units
-                  </Text>
-                  <HStack spacing={0} align="baseline">
-                    <Text fontSize="md">
-                      {formatUnits(fund.total_units).split(".")[0]}.
-                    </Text>
-                    <Text fontSize="sm" opacity={0.7}>
-                      {formatUnits(fund.total_units).split(".")[1]}
-                    </Text>
-                  </HStack>
-                </VStack>
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" color={mutedColor}>
-                    Invested
-                  </Text>
-                  <HStack spacing={0} align="baseline">
-                    <Text fontSize="md">
-                      {splitCurrencyForDisplay(invested, "₹").main}
-                    </Text>
-                    <Text fontSize="sm" opacity={0.7}>
-                      {splitCurrencyForDisplay(invested, "₹").decimals}
-                    </Text>
-                  </HStack>
-                </VStack>
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="sm" color={mutedColor}>
-                    Value
-                  </Text>
-                  <HStack spacing={0} align="baseline">
-                    <Text fontSize="md">
-                      {splitCurrencyForDisplay(fund.current_value, "₹").main}
-                    </Text>
-                    <Text fontSize="sm" opacity={0.7}>
-                      {
-                        splitCurrencyForDisplay(fund.current_value, "₹")
-                          .decimals
-                      }
-                    </Text>
-                  </HStack>
-                </VStack>
-              </HStack>
-            </VStack>
-            <Badge
-              colorScheme={unrealizedPnl >= 0 ? "green" : "red"}
-              size="sm"
-              fontWeight="medium"
-              px={2}
-              py={0.5}
-              borderRadius="md"
-            >
-              <HStack spacing={0} align="baseline">
-                <Text fontSize="sm" fontWeight="semibold">
-                  {splitPercentageForDisplay(unrealizedPercentage).main}
-                </Text>
-                <Text fontSize="xs" fontWeight="semibold" opacity={0.7}>
-                  {splitPercentageForDisplay(unrealizedPercentage).decimals}%
-                </Text>
-              </HStack>
-            </Badge>
-          </HStack>
-
-            <Collapse in={isExpanded} animateOpacity>
-             <Box pt={2}>
-               <Divider mb={3} />
-               <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4} mb={3}>
-                 <Stat size="sm">
-                   <StatLabel fontSize="xs" color={mutedColor}>
-                     NAV
-                   </StatLabel>
-                   <StatNumber fontSize="sm" color="gray.600">
-                     ₹{formatNav(fund.latest_nav)}
-                   </StatNumber>
-                 </Stat>
-                 <Stat size="sm">
-                   <StatLabel fontSize="xs" color={mutedColor}>
-                     Realized P&L
-                   </StatLabel>
-                   <HStack spacing={0} align="baseline">
-                     <StatNumber
-                       fontSize="sm"
-                       color={realizedPnl >= 0 ? "green.500" : "red.500"}
-                     >
-                       {splitCurrencyForDisplay(Math.abs(realizedPnl), "₹").main}
-                     </StatNumber>
-                     <Text
-                       fontSize="xs"
-                       color={realizedPnl >= 0 ? "green.500" : "red.500"}
-                       opacity={0.7}
-                     >
-                       {
-                         splitCurrencyForDisplay(Math.abs(realizedPnl), "₹")
-                           .decimals
-                       }
-                     </Text>
-                   </HStack>
-                 </Stat>
-                 <Stat size="sm">
-                   <StatLabel fontSize="xs" color={mutedColor}>
-                     Unrealized P&L
-                   </StatLabel>
-                   <HStack spacing={0} align="baseline">
-                     <StatNumber
-                       fontSize="sm"
-                       color={unrealizedPnl >= 0 ? "green.500" : "red.500"}
-                     >
-                       {
-                         splitCurrencyForDisplay(Math.abs(unrealizedPnl), "₹")
-                           .main
-                       }
-                     </StatNumber>
-                     <Text
-                       fontSize="xs"
-                       color={unrealizedPnl >= 0 ? "green.500" : "red.500"}
-                       opacity={0.7}
-                     >
-                       {
-                         splitCurrencyForDisplay(Math.abs(unrealizedPnl), "₹")
-                           .decimals
-                       }
-                     </Text>
-                   </HStack>
-                 </Stat>
-               </SimpleGrid>
-               <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4} mb={3}>
-                 <Stat size="sm">
-                   <StatLabel fontSize="xs" color={mutedColor}>
-                     Avg. Cost
-                   </StatLabel>
-                   <HStack spacing={0} align="baseline">
-                     <StatNumber fontSize="sm" color="gray.600">
-                       {
-                         splitCurrencyForDisplay(fund.average_cost_per_unit, "₹")
-                           .main
-                       }
-                     </StatNumber>
-                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                       {
-                         splitCurrencyForDisplay(fund.average_cost_per_unit, "₹")
-                           .decimals
-                       }
-                     </Text>
-                   </HStack>
-                 </Stat>
-                 <Stat size="sm">
-                   <StatLabel fontSize="xs" color={mutedColor}>
-                     Lowest Cost
-                   </StatLabel>
-                   <HStack spacing={0} align="baseline">
-                     <StatNumber fontSize="sm" color="gray.600">
-                       {lowestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(lowestPurchaseCost, "₹").main
-                         : "--"}
-                     </StatNumber>
-                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                       {lowestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(lowestPurchaseCost, "₹").decimals
-                         : ""}
-                     </Text>
-                   </HStack>
-                 </Stat>
-                 <Stat size="sm">
-                   <StatLabel fontSize="xs" color={mutedColor}>
-                     Highest Cost
-                   </StatLabel>
-                   <HStack spacing={0} align="baseline">
-                     <StatNumber fontSize="sm" color="gray.600">
-                       {highestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(highestPurchaseCost, "₹").main
-                         : "--"}
-                     </StatNumber>
-                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                       {highestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(highestPurchaseCost, "₹").decimals
-                         : ""}
-                     </Text>
-                   </HStack>
-                 </Stat>
-               </SimpleGrid>
-
-              <Divider mb={3} />
-
-               <SimpleGrid columns={{ base: 2, md: 4 }} spacing={2} w="full">
-                 <Button
-                   size="sm"
-                   colorScheme="teal"
-                   variant="outline"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onTradeUnits(fund.mutual_fund_id);
-                   }}
-                   sx={{ fontSize: "xs" }}
-                   w="full"
-                 >
-                   Buy/Sell
-                 </Button>
-                 <Button
-                   size="sm"
-                   colorScheme="purple"
-                   variant="outline"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onTransferUnits(fund.mutual_fund_id);
-                   }}
-                   sx={{ fontSize: "xs" }}
-                   isDisabled={fund.total_units <= 0}
-                   w="full"
-                 >
-                   Transfer
-                 </Button>
-                 <Button
-                   size="sm"
-                   colorScheme="orange"
-                   variant="outline"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onUpdateNav(fund);
-                   }}
-                   sx={{ fontSize: "xs" }}
-                   w="full"
-                 >
-                   Update NAV
-                 </Button>
-                 <Button
-                   size="sm"
-                   colorScheme="red"
-                   variant="outline"
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onCloseFund(fund.mutual_fund_id);
-                   }}
-                   isDisabled={fund.total_units > 0}
-                   sx={{ fontSize: "xs" }}
-                   w="full"
-                 >
-                   Close Fund
-                 </Button>
-               </SimpleGrid>
-            </Box>
-          </Collapse>
-        </CardBody>
-      </Card>
-    );
-  };
 
   return (
     <Box>
       <VStack spacing={6} align="stretch">
-        {/* Header with Portfolio Summary */}
-        <Box
-          mb={6}
-          p={{ base: 4, md: 6 }}
-          bg="white"
-          borderRadius="lg"
-          boxShadow="sm"
-        >
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            justify="space-between"
-            align={{ base: "start", md: "center" }}
-            mb={mutualFunds.length > 0 ? 6 : 0}
-            gap={{ base: 4, md: 0 }}
-          >
-            <Flex align="center" mb={{ base: 2, md: 0 }}>
-              <Text
-                fontSize={{ base: "lg", md: "xl" }}
-                fontWeight="semibold"
-                color="gray.700"
-                mr={3}
-              >
-                Mutual Funds Portfolio
-              </Text>
-            </Flex>
-            <Flex gap={2} width={{ base: "full", md: "auto" }}>
-              <Button
-                leftIcon={<Building2 size={16} />}
-                colorScheme="teal"
-                variant="outline"
-                size={{ base: "md", md: "sm" }}
-                onClick={onCreateAmc}
-                flex={{ base: 1, md: "none" }}
-              >
-                Create AMC
-              </Button>
-              <Button
-                leftIcon={<PieChart size={16} />}
-                colorScheme="teal"
-                variant={amcs.length === 0 ? "outline" : "solid"}
-                size={{ base: "md", md: "sm" }}
-                onClick={() => onCreateFund()}
-                title={
-                  amcs.length === 0
-                    ? "Create an AMC first"
-                    : "Create a new mutual fund"
-                }
-                flex={{ base: 1, md: "none" }}
-              >
-                Create Fund
-              </Button>
-            </Flex>
-          </Flex>
+          {/* Header with Portfolio Summary - Only show if there are AMCs */}
+          {amcs.length > 0 && (
+            <Box
+              p={{ base: 4, md: 6 }}
+              bg="white"
+              borderRadius="lg"
+              boxShadow="sm"
+            >
+           <Flex
+             direction={{ base: "column", md: "row" }}
+             justify="space-between"
+             align={{ base: "start", md: "center" }}
+             mb={4}
+             gap={{ base: 4, md: 0 }}
+           >
+              <Flex align="center" mb={{ base: 2, md: 0 }}>
+                <Icon as={TrendingUp} mr={2} color="teal.500" />
+                <Text
+                  fontSize={{ base: "lg", md: "xl" }}
+                  fontWeight="semibold"
+                  color="gray.700"
+                >
+                  Mutual Funds Portfolio
+                </Text>
+              </Flex>
+             <Flex gap={2} width={{ base: "full", md: "auto" }}>
+               <Button
+                 leftIcon={<Building2 size={16} />}
+                 colorScheme="teal"
+                 variant="outline"
+                 size={{ base: "md", md: "sm" }}
+                 onClick={onCreateAmc}
+                 flex={{ base: 1, md: "none" }}
+               >
+                 Create AMC
+               </Button>
+               <Button
+                 leftIcon={<PieChart size={16} />}
+                 colorScheme="teal"
+                 variant={amcs.length === 0 ? "outline" : "solid"}
+                 size={{ base: "md", md: "sm" }}
+                 onClick={() => onCreateFund()}
+                 title={
+                   amcs.length === 0
+                     ? "Create an AMC first"
+                     : "Create a new mutual fund"
+                 }
+                 flex={{ base: 1, md: "none" }}
+               >
+                 Create Fund
+               </Button>
+             </Flex>
+           </Flex>
 
-           {/* Portfolio Stats - Only show if there are funds */}
-           {mutualFunds.length > 0 && (
-             <>
-               {/* Mobile: Full grid with all metrics */}
+            {/* Portfolio Stats */}
+            <>
+                {/* Mobile: Full grid with all metrics */}
                <Box display={{ base: "block", md: "none" }}>
                  <SimpleGrid
                    columns={{ base: 2, sm: 3 }}
@@ -488,7 +199,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          fontWeight="semibold"
                          color="gray.600"
                        >
-                         {splitCurrencyForDisplay(totalInvested, "₹").main}
+                         {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").main}
                        </Text>
                        <Text
                          fontSize={{ base: "md", md: "lg" }}
@@ -496,7 +207,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          color="gray.600"
                          opacity={0.7}
                        >
-                         {splitCurrencyForDisplay(totalInvested, "₹").decimals}
+                         {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").decimals}
                        </Text>
                      </HStack>
                    </Box>
@@ -511,7 +222,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          fontWeight="semibold"
                          color="teal.600"
                        >
-                         {splitCurrencyForDisplay(totalCurrentValue, "₹").main}
+                         {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").main}
                        </Text>
                        <Text
                          fontSize={{ base: "md", md: "lg" }}
@@ -519,7 +230,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          color="teal.600"
                          opacity={0.7}
                        >
-                         {splitCurrencyForDisplay(totalCurrentValue, "₹").decimals}
+                         {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").decimals}
                        </Text>
                      </HStack>
                    </Box>
@@ -535,7 +246,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          color={totalRealizedGain >= 0 ? "green.500" : "red.500"}
                        >
                          {
-                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), "₹")
+                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
                              .main
                          }
                        </Text>
@@ -546,7 +257,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          opacity={0.7}
                        >
                          {
-                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), "₹")
+                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
                              .decimals
                          }
                        </Text>
@@ -567,7 +278,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                            {
                              splitCurrencyForDisplay(
                                Math.abs(totalUnrealizedPnL),
-                               "₹",
+                               currencySymbol || "₹",
                              ).main
                            }
                          </Text>
@@ -580,7 +291,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                            {
                              splitCurrencyForDisplay(
                                Math.abs(totalUnrealizedPnL),
-                               "₹",
+                               currencySymbol || "₹",
                              ).decimals
                            }
                          </Text>
@@ -640,7 +351,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          fontWeight="semibold"
                          color="gray.600"
                        >
-                         {splitCurrencyForDisplay(totalInvested, "₹").main}
+                         {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").main}
                        </Text>
                        <Text
                          fontSize={{ base: "md", md: "lg" }}
@@ -648,7 +359,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          color="gray.600"
                          opacity={0.7}
                        >
-                         {splitCurrencyForDisplay(totalInvested, "₹").decimals}
+                         {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").decimals}
                        </Text>
                      </HStack>
                    </Box>
@@ -663,7 +374,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          fontWeight="semibold"
                          color="teal.600"
                        >
-                         {splitCurrencyForDisplay(totalCurrentValue, "₹").main}
+                         {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").main}
                        </Text>
                        <Text
                          fontSize={{ base: "md", md: "lg" }}
@@ -671,7 +382,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          color="teal.600"
                          opacity={0.7}
                        >
-                         {splitCurrencyForDisplay(totalCurrentValue, "₹").decimals}
+                         {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").decimals}
                        </Text>
                      </HStack>
                    </Box>
@@ -687,7 +398,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          color={totalRealizedGain >= 0 ? "green.500" : "red.500"}
                        >
                          {
-                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), "₹")
+                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
                              .main
                          }
                        </Text>
@@ -698,7 +409,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                          opacity={0.7}
                        >
                          {
-                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), "₹")
+                           splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
                              .decimals
                          }
                        </Text>
@@ -719,7 +430,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                            {
                              splitCurrencyForDisplay(
                                Math.abs(totalUnrealizedPnL),
-                               "₹",
+                               currencySymbol || "₹",
                              ).main
                            }
                          </Text>
@@ -732,7 +443,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                            {
                              splitCurrencyForDisplay(
                                Math.abs(totalUnrealizedPnL),
-                               "₹",
+                               currencySymbol || "₹",
                              ).decimals
                            }
                          </Text>
@@ -772,36 +483,38 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                        </Text>
                      </VStack>
                    </Box>
-                 </Flex>
-               </Box>
-             </>
-           )}
-        </Box>
+                  </Flex>
+                </Box>
+                </>
+             </Box>
+          )}
 
         {/* AMC and Fund Details */}
         {amcs.length === 0 ? (
-          <Card
-            bg={cardBg}
-            borderColor={borderColor}
-            borderWidth={1}
-            shadow="sm"
+          <Box
+            p={12}
+            textAlign="center"
+            bg={useColorModeValue("gray.50", "gray.800")}
+            borderRadius="lg"
+            border="2px dashed"
+            borderColor="gray.300"
           >
-            <CardBody textAlign="center" py={12}>
-              <VStack spacing={4}>
-                <TrendingUp size={48} color="gray" />
-                <Text fontSize="lg" color="gray.500">
-                  No AMCs created yet
+            <VStack spacing={4}>
+              <Icon as={TrendingUp} boxSize={16} color="gray.400" />
+              <VStack spacing={2}>
+                <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+                  No AMCs Created Yet
                 </Text>
-                <Text color="gray.400">
+                <Text fontSize="md" color={useColorModeValue("gray.600", "gray.400")} maxW="400px">
                   Create your first Asset Management Company to start tracking
                   mutual fund investments
                 </Text>
-                <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
-                  Create Your First AMC
-                </Button>
               </VStack>
-            </CardBody>
-          </Card>
+              <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
+                Create Your First AMC
+              </Button>
+            </VStack>
+          </Box>
         ) : (
           <VStack spacing={4} align="stretch">
             {amcs
@@ -809,10 +522,10 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                 const amcFunds = mutualFunds.filter(
                   (fund) => fund.amc_id === amc.amc_id,
                 );
-                 const amcInvested = amcFunds.reduce(
-                   (sum, fund) => sum + fund.external_cash_invested,
-                   0,
-                 );
+                  const amcInvested = amcFunds.reduce(
+                    (sum, fund) => sum + fund.total_invested_cash,
+                    0,
+                  );
                 const amcCurrentValue = amcFunds.reduce(
                   (sum, fund) => sum + fund.current_value,
                   0,
@@ -842,7 +555,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                   amc.amcInvested > 0
                     ? (amc.amcUnrealizedPnL / amc.amcInvested) * 100
                     : 0;
-                const isExpanded = expandedAmc === amc.amc_id;
+                 const isExpanded = expandedAmc === amc.amc_id && amc.amcFunds.length > 0;
 
                 return (
                   <Card
@@ -944,7 +657,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                     {
                                       splitCurrencyForDisplay(
                                         amc.amcInvested,
-                                        "₹",
+                                        currencySymbol || "₹",
                                       ).main
                                     }
                                   </Text>
@@ -957,7 +670,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                     {
                                       splitCurrencyForDisplay(
                                         amc.amcInvested,
-                                        "₹",
+                                        currencySymbol || "₹",
                                       ).decimals
                                     }
                                   </Text>
@@ -997,7 +710,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                     {
                                       splitCurrencyForDisplay(
                                         amc.amcCurrentValue,
-                                        "₹",
+                                        currencySymbol || "₹",
                                       ).main
                                     }
                                   </Text>
@@ -1010,7 +723,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                     {
                                       splitCurrencyForDisplay(
                                         amc.amcCurrentValue,
-                                        "₹",
+                                        currencySymbol || "₹",
                                       ).decimals
                                     }
                                   </Text>
@@ -1055,7 +768,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                     {
                                       splitCurrencyForDisplay(
                                         Math.abs(amc.amcRealizedGain),
-                                        "₹",
+                                        currencySymbol || "₹",
                                       ).main
                                     }
                                   </Text>
@@ -1072,7 +785,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                     {
                                       splitCurrencyForDisplay(
                                         Math.abs(amc.amcRealizedGain),
-                                        "₹",
+                                        currencySymbol || "₹",
                                       ).decimals
                                     }
                                   </Text>
@@ -1114,7 +827,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                       {
                                         splitCurrencyForDisplay(
                                           Math.abs(amc.amcUnrealizedPnL),
-                                          "₹",
+                                          currencySymbol || "₹",
                                         ).main
                                       }
                                     </Text>
@@ -1131,7 +844,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                       {
                                         splitCurrencyForDisplay(
                                           Math.abs(amc.amcUnrealizedPnL),
-                                          "₹",
+                                          currencySymbol || "₹",
                                         ).decimals
                                       }
                                     </Text>
@@ -1222,7 +935,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                               <StatNumber fontSize="md" color={mutedColor}>
                                 {amc.amcInvested === 0
                                   ? "--"
-                                  : splitCurrencyForDisplay(amc.amcInvested, "₹")
+                                  : splitCurrencyForDisplay(amc.amcInvested, currencySymbol || "₹")
                                       .main}
                               </StatNumber>
                             </Stat>
@@ -1235,7 +948,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                   ? "--"
                                   : splitCurrencyForDisplay(
                                       amc.amcCurrentValue,
-                                      "₹",
+                                      currencySymbol || "₹",
                                     ).main}
                               </StatNumber>
                             </Stat>
@@ -1255,7 +968,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                   ? "--"
                                   : splitCurrencyForDisplay(
                                       Math.abs(amc.amcRealizedGain),
-                                      "₹",
+                                      currencySymbol || "₹",
                                     ).main}
                               </StatNumber>
                             </Stat>
@@ -1275,7 +988,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                                   ? "--"
                                   : splitCurrencyForDisplay(
                                       Math.abs(amc.amcUnrealizedPnL),
-                                      "₹",
+                                      currencySymbol || "₹",
                                     ).main}
                               </StatNumber>
                             </Stat>
@@ -1305,11 +1018,19 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                             gap={4}
                             w="full"
                           >
-                            {amc.amcFunds.map((fund) => (
-                              <GridItem key={fund.mutual_fund_id}>
-                                <FundCard fund={fund} />
-                              </GridItem>
-                            ))}
+                             {amc.amcFunds.map((fund) => (
+                               <GridItem key={fund.mutual_fund_id}>
+                                 <FundCard
+                                   fund={fund}
+                                   isExpanded={expandedFunds.has(fund.mutual_fund_id)}
+                                   onToggleExpansion={toggleFundExpansion}
+                                   onTradeUnits={onTradeUnits}
+                                   onTransferUnits={onTransferUnits}
+                                   onUpdateNav={onUpdateNav}
+                                   onCloseFund={onCloseFund}
+                                 />
+                               </GridItem>
+                             ))}
                           </Grid>
                         )}
                       </CardBody>

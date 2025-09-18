@@ -45,14 +45,25 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
   isOpen,
   onClose,
   onAssetCreated,
+  assetTypeId,
 }) => {
   const { ledgerId } = useLedgerStore();
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    asset_type_id: "",
+    asset_type_id: assetTypeId ? assetTypeId.toString() : "",
     notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Update form data when assetTypeId changes
+  useEffect(() => {
+    if (assetTypeId) {
+      setFormData(prev => ({
+        ...prev,
+        asset_type_id: assetTypeId.toString(),
+      }));
+    }
+  }, [assetTypeId]);
 
   // Modern theme colors
   const bgColor = useColorModeValue("white", "gray.800");

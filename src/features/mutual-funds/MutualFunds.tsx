@@ -21,6 +21,7 @@ import {
   useBreakpointValue,
   Badge,
   Flex,
+  useToast,
 } from "@chakra-ui/react";
 import useLedgerStore from "@/components/shared/store";
 
@@ -41,6 +42,7 @@ import { Building2, Trash2 } from "lucide-react";
 // API functions
 import { getAmcs, getMutualFunds, getAllMfTransactions, deleteMutualFund, deleteAmc } from "./api";
 import { MutualFund } from "./types";
+import { toastDefaults } from "@/components/shared/utils";
 
 // Map subtab names to indices
 const subTabMap = {
@@ -54,6 +56,7 @@ interface MutualFundsProps {
 
 const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   const { ledgerId } = useLedgerStore();
+  const toast = useToast();
   const [subTabIndex, setSubTabIndex] = useState(0);
 
   // Modal states
@@ -104,12 +107,12 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   const [selectedFundId, setSelectedFundId] = useState<number | undefined>();
   const [isAmcWarningOpen, setIsAmcWarningOpen] = useState<boolean>(false);
   const [preselectedAmcId, setPreselectedAmcId] = useState<number | null>(null);
-  const [fundToDelete, setFundToDelete] = useState<number | null>(null);
+  const [fundToDelete, setFundToDelete] = useState<{ id: number; name: string } | null>(null);
+  const [amcToDelete, setAmcToDelete] = useState<{ id: number; name: string } | null>(null);
 
   // Responsive modal settings
   const modalSize = useBreakpointValue({ base: "full", md: "md" });
   const isMobile = useBreakpointValue({ base: true, md: false });
-  const [amcToDelete, setAmcToDelete] = useState<number | null>(null);
 
   // Fetch data
   const { data: amcs = [], isLoading: isLoadingAmcs, refetch: refetchAmcs } = useQuery({
@@ -178,50 +181,82 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   };
 
   const handleCloseFund = (fundId: number) => {
-    setFundToDelete(fundId);
-    onDeleteFundModalOpen();
+    const fund = mutualFunds.find(f => f.mutual_fund_id === fundId);
+    if (fund) {
+      setFundToDelete({ id: fundId, name: fund.name });
+      onDeleteFundModalOpen();
+    }
   };
 
   const deleteFundMutation = useMutation({
     mutationFn: (fundId: number) => deleteMutualFund(ledgerId!, fundId),
     onSuccess: () => {
+      const fundName = fundToDelete?.name || "Fund";
       handleDataChange();
       onDeleteFundModalClose();
       setFundToDelete(null);
+      toast({
+        ...toastDefaults,
+        title: "Fund Closed",
+        description: `"${fundName}" has been successfully closed.`,
+        status: "success",
+      });
     },
     onError: (error: any) => {
-      // You should probably show a toast notification here
+      const fundName = fundToDelete?.name || "Fund";
+      toast({
+        ...toastDefaults,
+        title: "Delete Failed",
+        description: `Failed to close "${fundName}". Please try again.`,
+        status: "error",
+      });
       console.error("Error deleting fund:", error);
     },
   });
 
   const confirmDeleteFund = () => {
     if (fundToDelete) {
-      deleteFundMutation.mutate(fundToDelete);
+      deleteFundMutation.mutate(fundToDelete.id);
     }
   };
 
   const handleDeleteAmc = (amcId: number) => {
-    setAmcToDelete(amcId);
-    onDeleteAmcModalOpen();
+    const amc = amcs.find(a => a.amc_id === amcId);
+    if (amc) {
+      setAmcToDelete({ id: amcId, name: amc.name });
+      onDeleteAmcModalOpen();
+    }
   };
 
   const deleteAmcMutation = useMutation({
     mutationFn: (amcId: number) => deleteAmc(ledgerId!, amcId),
     onSuccess: () => {
+      const amcName = amcToDelete?.name || "AMC";
       handleDataChange();
       onDeleteAmcModalClose();
       setAmcToDelete(null);
+      toast({
+        ...toastDefaults,
+        title: "AMC Deleted",
+        description: `"${amcName}" has been successfully deleted.`,
+        status: "success",
+      });
     },
     onError: (error: any) => {
-      // You should probably show a toast notification here
+      const amcName = amcToDelete?.name || "AMC";
+      toast({
+        ...toastDefaults,
+        title: "Delete Failed",
+        description: `Failed to delete "${amcName}". Please try again.`,
+        status: "error",
+      });
       console.error("Error deleting amc:", error);
     },
   });
 
   const confirmDeleteAmc = () => {
     if (amcToDelete) {
-      deleteAmcMutation.mutate(amcToDelete);
+      deleteAmcMutation.mutate(amcToDelete.id);
     }
   };
 
@@ -314,15 +349,13 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
                 <Spinner size="xl" />
               </Box>
             ) : (
-               <MfTransactions
-                 amcs={amcs}
-                 mutualFunds={mutualFunds}
-                 transactions={transactions}
-                 onDataChange={handleDataChange}
-                 onAccountDataChange={onAccountDataChange}
-                 onCreateAmc={handleCreateAmc}
-                 onCreateFund={handleCreateFund}
-               />
+                <MfTransactions
+                  amcs={amcs}
+                  mutualFunds={mutualFunds}
+                  transactions={transactions}
+                  onDataChange={handleDataChange}
+                  onAccountDataChange={onAccountDataChange}
+                />
             )}
           </TabPanel>
         </TabPanels>
@@ -385,7 +418,9 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
           <ModalHeader>Close Mutual Fund</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            Are you sure you want to close this fund? This action cannot be undone.
+            Are you sure you want to close "{fundToDelete?.name}"?
+            <br />
+            This action cannot be undone.
           </ModalBody>
           <ModalFooter>
             <Button variant="ghost" mr={3} onClick={onDeleteFundModalClose}>
@@ -460,7 +495,9 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
           <ModalHeader>Delete AMC</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            Are you sure you want to delete this AMC? This action cannot be undone.
+            Are you sure you want to delete "{amcToDelete?.name}"?
+            <br />
+            This action cannot be undone.
           </ModalBody>
           <ModalFooter>
             <Button variant="ghost" mr={3} onClick={onDeleteAmcModalClose}>

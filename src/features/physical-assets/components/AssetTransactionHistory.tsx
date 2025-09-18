@@ -48,6 +48,7 @@ import {
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "@/components/shared/utils";
 import AssetTransactionNotesPopover from "./AssetTransactionNotesPopover";
+import EmptyStateTransactions from "./EmptyStateTransactions";
 
 
 const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
@@ -80,6 +81,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
         ledgerId: Number(ledgerId),
         assetTransactionId: selectedTransactionId,
       });
+      setSelectedTransactionId(null); // Clear selected transaction ID
       onClose();
       toast({
         ...toastDefaults,
@@ -103,8 +105,8 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
   // Sort transactions by date (newest first) and then by ID for consistent ordering
   const sortedTransactions = [...transactions].sort((a, b) => {
     // First sort by transaction date (newest first)
-    const dateA = new Date(a.transaction_date).getTime();
-    const dateB = new Date(b.transaction_date).getTime();
+    const dateA = a.transaction_date ? new Date(a.transaction_date).getTime() : 0;
+    const dateB = b.transaction_date ? new Date(b.transaction_date).getTime() : 0;
 
     if (dateA !== dateB) {
       return dateB - dateA; // Newest first
@@ -309,20 +311,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
   }
 
   if (sortedTransactions.length === 0) {
-    return (
-      <Box p={8} textAlign="center">
-        <VStack spacing={3}>
-          <Icon as={AlertTriangle} boxSize={8} color="gray.400" />
-          <Text fontSize="lg" color="gray.600" fontWeight="medium">
-            No Transactions Yet
-          </Text>
-          <Text color="gray.500" maxW="400px">
-            This asset doesn&#39;t have any buy or sell transactions yet. Use
-            the &quot;Buy/Sell&quot; button to start tracking your investments.
-          </Text>
-        </VStack>
-      </Box>
-    );
+    return <EmptyStateTransactions />;
   }
 
   return (
