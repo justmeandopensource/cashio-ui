@@ -106,7 +106,8 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
   };
 
   // Handle form submission
-  const handleCreate = async () => {
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!ledgerId) return;
 
     if (!validateForm()) {
@@ -234,13 +235,14 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
           </HStack>
         </Box>
 
-        <ModalBody
-          px={{ base: 4, sm: 8 }}
-          py={{ base: 4, sm: 6 }}
-          flex="1"
-          overflow="auto"
-        >
-          <VStack spacing={{ base: 5, sm: 6 }} align="stretch">
+         <ModalBody
+           px={{ base: 4, sm: 8 }}
+           py={{ base: 4, sm: 6 }}
+           flex="1"
+           overflow="auto"
+         >
+           <form id="create-physical-asset-form" onSubmit={handleCreate}>
+             <VStack spacing={{ base: 5, sm: 6 }} align="stretch">
             {/* Asset Details Form */}
             <Box
               bg={cardBg}
@@ -263,24 +265,25 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
                        </Text>
                      </HStack>
                    </FormLabel>
-                   <Input
-                     value={formData.name}
-                     onChange={(e) =>
-                       handleInputChange("name", e.target.value)
-                     }
-                     placeholder="e.g., Gold 22CT, ETH"
-                     maxLength={100}
-                     size="lg"
-                     bg={inputBg}
-                     borderColor={inputBorderColor}
-                     borderWidth="2px"
-                     borderRadius="md"
-                     _hover={{ borderColor: "teal.300" }}
-                     _focus={{
-                       borderColor: focusBorderColor,
-                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                     }}
-                   />
+                    <Input
+                      value={formData.name}
+                      onChange={(e) =>
+                        handleInputChange("name", e.target.value)
+                      }
+                      placeholder="e.g., Gold 22CT, ETH"
+                      maxLength={100}
+                      size="lg"
+                      bg={inputBg}
+                      borderColor={inputBorderColor}
+                      borderWidth="2px"
+                      borderRadius="md"
+                      autoFocus
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                    />
                    <FormErrorMessage>{errors.name}</FormErrorMessage>
                    <FormHelperText>Choose a unique name</FormHelperText>
                  </FormControl>
@@ -403,27 +406,27 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
               spacing={3}
               width="full"
             >
-              <Button
-                bg="teal.500"
-                color="white"
-                _hover={{
-                  bg: "teal.600",
-                  transform: isLoading ? "none" : "translateY(-2px)",
-                  boxShadow: isLoading ? "none" : "lg",
-                }}
-                onClick={handleCreate}
-                size="lg"
-                width={{ base: "full", md: "auto" }}
-                flex={{ base: "none", md: 1 }}
-                borderRadius="md"
-                isLoading={isLoading}
-                loadingText="Creating Asset..."
-                isDisabled={!isFormValid}
-                leftIcon={<Plus />}
-                transition="all 0.2s"
-              >
-                Create Physical Asset
-              </Button>
+               <Button
+                 type="submit"
+                 bg="teal.500"
+                 color="white"
+                 _hover={{
+                   bg: "teal.600",
+                   transform: isLoading ? "none" : "translateY(-2px)",
+                   boxShadow: isLoading ? "none" : "lg",
+                 }}
+                 size="lg"
+                 width={{ base: "full", md: "auto" }}
+                 flex={{ base: "none", md: 1 }}
+                 borderRadius="md"
+                 isLoading={isLoading}
+                 loadingText="Creating Asset..."
+                 isDisabled={!isFormValid}
+                 leftIcon={<Plus />}
+                 transition="all 0.2s"
+               >
+                 Create Physical Asset
+               </Button>
 
               <Button
                 variant="outline"
@@ -447,6 +450,7 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
               </Button>
             </Stack>
           </VStack>
+          </form>
         </ModalBody>
       </ModalContent>
     </Modal>

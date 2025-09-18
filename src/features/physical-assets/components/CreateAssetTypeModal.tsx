@@ -114,7 +114,8 @@ const CreateAssetTypeModal: FC<CreateAssetTypeModalProps> = ({
   };
 
   // Handle form submission
-  const handleCreate = async () => {
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
     if (!ledgerId) return;
 
     if (!validateForm()) {
@@ -232,13 +233,14 @@ const CreateAssetTypeModal: FC<CreateAssetTypeModalProps> = ({
           </HStack>
         </Box>
 
-        <ModalBody
-          px={{ base: 4, sm: 8 }}
-          py={{ base: 4, sm: 6 }}
-          flex="1"
-          overflow="auto"
-        >
-          <VStack spacing={{ base: 5, sm: 6 }} align="stretch">
+         <ModalBody
+           px={{ base: 4, sm: 8 }}
+           py={{ base: 4, sm: 6 }}
+           flex="1"
+           overflow="auto"
+         >
+           <form id="create-asset-type-form" onSubmit={handleCreate}>
+             <VStack spacing={{ base: 5, sm: 6 }} align="stretch">
             {/* Asset Type Details Form */}
             <Box
               bg={cardBg}
@@ -259,22 +261,23 @@ const CreateAssetTypeModal: FC<CreateAssetTypeModalProps> = ({
                       </Text>
                     </HStack>
                   </FormLabel>
-                  <Input
-                    value={formData.name}
-                    onChange={(e) => handleInputChange("name", e.target.value)}
-                    placeholder="e.g., Gold, Silver, Bitcoin"
-                    maxLength={100}
-                    size="lg"
-                    bg={inputBg}
-                    borderColor={inputBorderColor}
-                    borderWidth="2px"
-                    borderRadius="md"
-                    _hover={{ borderColor: "teal.300" }}
-                    _focus={{
-                      borderColor: focusBorderColor,
-                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                    }}
-                  />
+                   <Input
+                     value={formData.name}
+                     onChange={(e) => handleInputChange("name", e.target.value)}
+                     placeholder="e.g., Gold, Silver, Bitcoin"
+                     maxLength={100}
+                     size="lg"
+                     bg={inputBg}
+                     borderColor={inputBorderColor}
+                     borderWidth="2px"
+                     borderRadius="md"
+                     autoFocus
+                     _hover={{ borderColor: "teal.300" }}
+                     _focus={{
+                       borderColor: focusBorderColor,
+                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                     }}
+                   />
                   <FormErrorMessage>{errors.name}</FormErrorMessage>
                   <FormHelperText>
                     Choose a descriptive name for this asset type
@@ -416,27 +419,27 @@ const CreateAssetTypeModal: FC<CreateAssetTypeModalProps> = ({
               spacing={3}
               width="full"
             >
-              <Button
-                bg="teal.500"
-                color="white"
-                _hover={{
-                  bg: "teal.600",
-                  transform: isLoading ? "none" : "translateY(-2px)",
-                  boxShadow: isLoading ? "none" : "lg",
-                }}
-                onClick={handleCreate}
-                size="lg"
-                width={{ base: "full", md: "auto" }}
-                flex={{ base: "none", md: 1 }}
-                borderRadius="md"
-                isLoading={isLoading}
-                loadingText="Creating Asset Type..."
-                isDisabled={!isFormValid}
-                leftIcon={<Plus />}
-                transition="all 0.2s"
-              >
-                Create Asset Type
-              </Button>
+               <Button
+                 type="submit"
+                 bg="teal.500"
+                 color="white"
+                 _hover={{
+                   bg: "teal.600",
+                   transform: isLoading ? "none" : "translateY(-2px)",
+                   boxShadow: isLoading ? "none" : "lg",
+                 }}
+                 size="lg"
+                 width={{ base: "full", md: "auto" }}
+                 flex={{ base: "none", md: 1 }}
+                 borderRadius="md"
+                 isLoading={isLoading}
+                 loadingText="Creating Asset Type..."
+                 isDisabled={!isFormValid}
+                 leftIcon={<Plus />}
+                 transition="all 0.2s"
+               >
+                 Create Asset Type
+               </Button>
 
               <Button
                 variant="outline"
@@ -460,6 +463,7 @@ const CreateAssetTypeModal: FC<CreateAssetTypeModalProps> = ({
               </Button>
             </Stack>
           </VStack>
+          </form>
         </ModalBody>
       </ModalContent>
     </Modal>

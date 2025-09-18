@@ -213,7 +213,7 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
           overflow="auto"
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
-          <form onSubmit={handleSubmit}>
+          <form id="create-amc-form" onSubmit={handleSubmit}>
             <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
               {/* AMC Details Form */}
               <Box
@@ -322,6 +322,7 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
           <Box display={{ base: "block", sm: "none" }} mt={6}>
             <Button
               type="submit"
+              form="create-amc-form"
               bg="teal.500"
               color="white"
               _hover={{
@@ -376,6 +377,7 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
         >
           <Button
             type="submit"
+            form="create-amc-form"
             bg="teal.500"
             color="white"
             _hover={{

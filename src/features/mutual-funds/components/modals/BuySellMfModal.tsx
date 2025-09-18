@@ -140,6 +140,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
   // Reset form when modal opens
   useEffect(() => {
     if (isOpen && fund) {
+      setTabIndex(0);
       setFormData({
         mutual_fund_id: fund.mutual_fund_id.toString(),
         units: "",
@@ -166,8 +167,8 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
     onClose();
   };
 
-  const handleSubmit = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
     setErrors({});
 
     // Validation
@@ -323,25 +324,26 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                   </Text>
                 </HStack>
               </FormLabel>
-              <Input
-                type="number"
-                step="0.001"
-                value={formData.units}
-                onChange={(e) => handleInputChange("units", e.target.value)}
-                placeholder="0.000"
-                min={0}
-                max={type === "sell" ? selectedFund?.total_units : undefined}
-                size="lg"
-                bg={inputBg}
-                borderColor={inputBorderColor}
-                borderWidth="2px"
-                borderRadius="md"
-                _hover={{ borderColor: "teal.300" }}
-                _focus={{
-                  borderColor: focusBorderColor,
-                  boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                }}
-              />
+               <Input
+                 type="number"
+                 step="0.001"
+                 value={formData.units}
+                 onChange={(e) => handleInputChange("units", e.target.value)}
+                 placeholder="0.000"
+                 min={0}
+                 max={type === "sell" ? selectedFund?.total_units : undefined}
+                 size="lg"
+                 bg={inputBg}
+                 borderColor={inputBorderColor}
+                 borderWidth="2px"
+                 borderRadius="md"
+                 autoFocus
+                 _hover={{ borderColor: "teal.300" }}
+                 _focus={{
+                   borderColor: focusBorderColor,
+                   boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                 }}
+               />
               <FormErrorMessage>{errors.units}</FormErrorMessage>
               <FormHelperText>
                 {type === "buy" ? "Current holdings" : "Available to sell"}:{" "}
@@ -568,35 +570,36 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
 
       {/* Mobile-only action buttons that stay at bottom */}
       <Box display={{ base: "block", sm: "none" }}>
-        <Button
-          bg={type === "buy" ? "teal.500" : "red.400"}
-          color="white"
-          _hover={{
-            bg: type === "buy" ? "teal.600" : "red.500",
-            transform: transactionMutation.isPending
-              ? "none"
-              : "translateY(-2px)",
-            boxShadow: transactionMutation.isPending ? "none" : "lg",
-          }}
-          onClick={handleSubmit}
-          size="lg"
-          width="100%"
-          mb={3}
-          borderRadius="md"
-          isLoading={transactionMutation.isPending}
-          loadingText={`Processing ${type === "buy" ? "Purchase" : "Sale"}...`}
-          isDisabled={!isFormValid()}
-          leftIcon={
-            type === "buy" ? (
-              <TrendingUp size={16} />
-            ) : (
-              <TrendingDown size={16} />
-            )
-          }
-          transition="all 0.2s"
-        >
-          {type === "buy" ? "Buy Units" : "Sell Units"}
-        </Button>
+         <Button
+           type="submit"
+           form="buy-sell-mf-form"
+           bg={type === "buy" ? "teal.500" : "red.400"}
+           color="white"
+           _hover={{
+             bg: type === "buy" ? "teal.600" : "red.500",
+             transform: transactionMutation.isPending
+               ? "none"
+               : "translateY(-2px)",
+             boxShadow: transactionMutation.isPending ? "none" : "lg",
+           }}
+           size="lg"
+           width="100%"
+           mb={3}
+           borderRadius="md"
+           isLoading={transactionMutation.isPending}
+           loadingText={`Processing ${type === "buy" ? "Purchase" : "Sale"}...`}
+           isDisabled={!isFormValid()}
+           leftIcon={
+             type === "buy" ? (
+               <TrendingUp size={16} />
+             ) : (
+               <TrendingDown size={16} />
+             )
+           }
+           transition="all 0.2s"
+         >
+           {type === "buy" ? "Buy Units" : "Sell Units"}
+         </Button>
 
         <Button
           variant="outline"
@@ -693,22 +696,23 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           </HStack>
         </Box>
 
-        <ModalBody
-          px={{ base: 4, sm: 8 }}
-          py={{ base: 4, sm: 6 }}
-          flex="1"
-          overflow="auto"
-          display="flex"
-          flexDirection="column"
-          justifyContent={{ base: "space-between", sm: "flex-start" }}
-        >
-          <Tabs
-            isFitted
-            variant="enclosed"
-            index={tabIndex}
-            onChange={setTabIndex}
-            colorScheme="teal"
-          >
+         <ModalBody
+           px={{ base: 4, sm: 8 }}
+           py={{ base: 4, sm: 6 }}
+           flex="1"
+           overflow="auto"
+           display="flex"
+           flexDirection="column"
+           justifyContent={{ base: "space-between", sm: "flex-start" }}
+         >
+           <form id="buy-sell-mf-form" onSubmit={handleSubmit}>
+             <Tabs
+               isFitted
+               variant="enclosed"
+               index={tabIndex}
+               onChange={setTabIndex}
+               colorScheme="teal"
+             >
             <TabList
               borderRadius="md"
               bg={cardBg}
@@ -761,12 +765,13 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
               </Tab>
             </TabList>
 
-            <TabPanels>
-              <TabPanel p={0}>{renderForm("buy")}</TabPanel>
-              <TabPanel p={0}>{renderForm("sell")}</TabPanel>
-            </TabPanels>
-          </Tabs>
-        </ModalBody>
+             <TabPanels>
+               <TabPanel p={0}>{renderForm("buy")}</TabPanel>
+               <TabPanel p={0}>{renderForm("sell")}</TabPanel>
+             </TabPanels>
+           </Tabs>
+           </form>
+         </ModalBody>
 
         {/* Desktop-only footer */}
         <ModalFooter
@@ -777,35 +782,36 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           borderTop="1px solid"
           borderColor={borderColor}
         >
-          <Button
-            bg={currentType === "buy" ? "teal.500" : "red.400"}
-            color="white"
-            _hover={{
-              bg: currentType === "buy" ? "teal.600" : "red.500",
-              transform: transactionMutation.isPending
-                ? "none"
-                : "translateY(-2px)",
-              boxShadow: transactionMutation.isPending ? "none" : "lg",
-            }}
-            onClick={handleSubmit}
-            mr={3}
-            px={8}
-            py={3}
-            borderRadius="md"
-            isLoading={transactionMutation.isPending}
-            loadingText={`Processing ${currentType === "buy" ? "Purchase" : "Sale"}...`}
-            isDisabled={!isFormValid()}
-            leftIcon={
-              currentType === "buy" ? (
-                <TrendingUp size={16} />
-              ) : (
-                <TrendingDown size={16} />
-              )
-            }
-            transition="all 0.2s"
-          >
-            {currentType === "buy" ? "Buy Units" : "Sell Units"}
-          </Button>
+           <Button
+             type="submit"
+             form="buy-sell-mf-form"
+             bg={currentType === "buy" ? "teal.500" : "red.400"}
+             color="white"
+             _hover={{
+               bg: currentType === "buy" ? "teal.600" : "red.500",
+               transform: transactionMutation.isPending
+                 ? "none"
+                 : "translateY(-2px)",
+               boxShadow: transactionMutation.isPending ? "none" : "lg",
+             }}
+             mr={3}
+             px={8}
+             py={3}
+             borderRadius="md"
+             isLoading={transactionMutation.isPending}
+             loadingText={`Processing ${currentType === "buy" ? "Purchase" : "Sale"}...`}
+             isDisabled={!isFormValid()}
+             leftIcon={
+               currentType === "buy" ? (
+                 <TrendingUp size={16} />
+               ) : (
+                 <TrendingDown size={16} />
+               )
+             }
+             transition="all 0.2s"
+           >
+             {currentType === "buy" ? "Buy Units" : "Sell Units"}
+           </Button>
 
           <Button
             variant="outline"

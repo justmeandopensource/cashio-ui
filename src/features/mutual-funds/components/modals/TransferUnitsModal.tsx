@@ -307,7 +307,7 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
           flex="1"
           overflow="auto"
         >
-          <form onSubmit={handleSubmit}>
+          <form id="transfer-units-form" onSubmit={handleSubmit}>
             <VStack spacing={{ base: 5, sm: 6 }} align="stretch">
 
               {/* Error Display */}
@@ -402,25 +402,26 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
                           </Text>
                         </HStack>
                       </FormLabel>
-                      <Input
-                        type="number"
-                        step="0.001"
-                        value={formData.units}
-                        onChange={(e) => handleInputChange("units", e.target.value)}
-                        placeholder="0.000"
-                        min={0}
-                        max={availableUnits}
-                        size="lg"
-                        bg={inputBg}
-                        borderColor={inputBorderColor}
-                        borderWidth="2px"
-                        borderRadius="md"
-                        _hover={{ borderColor: "teal.300" }}
-                        _focus={{
-                          borderColor: focusBorderColor,
-                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                        }}
-                      />
+                       <Input
+                         type="number"
+                         step="0.001"
+                         value={formData.units}
+                         onChange={(e) => handleInputChange("units", e.target.value)}
+                         placeholder="0.000"
+                         min={0}
+                         max={availableUnits}
+                         size="lg"
+                         bg={inputBg}
+                         borderColor={inputBorderColor}
+                         borderWidth="2px"
+                         borderRadius="md"
+                         autoFocus
+                         _hover={{ borderColor: "teal.300" }}
+                         _focus={{
+                           borderColor: focusBorderColor,
+                           boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                         }}
+                       />
                        <FormHelperText>Available units: {formatUnits(availableUnits)}</FormHelperText>
                       <FormErrorMessage>{errors.units}</FormErrorMessage>
                     </FormControl>
@@ -621,33 +622,33 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
 
               {/* Action Buttons */}
               <Stack direction="row" spacing={3} width="full">
-                <Button
-                  bg="teal.500"
-                  color="white"
-                  _hover={{
-                    bg: "teal.600",
-                    transform: transferMutation.isPending ? "none" : "translateY(-2px)",
-                    boxShadow: transferMutation.isPending ? "none" : "lg",
-                  }}
-                  onClick={handleSubmit}
-                  size="lg"
-                  flex={1}
-                  borderRadius="md"
-                  isLoading={transferMutation.isPending}
-                  loadingText="Processing Transfer..."
-                  isDisabled={
-                    !formData.to_fund_id ||
-                    !formData.units ||
-                    fromUnits > availableUnits ||
-                    !formData.from_nav ||
-                    !formData.to_nav ||
-                    Object.keys(errors).length > 0
-                  }
-                  leftIcon={<ArrowRightLeft size={16} />}
-                  transition="all 0.2s"
-                >
-                  Transfer Units
-                </Button>
+                 <Button
+                   type="submit"
+                   bg="teal.500"
+                   color="white"
+                   _hover={{
+                     bg: "teal.600",
+                     transform: transferMutation.isPending ? "none" : "translateY(-2px)",
+                     boxShadow: transferMutation.isPending ? "none" : "lg",
+                   }}
+                   size="lg"
+                   flex={1}
+                   borderRadius="md"
+                   isLoading={transferMutation.isPending}
+                   loadingText="Processing Transfer..."
+                   isDisabled={
+                     !formData.to_fund_id ||
+                     !formData.units ||
+                     fromUnits > availableUnits ||
+                     !formData.from_nav ||
+                     !formData.to_nav ||
+                     Object.keys(errors).length > 0
+                   }
+                   leftIcon={<ArrowRightLeft size={16} />}
+                   transition="all 0.2s"
+                 >
+                   Transfer Units
+                 </Button>
 
                 <Button
                   variant="outline"

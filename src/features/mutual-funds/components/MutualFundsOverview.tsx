@@ -35,7 +35,10 @@ import {
   calculateFundPnL,
   splitCurrencyForDisplay,
   splitPercentageForDisplay,
+  calculateHighestPurchaseCost,
+  calculateLowestPurchaseCost,
 } from "../utils";
+import { useFundTransactions } from "../api";
 
 interface MutualFundsOverviewProps {
   amcs: Amc[];
@@ -126,7 +129,12 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
     const unrealizedPercentage =
       costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
-    const handleCardClick = (e: React.MouseEvent) => {
+    // Fetch transactions for cost calculations
+    const { data: transactions = [] } = useFundTransactions(fund.ledger_id, fund.mutual_fund_id);
+    const highestPurchaseCost = calculateHighestPurchaseCost(transactions);
+    const lowestPurchaseCost = calculateLowestPurchaseCost(transactions);
+
+    const handleCardClick = (e: MouseEvent) => {
       // Prevent expansion if clicking on interactive elements
       if ((e.target as HTMLElement).closest("button")) {
         return;
@@ -221,87 +229,123 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
             </Badge>
           </HStack>
 
-          <Collapse in={isExpanded} animateOpacity>
-            <Box pt={2}>
-              <Divider mb={3} />
-              <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} mb={3}>
-                <Stat size="sm">
-                  <StatLabel fontSize="xs" color={mutedColor}>
-                    Avg. Cost
-                  </StatLabel>
-                  <HStack spacing={0} align="baseline">
-                    <StatNumber fontSize="sm" color="gray.600">
-                      {
-                        splitCurrencyForDisplay(fund.average_cost_per_unit, "₹")
-                          .main
-                      }
-                    </StatNumber>
-                    <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                      {
-                        splitCurrencyForDisplay(fund.average_cost_per_unit, "₹")
-                          .decimals
-                      }
-                    </Text>
-                  </HStack>
-                </Stat>
-                <Stat size="sm">
-                  <StatLabel fontSize="xs" color={mutedColor}>
-                    NAV
-                  </StatLabel>
-                  <StatNumber fontSize="sm" color="gray.600">
-                    ₹{formatNav(fund.latest_nav)}
-                  </StatNumber>
-                </Stat>
-                <Stat size="sm">
-                  <StatLabel fontSize="xs" color={mutedColor}>
-                    Realized P&L
-                  </StatLabel>
-                  <HStack spacing={0} align="baseline">
-                    <StatNumber
-                      fontSize="sm"
-                      color={realizedPnl >= 0 ? "green.500" : "red.500"}
-                    >
-                      {splitCurrencyForDisplay(Math.abs(realizedPnl), "₹").main}
-                    </StatNumber>
-                    <Text
-                      fontSize="xs"
-                      color={realizedPnl >= 0 ? "green.500" : "red.500"}
-                      opacity={0.7}
-                    >
-                      {
-                        splitCurrencyForDisplay(Math.abs(realizedPnl), "₹")
-                          .decimals
-                      }
-                    </Text>
-                  </HStack>
-                </Stat>
-                <Stat size="sm">
-                  <StatLabel fontSize="xs" color={mutedColor}>
-                    Unrealized P&L
-                  </StatLabel>
-                  <HStack spacing={0} align="baseline">
-                    <StatNumber
-                      fontSize="sm"
-                      color={unrealizedPnl >= 0 ? "green.500" : "red.500"}
-                    >
-                      {
-                        splitCurrencyForDisplay(Math.abs(unrealizedPnl), "₹")
-                          .main
-                      }
-                    </StatNumber>
-                    <Text
-                      fontSize="xs"
-                      color={unrealizedPnl >= 0 ? "green.500" : "red.500"}
-                      opacity={0.7}
-                    >
-                      {
-                        splitCurrencyForDisplay(Math.abs(unrealizedPnl), "₹")
-                          .decimals
-                      }
-                    </Text>
-                  </HStack>
-                </Stat>
-              </SimpleGrid>
+            <Collapse in={isExpanded} animateOpacity>
+             <Box pt={2}>
+               <Divider mb={3} />
+               <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4} mb={3}>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     NAV
+                   </StatLabel>
+                   <StatNumber fontSize="sm" color="gray.600">
+                     ₹{formatNav(fund.latest_nav)}
+                   </StatNumber>
+                 </Stat>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     Realized P&L
+                   </StatLabel>
+                   <HStack spacing={0} align="baseline">
+                     <StatNumber
+                       fontSize="sm"
+                       color={realizedPnl >= 0 ? "green.500" : "red.500"}
+                     >
+                       {splitCurrencyForDisplay(Math.abs(realizedPnl), "₹").main}
+                     </StatNumber>
+                     <Text
+                       fontSize="xs"
+                       color={realizedPnl >= 0 ? "green.500" : "red.500"}
+                       opacity={0.7}
+                     >
+                       {
+                         splitCurrencyForDisplay(Math.abs(realizedPnl), "₹")
+                           .decimals
+                       }
+                     </Text>
+                   </HStack>
+                 </Stat>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     Unrealized P&L
+                   </StatLabel>
+                   <HStack spacing={0} align="baseline">
+                     <StatNumber
+                       fontSize="sm"
+                       color={unrealizedPnl >= 0 ? "green.500" : "red.500"}
+                     >
+                       {
+                         splitCurrencyForDisplay(Math.abs(unrealizedPnl), "₹")
+                           .main
+                       }
+                     </StatNumber>
+                     <Text
+                       fontSize="xs"
+                       color={unrealizedPnl >= 0 ? "green.500" : "red.500"}
+                       opacity={0.7}
+                     >
+                       {
+                         splitCurrencyForDisplay(Math.abs(unrealizedPnl), "₹")
+                           .decimals
+                       }
+                     </Text>
+                   </HStack>
+                 </Stat>
+               </SimpleGrid>
+               <SimpleGrid columns={{ base: 2, md: 3 }} spacing={4} mb={3}>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     Avg. Cost
+                   </StatLabel>
+                   <HStack spacing={0} align="baseline">
+                     <StatNumber fontSize="sm" color="gray.600">
+                       {
+                         splitCurrencyForDisplay(fund.average_cost_per_unit, "₹")
+                           .main
+                       }
+                     </StatNumber>
+                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                       {
+                         splitCurrencyForDisplay(fund.average_cost_per_unit, "₹")
+                           .decimals
+                       }
+                     </Text>
+                   </HStack>
+                 </Stat>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     Lowest Cost
+                   </StatLabel>
+                   <HStack spacing={0} align="baseline">
+                     <StatNumber fontSize="sm" color="gray.600">
+                       {lowestPurchaseCost !== null
+                         ? splitCurrencyForDisplay(lowestPurchaseCost, "₹").main
+                         : "--"}
+                     </StatNumber>
+                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                       {lowestPurchaseCost !== null
+                         ? splitCurrencyForDisplay(lowestPurchaseCost, "₹").decimals
+                         : ""}
+                     </Text>
+                   </HStack>
+                 </Stat>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     Highest Cost
+                   </StatLabel>
+                   <HStack spacing={0} align="baseline">
+                     <StatNumber fontSize="sm" color="gray.600">
+                       {highestPurchaseCost !== null
+                         ? splitCurrencyForDisplay(highestPurchaseCost, "₹").main
+                         : "--"}
+                     </StatNumber>
+                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                       {highestPurchaseCost !== null
+                         ? splitCurrencyForDisplay(highestPurchaseCost, "₹").decimals
+                         : ""}
+                     </Text>
+                   </HStack>
+                 </Stat>
+               </SimpleGrid>
 
               <Divider mb={3} />
 

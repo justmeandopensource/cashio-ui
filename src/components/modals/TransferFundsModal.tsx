@@ -215,7 +215,8 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     return accounts.filter((account) => account.account_id != fromAccountId);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     setIsLoading(true);
     try {
       const payload = {
@@ -313,16 +314,17 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
           </HStack>
         </Box>
 
-        <ModalBody
-          px={{ base: 4, sm: 8 }}
-          py={{ base: 4, sm: 6 }}
-          flex="1"
-          display="flex"
-          flexDirection="column"
-          overflow="auto"
-          justifyContent={{ base: "space-between", sm: "flex-start" }}
-        >
-          <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
+         <ModalBody
+           px={{ base: 4, sm: 8 }}
+           py={{ base: 4, sm: 6 }}
+           flex="1"
+           display="flex"
+           flexDirection="column"
+           overflow="auto"
+           justifyContent={{ base: "space-between", sm: "flex-start" }}
+         >
+           <form id="transfer-funds-form" onSubmit={handleSubmit}>
+             <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
             {/* Basic Info Card */}
             <Box
               bg={cardBg}
@@ -677,13 +679,15 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                 setNotes={setNotes}
                 borderColor={inputBorderColor}
               />
-            </Box>
-          </VStack>
+             </Box>
+           </VStack>
+           </form>
 
-          {/* Mobile-only action buttons that stay at bottom */}
+           {/* Mobile-only action buttons that stay at bottom */}
           <Box display={{ base: "block", sm: "none" }} mt={6}>
             <Button
-              onClick={handleSubmit}
+              type="submit"
+              form="transfer-funds-form"
               colorScheme="teal"
               size="lg"
               width="100%"
@@ -732,31 +736,32 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
           borderTop="1px solid"
           borderColor={borderColor}
         >
-          <Button
-            colorScheme="teal"
-            mr={3}
-            onClick={handleSubmit}
-            px={8}
-            py={3}
-            borderRadius="md"
-            isLoading={isLoading}
-            loadingText="Transferring..."
-            isDisabled={
-              !fromAccountId ||
-              !toAccountId ||
-              !amount ||
-              (isDifferentLedger &&
-                (!destinationLedgerId || !destinationAmount))
-            }
-            leftIcon={<Check />}
-            _hover={{
-              transform: isLoading ? "none" : "translateY(-2px)",
-              boxShadow: isLoading ? "none" : "lg",
-            }}
-            transition="all 0.2s"
-          >
-            Complete Transfer
-          </Button>
+           <Button
+             type="submit"
+             form="transfer-funds-form"
+             colorScheme="teal"
+             mr={3}
+             px={8}
+             py={3}
+             borderRadius="md"
+             isLoading={isLoading}
+             loadingText="Transferring..."
+             isDisabled={
+               !fromAccountId ||
+               !toAccountId ||
+               !amount ||
+               (isDifferentLedger &&
+                 (!destinationLedgerId || !destinationAmount))
+             }
+             leftIcon={<Check />}
+             _hover={{
+               transform: isLoading ? "none" : "translateY(-2px)",
+               boxShadow: isLoading ? "none" : "lg",
+             }}
+             transition="all 0.2s"
+           >
+             Complete Transfer
+           </Button>
           <Button
             variant="outline"
             onClick={onClose}

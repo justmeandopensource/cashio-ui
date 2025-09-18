@@ -178,3 +178,23 @@ export const splitPercentageForDisplay = (value: number): { main: string; decima
     decimals: ''
   };
 };
+
+/**
+ * Calculate highest purchase cost from buy transactions only
+ */
+export const calculateHighestPurchaseCost = (transactions: { transaction_type: string; nav_per_unit: number }[]): number | null => {
+  const buyTransactions = transactions.filter(t => t.transaction_type === "buy");
+  if (buyTransactions.length === 0) return null;
+
+  return Math.max(...buyTransactions.map(t => t.nav_per_unit));
+};
+
+/**
+ * Calculate lowest purchase cost from buy transactions only
+ */
+export const calculateLowestPurchaseCost = (transactions: { transaction_type: string; nav_per_unit: number }[]): number | null => {
+  const buyTransactions = transactions.filter(t => t.transaction_type === "buy");
+  if (buyTransactions.length === 0) return null;
+
+  return Math.min(...buyTransactions.map(t => t.nav_per_unit));
+};

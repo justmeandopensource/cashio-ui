@@ -146,10 +146,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
     onClose();
   };
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     if (!validateForm()) {
       return;
@@ -265,7 +263,7 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
           overflow="auto"
           justifyContent={{ base: "space-between", sm: "flex-start" }}
         >
-          <form onSubmit={handleSubmit}>
+          <form id="create-mutual-fund-form" onSubmit={handleSubmit}>
             <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
               {/* Fund Details Form */}
               <Box
@@ -460,6 +458,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
           {/* Mobile-only action buttons that stay at bottom */}
           <Box display={{ base: "block", sm: "none" }} mt={6}>
             <Button
+              type="submit"
+              form="create-mutual-fund-form"
               bg="teal.500"
               color="white"
               _hover={{
@@ -476,7 +476,7 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
               isDisabled={!isFormValid || amcs.length === 0}
               leftIcon={<CheckCircle />}
               transition="all 0.2s"
-              onClick={() => handleSubmit()}
+              onClick={handleSubmit}
             >
               Create Mutual Fund
             </Button>
@@ -513,6 +513,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
           borderColor={borderColor}
         >
           <Button
+            type="submit"
+            form="create-mutual-fund-form"
             bg="teal.500"
             color="white"
             _hover={{
@@ -529,7 +531,7 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
             isDisabled={!isFormValid || amcs.length === 0}
             leftIcon={<CheckCircle />}
             transition="all 0.2s"
-            onClick={() => handleSubmit()}
+            onClick={handleSubmit}
           >
             Create Mutual Fund
           </Button>

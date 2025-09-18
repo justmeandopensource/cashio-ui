@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/api";
 import {
   Amc,
@@ -147,5 +148,14 @@ export const getAmcSummaries = async (ledgerId: number): Promise<AmcSummary[]> =
       unrealized_pnl: currentValue - totalInvested,
       unrealized_pnl_percentage: totalInvested > 0 ? ((currentValue - totalInvested) / totalInvested) * 100 : 0,
     };
+  });
+};
+
+// React Query hooks
+export const useFundTransactions = (ledgerId: number, fundId: number) => {
+  return useQuery({
+    queryKey: ["fund-transactions", ledgerId, fundId],
+    queryFn: () => getFundTransactions(ledgerId, fundId),
+    enabled: !!ledgerId && !!fundId,
   });
 };
