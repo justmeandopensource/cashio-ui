@@ -11,6 +11,7 @@ import {
 import Layout from "../../components/Layout";
 import UpdateProfileForm from "./UpdateProfileForm";
 import ChangePasswordForm from "./ChangePasswordForm";
+import SystemBackup from './SystemBackup';
 import { useNavigate } from "react-router-dom";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
@@ -35,6 +36,7 @@ const Profile: React.FC = () => {
               <TabList>
                 <Tab>Account Details</Tab>
                 <Tab>Security</Tab>
+                <Tab>System</Tab>
               </TabList>
               <TabPanels>
                 <TabPanel>
@@ -42,6 +44,9 @@ const Profile: React.FC = () => {
                 </TabPanel>
                 <TabPanel>
                   <ChangePasswordForm />
+                </TabPanel>
+                <TabPanel>
+                  <SystemBackup />
                 </TabPanel>
               </TabPanels>
             </Tabs>

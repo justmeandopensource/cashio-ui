@@ -32,3 +32,36 @@ export const updateUserProfile = async (
 export const changePassword = async (data: ChangePassword): Promise<void> => {
   await api.put("/user/change-password", data);
 };
+
+// Backup and Restore APIs
+export const getBackups = async (): Promise<string[]> => {
+  const response = await api.get("/api/system/backups");
+  return response.data;
+};
+
+export const createBackup = async (): Promise<{ message: string; filename: string }> => {
+  const response = await api.post("/api/system/backup");
+  return response.data;
+};
+
+export const restoreBackup = async (filename: string): Promise<{ message: string; filename: string }> => {
+  const response = await api.post(`/api/system/restore/${filename}`);
+  return response.data;
+};
+
+export const deleteBackup = async (filename: string): Promise<{ message: string; filename: string }> => {
+  const response = await api.delete(`/api/system/backups/${filename}`);
+  return response.data;
+};
+
+export const uploadBackup = async (file: File): Promise<{ message: string; filename: string }> => {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await api.post("/api/system/upload-backup", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return response.data;
+};
