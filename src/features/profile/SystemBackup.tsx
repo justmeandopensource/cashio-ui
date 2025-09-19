@@ -325,91 +325,77 @@ const SystemBackup: React.FC = () => {
             </Text>
           </Box>
 
-          {/* Action Buttons Section */}
-          <Box>
-            <Text fontSize="sm" fontWeight="600" color="gray.700" mb={4}>
-              Backup Actions
-            </Text>
-            <Card
-              bg="white"
-              borderRadius="md"
-              border="1px"
-              borderColor="gray.200"
-              shadow="sm"
-            >
-              <CardBody px={6} py={5}>
-                <VStack spacing={4} align="stretch">
-                  <HStack
-                    spacing={4}
-                    flexDir={{ base: "column", sm: "row" }}
-                    align="stretch"
-                  >
-                    <Button
-                      leftIcon={<Icon as={FaPlus} boxSize={4} />}
-                      colorScheme="blue"
-                      onClick={() => createMutation.mutate()}
-                      isLoading={createMutation.isPending}
-                      size="lg"
-                      h="56px"
-                      fontSize="md"
-                      fontWeight="600"
-                      borderRadius="md"
-                      px={6}
-                      bgGradient="linear(to-r, blue.500, blue.600)"
-                      _hover={{
-                        bgGradient: "linear(to-r, blue.600, blue.700)",
-                        transform: "translateY(-1px)",
-                        shadow: "lg",
-                      }}
-                      _active={{
-                        transform: "translateY(0)",
-                      }}
-                      transition="all 0.2s"
-                      shadow="md"
-                      flex="1"
-                      minW="200px"
-                    >
-                      Create New Backup
-                    </Button>
-                    <Button
-                      leftIcon={<Icon as={FaUpload} boxSize={4} />}
-                      colorScheme="green"
-                      onClick={() => inputFileRef.current?.click()}
-                      isLoading={uploadMutation.isPending}
-                      size="lg"
-                      h="56px"
-                      fontSize="md"
-                      fontWeight="600"
-                      borderRadius="md"
-                      px={6}
-                      bgGradient="linear(to-r, green.500, green.600)"
-                      _hover={{
-                        bgGradient: "linear(to-r, green.600, green.700)",
-                        transform: "translateY(-1px)",
-                        shadow: "lg",
-                      }}
-                      _active={{
-                        transform: "translateY(0)",
-                      }}
-                      transition="all 0.2s"
-                      shadow="md"
-                      flex="1"
-                      minW="200px"
-                    >
-                      Upload & Restore
-                    </Button>
-                  </HStack>
-                  <input
-                    type="file"
-                    accept=".dump"
-                    ref={inputFileRef}
-                    style={{ display: "none" }}
-                    onChange={handleFileChange}
-                  />
-                </VStack>
-              </CardBody>
-            </Card>
-          </Box>
+           {/* Action Buttons Section */}
+           <Box>
+             <Text fontSize="sm" fontWeight="600" color="gray.700" mb={4}>
+               Backup Actions
+             </Text>
+             <VStack spacing={4} align="stretch">
+               <HStack
+                 spacing={4}
+                 flexDir={{ base: "column", sm: "row" }}
+                 align="stretch"
+               >
+                 <Button
+                   leftIcon={<Icon as={FaPlus} size={20} />}
+                   colorScheme="blue"
+                   onClick={() => createMutation.mutate()}
+                   isLoading={createMutation.isPending}
+                   size="lg"
+                   h="56px"
+                   fontSize="md"
+                   fontWeight="600"
+                   borderRadius="md"
+                   px={8}
+                   bgGradient="linear(to-r, blue.500, blue.600)"
+                   _hover={{
+                     bgGradient: "linear(to-r, blue.600, blue.700)",
+                     transform: "translateY(-1px)",
+                     shadow: "lg",
+                   }}
+                   _active={{
+                     transform: "translateY(0)",
+                   }}
+                   transition="all 0.2s"
+                   shadow="md"
+                 >
+                   Create New Backup
+                 </Button>
+                 <Button
+                   leftIcon={<Icon as={FaUpload} size={20} />}
+                   colorScheme="teal"
+                   onClick={() => inputFileRef.current?.click()}
+                   isLoading={uploadMutation.isPending}
+                   size="lg"
+                   h="56px"
+                   fontSize="md"
+                   fontWeight="600"
+                   borderRadius="md"
+                   px={8}
+                   bgGradient="linear(to-r, teal.500, teal.600)"
+                   _hover={{
+                     bgGradient: "linear(to-r, teal.600, teal.700)",
+                     transform: "translateY(-1px)",
+                     shadow: "lg",
+                   }}
+                   _active={{
+                     transform: "translateY(0)",
+                   }}
+                   transition="all 0.2s"
+                   shadow="md"
+                 >
+                   Upload & Restore
+                 </Button>
+               </HStack>
+               <input
+                 type="file"
+                 accept=".dump"
+                 ref={inputFileRef}
+                 style={{ display: "none" }}
+                 onChange={handleFileChange}
+               />
+             </VStack>
+           </Box>
 
           <Divider borderColor="gray.200" />
 

@@ -137,24 +137,25 @@ const UpdateProfileForm: React.FC = () => {
                   </FormControl>
                 </Box>
 
-                {/* Full Name and Email - Side by Side */}
-                <Box
-                  display={{ base: "block", lg: "grid" }}
-                  gridTemplateColumns="1fr 1fr"
-                  gap={8}
-                >
-                  <FormControl>
-                    <FormLabel
-                      fontSize="sm"
-                      fontWeight="600"
-                      color="gray.700"
-                      mb={3}
-                    >
-                      <HStack spacing={2}>
-                        <Icon as={User} boxSize={4} color="gray.500" />
-                        <Text>Full Name</Text>
-                      </HStack>
-                    </FormLabel>
+                 {/* Full Name and Email - Side by Side */}
+                 <Box
+                   display={{ base: "flex", lg: "grid" }}
+                   flexDirection={{ base: "column", lg: "row" }}
+                   gridTemplateColumns="1fr 1fr"
+                   gap={{ base: 6, lg: 8 }}
+                 >
+                   <FormControl>
+                     <FormLabel
+                       fontSize="sm"
+                       fontWeight="600"
+                       color="gray.700"
+                       mb={3}
+                     >
+                       <HStack spacing={2}>
+                         <Icon as={User} boxSize={4} color="gray.500" />
+                         <Text>Full Name</Text>
+                       </HStack>
+                     </FormLabel>
                     <Input
                       type="text"
                       {...register("full_name")}

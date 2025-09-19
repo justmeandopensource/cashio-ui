@@ -75,23 +75,24 @@ const ChangePasswordForm: React.FC = () => {
             {/* Form Fields */}
             <Box>
               <VStack spacing={6} align="stretch">
-                <Box
-                  display={{ base: "block", lg: "grid" }}
-                  gridTemplateColumns="1fr 1fr"
-                  gap={8}
-                >
-                  <FormControl isInvalid={!!errors.current_password}>
-                    <FormLabel
-                      fontSize="sm"
-                      fontWeight="600"
-                      color="gray.700"
-                      mb={3}
-                    >
-                      <HStack spacing={2}>
-                        <Icon as={Lock} boxSize={4} color="gray.500" />
-                        <Text>Current Password</Text>
-                      </HStack>
-                    </FormLabel>
+                 <Box
+                   display={{ base: "flex", lg: "grid" }}
+                   flexDirection={{ base: "column", lg: "row" }}
+                   gridTemplateColumns="1fr 1fr"
+                   gap={{ base: 6, lg: 8 }}
+                 >
+                   <FormControl isInvalid={!!errors.current_password}>
+                     <FormLabel
+                       fontSize="sm"
+                       fontWeight="600"
+                       color="gray.700"
+                       mb={3}
+                     >
+                       <HStack spacing={2}>
+                         <Icon as={Lock} boxSize={4} color="gray.500" />
+                         <Text>Current Password</Text>
+                       </HStack>
+                     </FormLabel>
                     <Input
                       type="password"
                       {...register("current_password", {
