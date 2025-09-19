@@ -567,7 +567,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                     _hover={{ shadow: "md", borderColor: "teal.300" }}
                     transition="all 0.2s"
                   >
-                    <CardHeader pb={2}>
+                    <CardHeader pt={2} pb={2}>
                       <HStack justify="space-between" align="center" w="full">
                         <HStack spacing={3}>
                           <IconButton

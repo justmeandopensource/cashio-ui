@@ -102,12 +102,11 @@ export const formatQuantity = (value: number, decimals: number = 4): string => {
 };
 
 /**
- * Get color for P&L display (green for profit, red for loss)
+ * Get color for P&L display (green for profit or zero, red for loss)
  */
 export const getPnLColor = (pnl: number): string => {
-  if (pnl > 0) return "green.500";
-  if (pnl < 0) return "red.500";
-  return "gray.500";
+  if (pnl >= 0) return "green.500";
+  return "red.500";
 };
 
 /**
