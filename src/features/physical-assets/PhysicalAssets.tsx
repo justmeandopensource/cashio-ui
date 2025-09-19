@@ -38,6 +38,7 @@ import {
   useToast,
   VStack,
   useBreakpointValue,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import { Plus, Coins, Package, AlertTriangle } from "lucide-react";
 import useLedgerStore from "@/components/shared/store";
@@ -327,86 +328,232 @@ const PhysicalAssets: FC = () => {
                 </Flex>
 
                  {/* Portfolio Stats */}
-                <Flex
-                  direction={{ base: "column", md: "row" }}
-                  gap={{ base: 4, md: 6 }}
-                  wrap="wrap"
-                >
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Total Invested</Text>
-                      <HStack spacing={0} align="baseline">
-                        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="gray.600">
-                          {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
+                <>
+                  {/* Mobile: Full grid with all metrics */}
+                  <Box display={{ base: "block", md: "none" }}>
+                    <SimpleGrid
+                      columns={{ base: 2, sm: 3 }}
+                      spacing={{ base: 4, md: 8 }}
+                    >
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Invested
                         </Text>
-                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="gray.600" opacity={0.7}>
-                          {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
-                        </Text>
-                      </HStack>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Total Value</Text>
-                      <HStack spacing={0} align="baseline">
-                        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" color="teal.600">
-                          {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
-                        </Text>
-                        <Text fontSize={{ base: "md", md: "lg" }} fontWeight="bold" color="teal.600" opacity={0.7}>
-                          {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
-                        </Text>
-                      </HStack>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Total Unrealized P&L</Text>
-                     <HStack spacing={0} align="baseline">
-                        <Text
-                        fontSize={{ base: "xl", md: "2xl" }}
-                        fontWeight="bold"
-                        color={getPnLColor(totalPnL)}
-                        >
-                        {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
-                        </Text>
-                        <Text
-                        fontSize={{ base: "md", md: "lg" }}
-                        fontWeight="bold"
-                        color={getPnLColor(totalPnL)}
-                        opacity={0.7}
-                        >
-                        {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
-                        </Text>
-                     </HStack>
-                      <HStack>
                         <HStack spacing={0} align="baseline">
                           <Text
-                              fontSize="sm"
-                              color={getPnLColor(totalPnL)}
+                            fontSize={{ base: "xl", md: "2xl" }}
+                            fontWeight="semibold"
+                            color="gray.600"
                           >
-                              {splitPercentageForDisplay(totalPnLPercentage).main}
+                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
                           </Text>
                           <Text
+                            fontSize={{ base: "md", md: "lg" }}
+                            fontWeight="semibold"
+                            color="gray.600"
+                            opacity={0.7}
+                          >
+                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
+                          </Text>
+                        </HStack>
+                      </Box>
+
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Value
+                        </Text>
+                        <HStack spacing={0} align="baseline">
+                          <Text
+                            fontSize={{ base: "xl", md: "2xl" }}
+                            fontWeight="semibold"
+                            color="teal.600"
+                          >
+                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
+                          </Text>
+                          <Text
+                            fontSize={{ base: "md", md: "lg" }}
+                            fontWeight="semibold"
+                            color="teal.600"
+                            opacity={0.7}
+                          >
+                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
+                          </Text>
+                        </HStack>
+                      </Box>
+
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Unrealized P&L
+                        </Text>
+                        <VStack align="start" spacing={0}>
+                          <HStack spacing={0} align="baseline">
+                            <Text
+                              fontSize={{ base: "xl", md: "2xl" }}
+                              fontWeight="semibold"
+                              color={getPnLColor(totalPnL)}
+                            >
+                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
+                            </Text>
+                            <Text
+                              fontSize={{ base: "md", md: "lg" }}
+                              fontWeight="semibold"
+                              color={getPnLColor(totalPnL)}
+                              opacity={0.7}
+                            >
+                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
+                            </Text>
+                          </HStack>
+                          <HStack spacing={0} align="baseline">
+                            <Text
+                              fontSize="sm"
+                              color={getPnLColor(totalPnL)}
+                            >
+                              {splitPercentageForDisplay(totalPnLPercentage).main}
+                            </Text>
+                            <Text
                               fontSize="xs"
                               color={getPnLColor(totalPnL)}
                               opacity={0.7}
-                          >
+                            >
                               {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                            </Text>
+                          </HStack>
+                        </VStack>
+                      </Box>
+
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Assets
+                        </Text>
+                        <VStack align="start" spacing={0}>
+                          <Text
+                            fontSize={{ base: "xl", md: "2xl" }}
+                            fontWeight="bold"
+                            color="blue.600"
+                          >
+                            {assets.length}
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
+                          </Text>
+                        </VStack>
+                      </Box>
+                    </SimpleGrid>
+                  </Box>
+
+                  {/* Desktop: All metrics in Flex layout */}
+                  <Box display={{ base: "none", md: "block" }}>
+                    <Flex
+                      direction={{ base: "column", md: "row" }}
+                      gap={{ base: 4, md: 6 }}
+                      wrap="wrap"
+                    >
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Invested
+                        </Text>
+                        <HStack spacing={0} align="baseline">
+                          <Text
+                            fontSize={{ base: "xl", md: "2xl" }}
+                            fontWeight="semibold"
+                            color="gray.600"
+                          >
+                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
+                          </Text>
+                          <Text
+                            fontSize={{ base: "md", md: "lg" }}
+                            fontWeight="semibold"
+                            color="gray.600"
+                            opacity={0.7}
+                          >
+                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
                           </Text>
                         </HStack>
-                       </HStack>
-                    </Box>
-                    <Box>
-                      <Text fontSize="sm" color="gray.600">Total Assets</Text>
-                      <VStack align="start" spacing={0}>
-                        <Text
-                          fontSize={{ base: "xl", md: "2xl" }}
-                          fontWeight="bold"
-                          color="blue.600"
-                        >
-                          {assets.length}
+                      </Box>
+
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Value
                         </Text>
-                        <Text fontSize="xs" color="gray.500">
-                          Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
+                        <HStack spacing={0} align="baseline">
+                          <Text
+                            fontSize={{ base: "xl", md: "2xl" }}
+                            fontWeight="semibold"
+                            color="teal.600"
+                          >
+                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
+                          </Text>
+                          <Text
+                            fontSize={{ base: "md", md: "lg" }}
+                            fontWeight="semibold"
+                            color="teal.600"
+                            opacity={0.7}
+                          >
+                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
+                          </Text>
+                        </HStack>
+                      </Box>
+
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Unrealized P&L
                         </Text>
-                      </VStack>
-                    </Box>
+                        <VStack align="start" spacing={0}>
+                          <HStack spacing={0} align="baseline">
+                            <Text
+                              fontSize={{ base: "xl", md: "2xl" }}
+                              fontWeight="semibold"
+                              color={getPnLColor(totalPnL)}
+                            >
+                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
+                            </Text>
+                            <Text
+                              fontSize={{ base: "md", md: "lg" }}
+                              fontWeight="semibold"
+                              color={getPnLColor(totalPnL)}
+                              opacity={0.7}
+                            >
+                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
+                            </Text>
+                          </HStack>
+                          <HStack spacing={0} align="baseline">
+                            <Text
+                              fontSize="sm"
+                              color={getPnLColor(totalPnL)}
+                            >
+                              {splitPercentageForDisplay(totalPnLPercentage).main}
+                            </Text>
+                            <Text
+                              fontSize="xs"
+                              color={getPnLColor(totalPnL)}
+                              opacity={0.7}
+                            >
+                              {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                            </Text>
+                          </HStack>
+                        </VStack>
+                      </Box>
+
+                      <Box>
+                        <Text fontSize="sm" color="gray.600" mb={1}>
+                          Total Assets
+                        </Text>
+                        <VStack align="start" spacing={0}>
+                          <Text
+                            fontSize={{ base: "xl", md: "2xl" }}
+                            fontWeight="bold"
+                            color="blue.600"
+                          >
+                            {assets.length}
+                          </Text>
+                          <Text fontSize="xs" color="gray.500">
+                            Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
+                          </Text>
+                        </VStack>
+                      </Box>
                     </Flex>
+                  </Box>
+                </>
                 </Box>
                 )}
 
