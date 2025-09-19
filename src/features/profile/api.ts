@@ -67,3 +67,29 @@ export const uploadBackup = async (file: File): Promise<{ message: string; filen
   });
   return response.data;
 };
+
+export const downloadBackup = async (filename: string) => {
+  try {
+    const response = await api.get(`/api/system/download-backup/${filename}`, {
+      responseType: 'blob',
+    });
+
+    // Create a blob URL for the file
+    const blob = new Blob([response.data]);
+    const url = window.URL.createObjectURL(blob);
+
+    // Create a temporary anchor element and trigger download
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+
+    // Clean up
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Download failed:', error);
+    throw error;
+  }
+};

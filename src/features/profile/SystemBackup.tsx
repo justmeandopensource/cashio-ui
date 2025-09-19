@@ -30,10 +30,11 @@ import {
   restoreBackup,
   deleteBackup,
   uploadBackup,
+  downloadBackup,
 } from "./api";
 import api from "@/lib/api"; // Import api instance for polling
 import { toastDefaults } from "@/components/shared/utils";
-import { FaDatabase, FaTrash, FaRedo, FaPlus, FaUpload } from "react-icons/fa";
+import { FaDatabase, FaTrash, FaRedo, FaPlus, FaUpload, FaDownload } from "react-icons/fa";
 
 const SystemBackup: React.FC = () => {
   const toast = useToast();
@@ -269,6 +270,26 @@ const SystemBackup: React.FC = () => {
     onUploadRestoreClose();
   };
 
+  const handleDownloadClick = async (filename: string) => {
+    try {
+      await downloadBackup(filename);
+      toast({
+        ...toastDefaults,
+        title: "Download Started",
+        description: `Downloading ${filename}`,
+        status: "success",
+      });
+    } catch (error) {
+      toast({
+        ...toastDefaults,
+        title: "Download Failed",
+        description: "Failed to download the backup file. Please try again.",
+        status: "error",
+        duration: 5000,
+      });
+    }
+  };
+
   if (isLoading) {
     return (
       <Box w="full" px={{ base: 6, md: 8 }} py={{ base: 6, md: 8 }}>
@@ -480,6 +501,28 @@ const SystemBackup: React.FC = () => {
                           </Box>
                         </HStack>
                         <HStack spacing={2} flexShrink={0}>
+                          <Button
+                            size="sm"
+                            leftIcon={<Icon as={FaDownload} boxSize={3} />}
+                            onClick={() => handleDownloadClick(file)}
+                            colorScheme="blue"
+                            variant="solid"
+                            borderRadius="md"
+                            h="40px"
+                            px={4}
+                            fontSize="sm"
+                            fontWeight="500"
+                            _hover={{
+                              transform: "translateY(-1px)",
+                              shadow: "md",
+                            }}
+                            _active={{
+                              transform: "translateY(0)",
+                            }}
+                            transition="all 0.2s"
+                          >
+                            Download
+                          </Button>
                           <Button
                             size="sm"
                             leftIcon={<Icon as={FaRedo} boxSize={3} />}
