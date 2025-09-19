@@ -269,15 +269,15 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
       <Tabs
         variant="soft-rounded"
         colorScheme="teal"
-        size={{ base: "sm", md: "md" }}
+        size={{ base: "md", md: "md" }}
         index={subTabIndex}
         onChange={handleSubTabChange}
       >
         <Box p={{ base: 2, md: 4 }}>
           <TabList borderBottom="none">
             <Tab
-              px={{ base: 3, md: 6 }}
-              py={3}
+              px={{ base: 4, md: 6 }}
+              py={4}
               fontWeight="medium"
               borderRadius="md"
               whiteSpace="nowrap"
@@ -302,8 +302,8 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
               </Flex>
             </Tab>
             <Tab
-              px={{ base: 3, md: 6 }}
-              py={3}
+              px={{ base: 4, md: 6 }}
+              py={4}
               fontWeight="medium"
               borderRadius="md"
               whiteSpace="nowrap"

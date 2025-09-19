@@ -28,11 +28,11 @@ const Profile: React.FC = () => {
       <Box flex={1} overflowY="auto">
         <PageContainer>
           <Box borderRadius="lg" boxShadow="lg" bg="white" overflow="hidden">
-            <Tabs
-              variant="soft-rounded"
-              colorScheme="teal"
-              size={{ base: "sm", md: "md" }}
-            >
+             <Tabs
+               variant="soft-rounded"
+               colorScheme="teal"
+               size={{ base: "md", md: "md" }}
+             >
               <Box
                 p={{ base: 2, md: 4 }}
                 borderBottom="1px solid"
@@ -43,66 +43,66 @@ const Profile: React.FC = () => {
                   borderBottom="none"
                   justifyContent={{ base: "space-around", md: "flex-start" }}
                 >
-                  <Tab
-                    px={{ base: 2, md: 6 }}
-                    py={3}
-                    fontWeight="medium"
-                    borderRadius="md"
-                    whiteSpace="nowrap"
-                    flex={{ base: 1, md: "none" }}
-                    _selected={{
-                      color: "teal.700",
-                      bg: "teal.50",
-                      fontWeight: "semibold",
-                      border: "1px solid",
-                      borderColor: "teal.400",
-                    }}
-                    _hover={{
-                      bg: "teal.25",
-                    }}
-                  >
-                    Account Details
-                  </Tab>
-                  <Tab
-                    px={{ base: 2, md: 6 }}
-                    py={3}
-                    fontWeight="medium"
-                    borderRadius="md"
-                    whiteSpace="nowrap"
-                    flex={{ base: 1, md: "none" }}
-                    _selected={{
-                      color: "teal.700",
-                      bg: "teal.50",
-                      fontWeight: "semibold",
-                      border: "1px solid",
-                      borderColor: "teal.400",
-                    }}
-                    _hover={{
-                      bg: "teal.25",
-                    }}
-                  >
-                    Security
-                  </Tab>
-                  <Tab
-                    px={{ base: 2, md: 6 }}
-                    py={3}
-                    fontWeight="medium"
-                    borderRadius="md"
-                    whiteSpace="nowrap"
-                    flex={{ base: 1, md: "none" }}
-                    _selected={{
-                      color: "teal.700",
-                      bg: "teal.50",
-                      fontWeight: "semibold",
-                      border: "1px solid",
-                      borderColor: "teal.400",
-                    }}
-                    _hover={{
-                      bg: "teal.25",
-                    }}
-                  >
-                    System
-                  </Tab>
+                   <Tab
+                     px={{ base: 4, md: 6 }}
+                     py={4}
+                     fontWeight="medium"
+                     borderRadius="md"
+                     whiteSpace="nowrap"
+                     flex={{ base: 1, md: "none" }}
+                     _selected={{
+                       color: "teal.700",
+                       bg: "teal.50",
+                       fontWeight: "semibold",
+                       border: "1px solid",
+                       borderColor: "teal.400",
+                     }}
+                     _hover={{
+                       bg: "teal.25",
+                     }}
+                   >
+                     Account Details
+                   </Tab>
+                   <Tab
+                     px={{ base: 4, md: 6 }}
+                     py={4}
+                     fontWeight="medium"
+                     borderRadius="md"
+                     whiteSpace="nowrap"
+                     flex={{ base: 1, md: "none" }}
+                     _selected={{
+                       color: "teal.700",
+                       bg: "teal.50",
+                       fontWeight: "semibold",
+                       border: "1px solid",
+                       borderColor: "teal.400",
+                     }}
+                     _hover={{
+                       bg: "teal.25",
+                     }}
+                   >
+                     Security
+                   </Tab>
+                   <Tab
+                     px={{ base: 4, md: 6 }}
+                     py={4}
+                     fontWeight="medium"
+                     borderRadius="md"
+                     whiteSpace="nowrap"
+                     flex={{ base: 1, md: "none" }}
+                     _selected={{
+                       color: "teal.700",
+                       bg: "teal.50",
+                       fontWeight: "semibold",
+                       border: "1px solid",
+                       borderColor: "teal.400",
+                     }}
+                     _hover={{
+                       bg: "teal.25",
+                     }}
+                   >
+                     System
+                   </Tab>
                 </TabList>
               </Box>
               <TabPanels>

@@ -91,7 +91,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
         <Tabs
           variant="soft-rounded"
           colorScheme="teal"
-          size={{ base: "sm", md: "md" }}
+          size={{ base: "md", md: "md" }}
           index={tabIndex}
           onChange={handleTabChange}
         >
@@ -107,8 +107,8 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
                   justifyContent={{ base: "space-around", md: "flex-start" }}
                 >
                   <Tab
-                    px={{ base: 2, md: 6 }}
-                    py={3}
+                    px={{ base: 4, md: 6 }}
+                    py={4}
                     fontWeight="medium"
                     borderRadius="md"
                     whiteSpace="nowrap"
@@ -135,8 +135,8 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
                     </Flex>
                   </Tab>
                   <Tab
-                    px={{ base: 2, md: 6 }}
-                    py={3}
+                    px={{ base: 4, md: 6 }}
+                    py={4}
                     fontWeight="medium"
                     borderRadius="md"
                     whiteSpace="nowrap"
@@ -158,8 +158,8 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
                     </Flex>
                   </Tab>
                    <Tab
-                     px={{ base: 2, md: 6 }}
-                     py={3}
+                     px={{ base: 4, md: 6 }}
+                     py={4}
                      fontWeight="medium"
                      borderRadius="md"
                      whiteSpace="nowrap"
@@ -181,8 +181,8 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
                      </Flex>
                    </Tab>
                    <Tab
-                     px={{ base: 2, md: 6 }}
-                     py={3}
+                     px={{ base: 4, md: 6 }}
+                     py={4}
                      fontWeight="medium"
                      borderRadius="md"
                      whiteSpace="nowrap"
