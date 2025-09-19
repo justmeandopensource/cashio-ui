@@ -60,6 +60,8 @@ export interface MfTransaction {
   units: number;
   nav_per_unit: number;
   total_amount: number;
+  amount_excluding_charges: number;
+  other_charges: number;
   account_id?: number;
   target_fund_id?: number;
   transaction_date: string;
@@ -67,6 +69,7 @@ export interface MfTransaction {
   ledger_id: number;
   created_at: string;
   linked_transaction_id?: number;
+  linked_charge_transaction_id?: number;
   realized_gain?: number;
   cost_basis_of_units_sold?: number;
   mutual_fund?: MutualFund;
@@ -78,7 +81,10 @@ export interface MfTransactionCreate {
   mutual_fund_id: number;
   transaction_type: 'buy' | 'sell' | 'switch_out' | 'switch_in';
   units: number;
-  nav_per_unit: number;
+  nav_per_unit?: number; // For switches, buy/sell use amount_excluding_charges
+  amount_excluding_charges: number; // For buy/sell transactions
+  other_charges?: number;
+  expense_category_id?: number;
   account_id?: number;
   target_fund_id?: number;
   transaction_date: string;
@@ -137,7 +143,9 @@ export interface AmcSummary {
 export interface BuySellFormData {
   mutual_fund_id: number;
   units: number;
-  nav_per_unit: number;
+  amount_excluding_charges: number;
+  other_charges?: number;
+  expense_category_id?: number;
   account_id: number;
   transaction_date: string;
   notes?: string;

@@ -150,14 +150,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
           </Tr>
         </Thead>
         <Tbody>
-          {transactions
-            .sort((a, b) => {
-              const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
-              if (dateComparison === 0) {
-                return b.transaction_id - a.transaction_id;
-              }
-              return dateComparison;
-            })
+           {transactions
+             .sort((a, b) => {
+               const dateComparison = new Date(b.date).getTime() - new Date(a.date).getTime();
+               if (dateComparison === 0) {
+                 return parseInt(b.transaction_id) - parseInt(a.transaction_id);
+               }
+               return dateComparison;
+             })
             .map((transaction) => (
             <Tr
               key={transaction.transaction_id}
@@ -425,54 +425,54 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   transition="opacity 0.2s"
                   className="action-icons"
                 >
-                   {!transaction.is_transfer && !transaction.is_asset_transaction && (
-                     <>
-                       <ChakraLink
-                         onClick={() => onEditTransaction(transaction)}
-                         _hover={{ textDecoration: "none" }}
-                       >
-                         <Icon
-                           as={Edit}
-                           boxSize={4}
-                           color="blue.500"
-                           _hover={{ color: "blue.600" }}
-                           transition="opacity 0.2s"
-                           data-testid="transactiontable-edit-icon"
-                         />
-                       </ChakraLink>
-                       <ChakraLink
-                         onClick={() => onCopyTransaction(transaction)}
-                         _hover={{ textDecoration: "none" }}
-                       >
-                         <Icon
-                           as={Copy}
-                           boxSize={4}
-                           color="gray.500"
-                           _hover={{ color: "gray.600" }}
-                           transition="opacity 0.2s"
-                           data-testid="transactiontable-copy-icon"
-                         />
-                       </ChakraLink>
-                     </>
-                   )}
-                   {!transaction.is_asset_transaction && (
-                     <ChakraLink
-                       onClick={() => {
-                         setSelectedTransactionId(transaction.transaction_id);
-                         onOpen();
-                       }}
-                       _hover={{ textDecoration: "none" }}
-                     >
-                       <Icon
-                         as={Trash2}
-                         boxSize={4}
-                         color="red.500"
-                         _hover={{ color: "red.600" }}
-                         transition="opacity 0.2s"
-                         data-testid="transactiontable-trash-icon"
-                       />
-                     </ChakraLink>
-                   )}
+                    {!transaction.is_transfer && !transaction.is_asset_transaction && !transaction.is_mf_transaction && (
+                      <>
+                        <ChakraLink
+                          onClick={() => onEditTransaction(transaction)}
+                          _hover={{ textDecoration: "none" }}
+                        >
+                          <Icon
+                            as={Edit}
+                            boxSize={4}
+                            color="blue.500"
+                            _hover={{ color: "blue.600" }}
+                            transition="opacity 0.2s"
+                            data-testid="transactiontable-edit-icon"
+                          />
+                        </ChakraLink>
+                        <ChakraLink
+                          onClick={() => onCopyTransaction(transaction)}
+                          _hover={{ textDecoration: "none" }}
+                        >
+                          <Icon
+                            as={Copy}
+                            boxSize={4}
+                            color="gray.500"
+                            _hover={{ color: "gray.600" }}
+                            transition="opacity 0.2s"
+                            data-testid="transactiontable-copy-icon"
+                          />
+                        </ChakraLink>
+                      </>
+                    )}
+                    {!transaction.is_asset_transaction && !transaction.is_mf_transaction && (
+                      <ChakraLink
+                        onClick={() => {
+                          setSelectedTransactionId(transaction.transaction_id);
+                          onOpen();
+                        }}
+                        _hover={{ textDecoration: "none" }}
+                      >
+                        <Icon
+                          as={Trash2}
+                          boxSize={4}
+                          color="red.500"
+                          _hover={{ color: "red.600" }}
+                          transition="opacity 0.2s"
+                          data-testid="transactiontable-trash-icon"
+                        />
+                      </ChakraLink>
+                    )}
                 </Flex>
               </Td>
             </Tr>

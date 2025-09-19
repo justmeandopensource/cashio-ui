@@ -63,6 +63,7 @@ interface Transaction {
   is_split: boolean;
   is_transfer: boolean;
   is_asset_transaction: boolean;
+  is_mf_transaction: boolean;
   credit: number;
   debit: number;
   tags?: TagItem[];
@@ -155,7 +156,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
               </Text>
 
               {/* Transaction type indicators */}
-              {(transaction.is_split || transaction.is_transfer || transaction.is_asset_transaction) && (
+              {(transaction.is_split || transaction.is_transfer || transaction.is_asset_transaction || transaction.is_mf_transaction) && (
                 <HStack spacing={1}>
                   {transaction.is_split && (
                     <Tooltip label="Split Transaction">
@@ -167,11 +168,16 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                       <Square size="8px" bg="blue.400" borderRadius="md" />
                     </Tooltip>
                   )}
-                   {transaction.is_asset_transaction && (
-                     <Tooltip label="Asset Transaction">
-                       <Square size="8px" bg="orange.400" borderRadius="md" />
-                     </Tooltip>
-                   )}
+                    {transaction.is_asset_transaction && (
+                      <Tooltip label="Asset Transaction">
+                        <Square size="8px" bg="orange.400" borderRadius="md" />
+                      </Tooltip>
+                    )}
+                    {transaction.is_mf_transaction && (
+                      <Tooltip label="Mutual Fund Transaction">
+                        <Square size="8px" bg="green.400" borderRadius="md" />
+                      </Tooltip>
+                    )}
                 </HStack>
               )}
             </HStack>
@@ -351,45 +357,45 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             )}
             {/* Action Icons */}
              <Flex justify="flex-end" mt={3} gap={2}>
-               {!transaction.is_transfer && !transaction.is_asset_transaction && (
-                 <>
-                   <Button
-                     size="md"
-                     variant="ghost"
-                     colorScheme="blue"
-                     leftIcon={<Edit size={18} />}
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       onEditTransaction(transaction);
-                     }}
-                     data-testid="transactioncard-edit-icon"
-                   />
-                   <Button
-                     size="md"
-                     variant="ghost"
-                     colorScheme="gray"
-                     leftIcon={<Copy size={18} />}
-                     onClick={(e) => {
-                       e.stopPropagation();
-                       onCopyTransaction(transaction);
-                     }}
-                     data-testid="transactioncard-copy-icon"
-                   />
-                 </>
-               )}
-               {!transaction.is_asset_transaction && (
-                 <Button
-                   size="md"
-                   variant="ghost"
-                   colorScheme="red"
-                   leftIcon={<Trash2 size={18} />}
-                   onClick={(e) => {
-                     e.stopPropagation();
-                     onOpen();
-                   }}
-                   data-testid="transactioncard-delete-icon"
-                 />
-               )}
+                {!transaction.is_transfer && !transaction.is_asset_transaction && !transaction.is_mf_transaction && (
+                  <>
+                    <Button
+                      size="md"
+                      variant="ghost"
+                      colorScheme="blue"
+                      leftIcon={<Edit size={18} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEditTransaction(transaction);
+                      }}
+                      data-testid="transactioncard-edit-icon"
+                    />
+                    <Button
+                      size="md"
+                      variant="ghost"
+                      colorScheme="gray"
+                      leftIcon={<Copy size={18} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onCopyTransaction(transaction);
+                      }}
+                      data-testid="transactioncard-copy-icon"
+                    />
+                  </>
+                )}
+                {!transaction.is_asset_transaction && !transaction.is_mf_transaction && (
+                  <Button
+                    size="md"
+                    variant="ghost"
+                    colorScheme="red"
+                    leftIcon={<Trash2 size={18} />}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onOpen();
+                    }}
+                    data-testid="transactioncard-delete-icon"
+                  />
+                )}
              </Flex>
           </Box>
         )}

@@ -48,7 +48,7 @@ import api from "@/lib/api";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import { buyMutualFund, sellMutualFund } from "../../api";
 import { MutualFund, MfTransactionCreate } from "../../types";
-import { formatUnits, formatAmount, validateBuySellForm } from "../../utils";
+import { formatUnits, formatAmount } from "../../utils";
 import useLedgerStore from "@/components/shared/store";
 
 interface BuySellMfModalProps {
@@ -68,7 +68,9 @@ interface Account {
 interface FormData {
   mutual_fund_id: string;
   units: string;
-  nav_per_unit: string;
+  amount_excluding_charges: string;
+  other_charges: string;
+  expense_category_id: string;
   account_id: string;
   transaction_date: Date;
   notes: string;
@@ -88,7 +90,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
   const [formData, setFormData] = useState<FormData>({
     mutual_fund_id: fund?.mutual_fund_id.toString() || "",
     units: "",
-    nav_per_unit: "",
+    amount_excluding_charges: "",
+    other_charges: "",
+    expense_category_id: "",
     account_id: "",
     transaction_date: new Date(),
     notes: "",
@@ -112,6 +116,17 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
     enabled: !!ledgerId && isOpen,
   });
 
+  const { data: expenseCategories, isLoading: categoriesLoading } = useQuery({
+    queryKey: ["categories", ledgerId, "expense"],
+    queryFn: async () => {
+      const response = await api.get(
+        `/category/list?type=expense&ignore_group=true`,
+      );
+      return response.data;
+    },
+    enabled: !!ledgerId && isOpen,
+  });
+
   const transactionMutation = useMutation({
     mutationFn: (transactionData: MfTransactionCreate) => {
       if (transactionData.transaction_type === "buy") {
@@ -124,6 +139,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       queryClient.invalidateQueries({ queryKey: ["mutual-funds", ledgerId] });
       queryClient.invalidateQueries({ queryKey: ["accounts", ledgerId] });
       queryClient.invalidateQueries({ queryKey: ["transactions", ledgerId] });
+      queryClient.invalidateQueries({ queryKey: ["fund-transactions", ledgerId] });
       onSuccess();
       handleClose();
     },
@@ -145,7 +161,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       setFormData({
         mutual_fund_id: fund.mutual_fund_id.toString(),
         units: "",
-        nav_per_unit: "",
+        amount_excluding_charges: "",
+        other_charges: "",
+        expense_category_id: "",
         account_id: "",
         transaction_date: new Date(),
         notes: "",
@@ -159,7 +177,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
     setFormData({
       mutual_fund_id: fund?.mutual_fund_id.toString() || "",
       units: "",
-      nav_per_unit: "",
+      amount_excluding_charges: "",
+      other_charges: "",
+      expense_category_id: "",
       account_id: "",
       transaction_date: new Date(),
       notes: "",
@@ -173,18 +193,26 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
     setErrors({});
 
     // Validation
-    const validationErrors = validateBuySellForm({
-      units: parseFloat(formData.units) || 0,
-      nav_per_unit: parseFloat(formData.nav_per_unit) || 0,
-      account_id: parseInt(formData.account_id) || 0,
-    });
-
     const newErrors: Record<string, string> = {};
     if (!formData.units || parseFloat(formData.units) <= 0) {
       newErrors.units = "Units must be greater than 0";
     }
-    if (!formData.nav_per_unit || parseFloat(formData.nav_per_unit) <= 0) {
-      newErrors.nav_per_unit = "NAV per unit must be greater than 0";
+    if (
+      !formData.amount_excluding_charges ||
+      parseFloat(formData.amount_excluding_charges) <= 0
+    ) {
+      newErrors.amount_excluding_charges =
+        "Amount excluding charges must be greater than 0";
+    }
+    if (parseFloat(formData.other_charges || "0") < 0) {
+      newErrors.other_charges = "Other charges cannot be negative";
+    }
+    if (
+      parseFloat(formData.other_charges || "0") > 0 &&
+      !formData.expense_category_id
+    ) {
+      newErrors.expense_category_id =
+        "Expense category is required when other charges are present";
     }
     if (!formData.account_id) {
       newErrors.account_id = "Please select an account.";
@@ -205,12 +233,6 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       newErrors.units = `Cannot sell more than available units (${selectedFund.total_units}).`;
     }
 
-    validationErrors.forEach((error) => {
-      if (error.includes("Units")) newErrors.units = error;
-      if (error.includes("NAV")) newErrors.nav_per_unit = error;
-      if (error.includes("Account")) newErrors.account_id = error;
-    });
-
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
@@ -220,7 +242,11 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       mutual_fund_id: fund!.mutual_fund_id,
       transaction_type: tabIndex === 0 ? "buy" : "sell",
       units: parseFloat(formData.units),
-      nav_per_unit: parseFloat(formData.nav_per_unit),
+      amount_excluding_charges: parseFloat(formData.amount_excluding_charges),
+      other_charges: parseFloat(formData.other_charges || "0"),
+      expense_category_id: formData.expense_category_id
+        ? parseInt(formData.expense_category_id)
+        : undefined,
       account_id: parseInt(formData.account_id),
       transaction_date: formData.transaction_date.toISOString(),
       notes: formData.notes.trim() || undefined,
@@ -254,8 +280,8 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
         }
       }
 
-      // For nav_per_unit field, limit to 2 decimal places
-      if (field === "nav_per_unit") {
+      // For amount_excluding_charges and other_charges fields, limit to 2 decimal places
+      if (field === "amount_excluding_charges" || field === "other_charges") {
         const stringValue = value as string;
         // Allow empty string, numbers, and decimal point
         if (stringValue === "" || /^\d*\.?\d*$/.test(stringValue)) {
@@ -280,18 +306,27 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
   };
 
   const selectedFund = fund;
-  const totalAmount =
-    (parseFloat(formData.units) || 0) *
-    (parseFloat(formData.nav_per_unit) || 0);
   const currentType = tabIndex === 0 ? "buy" : "sell";
+  const amountExcludingCharges =
+    parseFloat(formData.amount_excluding_charges) || 0;
+  const otherCharges = parseFloat(formData.other_charges) || 0;
+  const units = parseFloat(formData.units) || 0;
+  const navPerUnit = units > 0 ? amountExcludingCharges / units : 0;
+  const totalAmount =
+    currentType === "buy"
+      ? amountExcludingCharges + otherCharges
+      : amountExcludingCharges - otherCharges;
 
   const isFormValid = () => {
     return (
       formData.units &&
-      formData.nav_per_unit &&
+      formData.amount_excluding_charges &&
       formData.account_id &&
       (parseFloat(formData.units) || 0) > 0 &&
-      (parseFloat(formData.nav_per_unit) || 0) > 0 &&
+      (parseFloat(formData.amount_excluding_charges) || 0) > 0 &&
+      parseFloat(formData.other_charges || "0") >= 0 &&
+      (!(parseFloat(formData.other_charges || "0") > 0) ||
+        formData.expense_category_id) &&
       !(
         currentType === "sell" &&
         selectedFund &&
@@ -325,26 +360,26 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                   </Text>
                 </HStack>
               </FormLabel>
-               <Input
-                 type="number"
-                 step="0.001"
-                 value={formData.units}
-                 onChange={(e) => handleInputChange("units", e.target.value)}
-                 placeholder="0.000"
-                 min={0}
-                 max={type === "sell" ? selectedFund?.total_units : undefined}
-                 size="lg"
-                 bg={inputBg}
-                 borderColor={inputBorderColor}
-                 borderWidth="2px"
-                 borderRadius="md"
-                 autoFocus
-                 _hover={{ borderColor: "teal.300" }}
-                 _focus={{
-                   borderColor: focusBorderColor,
-                   boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                 }}
-               />
+              <Input
+                type="number"
+                step="0.001"
+                value={formData.units}
+                onChange={(e) => handleInputChange("units", e.target.value)}
+                placeholder="0.000"
+                min={0}
+                max={type === "sell" ? selectedFund?.total_units : undefined}
+                size="lg"
+                bg={inputBg}
+                borderColor={inputBorderColor}
+                borderWidth="2px"
+                borderRadius="md"
+                autoFocus
+                _hover={{ borderColor: "teal.300" }}
+                _focus={{
+                  borderColor: focusBorderColor,
+                  boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                }}
+              />
               <FormErrorMessage>{errors.units}</FormErrorMessage>
               <FormHelperText>
                 {type === "buy" ? "Current holdings" : "Available to sell"}:{" "}
@@ -352,12 +387,12 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
               </FormHelperText>
             </FormControl>
 
-            <FormControl flex={1} isInvalid={!!errors.nav_per_unit}>
+            <FormControl flex={1} isInvalid={!!errors.amount_excluding_charges}>
               <FormLabel fontWeight="semibold" mb={2}>
                 <HStack spacing={2}>
                   <DollarSign size={16} />
                   <Text>
-                    NAV per Unit{" "}
+                     Amount{" "}
                     <Text as="span" color="red.500">
                       *
                     </Text>
@@ -377,9 +412,12 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                 <Input
                   type="number"
                   step="0.01"
-                  value={formData.nav_per_unit}
+                  value={formData.amount_excluding_charges}
                   onChange={(e) =>
-                    handleInputChange("nav_per_unit", e.target.value)
+                    handleInputChange(
+                      "amount_excluding_charges",
+                      e.target.value,
+                    )
                   }
                   placeholder="0.00"
                   min={0}
@@ -394,11 +432,13 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                   }}
                 />
               </InputGroup>
-              <FormErrorMessage>{errors.nav_per_unit}</FormErrorMessage>
-              <FormHelperText>
-                Total: {currencySymbol || "₹"}
-                {formatAmount(totalAmount)}
-              </FormHelperText>
+              <FormErrorMessage>
+                {errors.amount_excluding_charges}
+              </FormErrorMessage>
+               <FormHelperText>
+                 NAV per unit: {currencySymbol || "₹"}
+                 {formatAmount(navPerUnit)}
+               </FormHelperText>
             </FormControl>
           </Stack>
 
@@ -522,6 +562,97 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
             </FormControl>
           </Stack>
 
+          <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+            <FormControl flex={1} isInvalid={!!errors.other_charges}>
+              <FormLabel fontWeight="semibold" mb={2}>
+                <HStack spacing={2}>
+                  <DollarSign size={16} />
+                  <Text>Other Charges</Text>
+                </HStack>
+              </FormLabel>
+              <InputGroup size="lg">
+                <InputLeftAddon
+                  bg={inputBorderColor}
+                  borderWidth="2px"
+                  borderColor={inputBorderColor}
+                  color="gray.600"
+                  fontWeight="semibold"
+                >
+                  {currencySymbol || "₹"}
+                </InputLeftAddon>
+                <Input
+                  type="number"
+                  step="0.01"
+                  value={formData.other_charges}
+                  onChange={(e) =>
+                    handleInputChange("other_charges", e.target.value)
+                  }
+                  placeholder="0.00"
+                  min={0}
+                  bg={inputBg}
+                  borderColor={inputBorderColor}
+                  borderWidth="2px"
+                  borderRadius="md"
+                  _hover={{ borderColor: "teal.300" }}
+                  _focus={{
+                    borderColor: focusBorderColor,
+                    boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                  }}
+                />
+              </InputGroup>
+              <FormErrorMessage>{errors.other_charges}</FormErrorMessage>
+              <FormHelperText>
+                Stamp duty, transaction fees, etc.
+              </FormHelperText>
+            </FormControl>
+
+            <FormControl flex={1} isInvalid={!!errors.expense_category_id}>
+              <FormLabel fontWeight="semibold" mb={2}>
+                <HStack spacing={2}>
+                  <FileText size={16} />
+                  <Text>Expense Category</Text>
+                </HStack>
+              </FormLabel>
+              {categoriesLoading ? (
+                <HStack justify="center" p={4}>
+                  <Spinner size="sm" />
+                  <Text fontSize="sm" color="gray.500">
+                    Loading categories...
+                  </Text>
+                </HStack>
+              ) : (
+                <Select
+                  value={formData.expense_category_id}
+                  onChange={(e) =>
+                    handleInputChange("expense_category_id", e.target.value)
+                  }
+                  placeholder="Select category (optional)"
+                  size="lg"
+                  bg={inputBg}
+                  borderColor={inputBorderColor}
+                  borderWidth="2px"
+                  borderRadius="md"
+                  _hover={{ borderColor: "teal.300" }}
+                  _focus={{
+                    borderColor: focusBorderColor,
+                    boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                  }}
+                >
+                  {expenseCategories?.map((category: any) => (
+                    <option
+                      key={category.category_id}
+                      value={category.category_id.toString()}
+                    >
+                      {category.name}
+                    </option>
+                  ))}
+                </Select>
+              )}
+              <FormErrorMessage>{errors.expense_category_id}</FormErrorMessage>
+              <FormHelperText>Required if other charges &gt; 0</FormHelperText>
+            </FormControl>
+          </Stack>
+
           <FormControl>
             <FormLabel fontWeight="semibold" mb={2}>
               <HStack spacing={2}>
@@ -571,35 +702,35 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
 
       {/* Mobile-only action buttons that stay at bottom */}
       <Box display={{ base: "block", sm: "none" }}>
-          <Button
-            onClick={() => handleSubmit()}
-            bg={type === "buy" ? "teal.500" : "red.400"}
-           color="white"
-           _hover={{
-             bg: type === "buy" ? "teal.600" : "red.500",
-             transform: transactionMutation.isPending
-               ? "none"
-               : "translateY(-2px)",
-             boxShadow: transactionMutation.isPending ? "none" : "lg",
-           }}
-           size="lg"
-           width="100%"
-           mb={3}
-           borderRadius="md"
-           isLoading={transactionMutation.isPending}
-           loadingText={`Processing ${type === "buy" ? "Purchase" : "Sale"}...`}
-           isDisabled={!isFormValid()}
-           leftIcon={
-             type === "buy" ? (
-               <TrendingUp size={16} />
-             ) : (
-               <TrendingDown size={16} />
-             )
-           }
-           transition="all 0.2s"
-         >
-           {type === "buy" ? "Buy Units" : "Sell Units"}
-         </Button>
+        <Button
+          onClick={() => handleSubmit()}
+          bg={type === "buy" ? "teal.500" : "red.400"}
+          color="white"
+          _hover={{
+            bg: type === "buy" ? "teal.600" : "red.500",
+            transform: transactionMutation.isPending
+              ? "none"
+              : "translateY(-2px)",
+            boxShadow: transactionMutation.isPending ? "none" : "lg",
+          }}
+          size="lg"
+          width="100%"
+          mb={3}
+          borderRadius="md"
+          isLoading={transactionMutation.isPending}
+          loadingText={`Processing ${type === "buy" ? "Purchase" : "Sale"}...`}
+          isDisabled={!isFormValid()}
+          leftIcon={
+            type === "buy" ? (
+              <TrendingUp size={16} />
+            ) : (
+              <TrendingDown size={16} />
+            )
+          }
+          transition="all 0.2s"
+        >
+          {type === "buy" ? "Buy Units" : "Sell Units"}
+        </Button>
 
         <Button
           variant="outline"
@@ -696,89 +827,89 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           </HStack>
         </Box>
 
-         <ModalBody
-           px={{ base: 4, sm: 8 }}
-           py={{ base: 4, sm: 6 }}
-           flex="1"
-           overflow="auto"
-           display="flex"
-           flexDirection="column"
-           justifyContent={{ base: "space-between", sm: "flex-start" }}
-         >
-            <Box
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !transactionMutation.isPending) {
-                  e.preventDefault();
-                  handleSubmit(e as any);
-                }
-              }}
+        <ModalBody
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 4, sm: 6 }}
+          flex="1"
+          overflow="auto"
+          display="flex"
+          flexDirection="column"
+          justifyContent={{ base: "space-between", sm: "flex-start" }}
+        >
+          <Box
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !transactionMutation.isPending) {
+                e.preventDefault();
+                handleSubmit(e as any);
+              }
+            }}
+          >
+            <Tabs
+              isFitted
+              variant="enclosed"
+              index={tabIndex}
+              onChange={setTabIndex}
+              colorScheme="teal"
             >
-              <Tabs
-               isFitted
-               variant="enclosed"
-               index={tabIndex}
-               onChange={setTabIndex}
-               colorScheme="teal"
-             >
-            <TabList
-              borderRadius="md"
-              bg={cardBg}
-              border="2px solid"
-              borderColor={inputBorderColor}
-              mb={6}
-            >
-              <Tab
-                _selected={{
-                  bg: "teal.500",
-                  color: "white",
-                  borderColor: "teal.500",
-                  fontWeight: "bold",
-                }}
-                _hover={{
-                  bg: "teal.50",
-                  _selected: { bg: "teal.400" },
-                }}
-                borderRadius="sm"
-                fontSize="md"
-                py={3}
-                transition="all 0.2s"
+              <TabList
+                borderRadius="md"
+                bg={cardBg}
+                border="2px solid"
+                borderColor={inputBorderColor}
+                mb={6}
               >
-                <HStack spacing={2}>
-                  <TrendingUp size={18} />
-                  <Text>Buy</Text>
-                </HStack>
-              </Tab>
-              <Tab
-                _selected={{
-                  bg: "red.400",
-                  color: "white",
-                  borderColor: "red.400",
-                  fontWeight: "bold",
-                }}
-                _hover={{
-                  bg: "red.50",
-                  _selected: { bg: "red.300" },
-                }}
-                borderRadius="sm"
-                fontSize="md"
-                py={3}
-                transition="all 0.2s"
-                isDisabled={fund ? fund.total_units <= 0 : false}
-              >
-                <HStack spacing={2}>
-                  <TrendingDown size={18} />
-                  <Text>Sell</Text>
-                </HStack>
-              </Tab>
-            </TabList>
+                <Tab
+                  _selected={{
+                    bg: "teal.500",
+                    color: "white",
+                    borderColor: "teal.500",
+                    fontWeight: "bold",
+                  }}
+                  _hover={{
+                    bg: "teal.50",
+                    _selected: { bg: "teal.400" },
+                  }}
+                  borderRadius="sm"
+                  fontSize="md"
+                  py={3}
+                  transition="all 0.2s"
+                >
+                  <HStack spacing={2}>
+                    <TrendingUp size={18} />
+                    <Text>Buy</Text>
+                  </HStack>
+                </Tab>
+                <Tab
+                  _selected={{
+                    bg: "red.400",
+                    color: "white",
+                    borderColor: "red.400",
+                    fontWeight: "bold",
+                  }}
+                  _hover={{
+                    bg: "red.50",
+                    _selected: { bg: "red.300" },
+                  }}
+                  borderRadius="sm"
+                  fontSize="md"
+                  py={3}
+                  transition="all 0.2s"
+                  isDisabled={fund ? fund.total_units <= 0 : false}
+                >
+                  <HStack spacing={2}>
+                    <TrendingDown size={18} />
+                    <Text>Sell</Text>
+                  </HStack>
+                </Tab>
+              </TabList>
 
-             <TabPanels>
-               <TabPanel p={0}>{renderForm("buy")}</TabPanel>
-               <TabPanel p={0}>{renderForm("sell")}</TabPanel>
-             </TabPanels>
+              <TabPanels>
+                <TabPanel p={0}>{renderForm("buy")}</TabPanel>
+                <TabPanel p={0}>{renderForm("sell")}</TabPanel>
+              </TabPanels>
             </Tabs>
-            </Box>
-         </ModalBody>
+          </Box>
+        </ModalBody>
 
         {/* Desktop-only footer */}
         <ModalFooter
@@ -789,35 +920,35 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           borderTop="1px solid"
           borderColor={borderColor}
         >
-            <Button
-              onClick={() => handleSubmit()}
-              bg={currentType === "buy" ? "teal.500" : "red.400"}
-             color="white"
-             _hover={{
-               bg: currentType === "buy" ? "teal.600" : "red.500",
-               transform: transactionMutation.isPending
-                 ? "none"
-                 : "translateY(-2px)",
-               boxShadow: transactionMutation.isPending ? "none" : "lg",
-             }}
-             mr={3}
-             px={8}
-             py={3}
-             borderRadius="md"
-             isLoading={transactionMutation.isPending}
-             loadingText={`Processing ${currentType === "buy" ? "Purchase" : "Sale"}...`}
-             isDisabled={!isFormValid()}
-             leftIcon={
-               currentType === "buy" ? (
-                 <TrendingUp size={16} />
-               ) : (
-                 <TrendingDown size={16} />
-               )
-             }
-             transition="all 0.2s"
-           >
-             {currentType === "buy" ? "Buy Units" : "Sell Units"}
-           </Button>
+          <Button
+            onClick={() => handleSubmit()}
+            bg={currentType === "buy" ? "teal.500" : "red.400"}
+            color="white"
+            _hover={{
+              bg: currentType === "buy" ? "teal.600" : "red.500",
+              transform: transactionMutation.isPending
+                ? "none"
+                : "translateY(-2px)",
+              boxShadow: transactionMutation.isPending ? "none" : "lg",
+            }}
+            mr={3}
+            px={8}
+            py={3}
+            borderRadius="md"
+            isLoading={transactionMutation.isPending}
+            loadingText={`Processing ${currentType === "buy" ? "Purchase" : "Sale"}...`}
+            isDisabled={!isFormValid()}
+            leftIcon={
+              currentType === "buy" ? (
+                <TrendingUp size={16} />
+              ) : (
+                <TrendingDown size={16} />
+              )
+            }
+            transition="all 0.2s"
+          >
+            {currentType === "buy" ? "Buy Units" : "Sell Units"}
+          </Button>
 
           <Button
             variant="outline"
@@ -838,4 +969,3 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
 };
 
 export default BuySellMfModal;
-
