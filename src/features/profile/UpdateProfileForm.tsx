@@ -11,6 +11,7 @@ import {
   useToast,
   VStack,
   Text,
+  Heading,
 } from "@chakra-ui/react";
 import { useUpdateUserProfile, useUserProfile } from "./hooks";
 import { UserUpdate } from "./api";
@@ -54,13 +55,21 @@ const UpdateProfileForm: React.FC = () => {
     return <Text>Loading...</Text>;
   }
 
-  return (
-    <Box as="form" onSubmit={handleSubmit(onSubmit)}>
-      <VStack spacing={4}>
-        <FormControl id="username">
-          <FormLabel>Username</FormLabel>
-          <Input type="text" value={user?.username} isReadOnly />
-        </FormControl>
+   return (
+     <Box maxW="md">
+       <VStack spacing={6} align="stretch">
+         <Box>
+           <Heading size="md">Account Information</Heading>
+           <Text mt={2} fontSize="sm" color="gray.500">
+             Update your personal details here.
+           </Text>
+         </Box>
+         <Box as="form" onSubmit={handleSubmit(onSubmit)}>
+           <VStack spacing={4}>
+         <FormControl id="username">
+           <FormLabel>Username</FormLabel>
+           <Input type="text" value={user?.username} isReadOnly bg="gray.50" opacity={0.7} />
+         </FormControl>
         <FormControl id="full_name">
           <FormLabel>Full Name</FormLabel>
           <Input type="text" {...register("full_name")} />
@@ -69,11 +78,15 @@ const UpdateProfileForm: React.FC = () => {
           <FormLabel>Email</FormLabel>
           <Input type="email" {...register("email")} />
         </FormControl>
-        <Button type="submit" isLoading={isUpdating} colorScheme="teal" isDisabled={!isDirty} leftIcon={<Save size={18} />}>
-          Save Changes
-        </Button>
-      </VStack>
-    </Box>
+         <Box alignSelf="flex-start" mt={4}>
+           <Button type="submit" isLoading={isUpdating} colorScheme="teal" isDisabled={!isDirty} leftIcon={<Save size={18} />}>
+             Save Changes
+           </Button>
+         </Box>
+         </VStack>
+       </Box>
+     </VStack>
+   </Box>
   );
 };
 

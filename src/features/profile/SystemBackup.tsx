@@ -272,8 +272,8 @@ const SystemBackup: React.FC = () => {
     onUploadRestoreClose();
   };
 
-  return (
-    <Box position="relative">
+   return (
+     <Box position="relative" maxW="md">
       {isRestoring && (
         <Box
           position="fixed"

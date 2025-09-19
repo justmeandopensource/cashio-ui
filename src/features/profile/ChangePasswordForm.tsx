@@ -11,14 +11,20 @@ import {
   useToast,
   VStack,
   FormErrorMessage,
+  Heading,
+  Text,
 } from "@chakra-ui/react";
 import { useChangePassword } from "./hooks";
 import { ChangePassword } from "./api";
 
 const ChangePasswordForm: React.FC = () => {
   const toast = useToast();
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<ChangePassword>();
+  const { register, handleSubmit, reset, watch, formState: { errors } } = useForm<ChangePassword>();
   const { mutate: changePassword, isLoading } = useChangePassword();
+
+  const currentPassword = watch("current_password");
+  const newPassword = watch("new_password");
+  const isButtonDisabled = !currentPassword || !newPassword || currentPassword === newPassword;
 
   const onSubmit = (data: ChangePassword) => {
     changePassword(data, {
@@ -44,9 +50,17 @@ const ChangePasswordForm: React.FC = () => {
     });
   };
 
-  return (
-    <Box as="form" onSubmit={handleSubmit(onSubmit)}>
-      <VStack spacing={4}>
+   return (
+     <Box maxW="md">
+       <VStack spacing={6} align="stretch">
+         <Box>
+           <Heading size="md">Change Password</Heading>
+           <Text mt={2} fontSize="sm" color="gray.500">
+             Update your password to keep your account secure.
+           </Text>
+         </Box>
+         <Box as="form" onSubmit={handleSubmit(onSubmit)}>
+           <VStack spacing={4}>
         <FormControl id="current_password" isInvalid={!!errors.current_password}>
           <FormLabel>Current Password</FormLabel>
           <Input type="password" {...register("current_password", { required: "Current password is required" })} />
@@ -57,11 +71,15 @@ const ChangePasswordForm: React.FC = () => {
           <Input type="password" {...register("new_password", { required: "New password is required" })} />
           <FormErrorMessage>{errors.new_password?.message}</FormErrorMessage>
         </FormControl>
-        <Button type="submit" isLoading={isLoading} colorScheme="teal" leftIcon={<KeyRound size={18} />}>
-          Change Password
-        </Button>
-      </VStack>
-    </Box>
+           <Box alignSelf="flex-start" mt={4}>
+             <Button type="submit" isLoading={isLoading} colorScheme="teal" leftIcon={<KeyRound size={18} />} isDisabled={isButtonDisabled}>
+               Change Password
+             </Button>
+           </Box>
+         </VStack>
+       </Box>
+     </VStack>
+   </Box>
   );
 };
 
