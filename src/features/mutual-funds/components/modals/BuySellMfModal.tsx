@@ -572,7 +572,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       {/* Mobile-only action buttons that stay at bottom */}
       <Box display={{ base: "block", sm: "none" }}>
           <Button
-            onClick={() => handleSubmit({} as React.FormEvent)}
+            onClick={() => handleSubmit()}
             bg={type === "buy" ? "teal.500" : "red.400"}
            color="white"
            _hover={{
@@ -790,7 +790,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           borderColor={borderColor}
         >
             <Button
-              onClick={() => handleSubmit({} as React.FormEvent)}
+              onClick={() => handleSubmit()}
               bg={currentType === "buy" ? "teal.500" : "red.400"}
              color="white"
              _hover={{
