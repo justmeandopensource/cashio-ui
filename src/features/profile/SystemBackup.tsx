@@ -100,7 +100,7 @@ const SystemBackup: React.FC = () => {
       const checkFn = async () => {
         await queryClient.invalidateQueries({ queryKey: ["backups"] });
         const newBackups = queryClient.getQueryData<string[]>(["backups"]);
-        return newBackups?.includes(data.filename) ?? false;
+        return newBackups?.includes(data.filename) || false;
       };
       poll(checkFn)
         .then(() =>
@@ -143,7 +143,7 @@ const SystemBackup: React.FC = () => {
       const checkFn = async () => {
         await queryClient.invalidateQueries({ queryKey: ["backups"] });
         const newBackups = queryClient.getQueryData<string[]>(["backups"]);
-        return !newBackups?.includes(variables) ?? false;
+        return !newBackups?.includes(variables);
       };
       poll(checkFn)
         .then(() =>
