@@ -4,8 +4,6 @@ import {
   Button,
   VStack,
   Text,
-  List,
-  ListItem,
   HStack,
   Tag,
   useToast,
@@ -21,6 +19,9 @@ import {
   Heading,
   Divider,
   AbsoluteCenter,
+  Icon,
+  Card,
+  CardBody,
 } from "@chakra-ui/react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
@@ -47,11 +48,7 @@ const SystemBackup: React.FC = () => {
     onOpen: onRestoreOpen,
     onClose: onRestoreClose,
   } = useDisclosure();
-  const {
-    isOpen: isDeleteOpen,
-    onOpen: onDeleteOpen,
-    onClose: onDeleteClose,
-  } = useDisclosure();
+
   const {
     isOpen: isUploadRestoreOpen,
     onOpen: onUploadRestoreOpen,
@@ -133,7 +130,7 @@ const SystemBackup: React.FC = () => {
 
   const deleteMutation = useMutation({
     mutationFn: deleteBackup,
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       toast({
         ...toastDefaults,
         title: "Deletion Started",
@@ -272,8 +269,31 @@ const SystemBackup: React.FC = () => {
     onUploadRestoreClose();
   };
 
-   return (
-     <Box position="relative" maxW="md">
+  if (isLoading) {
+    return (
+      <Box w="full" px={{ base: 6, md: 8 }} py={{ base: 6, md: 8 }}>
+        <VStack spacing={4} py={8}>
+          <Box
+            w={12}
+            h={12}
+            borderRadius="full"
+            bg="blue.100"
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Icon as={FaDatabase} color="blue.600" boxSize={6} />
+          </Box>
+          <Text color="gray.600" fontSize="lg">
+            Loading backups...
+          </Text>
+        </VStack>
+      </Box>
+    );
+  }
+
+  return (
+    <Box position="relative" w="full">
       {isRestoring && (
         <Box
           position="fixed"
@@ -293,91 +313,273 @@ const SystemBackup: React.FC = () => {
           </AbsoluteCenter>
         </Box>
       )}
-      <VStack spacing={6} align="stretch">
-        <Box>
-          <Heading size="md">Create or Restore from Backup</Heading>
-          <Text mt={2} fontSize="sm" color="gray.500">
-            Create a new backup, or upload a file to restore the database.
-          </Text>
-          <HStack mt={4} spacing={4}>
-            <Button
-              leftIcon={<FaPlus />}
-              colorScheme="blue"
-              onClick={() => createMutation.mutate()}
-              isLoading={createMutation.isPending}
-            >
-              Create New Backup
-            </Button>
-            <Button
-              leftIcon={<FaUpload />}
-              colorScheme="green"
-              onClick={() => inputFileRef.current?.click()}
-              isLoading={uploadMutation.isPending}
-            >
-              Upload & Restore
-            </Button>
-            <input
-              type="file"
-              accept=".dump"
-              ref={inputFileRef}
-              style={{ display: "none" }}
-              onChange={handleFileChange}
-            />
-          </HStack>
-        </Box>
 
-        <Divider />
-
-        <Box>
-          <Heading size="md">Available Backups</Heading>
-          {isLoading && <Spinner mt={4} />}
-          {isError && (
-            <Text color="red.500" mt={4}>
-              Error fetching backups.
+      <Box px={{ base: 6, md: 8 }} py={{ base: 6, md: 8 }}>
+        <VStack spacing={8} align="stretch" maxW="4xl">
+          {/* Header Section */}
+          <Box>
+            <Heading size="md">Database Backup Management</Heading>
+            <Text mt={2} fontSize="sm" color="gray.500">
+              Create new backups, upload existing ones, or restore from
+              available backup files.
             </Text>
-          )}
-          <List spacing={3} mt={4}>
-            {backups &&
-              backups.map((file) => (
-                <ListItem
-                  key={file}
-                  p={4}
-                  borderWidth="1px"
-                  borderRadius="md"
-                  d="flex"
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <HStack>
-                    <FaDatabase />
-                    <Text>{file}</Text>
-                  </HStack>
-                  <HStack spacing={2}>
+          </Box>
+
+          {/* Action Buttons Section */}
+          <Box>
+            <Text fontSize="sm" fontWeight="600" color="gray.700" mb={4}>
+              Backup Actions
+            </Text>
+            <Card
+              bg="white"
+              borderRadius="md"
+              border="1px"
+              borderColor="gray.200"
+              shadow="sm"
+            >
+              <CardBody px={6} py={5}>
+                <VStack spacing={4} align="stretch">
+                  <HStack
+                    spacing={4}
+                    flexDir={{ base: "column", sm: "row" }}
+                    align="stretch"
+                  >
                     <Button
-                      size="sm"
-                      leftIcon={<FaRedo />}
-                      onClick={() => handleRestoreClick(file)}
+                      leftIcon={<Icon as={FaPlus} boxSize={4} />}
+                      colorScheme="blue"
+                      onClick={() => createMutation.mutate()}
+                      isLoading={createMutation.isPending}
+                      size="lg"
+                      h="56px"
+                      fontSize="md"
+                      fontWeight="600"
+                      borderRadius="md"
+                      px={6}
+                      bgGradient="linear(to-r, blue.500, blue.600)"
+                      _hover={{
+                        bgGradient: "linear(to-r, blue.600, blue.700)",
+                        transform: "translateY(-1px)",
+                        shadow: "lg",
+                      }}
+                      _active={{
+                        transform: "translateY(0)",
+                      }}
+                      transition="all 0.2s"
+                      shadow="md"
+                      flex="1"
+                      minW="200px"
                     >
-                      Restore
+                      Create New Backup
                     </Button>
                     <Button
-                      size="sm"
-                      leftIcon={<FaTrash />}
-                      colorScheme="red"
-                      variant="outline"
-                      onClick={() => deleteMutation.mutate(file)}
+                      leftIcon={<Icon as={FaUpload} boxSize={4} />}
+                      colorScheme="green"
+                      onClick={() => inputFileRef.current?.click()}
+                      isLoading={uploadMutation.isPending}
+                      size="lg"
+                      h="56px"
+                      fontSize="md"
+                      fontWeight="600"
+                      borderRadius="md"
+                      px={6}
+                      bgGradient="linear(to-r, green.500, green.600)"
+                      _hover={{
+                        bgGradient: "linear(to-r, green.600, green.700)",
+                        transform: "translateY(-1px)",
+                        shadow: "lg",
+                      }}
+                      _active={{
+                        transform: "translateY(0)",
+                      }}
+                      transition="all 0.2s"
+                      shadow="md"
+                      flex="1"
+                      minW="200px"
                     >
-                      Delete
+                      Upload & Restore
                     </Button>
                   </HStack>
-                </ListItem>
-              ))}
-            {backups?.length === 0 && !isLoading && (
-              <Text mt={4}>No backups found.</Text>
+                  <input
+                    type="file"
+                    accept=".dump"
+                    ref={inputFileRef}
+                    style={{ display: "none" }}
+                    onChange={handleFileChange}
+                  />
+                </VStack>
+              </CardBody>
+            </Card>
+          </Box>
+
+          <Divider borderColor="gray.200" />
+
+          {/* Available Backups Section */}
+          <Box>
+            <Text fontSize="sm" fontWeight="600" color="gray.700" mb={4}>
+              Available Backups
+            </Text>
+            {isError && (
+              <Card
+                bg="red.50"
+                borderRadius="md"
+                border="1px"
+                borderColor="red.200"
+              >
+                <CardBody px={6} py={4}>
+                  <HStack spacing={3}>
+                    <Box
+                      w={8}
+                      h={8}
+                      borderRadius="md"
+                      bg="red.100"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Text fontSize="lg" color="red.600">
+                        ⚠️
+                      </Text>
+                    </Box>
+                    <Text color="red.700" fontWeight="500">
+                      Error fetching backups. Please try again.
+                    </Text>
+                  </HStack>
+                </CardBody>
+              </Card>
             )}
-          </List>
-        </Box>
-      </VStack>
+
+            {backups && backups.length > 0 && (
+              <VStack spacing={3} align="stretch">
+                {backups.map((file) => (
+                  <Card
+                    key={file}
+                    bg="white"
+                    borderRadius="md"
+                    border="1px"
+                    borderColor="gray.200"
+                    shadow="sm"
+                  >
+                    <CardBody px={6} py={4}>
+                      <HStack
+                        justify="space-between"
+                        align="center"
+                        spacing={4}
+                      >
+                        <HStack spacing={3} flex={1} minW={0}>
+                          <Box
+                            w={10}
+                            h={10}
+                            borderRadius="md"
+                            bg="blue.100"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            flexShrink={0}
+                          >
+                            <Icon
+                              as={FaDatabase}
+                              color="blue.600"
+                              boxSize={5}
+                            />
+                          </Box>
+                          <Box flex={1} minW={0}>
+                            <Text
+                              fontSize="md"
+                              fontWeight="600"
+                              color="gray.900"
+                              isTruncated
+                            >
+                              {file}
+                            </Text>
+                          </Box>
+                        </HStack>
+                        <HStack spacing={2} flexShrink={0}>
+                          <Button
+                            size="sm"
+                            leftIcon={<Icon as={FaRedo} boxSize={3} />}
+                            onClick={() => handleRestoreClick(file)}
+                            colorScheme="teal"
+                            variant="solid"
+                            borderRadius="md"
+                            h="40px"
+                            px={4}
+                            fontSize="sm"
+                            fontWeight="500"
+                            _hover={{
+                              transform: "translateY(-1px)",
+                              shadow: "md",
+                            }}
+                            _active={{
+                              transform: "translateY(0)",
+                            }}
+                            transition="all 0.2s"
+                          >
+                            Restore
+                          </Button>
+                          <Button
+                            size="sm"
+                            leftIcon={<Icon as={FaTrash} boxSize={3} />}
+                            colorScheme="red"
+                            variant="outline"
+                            onClick={() => deleteMutation.mutate(file)}
+                            borderRadius="md"
+                            h="40px"
+                            px={4}
+                            fontSize="sm"
+                            fontWeight="500"
+                            _hover={{
+                              bg: "red.50",
+                              transform: "translateY(-1px)",
+                              shadow: "md",
+                            }}
+                            _active={{
+                              transform: "translateY(0)",
+                            }}
+                            transition="all 0.2s"
+                          >
+                            Delete
+                          </Button>
+                        </HStack>
+                      </HStack>
+                    </CardBody>
+                  </Card>
+                ))}
+              </VStack>
+            )}
+
+            {backups?.length === 0 && !isLoading && (
+              <Card
+                bg="gray.50"
+                borderRadius="md"
+                border="1px"
+                borderColor="gray.200"
+              >
+                <CardBody px={6} py={8}>
+                  <VStack spacing={3}>
+                    <Box
+                      w={12}
+                      h={12}
+                      borderRadius="full"
+                      bg="gray.200"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                    >
+                      <Icon as={FaDatabase} color="gray.500" boxSize={6} />
+                    </Box>
+                    <Text color="gray.600" fontSize="md" textAlign="center">
+                      No backups found
+                    </Text>
+                    <Text color="gray.500" fontSize="sm" textAlign="center">
+                      Create your first backup to get started.
+                    </Text>
+                  </VStack>
+                </CardBody>
+              </Card>
+            )}
+          </Box>
+        </VStack>
+      </Box>
 
       {/* Restore Confirmation Modal */}
       <Modal isOpen={isRestoreOpen} onClose={onRestoreClose}>
@@ -388,7 +590,10 @@ const SystemBackup: React.FC = () => {
           <ModalBody>
             <Text>
               Are you sure you want to restore the database from{" "}
-              <Tag>{selectedFile}</Tag>?
+              <Tag colorScheme="blue" size="sm">
+                {selectedFile}
+              </Tag>
+              ?
             </Text>
             <Text mt={4} fontWeight="bold" color="red.500">
               This action is irreversible and will overwrite all current data.
@@ -417,7 +622,9 @@ const SystemBackup: React.FC = () => {
           <ModalCloseButton />
           <ModalBody>
             <Text>You are about to upload and restore the database from:</Text>
-            <Tag mt={2}>{fileToUpload?.name}</Tag>
+            <Tag mt={2} colorScheme="green" size="sm">
+              {fileToUpload?.name}
+            </Tag>
             <Text mt={4} fontWeight="bold" color="red.500">
               This will first upload the file, and then immediately begin the
               restore process, overwriting all current data. Are you sure you
