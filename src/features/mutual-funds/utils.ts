@@ -180,21 +180,21 @@ export const splitPercentageForDisplay = (value: number): { main: string; decima
 };
 
 /**
- * Calculate highest purchase cost from buy transactions only
+ * Calculate highest purchase cost from buy and switch_in transactions
  */
 export const calculateHighestPurchaseCost = (transactions: { transaction_type: string; nav_per_unit: number }[]): number | null => {
-  const buyTransactions = transactions.filter(t => t.transaction_type === "buy");
-  if (buyTransactions.length === 0) return null;
+  const purchaseTransactions = transactions.filter(t => t.transaction_type === "buy" || t.transaction_type === "switch_in");
+  if (purchaseTransactions.length === 0) return null;
 
-  return Math.max(...buyTransactions.map(t => t.nav_per_unit));
+  return Math.max(...purchaseTransactions.map(t => t.nav_per_unit));
 };
 
 /**
- * Calculate lowest purchase cost from buy transactions only
+ * Calculate lowest purchase cost from buy and switch_in transactions
  */
 export const calculateLowestPurchaseCost = (transactions: { transaction_type: string; nav_per_unit: number }[]): number | null => {
-  const buyTransactions = transactions.filter(t => t.transaction_type === "buy");
-  if (buyTransactions.length === 0) return null;
+  const purchaseTransactions = transactions.filter(t => t.transaction_type === "buy" || t.transaction_type === "switch_in");
+  if (purchaseTransactions.length === 0) return null;
 
-  return Math.min(...buyTransactions.map(t => t.nav_per_unit));
+  return Math.min(...purchaseTransactions.map(t => t.nav_per_unit));
 };

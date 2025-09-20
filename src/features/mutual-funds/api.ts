@@ -111,12 +111,15 @@ export const getMutualFundSummaries = async (ledgerId: number): Promise<MutualFu
   return funds.map(fund => ({
     mutual_fund_id: fund.mutual_fund_id,
     name: fund.name,
+    plan: fund.plan,
+    code: fund.code,
     amc_name: fund.amc?.name || '',
     total_units: fund.total_units,
     average_cost_per_unit: fund.average_cost_per_unit,
     latest_nav: fund.latest_nav,
     current_value: fund.current_value,
     total_invested: fund.total_units * fund.average_cost_per_unit,
+    total_realized_gain: fund.total_realized_gain,
     unrealized_pnl: fund.current_value - (fund.total_units * fund.average_cost_per_unit),
     unrealized_pnl_percentage: fund.total_units * fund.average_cost_per_unit > 0
       ? ((fund.current_value - (fund.total_units * fund.average_cost_per_unit)) / (fund.total_units * fund.average_cost_per_unit)) * 100
@@ -135,6 +138,7 @@ export const getAmcSummaries = async (ledgerId: number): Promise<AmcSummary[]> =
     const totalUnits = amcFunds.reduce((sum, fund) => sum + fund.total_units, 0);
     const totalInvested = amcFunds.reduce((sum, fund) => sum + (fund.total_units * fund.average_cost_per_unit), 0);
     const currentValue = amcFunds.reduce((sum, fund) => sum + fund.current_value, 0);
+    const totalRealizedGain = amcFunds.reduce((sum, fund) => sum + fund.total_realized_gain, 0);
 
     return {
       amc_id: amc.amc_id,
@@ -145,6 +149,7 @@ export const getAmcSummaries = async (ledgerId: number): Promise<AmcSummary[]> =
       latest_nav: 0, // Would need to calculate weighted average
       current_value: currentValue,
       total_invested: totalInvested,
+      total_realized_gain: totalRealizedGain,
       unrealized_pnl: currentValue - totalInvested,
       unrealized_pnl_percentage: totalInvested > 0 ? ((currentValue - totalInvested) / totalInvested) * 100 : 0,
     };

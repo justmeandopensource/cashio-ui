@@ -39,6 +39,8 @@ interface CreateMutualFundModalProps {
 
 interface FormData {
   name: string;
+  plan: string;
+  code: string;
   amc_id: string;
   notes: string;
 }
@@ -56,6 +58,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
+    plan: "",
+    code: "",
     amc_id: "",
     notes: "",
   });
@@ -98,6 +102,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
 
       setFormData({
         name: "",
+        plan: "",
+        code: "",
         amc_id: validPreselected ? preselectedAmcId.toString() : "",
         notes: "",
       });
@@ -115,6 +121,14 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
       newErrors.name = "Mutual fund name must be at least 2 characters";
     } else if (formData.name.length > 100) {
       newErrors.name = "Mutual fund name must be less than 100 characters";
+    }
+
+    if (formData.plan && formData.plan.length > 50) {
+      newErrors.plan = "Plan must be less than 50 characters";
+    }
+
+    if (formData.code && formData.code.length > 50) {
+      newErrors.code = "Code must be less than 50 characters";
     }
 
     if (formData.notes && formData.notes.length > 500) {
@@ -163,6 +177,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
 
     const fundData: MutualFundCreate = {
       name: formData.name.trim(),
+      plan: formData.plan.trim() || undefined,
+      code: formData.code.trim() || undefined,
       amc_id: amcId!,
       notes: formData.notes.trim() || undefined,
     };
@@ -182,6 +198,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
   const isLoading = createMutualFundMutation.isPending;
   const isFormValid =
     formData.name.trim() &&
+    (!formData.plan || formData.plan.length <= 50) &&
+    (!formData.code || formData.code.length <= 50) &&
     ((preselectedAmcId &&
       preselectedAmcId > 0 &&
       amcs.find((amc) => amc.amc_id === preselectedAmcId)) ||
@@ -307,9 +325,74 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
                     <FormHelperText>
                       Enter the complete name of the mutual fund scheme
                     </FormHelperText>
-                  </FormControl>
+                   </FormControl>
 
-                  {/* AMC Selection */}
+                   {/* Plan and Code side by side */}
+                   <HStack spacing={4} align="start">
+                     <FormControl isInvalid={!!errors.plan} flex={1}>
+                       <FormLabel fontWeight="semibold" mb={2}>
+                         <HStack spacing={2}>
+                           <FileText size={16} />
+                           <Text>Plan (Optional)</Text>
+                         </HStack>
+                       </FormLabel>
+                       <Input
+                         value={formData.plan}
+                         onChange={(e) =>
+                           handleInputChange("plan", e.target.value)
+                         }
+                         placeholder="Direct Growth"
+                         maxLength={50}
+                         size="lg"
+                         bg={inputBg}
+                         borderColor={inputBorderColor}
+                         borderWidth="2px"
+                         borderRadius="md"
+                         _hover={{ borderColor: "teal.300" }}
+                         _focus={{
+                           borderColor: focusBorderColor,
+                           boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                         }}
+                       />
+                       <FormErrorMessage>{errors.plan}</FormErrorMessage>
+                       <FormHelperText>
+                         Enter the plan type
+                       </FormHelperText>
+                     </FormControl>
+
+                     <FormControl isInvalid={!!errors.code} flex={1}>
+                       <FormLabel fontWeight="semibold" mb={2}>
+                         <HStack spacing={2}>
+                           <FileText size={16} />
+                           <Text>Code (Optional)</Text>
+                         </HStack>
+                       </FormLabel>
+                       <Input
+                         value={formData.code}
+                         onChange={(e) =>
+                           handleInputChange("code", e.target.value)
+                         }
+                         placeholder="HDFC001"
+                         maxLength={50}
+                         size="lg"
+                         bg={inputBg}
+                         borderColor={inputBorderColor}
+                         borderWidth="2px"
+                         borderRadius="md"
+                         _hover={{ borderColor: "teal.300" }}
+                         _focus={{
+                           borderColor: focusBorderColor,
+                           boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                         }}
+                       />
+                       <FormErrorMessage>{errors.code}</FormErrorMessage>
+                       <FormHelperText>
+                         Enter a unique code
+                       </FormHelperText>
+                     </FormControl>
+                   </HStack>
+
+                   {/* AMC Selection */}
                   <FormControl isInvalid={!!errors.amc_id} display={selectedAmc ? "block" : "none"}>
                     <FormLabel fontWeight="semibold" mb={2}>
                       <HStack spacing={2}>

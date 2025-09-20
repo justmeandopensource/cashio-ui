@@ -2,25 +2,27 @@
 export interface Amc {
   amc_id: number;
   name: string;
-  description?: string;
+  notes?: string;
   ledger_id: number;
   created_at: string;
 }
 
 export interface AmcCreate {
   name: string;
-  description?: string;
+  notes?: string;
 }
 
 export interface AmcUpdate {
   name?: string;
-  description?: string;
+  notes?: string;
 }
 
 // Mutual Fund Types
 export interface MutualFund {
   mutual_fund_id: number;
   name: string;
+  plan?: string;
+  code?: string;
   amc_id: number;
   ledger_id: number;
   total_units: number;
@@ -38,12 +40,16 @@ export interface MutualFund {
 
 export interface MutualFundCreate {
   name: string;
+  plan?: string;
+  code?: string;
   amc_id: number;
   notes?: string;
 }
 
 export interface MutualFundUpdate {
   name?: string;
+  plan?: string;
+  code?: string;
   amc_id?: number;
   notes?: string;
 }
@@ -103,9 +109,10 @@ export interface MfTransactionUpdate {
 export interface MfSwitchCreate {
   source_mutual_fund_id: number;
   target_mutual_fund_id: number;
-  units_to_switch: number;
-  source_nav_at_switch: number;
-  target_nav_at_switch: number;
+  source_units: number;
+  source_amount: number;
+  target_units: number;
+  target_amount: number;
   transaction_date: Date;
   notes?: string;
 }
@@ -114,13 +121,15 @@ export interface MfSwitchCreate {
 export interface MutualFundSummary {
   mutual_fund_id: number;
   name: string;
+  plan?: string;
+  code?: string;
   amc_name: string;
   total_units: number;
   average_cost_per_unit: number;
   latest_nav: number;
   current_value: number;
   total_invested: number;
-  total_realized_gain: number; // New field
+  total_realized_gain: number;
   unrealized_pnl: number;
   unrealized_pnl_percentage: number;
 }
@@ -134,7 +143,7 @@ export interface AmcSummary {
   latest_nav: number;
   current_value: number;
   total_invested: number;
-  total_realized_gain: number; // New field
+  total_realized_gain: number;
   unrealized_pnl: number;
   unrealized_pnl_percentage: number;
 }

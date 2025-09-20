@@ -36,7 +36,7 @@ interface CreateAmcModalProps {
 
 interface FormData {
   name: string;
-  description: string;
+  notes: string;
 }
 
 const CreateAmcModal: FC<CreateAmcModalProps> = ({
@@ -50,7 +50,7 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
 
   const [formData, setFormData] = useState<FormData>({
     name: "",
-    description: "",
+    notes: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -84,7 +84,7 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
     if (isOpen) {
       setFormData({
         name: "",
-        description: "",
+        notes: "",
       });
       setErrors({});
     }
@@ -102,8 +102,8 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
       newErrors.name = "AMC name must be less than 100 characters";
     }
 
-    if (formData.description && formData.description.length > 500) {
-      newErrors.description = "Description must be less than 500 characters";
+    if (formData.notes && formData.notes.length > 500) {
+      newErrors.notes = "Notes must be less than 500 characters";
     }
 
     setErrors(newErrors);
@@ -112,7 +112,7 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
 
   const handleClose = () => {
     createAmcMutation.reset();
-    setFormData({ name: "", description: "" });
+    setFormData({ name: "", notes: "" });
     setErrors({});
     onClose();
   };
@@ -126,7 +126,7 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
 
     const amcData: AmcCreate = {
       name: formData.name.trim(),
-      description: formData.description.trim() || undefined,
+      notes: formData.notes.trim() || undefined,
     };
 
     createAmcMutation.mutate(amcData);
@@ -260,20 +260,20 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
                     </FormHelperText>
                   </FormControl>
 
-                  {/* Description */}
-                  <FormControl isInvalid={!!errors.description}>
+                  {/* Notes */}
+                  <FormControl isInvalid={!!errors.notes}>
                     <FormLabel fontWeight="semibold" mb={2}>
                       <HStack spacing={2}>
                         <FileText size={16} />
-                        <Text>Description (Optional)</Text>
+                        <Text>Notes (Optional)</Text>
                       </HStack>
                     </FormLabel>
                     <Textarea
-                      value={formData.description}
+                      value={formData.notes}
                       onChange={(e) =>
-                        handleInputChange("description", e.target.value)
+                        handleInputChange("notes", e.target.value)
                       }
-                      placeholder="Add details about this AMC"
+                      placeholder="Add notes about this AMC"
                       rows={4}
                       maxLength={500}
                       bg={inputBg}
@@ -287,10 +287,10 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
                       }}
                       resize="vertical"
                     />
-                    <FormErrorMessage>{errors.description}</FormErrorMessage>
+                    <FormErrorMessage>{errors.notes}</FormErrorMessage>
                     <FormHelperText>
-                      Additional information about the AMC (
-                      {formData.description.length}/500 characters)
+                      Additional notes about the AMC (
+                      {formData.notes.length}/500 characters)
                     </FormHelperText>
                   </FormControl>
                 </VStack>

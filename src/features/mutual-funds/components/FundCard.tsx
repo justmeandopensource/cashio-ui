@@ -95,6 +95,16 @@ const FundCard: FC<FundCardProps> = ({
             >
               {fund.name}
             </Text>
+            {fund.plan && (
+              <Text
+                fontSize="sm"
+                color={mutedColor}
+                opacity={0.8}
+                noOfLines={1}
+              >
+                {fund.plan}
+              </Text>
+            )}
             <HStack spacing={{ base: 4, md: 6 }} color={mutedColor} align="start">
               <VStack align="start" spacing={0}>
                 <Text fontSize="sm" color={mutedColor}>

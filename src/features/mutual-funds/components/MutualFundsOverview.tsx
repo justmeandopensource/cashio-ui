@@ -1,27 +1,30 @@
-import { FC, useState } from "react";
-import {
-  Box,
-  Text,
-  Button,
-  VStack,
-  HStack,
-  Grid,
-  GridItem,
-  Stat,
-  StatLabel,
-  StatNumber,
-  Badge,
-  Card,
-  CardBody,
-  CardHeader,
-  Collapse,
-  IconButton,
-  Divider,
-  SimpleGrid,
-  Flex,
-  Icon,
-  useColorModeValue,
-} from "@chakra-ui/react";
+ import { FC, useState, useMemo } from "react";
+ import {
+   Box,
+   Text,
+   Button,
+   VStack,
+   HStack,
+   Grid,
+   GridItem,
+   Stat,
+   StatLabel,
+   StatNumber,
+   Badge,
+   Card,
+   CardBody,
+   CardHeader,
+   Collapse,
+   IconButton,
+   Divider,
+   SimpleGrid,
+   Flex,
+   Icon,
+   useColorModeValue,
+   Switch,
+   FormControl,
+   FormLabel,
+ } from "@chakra-ui/react";
 import {
   TrendingUp,
   PieChart,
@@ -66,9 +69,10 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
 
-  // State for expanded AMCs and funds
-  const [expandedAmc, setExpandedAmc] = useState<number | null>(null);
-  const [expandedFunds, setExpandedFunds] = useState<Set<number>>(new Set());
+   // State for expanded AMCs and funds
+   const [expandedAmc, setExpandedAmc] = useState<number | null>(null);
+   const [expandedFunds, setExpandedFunds] = useState<Set<number>>(new Set());
+   const [showAllAmcs, setShowAllAmcs] = useState(false);
 
   // Calculate overall portfolio metrics
   const totalInvested = mutualFunds.reduce(
@@ -88,8 +92,25 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
     return sum + unrealizedPnl;
   }, 0);
 
-  const totalPnLPercentage =
-    totalInvested > 0 ? (totalUnrealizedPnL / totalInvested) * 100 : 0;
+   const totalPnLPercentage =
+     totalInvested > 0 ? (totalUnrealizedPnL / totalInvested) * 100 : 0;
+
+   // Filter AMCs based on toggle and funds with non-zero value
+   const filteredAmcs = useMemo(() => {
+     if (showAllAmcs) return amcs;
+     return amcs.filter((amc) => {
+       const amcFunds = mutualFunds.filter((fund) => fund.amc_id === amc.amc_id);
+       return amcFunds.some((fund) => fund.current_value > 0);
+     });
+   }, [amcs, mutualFunds, showAllAmcs]);
+
+   // Check if there are AMCs with zero balance (no funds or all funds have zero value)
+   const hasZeroBalanceAmcs = useMemo(() => {
+     return amcs.some((amc) => {
+       const amcFunds = mutualFunds.filter((fund) => fund.amc_id === amc.amc_id);
+       return amcFunds.length === 0 || amcFunds.every((fund) => fund.current_value === 0);
+     });
+   }, [amcs, mutualFunds]);
 
   const toggleAmcExpansion = (amcId: number) => {
     const currentlyExpanded = expandedAmc;
@@ -152,33 +173,33 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                   Mutual Funds Portfolio
                 </Text>
               </Flex>
-             <Flex gap={2} width={{ base: "full", md: "auto" }}>
-               <Button
-                 leftIcon={<Building2 size={16} />}
-                 colorScheme="teal"
-                 variant="outline"
-                 size={{ base: "md", md: "sm" }}
-                 onClick={onCreateAmc}
-                 flex={{ base: 1, md: "none" }}
-               >
-                 Create AMC
-               </Button>
-               <Button
-                 leftIcon={<PieChart size={16} />}
-                 colorScheme="teal"
-                 variant={amcs.length === 0 ? "outline" : "solid"}
-                 size={{ base: "md", md: "sm" }}
-                 onClick={() => onCreateFund()}
-                 title={
-                   amcs.length === 0
-                     ? "Create an AMC first"
-                     : "Create a new mutual fund"
-                 }
-                 flex={{ base: 1, md: "none" }}
-               >
-                 Create Fund
-               </Button>
-             </Flex>
+              <Flex gap={2} width={{ base: "full", md: "auto" }}>
+                <Button
+                  leftIcon={<Building2 size={16} />}
+                  colorScheme="teal"
+                  variant="outline"
+                  size={{ base: "md", md: "sm" }}
+                  onClick={onCreateAmc}
+                  flex={{ base: 1, md: "none" }}
+                >
+                  Create AMC
+                </Button>
+                <Button
+                  leftIcon={<PieChart size={16} />}
+                  colorScheme="teal"
+                  variant={amcs.length === 0 ? "outline" : "solid"}
+                  size={{ base: "md", md: "sm" }}
+                  onClick={() => onCreateFund()}
+                  title={
+                    amcs.length === 0
+                      ? "Create an AMC first"
+                      : "Create a new mutual fund"
+                  }
+                  flex={{ base: 1, md: "none" }}
+                >
+                  Create Fund
+                </Button>
+              </Flex>
            </Flex>
 
             {/* Portfolio Stats */}
@@ -483,42 +504,63 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                        </Text>
                      </VStack>
                    </Box>
-                  </Flex>
-                </Box>
-                </>
-             </Box>
-          )}
+                   </Flex>
+                 </Box>
+                 </>
+                 {/* AMC Filter Toggle */}
+                 {hasZeroBalanceAmcs && (
+                   <Box mt={4} display="flex" justifyContent="flex-start" alignItems="center" gap={3}>
+                     <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                       Show zero balance AMCs
+                     </Text>
+                     <Switch
+                       id="show-all-amcs"
+                       isChecked={showAllAmcs}
+                       onChange={(e) => setShowAllAmcs(e.target.checked)}
+                       colorScheme="teal"
+                       size="md"
+                     />
+                   </Box>
+                 )}
+              </Box>
+           )}
 
-        {/* AMC and Fund Details */}
-        {amcs.length === 0 ? (
-          <Box
-            p={12}
-            textAlign="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
-            borderRadius="lg"
-            border="2px dashed"
-            borderColor="gray.300"
-          >
-            <VStack spacing={4}>
-              <Icon as={TrendingUp} boxSize={16} color="gray.400" />
-              <VStack spacing={2}>
-                <Text fontSize="xl" fontWeight="semibold" color="gray.700">
-                  No AMCs Created Yet
-                </Text>
-                <Text fontSize="md" color={useColorModeValue("gray.600", "gray.400")} maxW="400px">
-                  Create your first Asset Management Company to start tracking
-                  mutual fund investments
-                </Text>
-              </VStack>
-              <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
-                Create Your First AMC
-              </Button>
-            </VStack>
-          </Box>
+         {/* AMC and Fund Details */}
+         {filteredAmcs.length === 0 ? (
+           <Box
+             p={12}
+             textAlign="center"
+             bg={useColorModeValue("gray.50", "gray.800")}
+             borderRadius="lg"
+             border="2px dashed"
+             borderColor="gray.300"
+           >
+             <VStack spacing={4}>
+               <Icon as={TrendingUp} boxSize={16} color="gray.400" />
+               <VStack spacing={2}>
+                 <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+                   {amcs.length === 0 ? "No AMCs Created Yet" : showAllAmcs ? "No AMCs Available" : "No AMCs with Active Funds"}
+                 </Text>
+                 <Text fontSize="md" color={useColorModeValue("gray.600", "gray.400")} maxW="400px">
+                   {amcs.length === 0
+                     ? "Create your first Asset Management Company to start tracking mutual fund investments"
+                     : showAllAmcs
+                     ? "There are no AMCs in your portfolio"
+                     : "Toggle 'Show All AMCs' to view all companies or create funds with value"
+                   }
+                 </Text>
+               </VStack>
+               {amcs.length === 0 && (
+                 <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
+                   Create Your First AMC
+                 </Button>
+               )}
+             </VStack>
+           </Box>
         ) : (
-          <VStack spacing={4} align="stretch">
-            {amcs
-              .map((amc) => {
+           <VStack spacing={4} align="stretch">
+             {filteredAmcs
+               .map((amc) => {
                 const amcFunds = mutualFunds.filter(
                   (fund) => fund.amc_id === amc.amc_id,
                 );
@@ -594,20 +636,15 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                               align="center"
                               spacing={3}
                             >
-                              <VStack align="start" spacing={0}>
-                                <Text
-                                  fontSize="xl"
-                                  fontWeight="semibold"
-                                  color="gray.700"
-                                >
-                                  {amc.name}
-                                </Text>
-                                {amc.description && (
-                                  <Text color="gray.600" fontSize="md">
-                                    {amc.description}
-                                  </Text>
-                                )}
-                              </VStack>
+                               <VStack align="start" spacing={0}>
+                                 <Text
+                                   fontSize="xl"
+                                   fontWeight="semibold"
+                                   color="gray.700"
+                                 >
+                                   {amc.name}
+                                 </Text>
+                               </VStack>
                               <HStack spacing={2}>
                                 <Button
                                   size="xs"
@@ -923,7 +960,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                       </HStack>
                     </CardHeader>
 
-                    <Collapse in={isExpanded} animateOpacity>
+                     <Collapse in={isExpanded} transition={{ enter: { duration: 0 }, exit: { duration: 0 } }} animateOpacity={false}>
                       <CardBody pt={0}>
                         <Box display={{ base: "block", lg: "none" }} mb={4}>
                           <Divider mb={4} />
