@@ -1,8 +1,10 @@
+import React, { lazy, Suspense } from "react";
 import { Text, Box, useColorModeValue } from "@chakra-ui/react";
-import IncomeExpenseTrend from "./charts/IncomeExpenseTrend";
-import CurrentMonthOverview from "./charts/CurrentMonthOverview";
-import CategoryTrend from "./charts/CategoryTrend";
-import TagTrend from "./charts/TagTrend";
+
+const IncomeExpenseTrend = lazy(() => import("./charts/IncomeExpenseTrend"));
+const CurrentMonthOverview = lazy(() => import("./charts/CurrentMonthOverview"));
+const CategoryTrend = lazy(() => import("./charts/CategoryTrend"));
+const TagTrend = lazy(() => import("./charts/TagTrend"));
 
 interface InsightsMainChartsProps {
   ledgerId?: string;
@@ -58,7 +60,11 @@ const InsightsMainCharts = ({
     }
   };
 
-  return <Box>{renderVisualization()}</Box>;
+  return (
+    <Suspense fallback={<Box textAlign="center" py={8}><Text>Loading chart...</Text></Box>}>
+      <Box>{renderVisualization()}</Box>
+    </Suspense>
+  );
 };
 
 export default InsightsMainCharts;

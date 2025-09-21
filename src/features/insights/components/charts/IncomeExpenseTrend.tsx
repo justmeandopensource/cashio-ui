@@ -390,4 +390,4 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
   );
 };
 
-export default IncomeExpenseTrend;
+export default React.memo(IncomeExpenseTrend);

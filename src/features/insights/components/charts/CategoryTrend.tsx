@@ -636,4 +636,4 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
   );
 };
 
-export default CategoryTrend;
+export default React.memo(CategoryTrend);

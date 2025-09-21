@@ -513,4 +513,4 @@ const CurrentMonthOverview: React.FC = () => {
   );
 };
 
-export default CurrentMonthOverview;
+export default React.memo(CurrentMonthOverview);

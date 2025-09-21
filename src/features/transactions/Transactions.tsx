@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   Box,
   Text,
@@ -8,8 +8,10 @@ import {
   useToast,
   VStack,
   IconButton,
-  Spinner,
   Icon,
+  Skeleton,
+  SkeletonText,
+  SkeletonCircle,
 } from "@chakra-ui/react";
 import { Plus, ChevronLeft, ChevronRight, Filter, AlignLeft } from "lucide-react";
 
@@ -180,6 +182,63 @@ const Transactions: React.FC<TransactionsProps> = ({
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
+  // Optimistic delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (transactionId: string) =>
+      api.delete(`/ledger/${ledgerId}/transaction/${transactionId}`),
+    onMutate: async (transactionId) => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({
+        queryKey: ["transactions", ledgerId, accountId, pagination.current_page, { ...filters }],
+      });
+
+      // Snapshot previous value
+      const previousTransactions = queryClient.getQueryData([
+        "transactions",
+        ledgerId,
+        accountId,
+        pagination.current_page,
+        { ...filters },
+      ]);
+
+      // Optimistically remove the transaction
+      queryClient.setQueryData(
+        ["transactions", ledgerId, accountId, pagination.current_page, { ...filters }],
+        (old: Transaction[] | undefined) =>
+          old ? old.filter((t) => t.transaction_id !== transactionId) : old
+      );
+
+      // Return context with snapshotted value
+      return { previousTransactions };
+    },
+    onError: (err, transactionId, context) => {
+      // If mutation fails, use the context to roll back
+      if (context?.previousTransactions) {
+        queryClient.setQueryData(
+          ["transactions", ledgerId, accountId, pagination.current_page, { ...filters }],
+          context.previousTransactions
+        );
+      }
+      const axiosError = err as AxiosError<{ detail: string }>;
+      toast({
+        description: axiosError.response?.data?.detail || "Failed to delete transaction.",
+        status: "error",
+        ...toastDefaults,
+      });
+    },
+    onSuccess: () => {
+      if (onTransactionDeleted) {
+        onTransactionDeleted();
+      }
+      queryClient.invalidateQueries({ queryKey: ["account", accountId] });
+      toast({
+        description: "Transaction deleted",
+        status: "success",
+        ...toastDefaults,
+      });
+    },
+  });
+
   const handlePageChange = (page: number) => {
     setPagination((prev) => ({ ...prev, current_page: page }));
   };
@@ -227,48 +286,31 @@ const Transactions: React.FC<TransactionsProps> = ({
     }
   };
 
-  const handleDeleteTransaction = async (transactionId: string) => {
-    try {
-      await api.delete(
-        `/ledger/${ledgerId}/transaction/${transactionId}`,
-      );
-
-      if (onTransactionDeleted) {
-        onTransactionDeleted();
-      }
-
-      queryClient.invalidateQueries({
-        queryKey: [
-          "transactions",
-          ledgerId,
-          accountId,
-          pagination.current_page,
-          { ...filters },
-        ],
-      });
-      queryClient.refetchQueries({ queryKey: ["account", accountId] });
-
-      toast({
-        description: "Transaction deleted",
-        status: "success",
-        ...toastDefaults,
-      });
-    } catch (error) {
-      // Let the global interceptor handle 401 errors
-      const axiosError = error as AxiosError<{ detail: string }>;
-      toast({
-        description:
-          axiosError.response?.data?.detail || "Failed to delete transaction.",
-        status: "error",
-        ...toastDefaults,
-      });
-    }
+  const handleDeleteTransaction = (transactionId: string) => {
+    deleteMutation.mutate(transactionId);
   };
 
   if (shouldFetch && isTransactionsLoading) {
     return (
-      <Box textAlign="center" py={10}>
-        <Spinner size="xl" color="teal.500" />
+      <Box bg="gray.50" p={{ base: 3, lg: 6 }} borderRadius="lg">
+        <Flex justify="space-between" align="center" mb={4}>
+          <Flex align="center" gap={2}>
+            <SkeletonCircle size="6" />
+            <Skeleton height="6" width="32" />
+          </Flex>
+          <Skeleton height="8" width="24" />
+        </Flex>
+        <VStack spacing={3} align="stretch">
+          {Array.from({ length: 5 }).map((_, index) => (
+            <Box key={index} bg="white" p={4} borderRadius="md" boxShadow="sm">
+              <Flex justify="space-between" align="center" mb={2}>
+                <Skeleton height="4" width="20" />
+                <Skeleton height="5" width="16" />
+              </Flex>
+              <SkeletonText noOfLines={2} spacing="2" />
+            </Box>
+          ))}
+        </VStack>
       </Box>
     );
   }
@@ -356,38 +398,38 @@ const Transactions: React.FC<TransactionsProps> = ({
             />
           </Box>
 
-          <Box display={{ base: "block", lg: "none" }}>
-            <VStack spacing={1} align="stretch">
-              {transactionsData.map((transaction) => (
-                <TransactionCard
-                  key={transaction.transaction_id}
-                  transaction={transaction}
-                  isExpanded={
-                    expandedTransaction === transaction.transaction_id
-                  }
-                  toggleExpand={(e) =>
-                    toggleExpand(transaction.transaction_id, e)
-                  }
-                  fetchSplitTransactions={() =>
-                    fetchSplitTransactions(transaction.transaction_id)
-                  }
-                  splitTransactions={splitTransactions}
-                  fetchTransferDetails={() =>
-                    transaction.transfer_id
-                      ? fetchTransferDetails(transaction.transfer_id)
-                      : undefined
-                  }
-                  transferDetails={transferDetails || undefined}
-                  isSplitLoading={isSplitLoading}
-                  isTransferLoading={isTransferLoading}
-                  onDeleteTransaction={handleDeleteTransaction}
-                  onEditTransaction={handleEditTransaction} // Add this line
-                  onCopyTransaction={onCopyTransaction}
-                  showAccountName={!accountId}
-                />
-              ))}
-            </VStack>
-          </Box>
+           <Box display={{ base: "block", lg: "none" }}>
+             <VStack spacing={1} align="stretch">
+               {transactionsData.map((transaction) => (
+                 <TransactionCard
+                   key={transaction.transaction_id}
+                   transaction={transaction}
+                   isExpanded={
+                     expandedTransaction === transaction.transaction_id
+                   }
+                   toggleExpand={(e) =>
+                     toggleExpand(transaction.transaction_id, e)
+                   }
+                   fetchSplitTransactions={() =>
+                     fetchSplitTransactions(transaction.transaction_id)
+                   }
+                   splitTransactions={splitTransactions}
+                   fetchTransferDetails={() =>
+                     transaction.transfer_id
+                       ? fetchTransferDetails(transaction.transfer_id)
+                       : undefined
+                   }
+                   transferDetails={transferDetails || undefined}
+                   isSplitLoading={isSplitLoading}
+                   isTransferLoading={isTransferLoading}
+                   onDeleteTransaction={handleDeleteTransaction}
+                   onEditTransaction={handleEditTransaction}
+                   onCopyTransaction={onCopyTransaction}
+                   showAccountName={!accountId}
+                 />
+               ))}
+             </VStack>
+           </Box>
 
           {pagination.total_pages > 1 && (
             <Flex justifyContent="center" mt={6} alignItems="center">

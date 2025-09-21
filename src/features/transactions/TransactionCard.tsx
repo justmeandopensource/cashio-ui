@@ -445,4 +445,4 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   );
 };
 
-export default TransactionCard;
+export default React.memo(TransactionCard);

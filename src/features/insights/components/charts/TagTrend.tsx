@@ -515,4 +515,4 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
   );
 };
 
-export default TagTrendAnalysis;
+export default React.memo(TagTrendAnalysis);
