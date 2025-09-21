@@ -25,16 +25,16 @@ export interface MutualFund {
   code?: string;
   amc_id: number;
   ledger_id: number;
-  total_units: number;
-  average_cost_per_unit: number;
-  latest_nav: number;
+  total_units: number | string;
+  average_cost_per_unit: number | string;
+  latest_nav: number | string;
   last_nav_update?: string;
-  current_value: number;
+  current_value: number | string;
   notes?: string;
   created_at: string;
   updated_at: string;
-  total_realized_gain: number;
-  total_invested_cash: number;
+  total_realized_gain: number | string;
+  total_invested_cash: number | string;
   amc?: Amc;
 }
 
@@ -63,11 +63,11 @@ export interface MfTransaction {
   mf_transaction_id: number;
   mutual_fund_id: number;
   transaction_type: 'buy' | 'sell' | 'switch_out' | 'switch_in';
-  units: number;
-  nav_per_unit: number;
-  total_amount: number;
-  amount_excluding_charges: number;
-  other_charges: number;
+  units: number | string;
+  nav_per_unit: number | string;
+  total_amount: number | string;
+  amount_excluding_charges: number | string;
+  other_charges: number | string;
   account_id?: number;
   target_fund_id?: number;
   transaction_date: string;
@@ -76,8 +76,8 @@ export interface MfTransaction {
   created_at: string;
   linked_transaction_id?: number;
   linked_charge_transaction_id?: number;
-  realized_gain?: number;
-  cost_basis_of_units_sold?: number;
+  realized_gain?: number | string;
+  cost_basis_of_units_sold?: number | string;
   mutual_fund?: MutualFund;
   account_name?: string;
   target_fund_name?: string;
@@ -124,28 +124,28 @@ export interface MutualFundSummary {
   plan?: string;
   code?: string;
   amc_name: string;
-  total_units: number;
-  average_cost_per_unit: number;
-  latest_nav: number;
-  current_value: number;
-  total_invested: number;
-  total_realized_gain: number;
-  unrealized_pnl: number;
-  unrealized_pnl_percentage: number;
+  total_units: number | string;
+  average_cost_per_unit: number | string;
+  latest_nav: number | string;
+  current_value: number | string;
+  total_invested: number | string;
+  total_realized_gain: number | string;
+  unrealized_pnl: number | string;
+  unrealized_pnl_percentage: number | string;
 }
 
 export interface AmcSummary {
   amc_id: number;
   name: string;
   total_funds: number;
-  total_units: number;
-  average_cost_per_unit: number;
-  latest_nav: number;
-  current_value: number;
-  total_invested: number;
-  total_realized_gain: number;
-  unrealized_pnl: number;
-  unrealized_pnl_percentage: number;
+  total_units: number | string;
+  average_cost_per_unit: number | string;
+  latest_nav: number | string;
+  current_value: number | string;
+  total_invested: number | string;
+  total_realized_gain: number | string;
+  unrealized_pnl: number | string;
+  unrealized_pnl_percentage: number | string;
 }
 
 // Form Types

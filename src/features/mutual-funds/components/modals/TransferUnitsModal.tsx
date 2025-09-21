@@ -251,7 +251,7 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
     }
   };
 
-  const availableUnits = sourceFund?.total_units || 0;
+  const availableUnits = sourceFund ? parseFloat(String(sourceFund.total_units)) : 0;
   const sourceUnits = parseFloat(formData.source_units) || 0;
   const sourceAmount = parseFloat(formData.source_amount) || 0;
   const targetUnits = parseFloat(formData.target_units) || 0;

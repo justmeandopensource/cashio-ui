@@ -75,16 +75,18 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
    const [showAllAmcs, setShowAllAmcs] = useState(false);
 
   // Calculate overall portfolio metrics
+  const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
+
   const totalInvested = mutualFunds.reduce(
-    (sum, fund) => sum + fund.total_invested_cash,
+    (sum, fund) => sum + toNumber(fund.total_invested_cash),
     0,
   );
   const totalCurrentValue = mutualFunds.reduce(
-    (sum, fund) => sum + fund.current_value,
+    (sum, fund) => sum + toNumber(fund.current_value),
     0,
   );
   const totalRealizedGain = mutualFunds.reduce(
-    (sum, fund) => sum + (fund.total_realized_gain || 0),
+    (sum, fund) => sum + toNumber(fund.total_realized_gain || 0),
     0,
   );
   const totalUnrealizedPnL = mutualFunds.reduce((sum, fund) => {
@@ -561,21 +563,21 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
            <VStack spacing={4} align="stretch">
              {filteredAmcs
                .map((amc) => {
-                const amcFunds = mutualFunds.filter(
-                  (fund) => fund.amc_id === amc.amc_id,
-                );
-                  const amcInvested = amcFunds.reduce(
-                    (sum, fund) => sum + fund.total_invested_cash,
-                    0,
-                  );
-                const amcCurrentValue = amcFunds.reduce(
-                  (sum, fund) => sum + fund.current_value,
-                  0,
-                );
-                const amcRealizedGain = amcFunds.reduce(
-                  (sum, fund) => sum + (fund.total_realized_gain || 0),
-                  0,
-                );
+                 const amcFunds = mutualFunds.filter(
+                   (fund) => fund.amc_id === amc.amc_id,
+                 );
+                   const amcInvested = amcFunds.reduce(
+                     (sum, fund) => sum + toNumber(fund.total_invested_cash),
+                     0,
+                   );
+                 const amcCurrentValue = amcFunds.reduce(
+                   (sum, fund) => sum + toNumber(fund.current_value),
+                   0,
+                 );
+                 const amcRealizedGain = amcFunds.reduce(
+                   (sum, fund) => sum + toNumber(fund.total_realized_gain || 0),
+                   0,
+                 );
                 const amcUnrealizedPnL = amcFunds.reduce((sum, fund) => {
                   const { unrealizedPnl } = calculateFundPnL(fund);
                   return sum + unrealizedPnl;

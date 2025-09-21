@@ -2,40 +2,55 @@ import { MutualFund, MfTransaction, AmcSummary, MutualFundSummary } from "./type
 import { formatNumberAsCurrency } from "@components/shared/utils";
 
 // Format NAV to 2 decimal places
-export const formatNav = (nav: number): string => {
-  return nav.toFixed(2);
+export const formatNav = (nav: number | string): string => {
+  const numValue = typeof nav === 'string' ? parseFloat(nav) : nav;
+  return numValue.toFixed(2);
 };
 
 // Format units to 3 decimal places
-export const formatUnits = (units: number): string => {
-  return units.toFixed(3);
+export const formatUnits = (units: number | string): string => {
+  const numValue = typeof units === 'string' ? parseFloat(units) : units;
+  return numValue.toFixed(3);
 };
 
 // Format amounts to 2 decimal places
-export const formatAmount = (amount: number): string => {
-  return amount.toFixed(2);
+export const formatAmount = (amount: number | string): string => {
+  const numValue = typeof amount === 'string' ? parseFloat(amount) : amount;
+  return numValue.toFixed(2);
 };
 
 // Calculate P&L for a fund
 export const calculateFundPnL = (fund: MutualFund): { pnl: number; pnlPercentage: number; unrealizedPnl: number; realizedPnl: number } => {
-  const totalInvested = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
-  const currentValue = fund.current_value;
-  const realizedPnl = fund.total_realized_gain || 0;
+  const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
+
+  const totalUnits = toNumber(fund.total_units);
+  const avgCostPerUnit = toNumber(fund.average_cost_per_unit);
+  const totalInvestedCash = toNumber(fund.total_invested_cash);
+  const currentValue = toNumber(fund.current_value);
+  const realizedGain = toNumber(fund.total_realized_gain || 0);
+
+  const totalInvested = totalInvestedCash || (totalUnits * avgCostPerUnit);
   const unrealizedPnl = currentValue - totalInvested;
-  const pnl = unrealizedPnl + realizedPnl;
+  const pnl = unrealizedPnl + realizedGain;
   const pnlPercentage = totalInvested > 0 ? (unrealizedPnl / totalInvested) * 100 : 0;
 
-  return { pnl, pnlPercentage, unrealizedPnl, realizedPnl };
+  return { pnl, pnlPercentage, unrealizedPnl, realizedPnl: realizedGain };
 };
 
 // Calculate summary for AMC
 export const calculateAmcSummary = (amcFunds: MutualFund[]): AmcSummary => {
+  const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
+
   const totalFunds = amcFunds.length;
-  const totalUnits = amcFunds.reduce((sum, fund) => sum + fund.total_units, 0);
-  const totalInvested = amcFunds.reduce((sum, fund) => sum + (fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit)), 0);
-  const currentValue = amcFunds.reduce((sum, fund) => sum + fund.current_value, 0);
-  const totalRealizedGain = amcFunds.reduce((sum, fund) => sum + (fund.total_realized_gain || 0), 0);
-  const costBasis = amcFunds.reduce((sum, fund) => sum + (fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit)), 0);
+  const totalUnits = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_units), 0);
+  const totalInvested = amcFunds.reduce((sum, fund) => {
+    const investedCash = toNumber(fund.total_invested_cash);
+    const calculated = toNumber(fund.total_units) * toNumber(fund.average_cost_per_unit);
+    return sum + (investedCash || calculated);
+  }, 0);
+  const currentValue = amcFunds.reduce((sum, fund) => sum + toNumber(fund.current_value), 0);
+  const totalRealizedGain = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_realized_gain || 0), 0);
+  const costBasis = totalInvested;
   const unrealizedPnl = currentValue - costBasis;
   const unrealizedPnlPercentage = costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
@@ -56,21 +71,29 @@ export const calculateAmcSummary = (amcFunds: MutualFund[]): AmcSummary => {
 
 // Calculate summary for individual fund
 export const calculateFundSummary = (fund: MutualFund): MutualFundSummary => {
-  const costBasis = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
-  const totalInvested = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
-  const unrealizedPnl = fund.current_value - costBasis;
+  const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
+
+  const totalUnits = toNumber(fund.total_units);
+  const avgCostPerUnit = toNumber(fund.average_cost_per_unit);
+  const totalInvestedCash = toNumber(fund.total_invested_cash);
+  const currentValue = toNumber(fund.current_value);
+  const realizedGain = toNumber(fund.total_realized_gain || 0);
+
+  const costBasis = totalInvestedCash || (totalUnits * avgCostPerUnit);
+  const totalInvested = totalInvestedCash || (totalUnits * avgCostPerUnit);
+  const unrealizedPnl = currentValue - costBasis;
   const unrealizedPnlPercentage = costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
   return {
     mutual_fund_id: fund.mutual_fund_id,
     name: fund.name,
     amc_name: fund.amc?.name || '',
-    total_units: fund.total_units,
-    average_cost_per_unit: fund.average_cost_per_unit,
-    latest_nav: fund.latest_nav,
-    current_value: fund.current_value,
+    total_units: totalUnits,
+    average_cost_per_unit: avgCostPerUnit,
+    latest_nav: toNumber(fund.latest_nav),
+    current_value: currentValue,
     total_invested: totalInvested,
-    total_realized_gain: fund.total_realized_gain || 0,
+    total_realized_gain: realizedGain,
     unrealized_pnl: unrealizedPnl,
     unrealized_pnl_percentage: unrealizedPnlPercentage,
   };

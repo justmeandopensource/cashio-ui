@@ -228,7 +228,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
     if (
       tabIndex === 1 &&
       selectedFund &&
-      parseFloat(formData.units) > selectedFund.total_units
+      parseFloat(formData.units) > parseFloat(String(selectedFund.total_units))
     ) {
       newErrors.units = `Cannot sell more than available units (${selectedFund.total_units}).`;
     }
@@ -330,7 +330,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       !(
         currentType === "sell" &&
         selectedFund &&
-        parseFloat(formData.units) > selectedFund.total_units
+        parseFloat(formData.units) > parseFloat(String(selectedFund.total_units))
       ) &&
       Object.keys(errors).length === 0
     );
