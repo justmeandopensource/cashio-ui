@@ -4,24 +4,31 @@ import { formatNumberAsCurrency } from "@components/shared/utils";
 // Format NAV to 2 decimal places
 export const formatNav = (nav: number | string): string => {
   const numValue = typeof nav === 'string' ? parseFloat(nav) : nav;
+  if (isNaN(numValue)) return "0.00";
   return numValue.toFixed(2);
 };
 
 // Format units to 3 decimal places
 export const formatUnits = (units: number | string): string => {
   const numValue = typeof units === 'string' ? parseFloat(units) : units;
+  if (isNaN(numValue)) return "0.000";
   return numValue.toFixed(3);
 };
 
 // Format amounts to 2 decimal places
 export const formatAmount = (amount: number | string): string => {
   const numValue = typeof amount === 'string' ? parseFloat(amount) : amount;
+  if (isNaN(numValue)) return "0.00";
   return numValue.toFixed(2);
 };
 
 // Calculate P&L for a fund
 export const calculateFundPnL = (fund: MutualFund): { pnl: number; pnlPercentage: number; unrealizedPnl: number; realizedPnl: number } => {
-  const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
+  const toNumber = (value: number | string): number => {
+    if (value === undefined || value === null) return 0;
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return isNaN(num) ? 0 : num;
+  };
 
   const totalUnits = toNumber(fund.total_units);
   const avgCostPerUnit = toNumber(fund.average_cost_per_unit);
@@ -39,7 +46,11 @@ export const calculateFundPnL = (fund: MutualFund): { pnl: number; pnlPercentage
 
 // Calculate summary for AMC
 export const calculateAmcSummary = (amcFunds: MutualFund[]): AmcSummary => {
-  const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
+  const toNumber = (value: number | string): number => {
+    if (value === undefined || value === null) return 0;
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return isNaN(num) ? 0 : num;
+  };
 
   const totalFunds = amcFunds.length;
   const totalUnits = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_units), 0);
@@ -71,7 +82,11 @@ export const calculateAmcSummary = (amcFunds: MutualFund[]): AmcSummary => {
 
 // Calculate summary for individual fund
 export const calculateFundSummary = (fund: MutualFund): MutualFundSummary => {
-  const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
+  const toNumber = (value: number | string): number => {
+    if (value === undefined || value === null) return 0;
+    const num = typeof value === 'string' ? parseFloat(value) : value;
+    return isNaN(num) ? 0 : num;
+  };
 
   const totalUnits = toNumber(fund.total_units);
   const avgCostPerUnit = toNumber(fund.average_cost_per_unit);
@@ -164,6 +179,7 @@ export const formatPercentage = (percentage: number): { text: string; isPositive
  * Split currency value into main amount and decimal places for styling
  */
 export const splitCurrencyForDisplay = (value: number, currencySymbol: string): { main: string; decimals: string } => {
+  if (isNaN(value)) value = 0;
   const formatted = formatNumberAsCurrency(value, currencySymbol);
   const parts = formatted.split('.');
 
@@ -185,6 +201,7 @@ export const splitCurrencyForDisplay = (value: number, currencySymbol: string): 
  * Split percentage value into main amount and decimal places for styling
  */
 export const splitPercentageForDisplay = (value: number): { main: string; decimals: string } => {
+  if (isNaN(value)) value = 0;
   const formatted = Math.abs(value).toFixed(2);
   const parts = formatted.split('.');
 

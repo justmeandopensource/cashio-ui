@@ -59,10 +59,10 @@ const FundCard: FC<FundCardProps> = ({
   const unrealizedPercentage =
     costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
-  // Fetch transactions for cost calculations
-  const { data: transactions = [] } = useFundTransactions(fund.ledger_id, fund.mutual_fund_id);
-  const highestPurchaseCost = calculateHighestPurchaseCost(transactions);
-  const lowestPurchaseCost = calculateLowestPurchaseCost(transactions);
+  // Fetch transactions for cost calculations only when expanded
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useFundTransactions(fund.ledger_id, fund.mutual_fund_id, { enabled: isExpanded });
+  const highestPurchaseCost = isExpanded ? calculateHighestPurchaseCost(transactions) : null;
+  const lowestPurchaseCost = isExpanded ? calculateLowestPurchaseCost(transactions) : null;
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent expansion if clicking on interactive elements
@@ -251,40 +251,48 @@ const FundCard: FC<FundCardProps> = ({
                      </Text>
                   </HStack>
                 </Stat>
-                <Stat size="sm">
-                  <StatLabel fontSize="xs" color={mutedColor}>
-                    Lowest Cost
-                  </StatLabel>
-                  <HStack spacing={0} align="baseline">
-                    <StatNumber fontSize="sm" color="gray.600">
-                       {lowestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(lowestPurchaseCost, currencySymbol || "₹").main
-                         : "--"}
-                     </StatNumber>
-                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                       {lowestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(lowestPurchaseCost, currencySymbol || "₹").decimals
-                         : ""}
-                    </Text>
-                  </HStack>
-                </Stat>
-                <Stat size="sm">
-                  <StatLabel fontSize="xs" color={mutedColor}>
-                    Highest Cost
-                  </StatLabel>
-                  <HStack spacing={0} align="baseline">
-                    <StatNumber fontSize="sm" color="gray.600">
-                       {highestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(highestPurchaseCost, currencySymbol || "₹").main
-                         : "--"}
-                     </StatNumber>
-                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                       {highestPurchaseCost !== null
-                         ? splitCurrencyForDisplay(highestPurchaseCost, currencySymbol || "₹").decimals
-                         : ""}
-                    </Text>
-                  </HStack>
-                </Stat>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     Lowest Cost
+                   </StatLabel>
+                   <HStack spacing={0} align="baseline">
+                     <StatNumber fontSize="sm" color="gray.600">
+                        {isLoadingTransactions
+                          ? "Loading..."
+                          : lowestPurchaseCost !== null
+                          ? splitCurrencyForDisplay(lowestPurchaseCost, currencySymbol || "₹").main
+                          : "--"}
+                      </StatNumber>
+                      <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                        {isLoadingTransactions
+                          ? ""
+                          : lowestPurchaseCost !== null
+                          ? splitCurrencyForDisplay(lowestPurchaseCost, currencySymbol || "₹").decimals
+                          : ""}
+                     </Text>
+                   </HStack>
+                 </Stat>
+                 <Stat size="sm">
+                   <StatLabel fontSize="xs" color={mutedColor}>
+                     Highest Cost
+                   </StatLabel>
+                   <HStack spacing={0} align="baseline">
+                     <StatNumber fontSize="sm" color="gray.600">
+                        {isLoadingTransactions
+                          ? "Loading..."
+                          : highestPurchaseCost !== null
+                          ? splitCurrencyForDisplay(highestPurchaseCost, currencySymbol || "₹").main
+                          : "--"}
+                      </StatNumber>
+                      <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                        {isLoadingTransactions
+                          ? ""
+                          : highestPurchaseCost !== null
+                          ? splitCurrencyForDisplay(highestPurchaseCost, currencySymbol || "₹").decimals
+                          : ""}
+                     </Text>
+                   </HStack>
+                 </Stat>
               </SimpleGrid>
 
              <Divider mb={3} />

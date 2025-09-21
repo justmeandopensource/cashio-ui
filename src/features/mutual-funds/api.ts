@@ -157,10 +157,11 @@ export const getAmcSummaries = async (ledgerId: number): Promise<AmcSummary[]> =
 };
 
 // React Query hooks
-export const useFundTransactions = (ledgerId: number, fundId: number) => {
+export const useFundTransactions = (ledgerId: number, fundId: number, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ["fund-transactions", ledgerId, fundId],
     queryFn: () => getFundTransactions(ledgerId, fundId),
-    enabled: !!ledgerId && !!fundId,
+    enabled: !!ledgerId && !!fundId && (options?.enabled ?? true),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };

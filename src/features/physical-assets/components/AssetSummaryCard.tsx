@@ -154,10 +154,10 @@ const AssetSummaryCard: FC<AssetSummaryCardProps> = ({
   const hasHoldings = asset.total_quantity > 0;
   const costBasis = asset.total_quantity * asset.average_cost_per_unit;
 
-  // Fetch transactions for cost calculations
-  const { data: transactions = [] } = useAssetTransactions(asset.ledger_id, asset.physical_asset_id);
-  const highestPurchasePrice = calculateHighestPurchasePrice(transactions);
-  const lowestPurchasePrice = calculateLowestPurchasePrice(transactions);
+  // Fetch transactions for cost calculations only when expanded
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useAssetTransactions(asset.ledger_id, asset.physical_asset_id, { enabled: isExpanded });
+  const highestPurchasePrice = isExpanded ? calculateHighestPurchasePrice(transactions) : null;
+  const lowestPurchasePrice = isExpanded ? calculateLowestPurchasePrice(transactions) : null;
 
   // Delete confirmation dialog
   const {
@@ -330,40 +330,48 @@ const AssetSummaryCard: FC<AssetSummaryCardProps> = ({
                    </Text>
                  </HStack>
                </Stat>
-               <Stat size="sm">
-                 <StatLabel fontSize="xs" color={mutedColor}>
-                   Lowest Cost
-                 </StatLabel>
-                 <HStack spacing={0} align="baseline">
-                   <StatNumber fontSize="sm" color="gray.600">
-                     {lowestPurchasePrice !== null
-                       ? splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).main
-                       : "--"}
-                   </StatNumber>
-                   <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                     {lowestPurchasePrice !== null
-                       ? splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).decimals
-                       : ""}
-                   </Text>
-                 </HStack>
-               </Stat>
-               <Stat size="sm">
-                 <StatLabel fontSize="xs" color={mutedColor}>
-                   Highest Cost
-                 </StatLabel>
-                 <HStack spacing={0} align="baseline">
-                   <StatNumber fontSize="sm" color="gray.600">
-                     {highestPurchasePrice !== null
-                       ? splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).main
-                       : "--"}
-                   </StatNumber>
-                   <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                     {highestPurchasePrice !== null
-                       ? splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).decimals
-                       : ""}
-                   </Text>
-                 </HStack>
-               </Stat>
+                <Stat size="sm">
+                  <StatLabel fontSize="xs" color={mutedColor}>
+                    Lowest Cost
+                  </StatLabel>
+                  <HStack spacing={0} align="baseline">
+                    <StatNumber fontSize="sm" color="gray.600">
+                      {isLoadingTransactions
+                        ? "Loading..."
+                        : lowestPurchasePrice !== null
+                        ? splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).main
+                        : "--"}
+                    </StatNumber>
+                    <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                      {isLoadingTransactions
+                        ? ""
+                        : lowestPurchasePrice !== null
+                        ? splitCurrencyForDisplay(lowestPurchasePrice, currencySymbol).decimals
+                        : ""}
+                    </Text>
+                  </HStack>
+                </Stat>
+                <Stat size="sm">
+                  <StatLabel fontSize="xs" color={mutedColor}>
+                    Highest Cost
+                  </StatLabel>
+                  <HStack spacing={0} align="baseline">
+                    <StatNumber fontSize="sm" color="gray.600">
+                      {isLoadingTransactions
+                        ? "Loading..."
+                        : highestPurchasePrice !== null
+                        ? splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).main
+                        : "--"}
+                    </StatNumber>
+                    <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                      {isLoadingTransactions
+                        ? ""
+                        : highestPurchasePrice !== null
+                        ? splitCurrencyForDisplay(highestPurchasePrice, currencySymbol).decimals
+                        : ""}
+                    </Text>
+                  </HStack>
+                </Stat>
              </SimpleGrid>
 
             <Divider mb={3} />

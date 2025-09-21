@@ -206,40 +206,44 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
                 </TabList>
              </Box>
            </Box>
-          <TabPanels>
-            <TabPanel p={{ base: 2, md: 4 }}>
-              <LedgerMainAccounts
-                accounts={accounts || []}
-                isLoading={isLoading}
-                onAddTransaction={onAddTransaction}
-                onTransferFunds={onTransferFunds}
-              />
-            </TabPanel>
-            <TabPanel p={{ base: 2, md: 4 }}>
-                <LedgerMainTransactions
-                  onAddTransaction={onAddTransaction}
-                   onTransactionDeleted={async () => {
+           <TabPanels>
+             <TabPanel p={{ base: 2, md: 4 }}>
+               {tabIndex === 0 && (
+                 <LedgerMainAccounts
+                   accounts={accounts || []}
+                   isLoading={isLoading}
+                   onAddTransaction={onAddTransaction}
+                   onTransferFunds={onTransferFunds}
+                 />
+               )}
+             </TabPanel>
+             <TabPanel p={{ base: 2, md: 4 }}>
+               {tabIndex === 1 && (
+                 <LedgerMainTransactions
+                   onAddTransaction={onAddTransaction}
+                    onTransactionDeleted={async () => {
+                      await refreshAccountsData();
+                      await queryClient.invalidateQueries({
+                        queryKey: [`transactions-count`, ledgerId],
+                      });
+                      await refreshInsightsData();
+                    }}
+                   onTransactionUpdated={async () => {
                      await refreshAccountsData();
-                     await queryClient.invalidateQueries({
-                       queryKey: [`transactions-count`, ledgerId],
-                     });
                      await refreshInsightsData();
                    }}
-                  onTransactionUpdated={async () => {
-                    await refreshAccountsData();
-                    await refreshInsightsData();
-                  }}
-                  onCopyTransaction={handleCopyTransaction}
-                  shouldFetch={tabIndex === 1}
-                />
-            </TabPanel>
-             <TabPanel p={{ base: 2, md: 4 }}>
-               <PhysicalAssets />
+                   onCopyTransaction={handleCopyTransaction}
+                   shouldFetch={tabIndex === 1}
+                 />
+               )}
              </TabPanel>
               <TabPanel p={{ base: 2, md: 4 }}>
-                <MutualFunds onAccountDataChange={refreshAccountsData} />
+               {tabIndex === 2 && <PhysicalAssets />}
               </TabPanel>
-           </TabPanels>
+               <TabPanel p={{ base: 2, md: 4 }}>
+               {tabIndex === 3 && <MutualFunds onAccountDataChange={refreshAccountsData} />}
+               </TabPanel>
+            </TabPanels>
         </Tabs>
       </Box>
     </Box>

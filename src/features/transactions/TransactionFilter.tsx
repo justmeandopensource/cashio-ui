@@ -168,6 +168,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
       return data;
     },
     enabled: !!ledgerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Fetch categories
@@ -193,6 +194,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
       const data = await response.json();
       return data;
     },
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   // Check if filters have changed when the form is opened or filters change

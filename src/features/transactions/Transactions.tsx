@@ -177,6 +177,7 @@ const Transactions: React.FC<TransactionsProps> = ({
       return response.data.transactions;
     },
     enabled: shouldFetch,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const handlePageChange = (page: number) => {

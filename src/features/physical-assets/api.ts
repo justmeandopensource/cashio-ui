@@ -134,6 +134,7 @@ export const useAssetTypes = (ledgerId: number) => {
     queryKey: ["asset-types", ledgerId],
     queryFn: () => getAssetTypes(ledgerId),
     enabled: !!ledgerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -142,6 +143,7 @@ export const usePhysicalAssets = (ledgerId: number) => {
     queryKey: ["physical-assets", ledgerId],
     queryFn: () => getPhysicalAssets(ledgerId),
     enabled: !!ledgerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -153,11 +155,12 @@ export const usePhysicalAsset = (ledgerId: number, assetId: number) => {
   });
 };
 
-export const useAssetTransactions = (ledgerId: number, assetId: number) => {
+export const useAssetTransactions = (ledgerId: number, assetId: number, options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: ["asset-transactions", ledgerId, assetId],
     queryFn: () => getAssetTransactions(ledgerId, assetId),
-    enabled: !!ledgerId && !!assetId,
+    enabled: !!ledgerId && !!assetId && (options?.enabled ?? true),
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 
@@ -166,6 +169,7 @@ export const useAllAssetTransactions = (ledgerId: number) => {
     queryKey: ["all-asset-transactions", ledgerId],
     queryFn: () => getAllAssetTransactions(ledgerId),
     enabled: !!ledgerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 };
 

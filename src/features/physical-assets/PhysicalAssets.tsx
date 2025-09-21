@@ -284,393 +284,397 @@ const PhysicalAssets: FC = () => {
           </TabList>
         </Box>
 
-        <TabPanels>
-           <TabPanel p={{ base: 2, md: 4 }}>
-                {/* Portfolio Summary Header - Only show if there are asset types */}
-                {assetTypes.length > 0 && (
-                <Box mb={6} p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" boxShadow="sm">
-                <Flex
-                  direction={{ base: "column", md: "row" }}
-                  justify="space-between"
-                  align={{ base: "start", md: "center" }}
-                  mb={4}
-                  gap={{ base: 3, md: 0 }}
-                >
-                  <Flex align="center" mb={{ base: 2, md: 0 }}>
-                    <Icon as={Coins} mr={2} color="teal.500" />
-                    <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
-                      Physical Assets Portfolio
-                    </Text>
-                  </Flex>
-                  <Flex gap={2} width={{ base: "full", md: "auto" }}>
-                    <Button
-                      leftIcon={<Plus />}
-                      colorScheme="teal"
-                      variant="outline"
-                      size={{ base: "md", md: "sm" }}
-                      onClick={handleCreateAssetType}
-                      flex={{ base: 1, md: "none" }}
-                    >
-                      Asset Type
-                    </Button>
-                    <Button
-                      leftIcon={<Plus />}
-                      colorScheme="teal"
-                      variant={assetTypes.length === 0 ? "outline" : "solid"}
-                      size={{ base: "md", md: "sm" }}
-                      onClick={handleCreateAsset}
-                      title={assetTypes.length === 0 ? "Create an asset type first" : "Create a new physical asset"}
-                      flex={{ base: 1, md: "none" }}
-                    >
-                      Physical Asset
-                    </Button>
-                  </Flex>
-                </Flex>
-
-                 {/* Portfolio Stats */}
-                <>
-                  {/* Mobile: Full grid with all metrics */}
-                  <Box display={{ base: "block", md: "none" }}>
-                    <SimpleGrid
-                      columns={{ base: 2, sm: 3 }}
-                      spacing={{ base: 4, md: 8 }}
-                    >
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Invested
-                        </Text>
-                        <HStack spacing={0} align="baseline">
-                          <Text
-                            fontSize={{ base: "xl", md: "2xl" }}
-                            fontWeight="semibold"
-                            color="gray.600"
-                          >
-                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
-                          </Text>
-                          <Text
-                            fontSize={{ base: "md", md: "lg" }}
-                            fontWeight="semibold"
-                            color="gray.600"
-                            opacity={0.7}
-                          >
-                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
-                          </Text>
-                        </HStack>
-                      </Box>
-
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Value
-                        </Text>
-                        <HStack spacing={0} align="baseline">
-                          <Text
-                            fontSize={{ base: "xl", md: "2xl" }}
-                            fontWeight="semibold"
-                            color="teal.600"
-                          >
-                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
-                          </Text>
-                          <Text
-                            fontSize={{ base: "md", md: "lg" }}
-                            fontWeight="semibold"
-                            color="teal.600"
-                            opacity={0.7}
-                          >
-                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
-                          </Text>
-                        </HStack>
-                      </Box>
-
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Unrealized P&L
-                        </Text>
-                        <VStack align="start" spacing={0}>
-                          <HStack spacing={0} align="baseline">
-                            <Text
-                              fontSize={{ base: "xl", md: "2xl" }}
-                              fontWeight="semibold"
-                              color={getPnLColor(totalPnL)}
-                            >
-                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
-                            </Text>
-                            <Text
-                              fontSize={{ base: "md", md: "lg" }}
-                              fontWeight="semibold"
-                              color={getPnLColor(totalPnL)}
-                              opacity={0.7}
-                            >
-                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
-                            </Text>
-                          </HStack>
-                          <HStack spacing={0} align="baseline">
-                            <Text
-                              fontSize="sm"
-                              color={getPnLColor(totalPnL)}
-                            >
-                              {splitPercentageForDisplay(totalPnLPercentage).main}
-                            </Text>
-                            <Text
-                              fontSize="xs"
-                              color={getPnLColor(totalPnL)}
-                              opacity={0.7}
-                            >
-                              {splitPercentageForDisplay(totalPnLPercentage).decimals}%
-                            </Text>
-                          </HStack>
-                        </VStack>
-                      </Box>
-
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Assets
-                        </Text>
-                        <VStack align="start" spacing={0}>
-                          <Text
-                            fontSize={{ base: "xl", md: "2xl" }}
-                            fontWeight="bold"
-                            color="blue.600"
-                          >
-                            {assets.length}
-                          </Text>
-                          <Text fontSize="xs" color="gray.500">
-                            Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
-                          </Text>
-                        </VStack>
-                      </Box>
-                    </SimpleGrid>
-                  </Box>
-
-                  {/* Desktop: All metrics in Flex layout */}
-                  <Box display={{ base: "none", md: "block" }}>
-                    <Flex
-                      direction={{ base: "column", md: "row" }}
-                      gap={{ base: 4, md: 6 }}
-                      wrap="wrap"
-                    >
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Invested
-                        </Text>
-                        <HStack spacing={0} align="baseline">
-                          <Text
-                            fontSize={{ base: "xl", md: "2xl" }}
-                            fontWeight="semibold"
-                            color="gray.600"
-                          >
-                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
-                          </Text>
-                          <Text
-                            fontSize={{ base: "md", md: "lg" }}
-                            fontWeight="semibold"
-                            color="gray.600"
-                            opacity={0.7}
-                          >
-                            {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
-                          </Text>
-                        </HStack>
-                      </Box>
-
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Value
-                        </Text>
-                        <HStack spacing={0} align="baseline">
-                          <Text
-                            fontSize={{ base: "xl", md: "2xl" }}
-                            fontWeight="semibold"
-                            color="teal.600"
-                          >
-                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
-                          </Text>
-                          <Text
-                            fontSize={{ base: "md", md: "lg" }}
-                            fontWeight="semibold"
-                            color="teal.600"
-                            opacity={0.7}
-                          >
-                            {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
-                          </Text>
-                        </HStack>
-                      </Box>
-
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Unrealized P&L
-                        </Text>
-                        <VStack align="start" spacing={0}>
-                          <HStack spacing={0} align="baseline">
-                            <Text
-                              fontSize={{ base: "xl", md: "2xl" }}
-                              fontWeight="semibold"
-                              color={getPnLColor(totalPnL)}
-                            >
-                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
-                            </Text>
-                            <Text
-                              fontSize={{ base: "md", md: "lg" }}
-                              fontWeight="semibold"
-                              color={getPnLColor(totalPnL)}
-                              opacity={0.7}
-                            >
-                              {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
-                            </Text>
-                          </HStack>
-                          <HStack spacing={0} align="baseline">
-                            <Text
-                              fontSize="sm"
-                              color={getPnLColor(totalPnL)}
-                            >
-                              {splitPercentageForDisplay(totalPnLPercentage).main}
-                            </Text>
-                            <Text
-                              fontSize="xs"
-                              color={getPnLColor(totalPnL)}
-                              opacity={0.7}
-                            >
-                              {splitPercentageForDisplay(totalPnLPercentage).decimals}%
-                            </Text>
-                          </HStack>
-                        </VStack>
-                      </Box>
-
-                      <Box>
-                        <Text fontSize="sm" color="gray.600" mb={1}>
-                          Total Assets
-                        </Text>
-                        <VStack align="start" spacing={0}>
-                          <Text
-                            fontSize={{ base: "xl", md: "2xl" }}
-                            fontWeight="bold"
-                            color="blue.600"
-                          >
-                            {assets.length}
-                          </Text>
-                          <Text fontSize="xs" color="gray.500">
-                            Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
-                          </Text>
-                        </VStack>
-                      </Box>
-                    </Flex>
-                  </Box>
-                </>
-                </Box>
-                )}
-
-              {assetsLoading ? (
-                <Box p={8} textAlign="center">
-                  <VStack spacing={4}>
-                    <Spinner size="lg" color="teal.500" />
-                    <Text color="gray.600" fontSize="lg">
-                      Loading your physical assets...
-                    </Text>
-                    <Text color="gray.500" fontSize="sm">
-                      This may take a moment for large portfolios
-                    </Text>
-                  </VStack>
-                </Box>
-                ) : assetTypes.length === 0 ? (
-                  <EmptyStateAssets onCreateAssetType={handleCreateAssetType} />
-               ) : (
-                  <Box>
-                    {/* Asset Types and Assets Layout */}
-                    <VStack spacing={6} align="stretch">
-                      {assetTypes.length === 0 ? (
-                        <Card
-                          bg="white"
-                          borderColor="gray.200"
-                          borderWidth={1}
-                          shadow="sm"
-                        >
-                          <CardBody textAlign="center" py={12}>
-                            <VStack spacing={4}>
-                              <Icon as={Package} boxSize={12} color="gray.400" />
-                              <Text fontSize="lg" color="gray.500">
-                                No asset types created yet
-                              </Text>
-                              <Text color="gray.400">
-                                Create your first asset type to start tracking physical assets.
-                              </Text>
-                              <Button colorScheme="teal" onClick={handleCreateAssetType} size="lg">
-                                Create Your First Asset Type
-                              </Button>
-                            </VStack>
-                          </CardBody>
-                        </Card>
-                      ) : (
-                        assetTypes
-                          .map((assetType) => {
-                            const typeAssets = assets.filter(asset => asset.asset_type_id === assetType.asset_type_id);
-                            return {
-                              ...assetType,
-                              typeAssets,
-                            };
-                          })
-                          .sort((a, b) => b.typeAssets.length - a.typeAssets.length)
-                          .map((assetType) => (
-                            <AssetTypeCard
-                              key={assetType.asset_type_id}
-                              assetType={assetType}
-                              assets={assetType.typeAssets}
-                              currencySymbol={currencySymbol || "$"}
-                              onCreateAsset={() => {
-                                // Create asset for this type
-                                setSelectedAssetType(assetType);
-                                onCreateAssetModalOpen();
-                              }}
-                              onDeleteAssetType={handleDeleteAssetType}
-                              onBuySell={handleBuySell}
-                              onUpdatePrice={handleUpdatePrice}
-                              onDeleteAsset={handleDeleteAsset}
-                            />
-                          ))
-                      )}
-
-                      {/* Loading skeletons when data is being fetched */}
-                      {assetsLoading && assets.length === 0 && (
-                        <Box>
-                          <Text fontSize="lg" fontWeight="semibold" mb={4}>
-                            Loading Assets...
-                          </Text>
-                          <Flex
-                            gap={{ base: 3, md: 4 }}
-                            wrap="wrap"
-                            direction={{ base: "column", md: "row" }}
-                          >
-                            {Array.from({ length: 3 }).map((_, index) => (
-                              <AssetSummaryCardSkeleton key={`skeleton-${index}`} />
-                            ))}
-                          </Flex>
-                        </Box>
-                      )}
-                    </VStack>
-                  </Box>
-               )}
-
-
-             </TabPanel>
-
-            {/* Transactions Tab */}
+         <TabPanels>
             <TabPanel p={{ base: 2, md: 4 }}>
-              {assetsLoading ? (
-                <Box p={8} textAlign="center">
-                  <VStack spacing={4}>
-                    <Spinner size="lg" color="teal.500" />
-                    <Text color="gray.600" fontSize="lg">
-                      Loading transaction history...
-                    </Text>
-                    <Text color="gray.500" fontSize="sm">
-                      This may take a moment for large portfolios
-                    </Text>
-                  </VStack>
-                </Box>
-              ) : assets.length === 0 ? (
-                <EmptyStateTransactions />
-              ) : (
-                 <AssetTransactionHistory />
+              {tabIndex === 0 && (
+                <>
+                 {/* Portfolio Summary Header - Only show if there are asset types */}
+                 {assetTypes.length > 0 && (
+                 <Box mb={6} p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" boxShadow="sm">
+                 <Flex
+                   direction={{ base: "column", md: "row" }}
+                   justify="space-between"
+                   align={{ base: "start", md: "center" }}
+                   mb={4}
+                   gap={{ base: 3, md: 0 }}
+                 >
+                   <Flex align="center" mb={{ base: 2, md: 0 }}>
+                     <Icon as={Coins} mr={2} color="teal.500" />
+                     <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="bold">
+                       Physical Assets Portfolio
+                     </Text>
+                   </Flex>
+                   <Flex gap={2} width={{ base: "full", md: "auto" }}>
+                     <Button
+                       leftIcon={<Plus />}
+                       colorScheme="teal"
+                       variant="outline"
+                       size={{ base: "md", md: "sm" }}
+                       onClick={handleCreateAssetType}
+                       flex={{ base: 1, md: "none" }}
+                     >
+                       Asset Type
+                     </Button>
+                     <Button
+                       leftIcon={<Plus />}
+                       colorScheme="teal"
+                       variant={assetTypes.length === 0 ? "outline" : "solid"}
+                       size={{ base: "md", md: "sm" }}
+                       onClick={handleCreateAsset}
+                       title={assetTypes.length === 0 ? "Create an asset type first" : "Create a new physical asset"}
+                       flex={{ base: 1, md: "none" }}
+                     >
+                       Physical Asset
+                     </Button>
+                   </Flex>
+                 </Flex>
+
+                  {/* Portfolio Stats */}
+                 <>
+                   {/* Mobile: Full grid with all metrics */}
+                   <Box display={{ base: "block", md: "none" }}>
+                     <SimpleGrid
+                       columns={{ base: 2, sm: 3 }}
+                       spacing={{ base: 4, md: 8 }}
+                     >
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Invested
+                         </Text>
+                         <HStack spacing={0} align="baseline">
+                           <Text
+                             fontSize={{ base: "xl", md: "2xl" }}
+                             fontWeight="semibold"
+                             color="gray.600"
+                           >
+                             {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
+                           </Text>
+                           <Text
+                             fontSize={{ base: "md", md: "lg" }}
+                             fontWeight="semibold"
+                             color="gray.600"
+                             opacity={0.7}
+                           >
+                             {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
+                           </Text>
+                         </HStack>
+                       </Box>
+
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Value
+                         </Text>
+                         <HStack spacing={0} align="baseline">
+                           <Text
+                             fontSize={{ base: "xl", md: "2xl" }}
+                             fontWeight="semibold"
+                             color="teal.600"
+                           >
+                             {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
+                           </Text>
+                           <Text
+                             fontSize={{ base: "md", md: "lg" }}
+                             fontWeight="semibold"
+                             color="teal.600"
+                             opacity={0.7}
+                           >
+                             {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
+                           </Text>
+                         </HStack>
+                       </Box>
+
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Unrealized P&L
+                         </Text>
+                         <VStack align="start" spacing={0}>
+                           <HStack spacing={0} align="baseline">
+                             <Text
+                               fontSize={{ base: "xl", md: "2xl" }}
+                               fontWeight="semibold"
+                               color={getPnLColor(totalPnL)}
+                             >
+                               {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
+                             </Text>
+                             <Text
+                               fontSize={{ base: "md", md: "lg" }}
+                               fontWeight="semibold"
+                               color={getPnLColor(totalPnL)}
+                               opacity={0.7}
+                             >
+                               {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
+                             </Text>
+                           </HStack>
+                           <HStack spacing={0} align="baseline">
+                             <Text
+                               fontSize="sm"
+                               color={getPnLColor(totalPnL)}
+                             >
+                               {splitPercentageForDisplay(totalPnLPercentage).main}
+                             </Text>
+                             <Text
+                               fontSize="xs"
+                               color={getPnLColor(totalPnL)}
+                               opacity={0.7}
+                             >
+                               {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                             </Text>
+                           </HStack>
+                         </VStack>
+                       </Box>
+
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Assets
+                         </Text>
+                         <VStack align="start" spacing={0}>
+                           <Text
+                             fontSize={{ base: "xl", md: "2xl" }}
+                             fontWeight="bold"
+                             color="blue.600"
+                           >
+                             {assets.length}
+                           </Text>
+                           <Text fontSize="xs" color="gray.500">
+                             Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
+                           </Text>
+                         </VStack>
+                       </Box>
+                     </SimpleGrid>
+                   </Box>
+
+                   {/* Desktop: All metrics in Flex layout */}
+                   <Box display={{ base: "none", md: "block" }}>
+                     <Flex
+                       direction={{ base: "column", md: "row" }}
+                       gap={{ base: 4, md: 6 }}
+                       wrap="wrap"
+                     >
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Invested
+                         </Text>
+                         <HStack spacing={0} align="baseline">
+                           <Text
+                             fontSize={{ base: "xl", md: "2xl" }}
+                             fontWeight="semibold"
+                             color="gray.600"
+                           >
+                             {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").main}
+                           </Text>
+                           <Text
+                             fontSize={{ base: "md", md: "lg" }}
+                             fontWeight="semibold"
+                             color="gray.600"
+                             opacity={0.7}
+                           >
+                             {splitCurrencyForDisplay(totalInvested, currencySymbol || "$").decimals}
+                           </Text>
+                         </HStack>
+                       </Box>
+
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Value
+                         </Text>
+                         <HStack spacing={0} align="baseline">
+                           <Text
+                             fontSize={{ base: "xl", md: "2xl" }}
+                             fontWeight="semibold"
+                             color="teal.600"
+                           >
+                             {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").main}
+                           </Text>
+                           <Text
+                             fontSize={{ base: "md", md: "lg" }}
+                             fontWeight="semibold"
+                             color="teal.600"
+                             opacity={0.7}
+                           >
+                             {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "$").decimals}
+                           </Text>
+                         </HStack>
+                       </Box>
+
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Unrealized P&L
+                         </Text>
+                         <VStack align="start" spacing={0}>
+                           <HStack spacing={0} align="baseline">
+                             <Text
+                               fontSize={{ base: "xl", md: "2xl" }}
+                               fontWeight="semibold"
+                               color={getPnLColor(totalPnL)}
+                             >
+                               {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").main}
+                             </Text>
+                             <Text
+                               fontSize={{ base: "md", md: "lg" }}
+                               fontWeight="semibold"
+                               color={getPnLColor(totalPnL)}
+                               opacity={0.7}
+                             >
+                               {splitCurrencyForDisplay(Math.abs(totalPnL), currencySymbol || "$").decimals}
+                             </Text>
+                           </HStack>
+                           <HStack spacing={0} align="baseline">
+                             <Text
+                               fontSize="sm"
+                               color={getPnLColor(totalPnL)}
+                             >
+                               {splitPercentageForDisplay(totalPnLPercentage).main}
+                             </Text>
+                             <Text
+                               fontSize="xs"
+                               color={getPnLColor(totalPnL)}
+                               opacity={0.7}
+                             >
+                               {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                             </Text>
+                           </HStack>
+                         </VStack>
+                       </Box>
+
+                       <Box>
+                         <Text fontSize="sm" color="gray.600" mb={1}>
+                           Total Assets
+                         </Text>
+                         <VStack align="start" spacing={0}>
+                           <Text
+                             fontSize={{ base: "xl", md: "2xl" }}
+                             fontWeight="bold"
+                             color="blue.600"
+                           >
+                             {assets.length}
+                           </Text>
+                           <Text fontSize="xs" color="gray.500">
+                             Across {assetTypes.length} Asset Type{assetTypes.length !== 1 ? "s" : ""}
+                           </Text>
+                         </VStack>
+                       </Box>
+                     </Flex>
+                   </Box>
+                 </>
+                 </Box>
+                 )}
+
+               {assetsLoading ? (
+                 <Box p={8} textAlign="center">
+                   <VStack spacing={4}>
+                     <Spinner size="lg" color="teal.500" />
+                     <Text color="gray.600" fontSize="lg">
+                       Loading your physical assets...
+                     </Text>
+                     <Text color="gray.500" fontSize="sm">
+                       This may take a moment for large portfolios
+                     </Text>
+                   </VStack>
+                 </Box>
+                 ) : assetTypes.length === 0 ? (
+                   <EmptyStateAssets onCreateAssetType={handleCreateAssetType} />
+                ) : (
+                   <Box>
+                     {/* Asset Types and Assets Layout */}
+                     <VStack spacing={6} align="stretch">
+                       {assetTypes.length === 0 ? (
+                         <Card
+                           bg="white"
+                           borderColor="gray.200"
+                           borderWidth={1}
+                           shadow="sm"
+                         >
+                           <CardBody textAlign="center" py={12}>
+                             <VStack spacing={4}>
+                               <Icon as={Package} boxSize={12} color="gray.400" />
+                               <Text fontSize="lg" color="gray.500">
+                                 No asset types created yet
+                               </Text>
+                               <Text color="gray.400">
+                                 Create your first asset type to start tracking physical assets.
+                               </Text>
+                               <Button colorScheme="teal" onClick={handleCreateAssetType} size="lg">
+                                 Create Your First Asset Type
+                               </Button>
+                             </VStack>
+                           </CardBody>
+                         </Card>
+                       ) : (
+                         assetTypes
+                           .map((assetType) => {
+                             const typeAssets = assets.filter(asset => asset.asset_type_id === assetType.asset_type_id);
+                             return {
+                               ...assetType,
+                               typeAssets,
+                             };
+                           })
+                           .sort((a, b) => b.typeAssets.length - a.typeAssets.length)
+                           .map((assetType) => (
+                             <AssetTypeCard
+                               key={assetType.asset_type_id}
+                               assetType={assetType}
+                               assets={assetType.typeAssets}
+                               currencySymbol={currencySymbol || "$"}
+                               onCreateAsset={() => {
+                                 // Create asset for this type
+                                 setSelectedAssetType(assetType);
+                                 onCreateAssetModalOpen();
+                               }}
+                               onDeleteAssetType={handleDeleteAssetType}
+                               onBuySell={handleBuySell}
+                               onUpdatePrice={handleUpdatePrice}
+                               onDeleteAsset={handleDeleteAsset}
+                             />
+                           ))
+                       )}
+
+                       {/* Loading skeletons when data is being fetched */}
+                       {assetsLoading && assets.length === 0 && (
+                         <Box>
+                           <Text fontSize="lg" fontWeight="semibold" mb={4}>
+                             Loading Assets...
+                           </Text>
+                           <Flex
+                             gap={{ base: 3, md: 4 }}
+                             wrap="wrap"
+                             direction={{ base: "column", md: "row" }}
+                           >
+                             {Array.from({ length: 3 }).map((_, index) => (
+                               <AssetSummaryCardSkeleton key={`skeleton-${index}`} />
+                             ))}
+                           </Flex>
+                         </Box>
+                       )}
+                     </VStack>
+                   </Box>
+                )}
+                </>
               )}
-            </TabPanel>
-          </TabPanels>
+              </TabPanel>
+
+             {/* Transactions Tab */}
+             <TabPanel p={{ base: 2, md: 4 }}>
+               {tabIndex === 1 && (
+                 assetsLoading ? (
+                   <Box p={8} textAlign="center">
+                     <VStack spacing={4}>
+                       <Spinner size="lg" color="teal.500" />
+                       <Text color="gray.600" fontSize="lg">
+                         Loading transaction history...
+                       </Text>
+                       <Text color="gray.500" fontSize="sm">
+                         This may take a moment for large portfolios
+                       </Text>
+                     </VStack>
+                   </Box>
+                 ) : assets.length === 0 ? (
+                   <EmptyStateTransactions />
+                 ) : (
+                   <AssetTransactionHistory />
+                 )
+               )}
+             </TabPanel>
+           </TabPanels>
          </Tabs>
 
        {/* Modals */}

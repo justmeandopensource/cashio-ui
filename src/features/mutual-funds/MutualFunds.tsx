@@ -119,18 +119,21 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
     queryKey: ["amcs", ledgerId],
     queryFn: () => getAmcs(ledgerId!),
     enabled: !!ledgerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { data: mutualFunds = [], isLoading: isLoadingMutualFunds, refetch: refetchFunds } = useQuery({
     queryKey: ["mutual-funds", ledgerId],
     queryFn: () => getMutualFunds(ledgerId!),
     enabled: !!ledgerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { data: transactions = [], isLoading: isLoadingTransactions, refetch: refetchTransactions } = useQuery({
     queryKey: ["mf-transactions", ledgerId],
     queryFn: () => getAllMfTransactions(ledgerId!),
     enabled: !!ledgerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const isLoading = isLoadingAmcs || isLoadingMutualFunds || isLoadingTransactions;
@@ -323,42 +326,46 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
           </TabList>
         </Box>
 
-        <TabPanels>
-          <TabPanel p={{ base: 2, md: 4 }}>
-            {isLoading ? (
-              <Box display="flex" justifyContent="center" py={10}>
-                <Spinner size="xl" />
-              </Box>
-            ) : (
-               <MutualFundsOverview
-                 amcs={amcs}
-                 mutualFunds={mutualFunds}
-                 onCreateAmc={handleCreateAmc}
-                 onCreateFund={handleCreateFund}
-                 onTradeUnits={handleTradeUnits}
-                 onTransferUnits={handleTransferUnits}
-                 onUpdateNav={handleUpdateNav}
-                 onCloseFund={handleCloseFund}
-                 onDeleteAmc={handleDeleteAmc}
-               />
-            )}
-          </TabPanel>
-          <TabPanel p={{ base: 2, md: 4 }}>
-            {isLoading ? (
-              <Box display="flex" justifyContent="center" py={10}>
-                <Spinner size="xl" />
-              </Box>
-            ) : (
-                <MfTransactions
-                  amcs={amcs}
-                  mutualFunds={mutualFunds}
-                  transactions={transactions}
-                  onDataChange={handleDataChange}
-                  onAccountDataChange={onAccountDataChange}
-                />
-            )}
-          </TabPanel>
-        </TabPanels>
+         <TabPanels>
+           <TabPanel p={{ base: 2, md: 4 }}>
+             {subTabIndex === 0 && (
+               isLoading ? (
+                 <Box display="flex" justifyContent="center" py={10}>
+                   <Spinner size="xl" />
+                 </Box>
+               ) : (
+                 <MutualFundsOverview
+                   amcs={amcs}
+                   mutualFunds={mutualFunds}
+                   onCreateAmc={handleCreateAmc}
+                   onCreateFund={handleCreateFund}
+                   onTradeUnits={handleTradeUnits}
+                   onTransferUnits={handleTransferUnits}
+                   onUpdateNav={handleUpdateNav}
+                   onCloseFund={handleCloseFund}
+                   onDeleteAmc={handleDeleteAmc}
+                 />
+               )
+             )}
+           </TabPanel>
+           <TabPanel p={{ base: 2, md: 4 }}>
+             {subTabIndex === 1 && (
+               isLoading ? (
+                 <Box display="flex" justifyContent="center" py={10}>
+                   <Spinner size="xl" />
+                 </Box>
+               ) : (
+                 <MfTransactions
+                   amcs={amcs}
+                   mutualFunds={mutualFunds}
+                   transactions={transactions}
+                   onDataChange={handleDataChange}
+                   onAccountDataChange={onAccountDataChange}
+                 />
+               )
+             )}
+           </TabPanel>
+         </TabPanels>
       </Tabs>
 
       {/* Modals */}
