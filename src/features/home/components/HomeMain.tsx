@@ -1,5 +1,6 @@
 import HomeLedgerCards from "@features/home/components/HomeLedgerCards";
-import CreateLedgerModal from "@components/modals/CreateLedgerModal";
+import { lazy, Suspense } from "react";
+const CreateLedgerModal = lazy(() => import("@components/modals/CreateLedgerModal"));
 import PageContainer from "@components/shared/PageContainer";
 import HomeMainHeader from "./HomeMainHeader";
 import { Box } from "@chakra-ui/react";
@@ -28,11 +29,13 @@ const HomeMain = ({
           <HomeLedgerCards ledgers={ledgers} onOpen={onOpen} />
         </PageContainer>
       </Box>
-      <CreateLedgerModal
-        isOpen={isOpen}
-        onClose={onClose}
-        handleCreateLedger={handleCreateLedger}
-      />
+      <Suspense fallback={<div>Loading...</div>}>
+        <CreateLedgerModal
+          isOpen={isOpen}
+          onClose={onClose}
+          handleCreateLedger={handleCreateLedger}
+        />
+      </Suspense>
     </>
   );
 };

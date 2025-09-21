@@ -7,6 +7,7 @@ import {
   Flex,
   Text,
 } from "@chakra-ui/react";
+import { lazy, Suspense } from "react";
 import Layout from "@components/Layout";
 import LedgerMain from "@features/ledger/components/LedgerMain";
 import useLedgerStore from "@/components/shared/store";
@@ -17,7 +18,7 @@ import { BookText, ChevronLeft } from "lucide-react";
 import LedgerDetailsModal from "@components/modals/LedgerDetailsModal";
 import { useState } from "react";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
-import TransferFundsModal from "@components/modals/TransferFundsModal";
+const TransferFundsModal = lazy(() => import("@components/modals/TransferFundsModal"));
 import { useQueryClient } from "@tanstack/react-query";
 
 const Ledger = () => {
@@ -209,19 +210,21 @@ const Ledger = () => {
         initialData={transactionToCopy}
       />
 
-      <TransferFundsModal
-        isOpen={isTransferModalOpen}
-        onClose={() => {
-          setIsTransferModalOpen(false);
-          setTransactionToCopy(undefined);
-        }}
-        accountId={selectedAccountId}
-        onTransferCompleted={() => {
+      <Suspense fallback={<div>Loading...</div>}>
+        <TransferFundsModal
+          isOpen={isTransferModalOpen}
+          onClose={() => {
+            setIsTransferModalOpen(false);
+            setTransactionToCopy(undefined);
+          }}
+          accountId={selectedAccountId}
+          onTransferCompleted={() => {
           refreshAccountsData();
           refreshTransactionsData();
         }}
         initialData={transactionToCopy}
-      />
+        />
+      </Suspense>
     </Layout>
   );
 };

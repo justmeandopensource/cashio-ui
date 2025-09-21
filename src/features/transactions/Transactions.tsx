@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, lazy, Suspense } from "react";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   Box,
@@ -22,7 +22,7 @@ import TransactionFilter from "./TransactionFilter";
 import { AxiosError } from "axios";
 import useLedgerStore from "@/components/shared/store";
 import { toastDefaults } from "@/components/shared/utils";
-import EditTransactionModal from "@components/modals/EditTransactionModal/EditTransactionModal";
+const EditTransactionModal = lazy(() => import("@components/modals/EditTransactionModal/EditTransactionModal"));
 
 interface Transaction {
   transaction_id: string;
@@ -458,7 +458,11 @@ const Transactions: React.FC<TransactionsProps> = ({
           )}
         </>
       )}
-      {isEditModalOpen && selectedTransaction && ( <EditTransactionModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} transaction={selectedTransaction} onTransactionUpdated={handleTransactionUpdated} /> )}
+      {isEditModalOpen && selectedTransaction && (
+        <Suspense fallback={<div>Loading...</div>}>
+          <EditTransactionModal isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} transaction={selectedTransaction} onTransactionUpdated={handleTransactionUpdated} />
+        </Suspense>
+      )}
     </Box>
   );
 };

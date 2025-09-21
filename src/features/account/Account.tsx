@@ -6,13 +6,14 @@ import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
 import { Button, Box, Text, HStack, Badge, Flex } from "@chakra-ui/react";
+import { lazy, Suspense } from "react";
 import { Building, ShieldAlert, ChevronLeft } from "lucide-react";
 import { formatNumberAsCurrency } from "@components/shared/utils";
 import config from "@/config";
 import useLedgerStore from "@/components/shared/store";
 import UpdateAccountModal from "@components/modals/UpdateAccountModal";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
-import TransferFundsModal from "@components/modals/TransferFundsModal";
+const TransferFundsModal = lazy(() => import("@components/modals/TransferFundsModal"));
 import AccountDetailsModal from "@components/modals/AccountDetailsModal";
 import { useDisclosure } from "@chakra-ui/react";
 
@@ -271,19 +272,21 @@ const Account: React.FC = () => {
             initialData={transactionToCopy}
           />
 
-          <TransferFundsModal
-            isOpen={isTransferModalOpen}
-            onClose={() => {
-              setIsTransferModalOpen(false);
-              setTransactionToCopy(undefined);
-            }}
+          <Suspense fallback={<div>Loading...</div>}>
+            <TransferFundsModal
+              isOpen={isTransferModalOpen}
+              onClose={() => {
+                setIsTransferModalOpen(false);
+                setTransactionToCopy(undefined);
+              }}
             accountId={accountId as string}
             onTransferCompleted={() => {
               refreshAccountData();
               refreshTransactionsData();
             }}
             initialData={transactionToCopy}
-          />
+            />
+          </Suspense>
 
           <UpdateAccountModal
             isOpen={isUpdateModalOpen}
