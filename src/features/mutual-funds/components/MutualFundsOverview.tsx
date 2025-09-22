@@ -22,8 +22,7 @@
    Icon,
    useColorModeValue,
    Switch,
-   FormControl,
-   FormLabel,
+
  } from "@chakra-ui/react";
 import {
   TrendingUp,
@@ -97,22 +96,22 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
    const totalPnLPercentage =
      totalInvested > 0 ? (totalUnrealizedPnL / totalInvested) * 100 : 0;
 
-   // Filter AMCs based on toggle and funds with non-zero value
-   const filteredAmcs = useMemo(() => {
-     if (showAllAmcs) return amcs;
-     return amcs.filter((amc) => {
-       const amcFunds = mutualFunds.filter((fund) => fund.amc_id === amc.amc_id);
-       return amcFunds.some((fund) => fund.current_value > 0);
-     });
-   }, [amcs, mutualFunds, showAllAmcs]);
+    // Filter AMCs based on toggle and funds with non-zero value
+    const filteredAmcs = useMemo(() => {
+      if (showAllAmcs) return amcs;
+      return amcs.filter((amc) => {
+        const amcFunds = mutualFunds.filter((fund) => fund.amc_id === amc.amc_id);
+        return amcFunds.some((fund) => toNumber(fund.current_value) > 0);
+      });
+    }, [amcs, mutualFunds, showAllAmcs]);
 
-   // Check if there are AMCs with zero balance (no funds or all funds have zero value)
-   const hasZeroBalanceAmcs = useMemo(() => {
-     return amcs.some((amc) => {
-       const amcFunds = mutualFunds.filter((fund) => fund.amc_id === amc.amc_id);
-       return amcFunds.length === 0 || amcFunds.every((fund) => fund.current_value === 0);
-     });
-   }, [amcs, mutualFunds]);
+    // Check if there are AMCs with zero balance (no funds or all funds have zero value)
+    const hasZeroBalanceAmcs = useMemo(() => {
+      return amcs.some((amc) => {
+        const amcFunds = mutualFunds.filter((fund) => fund.amc_id === amc.amc_id);
+        return amcFunds.length === 0 || amcFunds.every((fund) => toNumber(fund.current_value) === 0);
+      });
+    }, [amcs, mutualFunds]);
 
   const toggleAmcExpansion = (amcId: number) => {
     const currentlyExpanded = expandedAmc;
