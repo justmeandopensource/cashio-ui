@@ -22,6 +22,7 @@ const CustomInput = React.forwardRef<
     onClick={onClick}
     ref={ref}
     value={value}
+    readOnly
     data-testid={testId}
   />
 ));
