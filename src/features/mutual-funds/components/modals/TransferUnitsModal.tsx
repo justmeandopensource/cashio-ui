@@ -387,6 +387,7 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
                        >
                     {mutualFunds
                       .filter(fund => fund.mutual_fund_id !== fromFundId)
+                      .sort((a, b) => a.name.localeCompare(b.name))
                       .map((fund) => (
                             <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
                               {fund.name} ({fund.amc?.name})

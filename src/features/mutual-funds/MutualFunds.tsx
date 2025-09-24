@@ -129,12 +129,12 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  const { data: transactions = [], isLoading: isLoadingTransactions, refetch: refetchTransactions } = useQuery({
-    queryKey: ["mf-transactions", ledgerId],
-    queryFn: () => getAllMfTransactions(ledgerId!),
-    enabled: !!ledgerId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+   const { data: transactions = [], isLoading: isLoadingTransactions, refetch: refetchTransactions } = useQuery({
+     queryKey: ["mf-transactions", ledgerId],
+     queryFn: () => getAllMfTransactions(ledgerId!),
+     enabled: !!ledgerId && subTabIndex === 1,
+     staleTime: 5 * 60 * 1000, // 5 minutes
+   });
 
   const isLoading = isLoadingAmcs || isLoadingMutualFunds || isLoadingTransactions;
 
