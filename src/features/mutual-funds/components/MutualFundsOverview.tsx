@@ -270,24 +270,24 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                      </VStack>
                    </Box>
 
-                   <Box>
-                     <Text fontSize="sm" color="gray.600" mb={1}>
-                       Total Funds
-                     </Text>
-                     <VStack align="start" spacing={0}>
-                       <Text
-                         fontSize={{ base: "xl", md: "2xl" }}
-                         fontWeight="bold"
-                         color="blue.600"
-                       >
-                         {mutualFunds.length}
-                       </Text>
-                       <Text fontSize="xs" color="gray.500">
-                         Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
-                       </Text>
-                     </VStack>
-                   </Box>
-                 </SimpleGrid>
+                    <Box>
+                      <Text fontSize="sm" color="gray.600" mb={1}>
+                        Total Funds
+                      </Text>
+                      <VStack align="start" spacing={0}>
+                        <Text
+                          fontSize={{ base: "xl", md: "2xl" }}
+                          fontWeight="bold"
+                          color="blue.600"
+                        >
+                          {mutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
+                        </Text>
+                        <Text fontSize="xs" color="gray.500">
+                          Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
+                        </Text>
+                      </VStack>
+                    </Box>
+                  </SimpleGrid>
                </Box>
 
                {/* Desktop: All metrics in Flex layout like physical assets */}
@@ -422,24 +422,24 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                      </VStack>
                    </Box>
 
-                   <Box>
-                     <Text fontSize="sm" color="gray.600" mb={1}>
-                       Total Funds
-                     </Text>
-                     <VStack align="start" spacing={0}>
-                       <Text
-                         fontSize={{ base: "xl", md: "2xl" }}
-                         fontWeight="bold"
-                         color="blue.600"
-                       >
-                         {mutualFunds.length}
-                       </Text>
-                       <Text fontSize="xs" color="gray.500">
-                         Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
-                       </Text>
-                     </VStack>
-                   </Box>
-                   </Flex>
+                    <Box>
+                      <Text fontSize="sm" color="gray.600" mb={1}>
+                        Total Funds
+                      </Text>
+                      <VStack align="start" spacing={0}>
+                        <Text
+                          fontSize={{ base: "xl", md: "2xl" }}
+                          fontWeight="bold"
+                          color="blue.600"
+                        >
+                          {mutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
+                        </Text>
+                        <Text fontSize="xs" color="gray.500">
+                          Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
+                        </Text>
+                      </VStack>
+                    </Box>
+                    </Flex>
                  </Box>
                   </>
                </Box>

@@ -23,6 +23,7 @@ export interface MutualFund {
   name: string;
   plan?: string;
   code?: string;
+  owner?: string;
   amc_id: number;
   ledger_id: number;
   total_units: number | string;
@@ -42,6 +43,7 @@ export interface MutualFundCreate {
   name: string;
   plan?: string;
   code?: string;
+  owner?: string;
   amc_id: number;
   notes?: string;
 }
@@ -50,6 +52,7 @@ export interface MutualFundUpdate {
   name?: string;
   plan?: string;
   code?: string;
+  owner?: string;
   amc_id?: number;
   notes?: string;
 }
@@ -123,6 +126,7 @@ export interface MutualFundSummary {
   name: string;
   plan?: string;
   code?: string;
+  owner?: string;
   amc_name: string;
   total_units: number | string;
   average_cost_per_unit: number | string;

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   Table,
   Thead,
@@ -307,7 +307,33 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
 
   // State for filtering
   const [selectedAmc, setSelectedAmc] = useState<string>("all");
+  const [selectedOwner, setSelectedOwner] = useState<string>("all");
   const [showZeroBalance, setShowZeroBalance] = useState(false);
+
+  // Available AMCs based on selected owner
+  const availableAmcs = useMemo(() => {
+    if (selectedOwner === "all") {
+      return amcs.slice().sort((a, b) => a.name.localeCompare(b.name));
+    } else {
+      const ownerFunds = mutualFunds.filter((fund) => fund.owner === selectedOwner);
+      const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
+      return amcs
+        .filter((amc) => ownerAmcIds.has(amc.amc_id))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }
+  }, [amcs, mutualFunds, selectedOwner]);
+
+  // Reset AMC filter if selected AMC is not available for the selected owner
+  useEffect(() => {
+    if (selectedOwner !== "all" && selectedAmc !== "all") {
+      const selectedAmcId = amcs.find((amc) => amc.name === selectedAmc)?.amc_id;
+      const ownerFunds = mutualFunds.filter((fund) => fund.owner === selectedOwner);
+      const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
+      if (selectedAmcId && !ownerAmcIds.has(selectedAmcId)) {
+        setSelectedAmc("all");
+      }
+    }
+  }, [selectedOwner, selectedAmc, mutualFunds, amcs]);
 
   // State for expanded rows
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
@@ -317,6 +343,12 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     if (plan === "Direct Growth") return "DG";
     if (plan === "Regular Growth") return "RG";
     return "";
+  };
+
+  // Helper to get owner initials
+  const getOwnerInitials = (owner: string | null | undefined): string => {
+    if (!owner) return "";
+    return owner.split(' ').map(word => word.charAt(0).toUpperCase()).join('');
   };
 
   // Prepare data with AMC names
@@ -342,7 +374,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     });
   }, [mutualFunds, amcs]);
 
-  // Filter funds based on selected AMC and zero balance toggle
+  // Filter funds based on selected AMC, owner and zero balance toggle
   const filteredFunds = useMemo(() => {
     let funds = fundsWithAmc;
 
@@ -351,13 +383,18 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
       funds = funds.filter((fund) => fund.amc_name === selectedAmc);
     }
 
+    // Owner filter
+    if (selectedOwner !== "all") {
+      funds = funds.filter((fund) => fund.owner === selectedOwner);
+    }
+
     // Zero balance filter
     if (!showZeroBalance) {
       funds = funds.filter((fund) => toNumber(fund.total_units) > 0);
     }
 
     return funds;
-  }, [fundsWithAmc, selectedAmc, showZeroBalance]);
+  }, [fundsWithAmc, selectedAmc, selectedOwner, showZeroBalance]);
 
   // Sort funds
   const sortedFunds = useMemo(() => {
@@ -463,7 +500,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
   return (
     <Box>
       {/* Filter Controls */}
-      <Flex mb={4} gap={4} align="center" wrap="wrap" justify="space-between">
+      <Flex mb={4} gap={4} align="center" wrap="wrap">
         <Select
           value={selectedAmc}
           onChange={(e) => setSelectedAmc(e.target.value)}
@@ -471,16 +508,28 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
           maxW="200px"
         >
           <option value="all">All AMCs</option>
-          {amcs
-            .slice()
-            .sort((a, b) => a.name.localeCompare(b.name))
-            .map((amc) => (
-              <option key={amc.amc_id} value={amc.name}>
-                {amc.name}
+          {availableAmcs.map((amc) => (
+            <option key={amc.amc_id} value={amc.name}>
+              {amc.name}
+            </option>
+          ))}
+        </Select>
+        <Select
+          value={selectedOwner}
+          onChange={(e) => setSelectedOwner(e.target.value)}
+          size="sm"
+          maxW="200px"
+        >
+          <option value="all">All Owners</option>
+          {Array.from(new Set(mutualFunds.map(fund => fund.owner).filter(Boolean)))
+            .sort()
+            .map((owner) => (
+              <option key={owner} value={owner}>
+                {owner}
               </option>
             ))}
         </Select>
-        <FormControl display="flex" alignItems="center" w="auto">
+        <FormControl display="flex" alignItems="center" w="auto" ml="auto">
           <FormLabel
             htmlFor="show-zero-balance"
             mb="0"
@@ -510,22 +559,23 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                   AMC {getSortIcon("amc")}
                 </Flex>
               </Th>
-              <Th
-                width="28%"
-                cursor="pointer"
-                onClick={() => handleSort("fund")}
-              >
-                <Flex align="center" gap={1}>
-                  Fund {getSortIcon("fund")}
-                </Flex>
-              </Th>
-              <Th
-                width="8%"
-                isNumeric
-                display={{ base: "none", lg: "table-cell" }}
-              >
-                NAV
-              </Th>
+               <Th
+                  width="24%"
+                  cursor="pointer"
+                  onClick={() => handleSort("fund")}
+                >
+                  <Flex align="center" gap={1}>
+                    Fund {getSortIcon("fund")}
+                  </Flex>
+                </Th>
+
+               <Th
+                 width="8%"
+                 isNumeric
+                 display={{ base: "none", lg: "table-cell" }}
+               >
+                 NAV
+               </Th>
               <Th
                 width="8%"
                 isNumeric
@@ -554,26 +604,26 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                   Value {getSortIcon("value")}
                 </Flex>
               </Th>
-              <Th
-                width="12%"
-                isNumeric
-                cursor="pointer"
-                onClick={() => handleSort("unrealized_pnl")}
-              >
-                <Flex align="center" gap={1} justify="flex-end">
-                  P&L {getSortIcon("unrealized_pnl")}
-                </Flex>
-              </Th>
-              <Th
-                width="8%"
-                isNumeric
-                cursor="pointer"
-                onClick={() => handleSort("unrealized_pnl_percentage")}
-              >
-                <Flex align="center" gap={1} justify="flex-end">
-                  P&L % {getSortIcon("unrealized_pnl_percentage")}
-                </Flex>
-              </Th>
+               <Th
+                 width="10%"
+                 isNumeric
+                 cursor="pointer"
+                 onClick={() => handleSort("unrealized_pnl")}
+               >
+                 <Flex align="center" gap={1} justify="flex-end">
+                   P&L {getSortIcon("unrealized_pnl")}
+                 </Flex>
+               </Th>
+               <Th
+                 width="7%"
+                 isNumeric
+                 cursor="pointer"
+                 onClick={() => handleSort("unrealized_pnl_percentage")}
+               >
+                 <Flex align="center" gap={1} justify="flex-end">
+                   P&L % {getSortIcon("unrealized_pnl_percentage")}
+                 </Flex>
+               </Th>
             </Tr>
           </Thead>
           <Tbody>
@@ -598,27 +648,37 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                     />
                   </Td>
                   <Td fontWeight="medium">{fund.amc_name}</Td>
-                  <Td>
-                    <HStack spacing={1} align="baseline">
-                      <Text fontWeight="medium" noOfLines={1}>
-                        {fund.name}
-                      </Text>
-                      {getPlanInitials(fund.plan) && (
-                        <Text
-                          as="span"
-                          fontSize="xs"
-                          color="gray.500"
-                          fontWeight="normal"
-                        >
-                          ({getPlanInitials(fund.plan)})
-                        </Text>
-                      )}
-                    </HStack>
-                  </Td>
-                  <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
-                    {currencySymbol || "₹"}
-                    {formatNav(fund.latest_nav)}
-                  </Td>
+                   <Td>
+                     <HStack spacing={1} align="baseline">
+                       <Text fontWeight="medium" noOfLines={1}>
+                         {fund.name}
+                       </Text>
+                       {getPlanInitials(fund.plan) && (
+                         <Text
+                           as="span"
+                           fontSize="xs"
+                           color="gray.500"
+                           fontWeight="normal"
+                         >
+                           ({getPlanInitials(fund.plan)})
+                         </Text>
+                       )}
+                       {getOwnerInitials(fund.owner) && (
+                         <Text
+                           as="span"
+                           fontSize="xs"
+                           color="gray.500"
+                           fontWeight="normal"
+                         >
+                           [{getOwnerInitials(fund.owner)}]
+                         </Text>
+                       )}
+                     </HStack>
+                    </Td>
+                   <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
+                     {currencySymbol || "₹"}
+                     {formatNav(fund.latest_nav)}
+                   </Td>
                   <Td isNumeric display={{ base: "none", md: "table-cell" }}>
                     {formatUnits(fund.total_units)}
                   </Td>

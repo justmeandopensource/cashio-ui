@@ -41,6 +41,7 @@ interface FormData {
   name: string;
   plan: string;
   code: string;
+  owner: string;
   amc_id: string;
   notes: string;
 }
@@ -60,6 +61,7 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
     name: "",
     plan: "",
     code: "",
+    owner: "",
     amc_id: "",
     notes: "",
   });
@@ -104,12 +106,13 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
         name: "",
         plan: "",
         code: "",
+        owner: "",
         amc_id: validPreselected ? preselectedAmcId.toString() : "",
         notes: "",
       });
       setErrors({});
     }
-  }, [isOpen, preselectedAmcId]); // Remove amcs from dependencies
+  }, [isOpen, preselectedAmcId, amcs]);
 
   // Form validation
   const validateForm = (): boolean => {
@@ -129,6 +132,10 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
 
     if (formData.code && formData.code.length > 50) {
       newErrors.code = "Code must be less than 50 characters";
+    }
+
+    if (formData.owner && formData.owner.length > 100) {
+      newErrors.owner = "Owner must be less than 100 characters";
     }
 
     if (formData.notes && formData.notes.length > 500) {
@@ -179,6 +186,7 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
       name: formData.name.trim(),
       plan: formData.plan.trim() || undefined,
       code: formData.code.trim() || undefined,
+      owner: formData.owner.trim() || undefined,
       amc_id: amcId!,
       notes: formData.notes.trim() || undefined,
     };
@@ -389,10 +397,42 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
                        <FormHelperText>
                          Enter a unique code
                        </FormHelperText>
-                     </FormControl>
-                   </HStack>
+                      </FormControl>
+                    </HStack>
 
-                   {/* AMC Selection */}
+                    {/* Owner */}
+                    <FormControl isInvalid={!!errors.owner}>
+                      <FormLabel fontWeight="semibold" mb={2}>
+                        <HStack spacing={2}>
+                          <FileText size={16} />
+                          <Text>Owner (Optional)</Text>
+                        </HStack>
+                      </FormLabel>
+                      <Input
+                        value={formData.owner}
+                        onChange={(e) =>
+                          handleInputChange("owner", e.target.value)
+                        }
+                        placeholder="e.g., John Doe"
+                        maxLength={100}
+                        size="lg"
+                        bg={inputBg}
+                        borderColor={inputBorderColor}
+                        borderWidth="2px"
+                        borderRadius="md"
+                        _hover={{ borderColor: "teal.300" }}
+                        _focus={{
+                          borderColor: focusBorderColor,
+                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                        }}
+                      />
+                      <FormErrorMessage>{errors.owner}</FormErrorMessage>
+                      <FormHelperText>
+                        Enter the owner name to allow same fund names for different owners
+                      </FormHelperText>
+                    </FormControl>
+
+                    {/* AMC Selection */}
                   <FormControl isInvalid={!!errors.amc_id} display={selectedAmc ? "block" : "none"}>
                     <FormLabel fontWeight="semibold" mb={2}>
                       <HStack spacing={2}>

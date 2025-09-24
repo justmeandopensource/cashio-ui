@@ -113,6 +113,7 @@ export const getMutualFundSummaries = async (ledgerId: number): Promise<MutualFu
     name: fund.name,
     plan: fund.plan,
     code: fund.code,
+    owner: fund.owner,
     amc_name: fund.amc?.name || '',
     total_units: fund.total_units,
     average_cost_per_unit: fund.average_cost_per_unit,
