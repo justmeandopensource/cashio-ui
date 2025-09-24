@@ -33,6 +33,7 @@ interface MutualFundsOverviewProps {
   onTransferUnits: (fundId: number) => void;
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
+  onViewTransactions: (fundId: number) => void;
 }
 
 const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
@@ -44,6 +45,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   onTransferUnits,
   onUpdateNav,
   onCloseFund,
+  onViewTransactions,
 }) => {
   const { currencySymbol } = useLedgerStore();
 
@@ -478,14 +480,15 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
               </VStack>
             </Box>
          ) : (
-            <MutualFundsTable
-              amcs={amcs}
-              mutualFunds={mutualFunds}
-              onTradeUnits={onTradeUnits}
-              onTransferUnits={onTransferUnits}
-              onUpdateNav={onUpdateNav}
-              onCloseFund={onCloseFund}
-            />
+             <MutualFundsTable
+               amcs={amcs}
+               mutualFunds={mutualFunds}
+               onTradeUnits={onTradeUnits}
+               onTransferUnits={onTransferUnits}
+               onUpdateNav={onUpdateNav}
+               onCloseFund={onCloseFund}
+               onViewTransactions={onViewTransactions}
+             />
          )}
       </VStack>
     </Box>

@@ -15,13 +15,9 @@ import {
   Select,
   Flex,
   useColorModeValue,
-  SimpleGrid,
   Stat,
   StatLabel,
   StatNumber,
-  Grid,
-  GridItem,
-  VStack,
   Icon,
   Switch,
   FormControl,
@@ -37,6 +33,7 @@ import {
   ArrowRightLeft,
   RefreshCw,
   XCircle,
+  List,
 } from "lucide-react";
 import { MutualFund, Amc } from "../types";
 import {
@@ -64,6 +61,7 @@ interface ExpandedFundRowProps {
   onTransferUnits: (fundId: number) => void;
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
+  onViewTransactions: (fundId: number) => void;
 }
 
 const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
@@ -75,6 +73,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
   onTransferUnits,
   onUpdateNav,
   onCloseFund,
+  onViewTransactions,
 }) => {
   const { unrealizedPnl, realizedPnl } = calculateFundPnL(fund);
   const { data: transactions = [], isLoading: isLoadingTransactions } =
@@ -220,42 +219,50 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
         </HStack>
 
         <HStack spacing={2}>
-          <Button
-            size="xs"
-            variant="outline"
-            leftIcon={<Icon as={ShoppingCart} boxSize={3} />}
-            onClick={() => onTradeUnits(fund.mutual_fund_id)}
-          >
-            Buy/Sell
-          </Button>
-          <Button
-            size="xs"
-            variant="outline"
-            leftIcon={<Icon as={ArrowRightLeft} boxSize={3} />}
-            onClick={() => onTransferUnits(fund.mutual_fund_id)}
-            isDisabled={toNumber(fund.total_units) <= 0}
-          >
-            Transfer
-          </Button>
-          <Button
-            size="xs"
-            variant="outline"
-            leftIcon={<Icon as={RefreshCw} boxSize={3} />}
-            onClick={() => onUpdateNav(fund)}
-          >
-            Update NAV
-          </Button>
-          <Button
-            size="xs"
-            variant="outline"
-            colorScheme="red"
-            leftIcon={<Icon as={XCircle} boxSize={3} />}
-            onClick={() => onCloseFund(fund.mutual_fund_id)}
-            isDisabled={toNumber(fund.total_units) > 0}
-          >
-            Close
-          </Button>
-        </HStack>
+           <Button
+             size="xs"
+             variant="outline"
+             leftIcon={<Icon as={ShoppingCart} boxSize={3} />}
+             onClick={() => onTradeUnits(fund.mutual_fund_id)}
+           >
+             Buy/Sell
+           </Button>
+           <Button
+             size="xs"
+             variant="outline"
+             leftIcon={<Icon as={ArrowRightLeft} boxSize={3} />}
+             onClick={() => onTransferUnits(fund.mutual_fund_id)}
+             isDisabled={toNumber(fund.total_units) <= 0}
+           >
+             Transfer
+           </Button>
+           <Button
+             size="xs"
+             variant="outline"
+             leftIcon={<Icon as={List} boxSize={3} />}
+             onClick={() => onViewTransactions(fund.mutual_fund_id)}
+           >
+             Transactions
+           </Button>
+           <Button
+             size="xs"
+             variant="outline"
+             leftIcon={<Icon as={RefreshCw} boxSize={3} />}
+             onClick={() => onUpdateNav(fund)}
+           >
+             Update NAV
+           </Button>
+           <Button
+             size="xs"
+             variant="outline"
+             colorScheme="red"
+             leftIcon={<Icon as={XCircle} boxSize={3} />}
+             onClick={() => onCloseFund(fund.mutual_fund_id)}
+             isDisabled={toNumber(fund.total_units) > 0}
+           >
+             Close
+           </Button>
+         </HStack>
       </Flex>
     </Box>
   );
@@ -268,6 +275,7 @@ interface MutualFundsTableProps {
   onTransferUnits: (fundId: number) => void;
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
+  onViewTransactions: (fundId: number) => void;
 }
 
 type SortField =
@@ -278,6 +286,8 @@ type SortField =
   | "unrealized_pnl"
   | "unrealized_pnl_percentage";
 
+type SortDirection = "asc" | "desc";
+
 const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
   amcs,
   mutualFunds,
@@ -285,6 +295,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
   onTransferUnits,
   onUpdateNav,
   onCloseFund,
+  onViewTransactions,
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
@@ -441,6 +452,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               onTransferUnits={onTransferUnits}
               onUpdateNav={onUpdateNav}
               onCloseFund={onCloseFund}
+              onViewTransactions={onViewTransactions}
             />
           </Collapse>
         </Td>

@@ -52,6 +52,7 @@ interface MfTransactionsProps {
   transactions?: MfTransaction[];
   onDataChange: () => void;
   onAccountDataChange?: () => void;
+  initialFundFilter?: string;
 }
 
 const MfTransactions: FC<MfTransactionsProps> = ({
@@ -60,6 +61,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   transactions = [],
   onDataChange,
   onAccountDataChange,
+  initialFundFilter,
 }) => {
   const { ledgerId, currencySymbol } = useLedgerStore();
   const cardBg = useColorModeValue("white", "gray.800");
@@ -69,7 +71,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   // State for filters
   const [searchTerm, setSearchTerm] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [fundFilter, setFundFilter] = useState<string>("all");
+  const [fundFilter, setFundFilter] = useState<string>(initialFundFilter || "all");
   const [amcFilter, setAmcFilter] = useState<string>("all");
 
   // Delete transaction state

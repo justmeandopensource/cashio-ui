@@ -1,5 +1,5 @@
 import { useState, FC } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import {
   Box,
   Tab,
@@ -44,11 +44,7 @@ import { getAmcs, getMutualFunds, getAllMfTransactions, deleteMutualFund, delete
 import { MutualFund } from "./types";
 import { toastDefaults } from "@/components/shared/utils";
 
-// Map subtab names to indices
-const subTabMap = {
-  overview: 0,
-  transactions: 1,
-};
+
 
 interface MutualFundsProps {
   onAccountDataChange?: () => void;
@@ -58,6 +54,7 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   const { ledgerId } = useLedgerStore();
   const toast = useToast();
   const [subTabIndex, setSubTabIndex] = useState(0);
+  const [selectedFundFilter, setSelectedFundFilter] = useState<string>("all");
 
   // Modal states
   const {
@@ -189,6 +186,11 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
       setFundToDelete({ id: fundId, name: fund.name });
       onDeleteFundModalOpen();
     }
+  };
+
+  const handleViewTransactions = (fundId: number) => {
+    setSelectedFundFilter(fundId.toString());
+    setSubTabIndex(1); // Switch to Transactions tab
   };
 
   const deleteFundMutation = useMutation({
@@ -334,17 +336,18 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
                    <Spinner size="xl" />
                  </Box>
                ) : (
-                 <MutualFundsOverview
-                   amcs={amcs}
-                   mutualFunds={mutualFunds}
-                   onCreateAmc={handleCreateAmc}
-                   onCreateFund={handleCreateFund}
-                   onTradeUnits={handleTradeUnits}
-                   onTransferUnits={handleTransferUnits}
-                   onUpdateNav={handleUpdateNav}
-                   onCloseFund={handleCloseFund}
-                   onDeleteAmc={handleDeleteAmc}
-                 />
+                  <MutualFundsOverview
+                    amcs={amcs}
+                    mutualFunds={mutualFunds}
+                    onCreateAmc={handleCreateAmc}
+                    onCreateFund={handleCreateFund}
+                    onTradeUnits={handleTradeUnits}
+                    onTransferUnits={handleTransferUnits}
+                    onUpdateNav={handleUpdateNav}
+                    onCloseFund={handleCloseFund}
+                    onViewTransactions={handleViewTransactions}
+                    onDeleteAmc={handleDeleteAmc}
+                  />
                )
              )}
            </TabPanel>
@@ -355,13 +358,14 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
                    <Spinner size="xl" />
                  </Box>
                ) : (
-                 <MfTransactions
-                   amcs={amcs}
-                   mutualFunds={mutualFunds}
-                   transactions={transactions}
-                   onDataChange={handleDataChange}
-                   onAccountDataChange={onAccountDataChange}
-                 />
+                  <MfTransactions
+                    amcs={amcs}
+                    mutualFunds={mutualFunds}
+                    transactions={transactions}
+                    onDataChange={handleDataChange}
+                    onAccountDataChange={onAccountDataChange}
+                    initialFundFilter={selectedFundFilter}
+                  />
                )
              )}
            </TabPanel>
