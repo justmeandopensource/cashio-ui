@@ -276,6 +276,8 @@ interface MutualFundsTableProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
+  selectedOwner: string;
+  onOwnerChange: (owner: string) => void;
 }
 
 type SortField =
@@ -296,6 +298,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
   onUpdateNav,
   onCloseFund,
   onViewTransactions,
+  selectedOwner,
+  onOwnerChange,
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
@@ -307,7 +311,6 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
 
   // State for filtering
   const [selectedAmc, setSelectedAmc] = useState<string>("all");
-  const [selectedOwner, setSelectedOwner] = useState<string>("all");
   const [showZeroBalance, setShowZeroBalance] = useState(false);
 
   // Available AMCs based on selected owner
@@ -516,7 +519,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
         </Select>
         <Select
           value={selectedOwner}
-          onChange={(e) => setSelectedOwner(e.target.value)}
+          onChange={(e) => onOwnerChange(e.target.value)}
           size="sm"
           maxW="200px"
         >

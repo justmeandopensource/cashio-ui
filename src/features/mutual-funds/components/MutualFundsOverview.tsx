@@ -1,4 +1,4 @@
- import { FC } from "react";
+ import { FC, useState, useMemo } from "react";
 import {
   Box,
   Text,
@@ -48,23 +48,31 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   onViewTransactions,
 }) => {
   const { currencySymbol } = useLedgerStore();
+  const [selectedOwner, setSelectedOwner] = useState<string>("all");
 
   // Calculate overall portfolio metrics
   const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
 
-  const totalInvested = mutualFunds.reduce(
+  const filteredMutualFunds = useMemo(() => {
+    if (selectedOwner === "all") {
+      return mutualFunds;
+    }
+    return mutualFunds.filter((fund) => fund.owner === selectedOwner);
+  }, [mutualFunds, selectedOwner]);
+
+  const totalInvested = filteredMutualFunds.reduce(
     (sum, fund) => sum + toNumber(fund.total_invested_cash),
     0,
   );
-  const totalCurrentValue = mutualFunds.reduce(
+  const totalCurrentValue = filteredMutualFunds.reduce(
     (sum, fund) => sum + toNumber(fund.current_value),
     0,
   );
-  const totalRealizedGain = mutualFunds.reduce(
+  const totalRealizedGain = filteredMutualFunds.reduce(
     (sum, fund) => sum + toNumber(fund.total_realized_gain || 0),
     0,
   );
-  const totalUnrealizedPnL = mutualFunds.reduce((sum, fund) => {
+  const totalUnrealizedPnL = filteredMutualFunds.reduce((sum, fund) => {
     const { unrealizedPnl } = calculateFundPnL(fund);
     return sum + unrealizedPnl;
   }, 0);
@@ -280,7 +288,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                           fontWeight="bold"
                           color="blue.600"
                         >
-                          {mutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
+                          {filteredMutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
                         </Text>
                         <Text fontSize="xs" color="gray.500">
                           Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
@@ -432,7 +440,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                           fontWeight="bold"
                           color="blue.600"
                         >
-                          {mutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
+                          {filteredMutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
                         </Text>
                         <Text fontSize="xs" color="gray.500">
                           Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
@@ -488,6 +496,8 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
                onUpdateNav={onUpdateNav}
                onCloseFund={onCloseFund}
                onViewTransactions={onViewTransactions}
+               selectedOwner={selectedOwner}
+               onOwnerChange={setSelectedOwner}
              />
          )}
       </VStack>
