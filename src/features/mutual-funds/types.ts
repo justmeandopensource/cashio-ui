@@ -152,6 +152,39 @@ export interface AmcSummary {
   unrealized_pnl_percentage: number | string;
 }
 
+// Bulk NAV Types
+export interface NavFetchResult {
+  scheme_code: string;
+  fund_name?: string;
+  nav_value?: number;
+  nav_date?: string;
+  success: boolean;
+  error_message?: string;
+}
+
+export interface BulkNavFetchRequest {
+  scheme_codes: string[];
+}
+
+export interface BulkNavFetchResponse {
+  results: NavFetchResult[];
+  total_requested: number;
+  total_successful: number;
+  total_failed: number;
+}
+
+export interface BulkNavUpdateRequest {
+  updates: Array<{
+    mutual_fund_id: number;
+    latest_nav: number;
+  }>;
+}
+
+export interface BulkNavUpdateResponse {
+  updated_funds: number[];
+  total_updated: number;
+}
+
 // Form Types
 export interface BuySellFormData {
   mutual_fund_id: number;

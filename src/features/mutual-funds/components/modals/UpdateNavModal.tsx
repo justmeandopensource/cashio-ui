@@ -24,11 +24,12 @@ import {
   AlertDescription,
   InputGroup,
   InputLeftAddon,
+  useToast,
 } from "@chakra-ui/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { TrendingUp, Calculator, Info, RefreshCw, Clock, X } from "lucide-react";
+import { TrendingUp, Calculator, Info, RefreshCw, Clock, X, Download } from "lucide-react";
 
-import { updateMutualFundNav } from "../../api";
+import { updateMutualFundNav, bulkFetchNav } from "../../api";
 import { MutualFund } from "../../types";
 import { formatAmount, formatNav } from "../../utils";
 import { splitCurrencyForDisplay } from "../../../physical-assets/utils";
@@ -55,6 +56,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
   const { ledgerId } = useLedgerStore();
   const { currencySymbol } = useLedgerStore();
   const queryClient = useQueryClient();
+  const toast = useToast();
 
   const [formData, setFormData] = useState<FormData>({ nav: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -81,6 +83,39 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
     onError: (error: any) => {
       // Error will be displayed in the Alert component below
       console.error("NAV update failed:", error);
+    },
+  });
+
+  const fetchNavMutation = useMutation({
+    mutationFn: () => {
+      if (!fund?.code) {
+        throw new Error("No scheme code available for this fund");
+      }
+      return bulkFetchNav(Number(ledgerId), { scheme_codes: [fund.code] });
+    },
+    onSuccess: (data) => {
+      const result = data.results[0];
+      if (result.success && result.nav_value) {
+        setFormData({ nav: result.nav_value.toFixed(2) });
+        setErrors({});
+      } else {
+        toast({
+          title: "Fetch Failed",
+          description: result.error_message || "Failed to fetch NAV",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Fetch Failed",
+        description: error?.response?.data?.detail || error?.message || "Failed to fetch NAV",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     },
   });
 
@@ -154,8 +189,11 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
 
   if (!fund) return null;
 
-  const newNavValue = parseFloat(formData.nav) || fund.latest_nav;
-  const newCurrentValue = fund.total_units * newNavValue;
+  const newNavValue = parseFloat(formData.nav);
+  const areNavsEqual = !isNaN(newNavValue) && Math.round(newNavValue * 100) === Math.round(fund.latest_nav * 100);
+
+  const previewNavValue = isNaN(newNavValue) ? fund.latest_nav : newNavValue;
+  const newCurrentValue = fund.total_units * previewNavValue;
   const currentValueChange = newCurrentValue - fund.current_value;
 
   return (
@@ -292,15 +330,30 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
             >
               <VStack spacing={5} align="stretch">
                 <FormControl isInvalid={!!errors.nav}>
-                  <FormLabel fontWeight="semibold" mb={2}>
-                    <HStack spacing={2}>
-                      <Calculator size={16} />
-                      <Text>New NAV per Unit</Text>
-                      <Text as="span" color="red.500">
-                        *
-                      </Text>
-                    </HStack>
-                  </FormLabel>
+                   <HStack justify="space-between" align="center" mb={2}>
+                     <FormLabel fontWeight="semibold" mb={0}>
+                       <HStack spacing={2}>
+                         <Calculator size={16} />
+                         <Text>New NAV per Unit</Text>
+                         <Text as="span" color="red.500">
+                           *
+                         </Text>
+                       </HStack>
+                     </FormLabel>
+                     {fund?.code && (
+                       <Button
+                         size="xs"
+                         variant="outline"
+                         leftIcon={<Download size={14} />}
+                         onClick={() => fetchNavMutation.mutate()}
+                         isLoading={fetchNavMutation.isPending}
+                         loadingText="Fetching..."
+                         colorScheme="teal"
+                       >
+                         Fetch NAV
+                       </Button>
+                     )}
+                   </HStack>
                   <InputGroup size="lg">
                     <InputLeftAddon
                       bg={inputBorderColor}
@@ -336,7 +389,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                 </FormControl>
 
                 {/* Preview of changes */}
-                {formData.nav && !isNaN(parseFloat(formData.nav)) && (
+                {formData.nav && !isNaN(newNavValue) && !areNavsEqual && (
                   <Box
                     p={4}
                     bg={currentValueChange >= 0 ? "green.50" : "red.50"}
@@ -467,7 +520,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
               isDisabled={
                 !formData.nav.trim() ||
                 !!errors.nav ||
-                parseFloat(formData.nav) === fund.latest_nav
+                areNavsEqual
               }
               leftIcon={<RefreshCw />}
               transition="all 0.2s"
@@ -523,11 +576,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
             borderRadius="md"
             isLoading={updateNavMutation.isPending}
             loadingText="Updating NAV..."
-            isDisabled={
-              !formData.nav.trim() ||
-              !!errors.nav ||
-              parseFloat(formData.nav) === fund.latest_nav
-            }
+              isDisabled={!formData.nav.trim() || !!errors.nav || areNavsEqual}
             leftIcon={<RefreshCw />}
             transition="all 0.2s"
           >

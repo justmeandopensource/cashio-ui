@@ -14,6 +14,10 @@ import {
   MfSwitchCreate,
   MutualFundSummary,
   AmcSummary,
+  BulkNavFetchRequest,
+  BulkNavFetchResponse,
+  BulkNavUpdateRequest,
+  BulkNavUpdateResponse,
 } from "./types";
 
 // AMC API functions
@@ -103,6 +107,17 @@ export const deleteMfTransaction = async (ledgerId: number, transactionId: numbe
   await api.delete(`/ledger/${ledgerId}/mf-transaction/${transactionId}`);
 };
 
+// Bulk NAV API functions
+export const bulkFetchNav = async (ledgerId: number, request: BulkNavFetchRequest): Promise<BulkNavFetchResponse> => {
+  const response = await api.post(`/ledger/${ledgerId}/mutual-funds/bulk-fetch-nav`, request);
+  return response.data;
+};
+
+export const bulkUpdateNav = async (ledgerId: number, request: BulkNavUpdateRequest): Promise<BulkNavUpdateResponse> => {
+  const response = await api.put(`/ledger/${ledgerId}/mutual-funds/bulk-update-nav`, request);
+  return response.data;
+};
+
 // Summary API functions (for dashboard)
 export const getMutualFundSummaries = async (ledgerId: number): Promise<MutualFundSummary[]> => {
   // This would be a new endpoint for dashboard summaries
@@ -165,4 +180,19 @@ export const useFundTransactions = (ledgerId: number, fundId: number, options?: 
     enabled: !!ledgerId && !!fundId && (options?.enabled ?? true),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+};
+
+// Bulk NAV hooks
+export const useBulkFetchNav = () => {
+  // This will be used with mutations, not queries
+  return {
+    bulkFetchNav,
+  };
+};
+
+export const useBulkUpdateNav = () => {
+  // This will be used with mutations, not queries
+  return {
+    bulkUpdateNav,
+  };
 };
