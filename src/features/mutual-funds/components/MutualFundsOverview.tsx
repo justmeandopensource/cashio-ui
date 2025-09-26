@@ -485,30 +485,54 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
           </Box>
         )}
 
-        {mutualFunds.length === 0 ? (
-          <Box
-            p={12}
-            textAlign="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
-            borderRadius="lg"
-            border="2px dashed"
-            borderColor="gray.300"
-          >
-            {/* Empty State */}
-          </Box>
-        ) : (
-          <MutualFundsTable
-            amcs={amcs}
-            mutualFunds={mutualFunds}
-            onTradeUnits={onTradeUnits}
-            onTransferUnits={onTransferUnits}
-            onUpdateNav={onUpdateNav}
-            onCloseFund={onCloseFund}
-            onViewTransactions={onViewTransactions}
-            selectedOwner={selectedOwner}
-            onOwnerChange={setSelectedOwner}
-          />
-        )}
+         {amcs.length === 0 ? (
+           <Box
+             p={12}
+             textAlign="center"
+             bg={useColorModeValue("gray.50", "gray.800")}
+             borderRadius="lg"
+             border="2px dashed"
+             borderColor="gray.300"
+           >
+             <VStack spacing={4}>
+               <Icon as={TrendingUp} boxSize={16} color="gray.400" />
+               <VStack spacing={2}>
+                 <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+                   No AMCs Created Yet
+                 </Text>
+                 <Text fontSize="md" color={useColorModeValue("gray.600", "gray.400")} maxW="400px">
+                   Create your first Asset Management Company to start tracking mutual fund investments
+                 </Text>
+               </VStack>
+               <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
+                 Create Your First AMC
+               </Button>
+             </VStack>
+           </Box>
+         ) : mutualFunds.length === 0 ? (
+           <Box
+             p={12}
+             textAlign="center"
+             bg={useColorModeValue("gray.50", "gray.800")}
+             borderRadius="lg"
+             border="2px dashed"
+             borderColor="gray.300"
+           >
+             {/* Empty State for no funds but AMCs exist */}
+           </Box>
+         ) : (
+           <MutualFundsTable
+             amcs={amcs}
+             mutualFunds={mutualFunds}
+             onTradeUnits={onTradeUnits}
+             onTransferUnits={onTransferUnits}
+             onUpdateNav={onUpdateNav}
+             onCloseFund={onCloseFund}
+             onViewTransactions={onViewTransactions}
+             selectedOwner={selectedOwner}
+             onOwnerChange={setSelectedOwner}
+           />
+         )}
       </VStack>
       <BulkNavUpdateModal
         isOpen={isBulkNavModalOpen}
