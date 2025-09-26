@@ -37,6 +37,10 @@ const visualizationOptions = [
     value: "tag-trend",
     label: "Tag Trend",
   },
+  {
+    value: "mutual-funds-allocation",
+    label: "MF - Value by AMC",
+  },
 ];
 
 const Insights = () => {

@@ -143,6 +143,9 @@ export const getMutualFundSummaries = async (ledgerId: number): Promise<MutualFu
   }));
 };
 
+const toNumber = (value: number | string): number =>
+  typeof value === "string" ? parseFloat(value) : value;
+
 export const getAmcSummaries = async (ledgerId: number): Promise<AmcSummary[]> => {
   // This would be a new endpoint for AMC summaries
   // For now, we'll calculate on frontend
@@ -151,10 +154,10 @@ export const getAmcSummaries = async (ledgerId: number): Promise<AmcSummary[]> =
 
   return amcs.map(amc => {
     const amcFunds = funds.filter(fund => fund.amc_id === amc.amc_id);
-    const totalUnits = amcFunds.reduce((sum, fund) => sum + fund.total_units, 0);
-    const totalInvested = amcFunds.reduce((sum, fund) => sum + (fund.total_units * fund.average_cost_per_unit), 0);
-    const currentValue = amcFunds.reduce((sum, fund) => sum + fund.current_value, 0);
-    const totalRealizedGain = amcFunds.reduce((sum, fund) => sum + fund.total_realized_gain, 0);
+    const totalUnits = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_units), 0);
+    const totalInvested = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_invested_cash), 0);
+    const currentValue = amcFunds.reduce((sum, fund) => sum + toNumber(fund.current_value), 0);
+    const totalRealizedGain = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_realized_gain || 0), 0);
 
     return {
       amc_id: amc.amc_id,
