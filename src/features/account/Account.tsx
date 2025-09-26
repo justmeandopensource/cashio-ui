@@ -120,6 +120,10 @@ const Account: React.FC = () => {
     await queryClient.invalidateQueries({
       queryKey: ["transactions"],
     });
+    // Invalidate accounts query to update balances in ledger page
+    await queryClient.invalidateQueries({
+      queryKey: ["accounts", ledgerId],
+    });
     // Invalidate insights queries to refresh charts after transaction changes
     await queryClient.invalidateQueries({
       queryKey: ["current-month-overview"],
@@ -288,14 +292,17 @@ const Account: React.FC = () => {
             />
           </Suspense>
 
-          <UpdateAccountModal
-            isOpen={isUpdateModalOpen}
-            onClose={() => setIsUpdateModalOpen(false)}
-            account={account}
-            onUpdateCompleted={refreshAccountData}
-            currentDescription={account.description}
-            currentNotes={account.notes}
-          />
+           <UpdateAccountModal
+             isOpen={isUpdateModalOpen}
+             onClose={() => setIsUpdateModalOpen(false)}
+             account={account}
+             onUpdateCompleted={async () => {
+               await refreshAccountData();
+               await queryClient.invalidateQueries({ queryKey: ["accounts", ledgerId] });
+             }}
+             currentDescription={account.description}
+             currentNotes={account.notes}
+           />
 
           <AccountDetailsModal
             isOpen={isDetailsModalOpen}
