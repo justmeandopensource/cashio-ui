@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   Box,
@@ -79,12 +79,17 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   const { isOpen: isDeleteOpen, onOpen: onDeleteOpen, onClose: onDeleteClose } = useDisclosure();
 
   // Responsive breakpoint
+  const [hasResolvedBreakpoint, setHasResolvedBreakpoint] = useState(false);
   const isMobile = useBreakpointValue({ base: true, md: false });
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
   const [openPopoverId, setOpenPopoverId] = useState<number | null>(null);
 
+  useEffect(() => {
+    setHasResolvedBreakpoint(true);
+  }, []);
+
   // Filter transactions (sorted by date descending by default)
-  const filteredTransactions = transactions
+  const allFilteredTransactions = transactions
     .filter(transaction => {
       const matchesSearch = searchTerm === "" ||
         transaction.mutual_fund?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -104,6 +109,10 @@ const MfTransactions: FC<MfTransactionsProps> = ({
       }
       return dateComparison;
     });
+
+  const filteredTransactions = fundFilter === "all" && allFilteredTransactions.length > 10
+    ? allFilteredTransactions.slice(0, 10)
+    : allFilteredTransactions;
 
   const handleDeleteTransaction = async () => {
     if (!transactionToDelete || !ledgerId) return;
@@ -321,6 +330,10 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   );
 
 
+
+  if (!hasResolvedBreakpoint) {
+    return null; // Or a loading spinner if preferred
+  }
 
   return (
     <Box>
@@ -755,7 +768,6 @@ const MfTransactions: FC<MfTransactionsProps> = ({
          </ModalContent>
        </Modal>
     </Box>
-  );
-};
-
+    );
+  };
 export default MfTransactions;
