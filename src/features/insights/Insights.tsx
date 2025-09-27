@@ -41,6 +41,10 @@ const visualizationOptions = [
     value: "mutual-funds-allocation",
     label: "MF - Value by AMC",
   },
+  {
+    value: "mutual-funds-yearly-investments",
+    label: "MF - Yearly Investments",
+  },
 ];
 
 const Insights = () => {
@@ -150,6 +154,7 @@ const Insights = () => {
                   bg="whiteAlpha.100"
                   _hover={{ bg: "whiteAlpha.300" }}
                   size="md"
+                  minW={{ base: "100%", lg: "260px" }}
                   w="100%"
                 >
                   {visualizationOptions.map((option) => (

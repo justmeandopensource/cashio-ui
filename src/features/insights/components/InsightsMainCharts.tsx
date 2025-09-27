@@ -6,6 +6,7 @@ const CurrentMonthOverview = lazy(() => import("./charts/CurrentMonthOverview"))
 const CategoryTrend = lazy(() => import("./charts/CategoryTrend"));
 const TagTrend = lazy(() => import("./charts/TagTrend"));
 const MutualFundsAllocation = lazy(() => import("./charts/MutualFundsAllocation"));
+const MutualFundsYearlyInvestments = lazy(() => import("./charts/MutualFundsYearlyInvestments"));
 
 interface InsightsMainChartsProps {
   ledgerId?: string;
@@ -46,6 +47,8 @@ const InsightsMainCharts = ({
         return <TagTrend />;
       case "mutual-funds-allocation":
         return <MutualFundsAllocation ledgerId={ledgerId} />;
+      case "mutual-funds-yearly-investments":
+        return <MutualFundsYearlyInvestments ledgerId={ledgerId} />;
       default:
         return (
           <Box

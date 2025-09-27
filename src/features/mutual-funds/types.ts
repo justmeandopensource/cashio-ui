@@ -185,6 +185,11 @@ export interface BulkNavUpdateResponse {
   total_updated: number;
 }
 
+export interface YearlyInvestment {
+  year: number;
+  total_invested: number;
+}
+
 // Form Types
 export interface BuySellFormData {
   mutual_fund_id: number;

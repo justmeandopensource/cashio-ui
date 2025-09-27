@@ -18,6 +18,7 @@ import {
   BulkNavFetchResponse,
   BulkNavUpdateRequest,
   BulkNavUpdateResponse,
+  YearlyInvestment,
 } from "./types";
 
 // AMC API functions
@@ -115,6 +116,12 @@ export const bulkFetchNav = async (ledgerId: number, request: BulkNavFetchReques
 
 export const bulkUpdateNav = async (ledgerId: number, request: BulkNavUpdateRequest): Promise<BulkNavUpdateResponse> => {
   const response = await api.put(`/ledger/${ledgerId}/mutual-funds/bulk-update-nav`, request);
+  return response.data;
+};
+
+export const getYearlyInvestments = async (ledgerId: number, owner?: string): Promise<YearlyInvestment[]> => {
+  const params = owner && owner !== 'all' ? { owner } : {};
+  const response = await api.get(`/ledger/${ledgerId}/mutual-funds/yearly-investments`, { params });
   return response.data;
 };
 
