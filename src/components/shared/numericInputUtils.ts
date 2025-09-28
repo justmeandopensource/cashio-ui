@@ -62,7 +62,7 @@ export const handleNumericInput = (
 // Function to handle paste events for numeric inputs
 export const handleNumericPaste = (
   e: React.ClipboardEvent<HTMLInputElement>,
-  setValue: React.Dispatch<React.SetStateAction<string>>,
+  onValue: (value: string) => void,
 ) => {
   e.preventDefault();
   const pastedText = e.clipboardData.getData("text");
@@ -89,5 +89,5 @@ export const handleNumericPaste = (
     cleanedText = cleanedText.substring(1);
   }
 
-  setValue(cleanedText);
+  onValue(cleanedText);
 };

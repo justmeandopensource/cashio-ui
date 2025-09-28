@@ -40,7 +40,7 @@ import UpdateNavModal from "./components/modals/UpdateNavModal";
 import { Building2, Trash2 } from "lucide-react";
 
 // API functions
-import { getAmcs, getMutualFunds, getAllMfTransactions, deleteMutualFund, deleteAmc } from "./api";
+import { getAmcs, getMutualFunds, getAllMfTransactions, deleteMutualFund } from "./api";
 import { MutualFund } from "./types";
 import { toastDefaults } from "@/components/shared/utils";
 
@@ -93,19 +93,12 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
     onClose: onDeleteFundModalClose,
   } = useDisclosure();
 
-  const {
-    isOpen: isDeleteAmcModalOpen,
-    onOpen: onDeleteAmcModalOpen,
-    onClose: onDeleteAmcModalClose,
-  } = useDisclosure();
-
   // State for modals
   const [selectedFund, setSelectedFund] = useState<MutualFund | null>(null);
   const [selectedFundId, setSelectedFundId] = useState<number | undefined>();
   const [isAmcWarningOpen, setIsAmcWarningOpen] = useState<boolean>(false);
   const [preselectedAmcId, setPreselectedAmcId] = useState<number | null>(null);
   const [fundToDelete, setFundToDelete] = useState<{ id: number; name: string } | null>(null);
-  const [amcToDelete, setAmcToDelete] = useState<{ id: number; name: string } | null>(null);
 
   // Responsive modal settings
   const modalSize = useBreakpointValue({ base: "full", md: "md" });
@@ -114,21 +107,21 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   // Fetch data
   const { data: amcs = [], isLoading: isLoadingAmcs, refetch: refetchAmcs } = useQuery({
     queryKey: ["amcs", ledgerId],
-    queryFn: () => getAmcs(ledgerId!),
+    queryFn: () => getAmcs(Number(ledgerId)),
     enabled: !!ledgerId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const { data: mutualFunds = [], isLoading: isLoadingMutualFunds, refetch: refetchFunds } = useQuery({
     queryKey: ["mutual-funds", ledgerId],
-    queryFn: () => getMutualFunds(ledgerId!),
+    queryFn: () => getMutualFunds(Number(ledgerId)),
     enabled: !!ledgerId,
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
    const { data: transactions = [], isLoading: isLoadingTransactions, refetch: refetchTransactions } = useQuery({
      queryKey: ["mf-transactions", ledgerId],
-     queryFn: () => getAllMfTransactions(ledgerId!),
+     queryFn: () => getAllMfTransactions(Number(ledgerId)),
      enabled: !!ledgerId && subTabIndex === 1,
      staleTime: 5 * 60 * 1000, // 5 minutes
    });
@@ -194,7 +187,7 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   };
 
   const deleteFundMutation = useMutation({
-    mutationFn: (fundId: number) => deleteMutualFund(ledgerId!, fundId),
+    mutationFn: (fundId: number) => deleteMutualFund(Number(ledgerId), fundId),
     onSuccess: () => {
       const fundName = fundToDelete?.name || "Fund";
       handleDataChange();
@@ -225,45 +218,7 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
     }
   };
 
-  const handleDeleteAmc = (amcId: number) => {
-    const amc = amcs.find(a => a.amc_id === amcId);
-    if (amc) {
-      setAmcToDelete({ id: amcId, name: amc.name });
-      onDeleteAmcModalOpen();
-    }
-  };
 
-  const deleteAmcMutation = useMutation({
-    mutationFn: (amcId: number) => deleteAmc(ledgerId!, amcId),
-    onSuccess: () => {
-      const amcName = amcToDelete?.name || "AMC";
-      handleDataChange();
-      onDeleteAmcModalClose();
-      setAmcToDelete(null);
-      toast({
-        ...toastDefaults,
-        title: "AMC Deleted",
-        description: `"${amcName}" has been successfully deleted.`,
-        status: "success",
-      });
-    },
-    onError: (error: any) => {
-      const amcName = amcToDelete?.name || "AMC";
-      toast({
-        ...toastDefaults,
-        title: "Delete Failed",
-        description: `Failed to delete "${amcName}". Please try again.`,
-        status: "error",
-      });
-      console.error("Error deleting amc:", error);
-    },
-  });
-
-  const confirmDeleteAmc = () => {
-    if (amcToDelete) {
-      deleteAmcMutation.mutate(amcToDelete.id);
-    }
-  };
 
   if (!ledgerId) {
     return <Box>No ledger selected</Box>;
@@ -336,18 +291,17 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
                    <Spinner size="xl" />
                  </Box>
                ) : (
-                  <MutualFundsOverview
-                    amcs={amcs}
-                    mutualFunds={mutualFunds}
-                    onCreateAmc={handleCreateAmc}
-                    onCreateFund={handleCreateFund}
-                    onTradeUnits={handleTradeUnits}
-                    onTransferUnits={handleTransferUnits}
-                    onUpdateNav={handleUpdateNav}
-                    onCloseFund={handleCloseFund}
-                    onViewTransactions={handleViewTransactions}
-                    onDeleteAmc={handleDeleteAmc}
-                  />
+                   <MutualFundsOverview
+                     amcs={amcs}
+                     mutualFunds={mutualFunds}
+                     onCreateAmc={handleCreateAmc}
+                     onCreateFund={handleCreateFund}
+                     onTradeUnits={handleTradeUnits}
+                     onTransferUnits={handleTransferUnits}
+                     onUpdateNav={handleUpdateNav}
+                     onCloseFund={handleCloseFund}
+                     onViewTransactions={handleViewTransactions}
+                   />
                )
              )}
            </TabPanel>
@@ -393,27 +347,27 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
         preselectedAmcId={preselectedAmcId}
       />
 
-      <BuySellMfModal
-        isOpen={isBuySellModalOpen}
-        onClose={onBuySellModalClose}
-        fund={selectedFund}
-        onSuccess={handleDataChange}
-      />
+       <BuySellMfModal
+         isOpen={isBuySellModalOpen}
+         onClose={onBuySellModalClose}
+         fund={selectedFund || undefined}
+         onSuccess={handleDataChange}
+       />
 
-      <TransferUnitsModal
-        isOpen={isTransferModalOpen}
-        onClose={onTransferModalClose}
-        fromFundId={selectedFundId}
-        mutualFunds={mutualFunds}
-        onSuccess={handleDataChange}
-      />
+       <TransferUnitsModal
+         isOpen={isTransferModalOpen}
+         onClose={onTransferModalClose}
+         fromFundId={selectedFundId!}
+         mutualFunds={mutualFunds}
+         onSuccess={handleDataChange}
+       />
 
-      <UpdateNavModal
-        isOpen={isUpdateNavModalOpen}
-        onClose={onUpdateNavModalClose}
-        fund={selectedFund}
-        onSuccess={handleDataChange}
-      />
+       <UpdateNavModal
+         isOpen={isUpdateNavModalOpen}
+         onClose={onUpdateNavModalClose}
+         fund={selectedFund}
+         onSuccess={handleDataChange}
+       />
 
       <Modal
         isOpen={isDeleteFundModalOpen}
@@ -492,39 +446,7 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
         </ModalContent>
       </Modal>
 
-      <Modal
-        isOpen={isDeleteAmcModalOpen}
-        onClose={onDeleteAmcModalClose}
-        size={modalSize}
-        motionPreset="slideInBottom"
-      >
-        <ModalOverlay />
-        <ModalContent
-          margin={isMobile ? 0 : "auto"}
-          borderRadius={isMobile ? 0 : "md"}
-        >
-          <ModalHeader>Delete AMC</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            Are you sure you want to delete &quot;{amcToDelete?.name}&quot;?
-            <br />
-            This action cannot be undone.
-          </ModalBody>
-          <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onDeleteAmcModalClose}>
-              Cancel
-            </Button>
-            <Button
-              colorScheme="red"
-              onClick={confirmDeleteAmc}
-              isLoading={deleteAmcMutation.isPending}
-              leftIcon={<Trash2 size={16} />}
-            >
-              Delete AMC
-            </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+
     </Box>
   );
 };

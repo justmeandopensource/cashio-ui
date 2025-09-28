@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from "react";
+import { lazy, Suspense } from "react";
 import { Text, Box, useColorModeValue } from "@chakra-ui/react";
 
 const IncomeExpenseTrend = lazy(() => import("./charts/IncomeExpenseTrend"));

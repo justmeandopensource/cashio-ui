@@ -36,7 +36,7 @@ export interface AssetTransaction {
   total_amount: number;
   account_id: number;
   transaction_date: string;
-  notes?: string;
+  notes?: string | null;
   created_at: string;
   physical_asset?: PhysicalAsset;
   account_name?: string;

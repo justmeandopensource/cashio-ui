@@ -138,24 +138,31 @@ export const getMutualFundSummaries = async (ledgerId: number): Promise<MutualFu
   // This would be a new endpoint for dashboard summaries
   // For now, we'll calculate on frontend
   const funds = await getMutualFunds(ledgerId);
-  return funds.map(fund => ({
-    mutual_fund_id: fund.mutual_fund_id,
-    name: fund.name,
-    plan: fund.plan,
-    code: fund.code,
-    owner: fund.owner,
-    amc_name: fund.amc?.name || '',
-    total_units: fund.total_units,
-    average_cost_per_unit: fund.average_cost_per_unit,
-    latest_nav: fund.latest_nav,
-    current_value: fund.current_value,
-    total_invested: fund.total_units * fund.average_cost_per_unit,
-    total_realized_gain: fund.total_realized_gain,
-    unrealized_pnl: fund.current_value - (fund.total_units * fund.average_cost_per_unit),
-    unrealized_pnl_percentage: fund.total_units * fund.average_cost_per_unit > 0
-      ? ((fund.current_value - (fund.total_units * fund.average_cost_per_unit)) / (fund.total_units * fund.average_cost_per_unit)) * 100
-      : 0,
-  }));
+  return funds.map(fund => {
+    const totalUnits = toNumber(fund.total_units);
+    const averageCost = toNumber(fund.average_cost_per_unit);
+    const currentValue = toNumber(fund.current_value);
+    const totalRealizedGain = toNumber(fund.total_realized_gain);
+    const totalInvested = totalUnits * averageCost;
+    return {
+      mutual_fund_id: fund.mutual_fund_id,
+      name: fund.name,
+      plan: fund.plan,
+      code: fund.code,
+      owner: fund.owner,
+      amc_name: fund.amc?.name || '',
+      total_units: totalUnits,
+      average_cost_per_unit: averageCost,
+      latest_nav: toNumber(fund.latest_nav),
+      current_value: currentValue,
+      total_invested: totalInvested,
+      total_realized_gain: totalRealizedGain,
+      unrealized_pnl: currentValue - totalInvested,
+      unrealized_pnl_percentage: totalInvested > 0
+        ? ((currentValue - totalInvested) / totalInvested) * 100
+        : 0,
+    };
+  });
 };
 
 const toNumber = (value: number | string): number =>

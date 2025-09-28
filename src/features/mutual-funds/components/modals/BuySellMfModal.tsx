@@ -228,9 +228,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
     if (
       tabIndex === 1 &&
       selectedFund &&
-      parseFloat(formData.units) > parseFloat(String(selectedFund.total_units))
+      parseFloat(formData.units) > totalUnits
     ) {
-      newErrors.units = `Cannot sell more than available units (${selectedFund.total_units}).`;
+      newErrors.units = `Cannot sell more than available units (${totalUnits}).`;
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -306,6 +306,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
   };
 
   const selectedFund = fund;
+  const totalUnits = selectedFund ? Number(selectedFund.total_units) : 0;
   const currentType = tabIndex === 0 ? "buy" : "sell";
   const amountExcludingCharges =
     parseFloat(formData.amount_excluding_charges) || 0;
@@ -325,7 +326,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
       !(
         currentType === "sell" &&
         selectedFund &&
-        parseFloat(formData.units) > parseFloat(String(selectedFund.total_units))
+        parseFloat(formData.units) > totalUnits
       ) &&
       Object.keys(errors).length === 0
     );
@@ -362,7 +363,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                 onChange={(e) => handleInputChange("units", e.target.value)}
                 placeholder="0.000"
                 min={0}
-                max={type === "sell" ? selectedFund?.total_units : undefined}
+                 max={type === "sell" ? totalUnits : undefined}
                 size="lg"
                 bg={inputBg}
                 borderColor={inputBorderColor}
@@ -378,7 +379,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
               <FormErrorMessage>{errors.units}</FormErrorMessage>
               <FormHelperText>
                 {type === "buy" ? "Current holdings" : "Available to sell"}:{" "}
-                {selectedFund ? formatUnits(selectedFund.total_units) : "0"}
+                {selectedFund ? formatUnits(totalUnits) : "0"}
               </FormHelperText>
             </FormControl>
 
@@ -889,7 +890,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                   fontSize="md"
                   py={3}
                   transition="all 0.2s"
-                  isDisabled={fund ? fund.total_units <= 0 : false}
+                  isDisabled={fund ? totalUnits <= 0 : false}
                 >
                   <HStack spacing={2}>
                     <TrendingDown size={18} />

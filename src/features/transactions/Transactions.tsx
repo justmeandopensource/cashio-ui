@@ -33,6 +33,7 @@ interface Transaction {
   is_split: boolean;
   is_transfer: boolean;
   is_asset_transaction: boolean;
+  is_mf_transaction: boolean;
   notes?: string;
   credit: number;
   debit: number;
@@ -65,7 +66,7 @@ interface TransactionsProps {
   onTransactionDeleted?: () => void;
   onTransactionUpdated?: () => void;
   // eslint-disable-next-line no-unused-vars
-  onCopyTransaction: (tx: Transaction) => void;
+  onCopyTransaction: (tx: Transaction) => Promise<void>;
   shouldFetch?: boolean;
 }
 
@@ -186,7 +187,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   const deleteMutation = useMutation({
     mutationFn: (transactionId: string) =>
       api.delete(`/ledger/${ledgerId}/transaction/${transactionId}`),
-    onMutate: async (transactionId) => {
+    onMutate: async (_transactionId) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({
         queryKey: ["transactions", ledgerId, accountId, pagination.current_page, { ...filters }],
@@ -205,13 +206,13 @@ const Transactions: React.FC<TransactionsProps> = ({
       queryClient.setQueryData(
         ["transactions", ledgerId, accountId, pagination.current_page, { ...filters }],
         (old: Transaction[] | undefined) =>
-          old ? old.filter((t) => t.transaction_id !== transactionId) : old
+          old ? old.filter((t) => t.transaction_id !== _transactionId) : old
       );
 
       // Return context with snapshotted value
       return { previousTransactions };
     },
-    onError: (err, transactionId, context) => {
+    onError: (err, _transactionId, context) => {
       // If mutation fails, use the context to roll back
       if (context?.previousTransactions) {
         queryClient.setQueryData(
@@ -286,7 +287,7 @@ const Transactions: React.FC<TransactionsProps> = ({
     }
   };
 
-  const handleDeleteTransaction = (transactionId: string) => {
+  const handleDeleteTransaction = async (transactionId: string) => {
     deleteMutation.mutate(transactionId);
   };
 

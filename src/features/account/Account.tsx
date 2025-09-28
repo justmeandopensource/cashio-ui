@@ -72,7 +72,7 @@ const Account: React.FC = () => {
     undefined,
   );
 
-  const handleCopyTransaction = (transaction: any) => {
+  const handleCopyTransaction = async (transaction: any) => {
     setTransactionToCopy(transaction);
     if (transaction.is_transfer) {
       setIsTransferModalOpen(true);

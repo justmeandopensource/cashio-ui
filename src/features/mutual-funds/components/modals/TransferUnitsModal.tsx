@@ -98,7 +98,7 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
   const transferMutation = useMutation({
     mutationFn: (switchData: MfSwitchCreate) =>
       switchMutualFundUnits(Number(ledgerId), switchData),
-    onSuccess: (data, variables) => {
+    onSuccess: (_, variables) => {
       // Invalidate queries for both source and target funds to refresh lowest/highest costs
       queryClient.invalidateQueries({ queryKey: ["fund-transactions", ledgerId, variables.source_mutual_fund_id] });
       queryClient.invalidateQueries({ queryKey: ["fund-transactions", ledgerId, variables.target_mutual_fund_id] });
@@ -602,15 +602,14 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
                            },
                          }}
                        >
-                         <ChakraDatePicker
-                           selected={formData.transaction_date}
-                           onChange={(date: Date | null) => {
-                             if (date) {
-                               handleInputChange("transaction_date", date);
-                             }
-                           }}
-                           maxDate={new Date()}
-                         />
+                          <ChakraDatePicker
+                            selected={formData.transaction_date}
+                            onChange={(date: Date | null) => {
+                              if (date) {
+                                handleInputChange("transaction_date", date);
+                              }
+                            }}
+                          />
                        </Box>
 
                      </FormControl>

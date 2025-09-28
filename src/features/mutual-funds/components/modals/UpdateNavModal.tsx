@@ -191,11 +191,11 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
   if (!fund) return null;
 
   const newNavValue = parseFloat(formData.nav);
-  const areNavsEqual = !isNaN(newNavValue) && Math.round(newNavValue * 100) === Math.round(fund.latest_nav * 100);
+  const areNavsEqual = !isNaN(newNavValue) && Math.round(newNavValue * 100) === Math.round(Number(fund.latest_nav) * 100);
 
   const previewNavValue = isNaN(newNavValue) ? fund.latest_nav : newNavValue;
-  const newCurrentValue = fund.total_units * previewNavValue;
-  const currentValueChange = newCurrentValue - fund.current_value;
+  const newCurrentValue = Number(fund.total_units) * Number(previewNavValue);
+  const currentValueChange = newCurrentValue - Number(fund.current_value);
 
   return (
     <Modal
@@ -290,12 +290,12 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                     </Text>
                   </HStack>
                   <HStack spacing={0} align="baseline">
-                    <Text fontSize="xl" fontWeight="bold">
-                      {splitCurrencyForDisplay(fund.latest_nav, currencySymbol || "₹").main}
-                    </Text>
-                    <Text fontSize="lg" fontWeight="bold" opacity={0.7}>
-                      {splitCurrencyForDisplay(fund.latest_nav, currencySymbol || "₹").decimals}
-                    </Text>
+                     <Text fontSize="xl" fontWeight="bold">
+                       {splitCurrencyForDisplay(Number(fund.latest_nav), currencySymbol || "₹").main}
+                     </Text>
+                     <Text fontSize="lg" fontWeight="bold" opacity={0.7}>
+                       {splitCurrencyForDisplay(Number(fund.latest_nav), currencySymbol || "₹").decimals}
+                     </Text>
                   </HStack>
                   <Text fontSize="sm" color="gray.500">
                     per unit

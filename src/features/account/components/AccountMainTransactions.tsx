@@ -12,7 +12,7 @@ interface AccountMainTransactionsProps {
   onTransactionDeleted: () => void;
   onTransactionUpdated: () => void;
    // eslint-disable-next-line no-unused-vars
-   onCopyTransaction: (transaction: any) => void;
+   onCopyTransaction: (transaction: any) => Promise<void>;
 }
 
 const AccountMainTransactions: React.FC<AccountMainTransactionsProps> = ({

@@ -20,7 +20,7 @@ interface Account {
 interface AccountMainProps {
   account: Account;
    // eslint-disable-next-line no-unused-vars
-   onCopyTransaction: (transaction: any) => void;
+   onCopyTransaction: (transaction: any) => Promise<void>;
   onAddTransaction: () => void;
   onTransactionDeleted: () => void;
   onTransactionUpdated: () => void;

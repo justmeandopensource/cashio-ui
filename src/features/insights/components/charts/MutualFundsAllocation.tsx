@@ -70,7 +70,7 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
   // Fetch mutual funds data
   const { data: mutualFunds = [], isLoading: isLoadingFunds } = useQuery<MutualFund[]>({
     queryKey: ["mutual-funds", ledgerId],
-    queryFn: () => getMutualFunds(ledgerId!),
+    queryFn: () => getMutualFunds(Number(ledgerId)),
     enabled: !!ledgerId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -78,7 +78,7 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
   // Fetch AMC summaries
   const { data: amcSummaries, isLoading: isLoadingSummaries, isError } = useQuery<AmcSummary[]>({
     queryKey: ["amc-summaries", ledgerId],
-    queryFn: () => getAmcSummaries(ledgerId!),
+    queryFn: () => getAmcSummaries(Number(ledgerId)),
     enabled: !!ledgerId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -262,7 +262,7 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
                     fill="#8884d8"
                     dataKey="value"
                   >
-                    {chartData.map((entry, idx) => (
+                    {chartData.map((_entry, idx) => (
                       <Cell
                         key={`cell-${idx}`}
                         fill={COLORS[idx % COLORS.length]}

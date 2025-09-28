@@ -180,7 +180,7 @@ export const useCreateAssetType = () => {
   return useMutation({
     mutationFn: ({ ledgerId, data }: { ledgerId: number; data: AssetTypeCreate }) =>
       createAssetType(ledgerId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["asset-types", variables.ledgerId],
       });
@@ -201,7 +201,7 @@ export const useUpdateAssetType = () => {
       typeId: number;
       data: AssetTypeUpdate;
     }) => updateAssetType(ledgerId, typeId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["asset-types", variables.ledgerId],
       });
@@ -215,7 +215,7 @@ export const useDeleteAssetType = () => {
   return useMutation({
     mutationFn: ({ ledgerId, typeId }: { ledgerId: number; typeId: number }) =>
       deleteAssetType(ledgerId, typeId),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["asset-types", variables.ledgerId],
       });
@@ -229,7 +229,7 @@ export const useCreatePhysicalAsset = () => {
   return useMutation({
     mutationFn: ({ ledgerId, data }: { ledgerId: number; data: PhysicalAssetCreate }) =>
       createPhysicalAsset(ledgerId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["physical-assets", variables.ledgerId],
       });
@@ -250,7 +250,7 @@ export const useUpdatePhysicalAsset = () => {
       assetId: number;
       data: PhysicalAssetUpdate;
     }) => updatePhysicalAsset(ledgerId, assetId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["physical-assets", variables.ledgerId],
       });
@@ -274,7 +274,7 @@ export const useUpdatePhysicalAssetPrice = () => {
       assetId: number;
       data: PhysicalAssetPriceUpdate;
     }) => updatePhysicalAssetPrice(ledgerId, assetId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["physical-assets", variables.ledgerId],
       });
@@ -291,7 +291,7 @@ export const useDeletePhysicalAsset = () => {
   return useMutation({
     mutationFn: ({ ledgerId, assetId }: { ledgerId: number; assetId: number }) =>
       deletePhysicalAsset(ledgerId, assetId),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["physical-assets", variables.ledgerId],
       });
@@ -305,7 +305,7 @@ export const useBuyAsset = () => {
   return useMutation({
     mutationFn: ({ ledgerId, data }: { ledgerId: number; data: AssetTransactionCreate }) =>
       buyAsset(ledgerId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["physical-assets", variables.ledgerId],
       });
@@ -332,7 +332,7 @@ export const useSellAsset = () => {
   return useMutation({
     mutationFn: ({ ledgerId, data }: { ledgerId: number; data: AssetTransactionCreate }) =>
       sellAsset(ledgerId, data),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["physical-assets", variables.ledgerId],
       });
@@ -359,7 +359,7 @@ export const useDeleteAssetTransaction = () => {
   return useMutation({
     mutationFn: ({ ledgerId, assetTransactionId }: { ledgerId: number; assetTransactionId: number }) =>
       deleteAssetTransaction(ledgerId, assetTransactionId),
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["physical-assets", variables.ledgerId],
       });

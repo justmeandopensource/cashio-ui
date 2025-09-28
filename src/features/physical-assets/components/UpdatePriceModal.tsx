@@ -248,12 +248,12 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                     </Text>
                   </HStack>
                   <HStack spacing={0} align="baseline">
-                    <Text fontSize="xl" fontWeight="bold">
-                      {splitCurrencyForDisplay(currentPrice, currencySymbol).main}
-                    </Text>
-                    <Text fontSize="lg" fontWeight="bold" opacity={0.7}>
-                      {splitCurrencyForDisplay(currentPrice, currencySymbol).decimals}
-                    </Text>
+                     <Text fontSize="xl" fontWeight="bold">
+                       {splitCurrencyForDisplay(currentPrice, currencySymbol || "$").main}
+                     </Text>
+                     <Text fontSize="lg" fontWeight="bold" opacity={0.7}>
+                       {splitCurrencyForDisplay(currentPrice, currencySymbol || "$").decimals}
+                     </Text>
                   </HStack>
                   <Text fontSize="sm" color="gray.500">
                     per {asset.asset_type?.unit_symbol}

@@ -41,7 +41,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
   const queryClient = useQueryClient();
   const [tabIndex, setTabIndex] = useState(0);
 
-  const handleCopyTransaction = (transaction: any) => {
+  const handleCopyTransaction = async (transaction: any) => {
     onAddTransaction(undefined, transaction);
   };
 

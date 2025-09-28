@@ -56,7 +56,7 @@ const MutualFundsYearlyInvestments: React.FC<MutualFundsYearlyInvestmentsProps> 
   // Fetch mutual funds data
   const { data: mutualFunds = [], isLoading: isLoadingFunds } = useQuery<MutualFund[]>({
     queryKey: ["mutual-funds", ledgerId],
-    queryFn: () => getMutualFunds(ledgerId!),
+    queryFn: () => getMutualFunds(Number(ledgerId)),
     enabled: !!ledgerId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -64,7 +64,7 @@ const MutualFundsYearlyInvestments: React.FC<MutualFundsYearlyInvestmentsProps> 
   // Fetch yearly investments
   const { data: yearlyInvestments = [], isLoading: isLoadingInvestments, isError } = useQuery<YearlyInvestment[]>({
     queryKey: ["yearly-investments", ledgerId, selectedOwner],
-    queryFn: () => getYearlyInvestments(ledgerId!, selectedOwner),
+    queryFn: () => getYearlyInvestments(Number(ledgerId), selectedOwner),
     enabled: !!ledgerId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -198,7 +198,7 @@ const MutualFundsYearlyInvestments: React.FC<MutualFundsYearlyInvestmentsProps> 
               />
               <YAxis
                 tick={{ fontSize: 12 }}
-                tickFormatter={(value) => formatNumberAsCurrency(value, currencySymbol as string, true)}
+                tickFormatter={(value) => formatNumberAsCurrency(value, currencySymbol as string)}
               />
               <Tooltip content={<CustomTooltip />} />
               <Bar

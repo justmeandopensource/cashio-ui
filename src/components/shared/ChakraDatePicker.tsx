@@ -36,15 +36,16 @@ const ChakraDatePicker: React.FC<ChakraDatePickerProps> = ({
   shouldCloseOnSelect = true,
   "data-testid": testId,
 }) => {
-  const renderCustomHeader = ({
-    date,
-    changeYear,
-    changeMonth,
-    decreaseMonth,
-    increaseMonth,
-    prevMonthButtonDisabled,
-    nextMonthButtonDisabled,
-  }) => {
+  const renderCustomHeader = (params: any) => {
+    const {
+      date,
+      changeYear,
+      changeMonth,
+      decreaseMonth,
+      increaseMonth,
+      prevMonthButtonDisabled,
+      nextMonthButtonDisabled,
+    } = params;
     const years = Array.from({ length: 200 }, (_, i) => new Date().getFullYear() - 100 + i);
     const months = [
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",

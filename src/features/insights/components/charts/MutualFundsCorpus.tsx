@@ -57,7 +57,7 @@ const MutualFundsCorpus: React.FC<MutualFundsCorpusProps> = ({
   // Fetch mutual funds data
   const { data: mutualFunds = [], isLoading: isLoadingFunds } = useQuery<MutualFund[]>({
     queryKey: ["mutual-funds", ledgerId],
-    queryFn: () => getMutualFunds(ledgerId!),
+    queryFn: () => getMutualFunds(Number(ledgerId)),
     enabled: !!ledgerId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -65,7 +65,7 @@ const MutualFundsCorpus: React.FC<MutualFundsCorpusProps> = ({
   // Fetch corpus growth data
   const { data: corpusGrowth = [], isLoading: isLoadingCorpus, isError } = useQuery<YearlyInvestment[]>({
     queryKey: ["corpus-growth", ledgerId, selectedOwner, selectedGranularity],
-    queryFn: () => getCorpusGrowth(ledgerId!, selectedOwner, selectedGranularity),
+    queryFn: () => getCorpusGrowth(Number(ledgerId), selectedOwner, selectedGranularity),
     enabled: !!ledgerId,
     staleTime: 1000 * 60 * 5, // 5 minutes
   });
@@ -231,7 +231,7 @@ const MutualFundsCorpus: React.FC<MutualFundsCorpusProps> = ({
               />
               <YAxis
                 tick={{ fontSize: 12 }}
-                tickFormatter={(value) => formatNumberAsCurrency(value, currencySymbol as string, true)}
+                tickFormatter={(value) => formatNumberAsCurrency(value, currencySymbol as string)}
               />
               <Tooltip content={<CustomTooltip />} />
               <Area

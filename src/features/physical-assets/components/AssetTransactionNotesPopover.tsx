@@ -58,7 +58,7 @@ const useUpdateAssetTransactionNotes = () => {
 interface AssetTransactionNotesPopoverProps {
   transaction: {
     asset_transaction_id: number;
-    notes: string | null;
+    notes?: string | null;
   };
   isOpen: boolean;
   onOpen: () => void;

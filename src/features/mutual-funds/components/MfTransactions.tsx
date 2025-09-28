@@ -229,45 +229,45 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                {/* Right side with amount and units */}
                <VStack align="flex-end" spacing={1}>
                   <HStack spacing={0} align="baseline" justify="flex-end">
-                    <Text
-                      fontSize="sm"
-                      fontWeight="semibold"
-                      color={getPnLColor(
-                        transaction.transaction_type === 'buy'
-                          ? transaction.amount_excluding_charges // Positive for green (money in)
-                          : transaction.transaction_type === 'sell'
-                          ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                          : transaction.transaction_type === 'switch_out'
-                          ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                          : 0 // switch_in = neutral
-                      )}
-                    >
-                      {splitCurrencyForDisplay(transaction.amount_excluding_charges, currencySymbol || "₹").main}
-                    </Text>
-                    <Text
-                      fontSize="xs"
-                      fontWeight="semibold"
-                      opacity={0.7}
-                      color={getPnLColor(
-                        transaction.transaction_type === 'buy'
-                          ? transaction.amount_excluding_charges // Positive for green (money in)
-                          : transaction.transaction_type === 'sell'
-                          ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                          : transaction.transaction_type === 'switch_out'
-                          ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                          : 0 // switch_in = neutral
-                      )}
-                    >
-                      {splitCurrencyForDisplay(transaction.amount_excluding_charges, currencySymbol || "₹").decimals}
-                    </Text>
-                  </HStack>
-                 {transaction.other_charges > 0 && (
-                   <HStack spacing={0} align="baseline" justify="flex-end">
-                     <Text fontSize="xs" color="red.500" fontWeight="medium">
-                       +{currencySymbol || "₹"}{splitCurrencyForDisplay(transaction.other_charges, currencySymbol || "₹").main}{splitCurrencyForDisplay(transaction.other_charges, currencySymbol || "₹").decimals} charges
+                     <Text
+                       fontSize="sm"
+                       fontWeight="semibold"
+                       color={getPnLColor(
+                         transaction.transaction_type === 'buy'
+                           ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
+                           : transaction.transaction_type === 'sell'
+                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                           : transaction.transaction_type === 'switch_out'
+                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                           : 0 // switch_in = neutral
+                       )}
+                     >
+                       {splitCurrencyForDisplay(Number(transaction.amount_excluding_charges), currencySymbol || "₹").main}
                      </Text>
-                   </HStack>
-                 )}
+                     <Text
+                       fontSize="xs"
+                       fontWeight="semibold"
+                       opacity={0.7}
+                       color={getPnLColor(
+                         transaction.transaction_type === 'buy'
+                           ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
+                           : transaction.transaction_type === 'sell'
+                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                           : transaction.transaction_type === 'switch_out'
+                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                           : 0 // switch_in = neutral
+                       )}
+                     >
+                       {splitCurrencyForDisplay(Number(transaction.amount_excluding_charges), currencySymbol || "₹").decimals}
+                     </Text>
+                  </HStack>
+                  {Number(transaction.other_charges) > 0 && (
+                    <HStack spacing={0} align="baseline" justify="flex-end">
+                      <Text fontSize="xs" color="red.500" fontWeight="medium">
+                        +{currencySymbol || "₹"}{splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").main}{splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").decimals} charges
+                      </Text>
+                    </HStack>
+                  )}
                  <Text fontSize="sm" color="gray.600" fontWeight="medium">
                    {formatUnits(transaction.units)} units
                  </Text>
@@ -281,7 +281,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                    fontWeight="medium"
                    display="inline-block"
                  >
-                   {currencySymbol || "₹"}{formatNav(transaction.nav_per_unit)}/unit
+                    {currencySymbol || "₹"}{formatNav(Number(transaction.nav_per_unit))}/unit
                  </Box>
                </VStack>
             </Flex>
@@ -542,81 +542,81 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                             <Td isNumeric>
                               <Text fontSize="sm">{formatUnits(transaction.units)}</Text>
                             </Td>
-                             <Td isNumeric>
-                               <Text fontSize="sm">{currencySymbol || "₹"}{formatNav(transaction.nav_per_unit)}</Text>
-                             </Td>
-                             <Td isNumeric>
-                                <HStack spacing={0} align="baseline" justify="flex-end">
-                                  <Text
-                                    fontSize="sm"
-                                    fontWeight="semibold"
-                                    color={getPnLColor(
-                                      transaction.transaction_type === 'buy'
-                                        ? transaction.amount_excluding_charges // Positive for green (money in)
-                                        : transaction.transaction_type === 'sell'
-                                        ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                                        : transaction.transaction_type === 'switch_out'
-                                        ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                                        : 0 // switch_in = neutral
-                                    )}
-                                  >
-                                    {splitCurrencyForDisplay(
-                                      transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
-                                        ? transaction.amount_excluding_charges
-                                        : transaction.amount_excluding_charges,
-                                      currencySymbol || "₹"
-                                    ).main}
-                                  </Text>
-                                  <Text
-                                    fontSize="xs"
-                                    fontWeight="semibold"
-                                    opacity={0.7}
-                                    color={getPnLColor(
-                                      transaction.transaction_type === 'buy'
-                                        ? transaction.amount_excluding_charges // Positive for green (money in)
-                                        : transaction.transaction_type === 'sell'
-                                        ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                                        : transaction.transaction_type === 'switch_out'
-                                        ? -Math.abs(transaction.amount_excluding_charges) // Always negative for red (money out)
-                                        : 0 // switch_in = neutral
-                                    )}
-                                  >
-                                    {splitCurrencyForDisplay(
-                                      transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
-                                        ? transaction.amount_excluding_charges
-                                        : transaction.amount_excluding_charges,
-                                      currencySymbol || "₹"
-                                    ).decimals}
-                                  </Text>
-                                </HStack>
-                             </Td>
                               <Td isNumeric>
-                                {transaction.other_charges > 0 && (
-                                  <HStack spacing={0} align="baseline" justify="flex-end">
-                                    <Text
-                                      fontSize="sm"
-                                      fontWeight="semibold"
-                                      color="red.500"
-                                    >
-                                      {splitCurrencyForDisplay(
-                                        transaction.other_charges,
-                                        currencySymbol || "₹"
-                                      ).main}
-                                    </Text>
-                                    <Text
-                                      fontSize="xs"
-                                      fontWeight="semibold"
-                                      opacity={0.7}
-                                      color="red.500"
-                                    >
-                                      {splitCurrencyForDisplay(
-                                        transaction.other_charges,
-                                        currencySymbol || "₹"
-                                      ).decimals}
-                                    </Text>
-                                  </HStack>
-                                )}
+                                <Text fontSize="sm">{currencySymbol || "₹"}{formatNav(Number(transaction.nav_per_unit))}</Text>
                               </Td>
+                              <Td isNumeric>
+                                 <HStack spacing={0} align="baseline" justify="flex-end">
+                                   <Text
+                                     fontSize="sm"
+                                     fontWeight="semibold"
+                                     color={getPnLColor(
+                                       transaction.transaction_type === 'buy'
+                                         ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
+                                         : transaction.transaction_type === 'sell'
+                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                                         : transaction.transaction_type === 'switch_out'
+                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                                         : 0 // switch_in = neutral
+                                     )}
+                                   >
+                                     {splitCurrencyForDisplay(
+                                       transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
+                                         ? Number(transaction.amount_excluding_charges)
+                                         : Number(transaction.amount_excluding_charges),
+                                       currencySymbol || "₹"
+                                     ).main}
+                                   </Text>
+                                   <Text
+                                     fontSize="xs"
+                                     fontWeight="semibold"
+                                     opacity={0.7}
+                                     color={getPnLColor(
+                                       transaction.transaction_type === 'buy'
+                                         ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
+                                         : transaction.transaction_type === 'sell'
+                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                                         : transaction.transaction_type === 'switch_out'
+                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
+                                         : 0 // switch_in = neutral
+                                     )}
+                                   >
+                                     {splitCurrencyForDisplay(
+                                       transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
+                                         ? Number(transaction.amount_excluding_charges)
+                                         : Number(transaction.amount_excluding_charges),
+                                       currencySymbol || "₹"
+                                     ).decimals}
+                                   </Text>
+                                 </HStack>
+                              </Td>
+                               <Td isNumeric>
+                                 {Number(transaction.other_charges) > 0 && (
+                                   <HStack spacing={0} align="baseline" justify="flex-end">
+                                     <Text
+                                       fontSize="sm"
+                                       fontWeight="semibold"
+                                       color="red.500"
+                                     >
+                                       {splitCurrencyForDisplay(
+                                         Number(transaction.other_charges),
+                                         currencySymbol || "₹"
+                                       ).main}
+                                     </Text>
+                                     <Text
+                                       fontSize="xs"
+                                       fontWeight="semibold"
+                                       opacity={0.7}
+                                       color="red.500"
+                                     >
+                                       {splitCurrencyForDisplay(
+                                         Number(transaction.other_charges),
+                                         currencySymbol || "₹"
+                                       ).decimals}
+                                     </Text>
+                                   </HStack>
+                                 )}
+                               </Td>
                               <Td>
                                 {transaction.transaction_type === 'switch_out' || transaction.transaction_type === 'switch_in' ? (
                                   <Text fontSize="sm" color={mutedColor}>
@@ -703,49 +703,49 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                     {formatDate(transactionToDelete.transaction_date)}
                   </Text>
                   <VStack align="start" spacing={1}>
-                    <HStack spacing={0} align="baseline">
-                       <Text
-                         fontSize="sm"
-                         fontWeight="semibold"
-                         color={getPnLColor(
-                           transactionToDelete.transaction_type === 'buy'
-                             ? transactionToDelete.amount_excluding_charges // Positive for green (money in)
-                             : transactionToDelete.transaction_type === 'sell'
-                             ? -Math.abs(transactionToDelete.amount_excluding_charges) // Always negative for red (money out)
-                             : transactionToDelete.transaction_type === 'switch_out'
-                             ? -Math.abs(transactionToDelete.amount_excluding_charges) // Always negative for red (money out)
-                             : 0
-                         )}
-                       >
-                          {splitCurrencyForDisplay(transactionToDelete.amount_excluding_charges, currencySymbol || "₹").main}
-                       </Text>
-                       <Text
-                         fontSize="xs"
-                         fontWeight="semibold"
-                         opacity={0.7}
-                         color={getPnLColor(
-                           transactionToDelete.transaction_type === 'buy'
-                             ? transactionToDelete.amount_excluding_charges // Positive for green (money in)
-                             : transactionToDelete.transaction_type === 'sell'
-                             ? -Math.abs(transactionToDelete.amount_excluding_charges) // Always negative for red (money out)
-                             : transactionToDelete.transaction_type === 'switch_out'
-                             ? -Math.abs(transactionToDelete.amount_excluding_charges) // Always negative for red (money out)
-                             : 0
-                         )}
-                       >
-                          {splitCurrencyForDisplay(transactionToDelete.amount_excluding_charges, currencySymbol || "₹").decimals}
-                       </Text>
+                     <HStack spacing={0} align="baseline">
+                        <Text
+                          fontSize="sm"
+                          fontWeight="semibold"
+                          color={getPnLColor(
+                            transactionToDelete.transaction_type === 'buy'
+                              ? Number(transactionToDelete.amount_excluding_charges) // Positive for green (money in)
+                              : transactionToDelete.transaction_type === 'sell'
+                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
+                              : transactionToDelete.transaction_type === 'switch_out'
+                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
+                              : 0
+                          )}
+                        >
+                           {splitCurrencyForDisplay(Number(transactionToDelete.amount_excluding_charges), currencySymbol || "₹").main}
+                        </Text>
+                        <Text
+                          fontSize="xs"
+                          fontWeight="semibold"
+                          opacity={0.7}
+                          color={getPnLColor(
+                            transactionToDelete.transaction_type === 'buy'
+                              ? Number(transactionToDelete.amount_excluding_charges) // Positive for green (money in)
+                              : transactionToDelete.transaction_type === 'sell'
+                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
+                              : transactionToDelete.transaction_type === 'switch_out'
+                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
+                              : 0
+                          )}
+                        >
+                           {splitCurrencyForDisplay(Number(transactionToDelete.amount_excluding_charges), currencySymbol || "₹").decimals}
+                        </Text>
                       <Text fontSize="xs" color="gray.600" ml={1}>
                         (excl. charges)
                       </Text>
                     </HStack>
-                    {transactionToDelete.other_charges > 0 && (
-                      <HStack spacing={0} align="baseline">
-                        <Text fontSize="xs" color="red.500" fontWeight="medium">
-                          +{currencySymbol || "₹"}{splitCurrencyForDisplay(transactionToDelete.other_charges, currencySymbol || "₹").main}{splitCurrencyForDisplay(transactionToDelete.other_charges, currencySymbol || "₹").decimals} charges
-                        </Text>
-                      </HStack>
-                    )}
+                     {Number(transactionToDelete.other_charges) > 0 && (
+                       <HStack spacing={0} align="baseline">
+                         <Text fontSize="xs" color="red.500" fontWeight="medium">
+                           +{currencySymbol || "₹"}{splitCurrencyForDisplay(Number(transactionToDelete.other_charges), currencySymbol || "₹").main}{splitCurrencyForDisplay(Number(transactionToDelete.other_charges), currencySymbol || "₹").decimals} charges
+                         </Text>
+                       </HStack>
+                     )}
                   </VStack>
                </Box>
              )}

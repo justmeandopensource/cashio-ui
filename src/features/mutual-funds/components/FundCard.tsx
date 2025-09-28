@@ -56,15 +56,19 @@ const FundCard: FC<FundCardProps> = ({
   const mutedColor = useColorModeValue("gray.600", "gray.400");
 
   const { unrealizedPnl, realizedPnl } = calculateFundPnL(fund);
-  const costBasis = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
-  const invested = fund.total_invested_cash || (fund.total_units * fund.average_cost_per_unit);
+  const totalUnits = Number(fund.total_units);
+  const averageCost = Number(fund.average_cost_per_unit);
+  const totalInvestedCash = Number(fund.total_invested_cash);
+  const costBasis = totalInvestedCash || (totalUnits * averageCost);
+  const invested = totalInvestedCash || (totalUnits * averageCost);
   const unrealizedPercentage =
     costBasis > 0 ? (unrealizedPnl / costBasis) * 100 : 0;
 
   // Fetch transactions for cost calculations only when expanded
   const { data: transactions = [], isLoading: isLoadingTransactions } = useFundTransactions(fund.ledger_id, fund.mutual_fund_id, { enabled: isExpanded });
-  const highestPurchaseCost = isExpanded ? calculateHighestPurchaseCost(transactions) : null;
-  const lowestPurchaseCost = isExpanded ? calculateLowestPurchaseCost(transactions) : null;
+  const transactionsForCost = transactions.map(tx => ({ ...tx, nav_per_unit: Number(tx.nav_per_unit) }));
+  const highestPurchaseCost = isExpanded ? calculateHighestPurchaseCost(transactionsForCost) : null;
+  const lowestPurchaseCost = isExpanded ? calculateLowestPurchaseCost(transactionsForCost) : null;
 
   const handleCardClick = (e: React.MouseEvent<HTMLDivElement>) => {
     // Prevent expansion if clicking on interactive elements
@@ -138,17 +142,17 @@ const FundCard: FC<FundCardProps> = ({
                 <Text fontSize="sm" color={mutedColor}>
                   Value
                 </Text>
-                <HStack spacing={0} align="baseline">
-                  <Text fontSize="md">
-                    {splitCurrencyForDisplay(fund.current_value, currencySymbol || "₹").main}
-                  </Text>
-                  <Text fontSize="sm" opacity={0.7}>
-                    {
-                      splitCurrencyForDisplay(fund.current_value, currencySymbol || "₹")
-                        .decimals
-                    }
-                  </Text>
-                </HStack>
+                 <HStack spacing={0} align="baseline">
+                   <Text fontSize="md">
+                     {splitCurrencyForDisplay(Number(fund.current_value), currencySymbol || "₹").main}
+                   </Text>
+                   <Text fontSize="sm" opacity={0.7}>
+                     {
+                       splitCurrencyForDisplay(Number(fund.current_value), currencySymbol || "₹")
+                         .decimals
+                     }
+                   </Text>
+                 </HStack>
               </VStack>
             </HStack>
           </VStack>
@@ -179,9 +183,9 @@ const FundCard: FC<FundCardProps> = ({
                   <StatLabel fontSize="xs" color={mutedColor}>
                     NAV
                   </StatLabel>
-                  <StatNumber fontSize="sm" color="gray.600">
-                    {currencySymbol || "₹"}{formatNav(fund.latest_nav)}
-                  </StatNumber>
+                   <StatNumber fontSize="sm" color="gray.600">
+                     {currencySymbol || "₹"}{formatNav(Number(fund.latest_nav))}
+                   </StatNumber>
                 </Stat>
                 <Stat size="sm">
                   <StatLabel fontSize="xs" color={mutedColor}>
@@ -239,18 +243,18 @@ const FundCard: FC<FundCardProps> = ({
                     Avg. Cost
                   </StatLabel>
                   <HStack spacing={0} align="baseline">
-                     <StatNumber fontSize="sm" color="gray.600">
-                       {
-                         splitCurrencyForDisplay(fund.average_cost_per_unit, currencySymbol || "₹")
-                           .main
-                       }
-                     </StatNumber>
-                     <Text fontSize="xs" color="gray.600" opacity={0.7}>
-                       {
-                         splitCurrencyForDisplay(fund.average_cost_per_unit, currencySymbol || "₹")
-                           .decimals
-                       }
-                     </Text>
+                      <StatNumber fontSize="sm" color="gray.600">
+                        {
+                          splitCurrencyForDisplay(Number(fund.average_cost_per_unit), currencySymbol || "₹")
+                            .main
+                        }
+                      </StatNumber>
+                      <Text fontSize="xs" color="gray.600" opacity={0.7}>
+                        {
+                          splitCurrencyForDisplay(Number(fund.average_cost_per_unit), currencySymbol || "₹")
+                            .decimals
+                        }
+                      </Text>
                   </HStack>
                 </Stat>
                  <Stat size="sm">
@@ -322,7 +326,7 @@ const FundCard: FC<FundCardProps> = ({
                     onTransferUnits(fund.mutual_fund_id);
                   }}
                   sx={{ fontSize: "xs" }}
-                  isDisabled={fund.total_units <= 0}
+                   isDisabled={totalUnits <= 0}
                   w="full"
                 >
                   Transfer
@@ -348,7 +352,7 @@ const FundCard: FC<FundCardProps> = ({
                     e.stopPropagation();
                     onCloseFund(fund.mutual_fund_id);
                   }}
-                  isDisabled={fund.total_units > 0}
+                   isDisabled={totalUnits > 0}
                   sx={{ fontSize: "xs" }}
                   w="full"
                 >
