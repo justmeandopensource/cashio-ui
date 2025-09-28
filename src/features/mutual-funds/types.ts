@@ -187,6 +187,7 @@ export interface BulkNavUpdateResponse {
 
 export interface YearlyInvestment {
   year: number;
+  month?: number;
   total_invested: number;
 }
 

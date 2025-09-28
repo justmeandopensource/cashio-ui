@@ -125,6 +125,14 @@ export const getYearlyInvestments = async (ledgerId: number, owner?: string): Pr
   return response.data;
 };
 
+export const getCorpusGrowth = async (ledgerId: number, owner?: string, granularity?: string): Promise<YearlyInvestment[]> => {
+  const params: any = {};
+  if (owner && owner !== 'all') params.owner = owner;
+  if (granularity) params.granularity = granularity;
+  const response = await api.get(`/ledger/${ledgerId}/mutual-funds/corpus-growth`, { params });
+  return response.data;
+};
+
 // Summary API functions (for dashboard)
 export const getMutualFundSummaries = async (ledgerId: number): Promise<MutualFundSummary[]> => {
   // This would be a new endpoint for dashboard summaries

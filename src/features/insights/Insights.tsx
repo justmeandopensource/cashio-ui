@@ -45,6 +45,10 @@ const visualizationOptions = [
     value: "mutual-funds-yearly-investments",
     label: "MF - Yearly Investments",
   },
+  {
+    value: "mutual-funds-corpus",
+    label: "MF - Corpus",
+  },
 ];
 
 const Insights = () => {
