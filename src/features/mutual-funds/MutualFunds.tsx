@@ -1,5 +1,5 @@
 import { useState, FC } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   Box,
   Tab,
@@ -53,6 +53,7 @@ interface MutualFundsProps {
 const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
   const { ledgerId } = useLedgerStore();
   const toast = useToast();
+  const queryClient = useQueryClient();
   const [subTabIndex, setSubTabIndex] = useState(0);
   const [selectedFundFilter, setSelectedFundFilter] = useState<string>("all");
 
@@ -167,6 +168,8 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
     refetchAmcs();
     refetchFunds();
     refetchTransactions();
+    // Invalidate all transaction queries since MF transactions affect regular ledger transactions
+    queryClient.invalidateQueries({ queryKey: ["transactions", ledgerId] });
     // Also refresh account data if callback is provided
     if (onAccountDataChange) {
       onAccountDataChange();
