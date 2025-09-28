@@ -429,7 +429,7 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
           <ModalHeader>Close Mutual Fund</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            Are you sure you want to close "{fundToDelete?.name}"?
+            Are you sure you want to close &quot;{fundToDelete?.name}&quot;?
             <br />
             This action cannot be undone.
           </ModalBody>
@@ -506,7 +506,7 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
           <ModalHeader>Delete AMC</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            Are you sure you want to delete "{amcToDelete?.name}"?
+            Are you sure you want to delete &quot;{amcToDelete?.name}&quot;?
             <br />
             This action cannot be undone.
           </ModalBody>

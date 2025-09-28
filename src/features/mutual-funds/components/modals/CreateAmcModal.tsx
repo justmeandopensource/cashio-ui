@@ -1,4 +1,4 @@
-import { FC, useRef, useState, useEffect } from "react";
+import React, { FC, useRef, useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,

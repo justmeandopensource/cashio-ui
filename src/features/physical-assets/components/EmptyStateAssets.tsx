@@ -7,7 +7,7 @@ import {
   Icon,
   useColorModeValue,
 } from "@chakra-ui/react";
-import { Coins, Plus } from "lucide-react";
+import { Coins } from "lucide-react";
 
 interface EmptyStateAssetsProps {
   onCreateAssetType: () => void;

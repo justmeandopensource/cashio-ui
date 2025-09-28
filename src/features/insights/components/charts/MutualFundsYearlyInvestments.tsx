@@ -71,13 +71,7 @@ const MutualFundsYearlyInvestments: React.FC<MutualFundsYearlyInvestmentsProps> 
 
   const isLoading = isLoadingFunds || isLoadingInvestments;
 
-  // Filter funds by owner
-  const filteredFunds = useMemo(() => {
-    if (selectedOwner === "all") {
-      return mutualFunds;
-    }
-    return mutualFunds.filter((fund) => fund.owner === selectedOwner);
-  }, [mutualFunds, selectedOwner]);
+
 
   // Get unique owners for dropdown
   const availableOwners = useMemo(() => {

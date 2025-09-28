@@ -27,6 +27,7 @@ import useLedgerStore from "../../../components/shared/store";
 import MutualFundsTable from "./MutualFundsTable";
 import BulkNavUpdateModal from "./modals/BulkNavUpdateModal";
 
+/* eslint-disable no-unused-vars */
 interface MutualFundsOverviewProps {
   amcs: Amc[];
   mutualFunds: MutualFund[];
@@ -38,6 +39,7 @@ interface MutualFundsOverviewProps {
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
 }
+/* eslint-enable no-unused-vars */
 
 const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   amcs,
@@ -54,6 +56,8 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   const [selectedOwner, setSelectedOwner] = useState<string>("all");
   const [isBulkNavModalOpen, setIsBulkNavModalOpen] = useState(false);
   const toast = useToast();
+  const emptyStateBg = useColorModeValue("gray.50", "gray.800");
+  const emptyStateTextColor = useColorModeValue("gray.600", "gray.400");
 
   const toNumber = (value: number | string): number =>
     typeof value === "string" ? parseFloat(value) : value;
@@ -485,39 +489,39 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
           </Box>
         )}
 
-         {amcs.length === 0 ? (
-           <Box
-             p={12}
-             textAlign="center"
-             bg={useColorModeValue("gray.50", "gray.800")}
-             borderRadius="lg"
-             border="2px dashed"
-             borderColor="gray.300"
-           >
-             <VStack spacing={4}>
-               <Icon as={TrendingUp} boxSize={16} color="gray.400" />
-               <VStack spacing={2}>
-                 <Text fontSize="xl" fontWeight="semibold" color="gray.700">
-                   No AMCs Created Yet
-                 </Text>
-                 <Text fontSize="md" color={useColorModeValue("gray.600", "gray.400")} maxW="400px">
-                   Create your first Asset Management Company to start tracking mutual fund investments
-                 </Text>
-               </VStack>
-               <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
-                 Create Your First AMC
-               </Button>
-             </VStack>
-           </Box>
-         ) : mutualFunds.length === 0 ? (
-           <Box
-             p={12}
-             textAlign="center"
-             bg={useColorModeValue("gray.50", "gray.800")}
-             borderRadius="lg"
-             border="2px dashed"
-             borderColor="gray.300"
-           >
+          {amcs.length === 0 ? (
+            <Box
+              p={12}
+              textAlign="center"
+              bg={emptyStateBg}
+              borderRadius="lg"
+              border="2px dashed"
+              borderColor="gray.300"
+            >
+              <VStack spacing={4}>
+                <Icon as={TrendingUp} boxSize={16} color="gray.400" />
+                <VStack spacing={2}>
+                  <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+                    No AMCs Created Yet
+                  </Text>
+                  <Text fontSize="md" color={emptyStateTextColor} maxW="400px">
+                    Create your first Asset Management Company to start tracking mutual fund investments
+                  </Text>
+                </VStack>
+                <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
+                  Create Your First AMC
+                </Button>
+              </VStack>
+            </Box>
+          ) : mutualFunds.length === 0 ? (
+            <Box
+              p={12}
+              textAlign="center"
+              bg={emptyStateBg}
+              borderRadius="lg"
+              border="2px dashed"
+              borderColor="gray.300"
+            >
              {/* Empty State for no funds but AMCs exist */}
            </Box>
          ) : (

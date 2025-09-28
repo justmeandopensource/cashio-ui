@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -309,13 +309,8 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
   const currentType = tabIndex === 0 ? "buy" : "sell";
   const amountExcludingCharges =
     parseFloat(formData.amount_excluding_charges) || 0;
-  const otherCharges = parseFloat(formData.other_charges) || 0;
   const units = parseFloat(formData.units) || 0;
   const navPerUnit = units > 0 ? amountExcludingCharges / units : 0;
-  const totalAmount =
-    currentType === "buy"
-      ? amountExcludingCharges + otherCharges
-      : amountExcludingCharges - otherCharges;
 
   const isFormValid = () => {
     return (

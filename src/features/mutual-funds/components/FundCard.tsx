@@ -1,4 +1,4 @@
-import { FC, useState } from "react";
+import React, { FC } from "react";
 import {
   Box,
   Text,
@@ -29,6 +29,7 @@ import {
 import { useFundTransactions } from "../api";
 import useLedgerStore from "../../../components/shared/store";
 
+/* eslint-disable no-unused-vars */
 interface FundCardProps {
   fund: MutualFund;
   isExpanded: boolean;
@@ -38,6 +39,7 @@ interface FundCardProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
 }
+/* eslint-enable no-unused-vars */
 
 const FundCard: FC<FundCardProps> = ({
   fund,

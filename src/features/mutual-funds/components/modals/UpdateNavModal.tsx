@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
-import {
-  Modal,
+import React from "react";
+ import {
+   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
@@ -31,7 +32,7 @@ import { TrendingUp, Calculator, Info, RefreshCw, Clock, X, Download } from "luc
 
 import { updateMutualFundNav, bulkFetchNav } from "../../api";
 import { MutualFund } from "../../types";
-import { formatAmount, formatNav } from "../../utils";
+
 import { splitCurrencyForDisplay } from "../../../physical-assets/utils";
 import useLedgerStore from "@/components/shared/store";
 import { format } from "date-fns";

@@ -21,7 +21,6 @@ import {
   useColorModeValue,
   Icon,
   Spinner,
-  Progress,
   Alert,
   AlertIcon,
   AlertTitle,
@@ -29,7 +28,6 @@ import {
 } from "@chakra-ui/react";
 import {
   RefreshCw,
-  CheckCircle,
   XCircle,
   AlertTriangle,
   Play,
@@ -47,17 +45,7 @@ interface BulkNavUpdateModalProps {
   onSuccess: () => void;
 }
 
-interface FundComparison {
-  fund: MutualFund;
-  fetchedResult: NavFetchResult | null;
-  currentNav: number;
-  fetchedNav: number | null;
-  change: number | null;
-  changePercent: number | null;
-  isSelected: boolean;
-  isFetching: boolean;
-  isUpToDate: boolean;
-}
+
 
 const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
   isOpen,
@@ -107,7 +95,7 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
         });
         const result = data.results[0];
         setResults((prev) => new Map(prev).set(fund.code!, result));
-      } catch (error) {
+      } catch {
         const errorResult: NavFetchResult = {
           scheme_code: fund.code!,
           success: false,

@@ -1,6 +1,7 @@
 import { FC, useState, useEffect } from "react";
-import {
-  Modal,
+import React from "react";
+ import {
+   Modal,
   ModalOverlay,
   ModalContent,
   ModalBody,
@@ -91,9 +92,8 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
 
-  const sourceFund = mutualFunds.find(fund => fund.mutual_fund_id === fromFundId);
-  const fromFund = mutualFunds.find(fund => fund.mutual_fund_id.toString() === formData.from_fund_id);
-  const toFund = mutualFunds.find(fund => fund.mutual_fund_id.toString() === formData.to_fund_id);
+   const sourceFund = mutualFunds.find(fund => fund.mutual_fund_id === fromFundId);
+   const toFund = mutualFunds.find(fund => fund.mutual_fund_id.toString() === formData.to_fund_id);
 
   const transferMutation = useMutation({
     mutationFn: (switchData: MfSwitchCreate) =>

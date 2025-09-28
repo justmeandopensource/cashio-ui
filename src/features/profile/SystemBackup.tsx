@@ -279,7 +279,7 @@ const SystemBackup: React.FC = () => {
         description: `Downloading ${filename}`,
         status: "success",
       });
-    } catch (error) {
+    } catch {
       toast({
         ...toastDefaults,
         title: "Download Failed",

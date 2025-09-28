@@ -67,6 +67,8 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   const cardBg = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
   const mutedColor = useColorModeValue("gray.600", "gray.400");
+  const emptyStateBg = useColorModeValue("gray.50", "gray.800");
+  const emptyStateTextColor = useColorModeValue("gray.600", "gray.400");
 
   // State for filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -426,7 +428,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
           <Box
             p={8}
             textAlign="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
+            bg={emptyStateBg}
             borderRadius="lg"
             border="2px dashed"
             borderColor="gray.300"
@@ -436,7 +438,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                 <Text fontSize="lg" fontWeight="semibold" color="gray.700">
                   No Transactions Yet
                 </Text>
-                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} maxW="300px">
+                <Text fontSize="sm" color={emptyStateTextColor} maxW="300px">
                   Create your first Asset Management Company to start recording transactions
                 </Text>
               </VStack>
@@ -446,7 +448,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
           <Box
             p={8}
             textAlign="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
+            bg={emptyStateBg}
             borderRadius="lg"
             border="2px dashed"
             borderColor="gray.300"
@@ -456,7 +458,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                 <Text fontSize="lg" fontWeight="semibold" color="gray.700">
                   No Transactions Yet
                 </Text>
-                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} maxW="300px">
+                <Text fontSize="sm" color={emptyStateTextColor} maxW="300px">
                   Create your first mutual fund to start recording transactions
                 </Text>
               </VStack>
@@ -466,7 +468,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
           <Box
             p={8}
             textAlign="center"
-            bg={useColorModeValue("gray.50", "gray.800")}
+            bg={emptyStateBg}
             borderRadius="lg"
             border="2px dashed"
             borderColor="gray.300"
@@ -476,7 +478,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                 <Text fontSize="lg" fontWeight="semibold" color="gray.700">
                   No Transactions Recorded Yet
                 </Text>
-                <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.400")} maxW="300px">
+                <Text fontSize="sm" color={emptyStateTextColor} maxW="300px">
                   Start by buying units in one of your mutual funds
                 </Text>
               </VStack>

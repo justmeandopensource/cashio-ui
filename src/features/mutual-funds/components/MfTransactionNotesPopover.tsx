@@ -97,7 +97,7 @@ const MfTransactionNotesPopover: FC<MfTransactionNotesPopoverProps> = ({
         status: "success",
       });
       onClose();
-    } catch (error) {
+    } catch {
       toast({
         ...toastDefaults,
         title: "Error",

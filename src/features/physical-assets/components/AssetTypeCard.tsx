@@ -33,10 +33,15 @@ interface AssetTypeCardProps {
   assetType: AssetType;
   assets: PhysicalAsset[];
   currencySymbol: string;
+  // eslint-disable-next-line no-unused-vars
   onCreateAsset: (assetTypeId: number) => void;
+  // eslint-disable-next-line no-unused-vars
   onDeleteAssetType: (assetType: AssetType) => void;
+  // eslint-disable-next-line no-unused-vars
   onBuySell: (asset: PhysicalAsset) => void;
+  // eslint-disable-next-line no-unused-vars
   onUpdatePrice: (asset: PhysicalAsset) => void;
+  // eslint-disable-next-line no-unused-vars
   onDeleteAsset: (asset: PhysicalAsset) => void;
 }
 

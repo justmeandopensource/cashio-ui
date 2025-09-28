@@ -52,6 +52,7 @@ import { useFundTransactions } from "../api";
 import useLedgerStore from "../../../components/shared/store";
 
 // Expanded Fund Row Component
+/* eslint-disable no-unused-vars */
 interface ExpandedFundRowProps {
   fund: MutualFund & { amc_name: string; invested: number; unrealized_pnl_percentage: number };
   currencySymbol: string | undefined;
@@ -63,6 +64,7 @@ interface ExpandedFundRowProps {
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
 }
+/* eslint-enable no-unused-vars */
 
 const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
   fund,
@@ -75,7 +77,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
   onCloseFund,
   onViewTransactions,
 }) => {
-  const { unrealizedPnl, realizedPnl } = calculateFundPnL(fund);
+  const { realizedPnl } = calculateFundPnL(fund);
   const { data: transactions = [], isLoading: isLoadingTransactions } =
     useFundTransactions(fund.ledger_id, fund.mutual_fund_id, {
       enabled: isExpanded,
@@ -268,6 +270,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
   );
 };
 
+/* eslint-disable no-unused-vars */
 interface MutualFundsTableProps {
   amcs: Amc[];
   mutualFunds: MutualFund[];
@@ -279,6 +282,7 @@ interface MutualFundsTableProps {
   selectedOwner: string;
   onOwnerChange: (owner: string) => void;
 }
+/* eslint-enable no-unused-vars */
 
 type SortField =
   | "amc"

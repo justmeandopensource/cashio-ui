@@ -1,4 +1,4 @@
-import { FC, useState, useEffect } from "react";
+import React, { FC, useState, useEffect } from "react";
 import {
   Modal,
   ModalOverlay,
@@ -30,7 +30,7 @@ import { useUpdatePhysicalAssetPrice } from "../api";
 import { PhysicalAsset } from "../types";
 import useLedgerStore from "@/components/shared/store";
 import { format } from "date-fns";
-import { formatCurrencyWithSymbol, splitCurrencyForDisplay } from "../utils";
+import { splitCurrencyForDisplay } from "../utils";
 
 interface UpdatePriceModalProps {
   isOpen: boolean;

@@ -1,6 +1,7 @@
 import { FC, useState } from "react";
-import {
-  Box,
+import React from "react";
+ import {
+   Box,
   Button,
   Text,
   VStack,
