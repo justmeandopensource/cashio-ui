@@ -36,6 +36,7 @@ export interface MutualFund {
   updated_at: string;
   total_realized_gain: number | string;
   total_invested_cash: number | string;
+  xirr_percentage?: number;
   amc?: Amc;
 }
 

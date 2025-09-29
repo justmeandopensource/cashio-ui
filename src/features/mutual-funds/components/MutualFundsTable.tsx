@@ -54,7 +54,7 @@ import useLedgerStore from "../../../components/shared/store";
 // Expanded Fund Row Component
 /* eslint-disable no-unused-vars */
 interface ExpandedFundRowProps {
-  fund: MutualFund & { amc_name: string; invested: number; unrealized_pnl_percentage: number };
+  fund: MutualFund & { amc_name: string; invested: number; unrealized_pnl_percentage: number; xirr_percentage: number };
   currencySymbol: string | undefined;
   mutedColor: string;
   isExpanded: boolean;
@@ -290,7 +290,8 @@ type SortField =
   | "invested"
   | "value"
   | "unrealized_pnl"
-  | "unrealized_pnl_percentage";
+  | "unrealized_pnl_percentage"
+  | "xirr_percentage";
 
 type SortDirection = "asc" | "desc";
 
@@ -377,6 +378,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
         current_value: currentValueNum,
         unrealized_pnl: unrealizedPnl,
         unrealized_pnl_percentage: unrealizedPnlPercentage,
+        xirr_percentage: fund.xirr_percentage || 0,
       };
     });
   }, [mutualFunds, amcs]);
@@ -433,6 +435,10 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
           aValue = a.unrealized_pnl_percentage;
           bValue = b.unrealized_pnl_percentage;
           break;
+        case "xirr_percentage":
+          aValue = a.xirr_percentage || 0;
+          bValue = b.xirr_percentage || 0;
+          break;
         default:
           return 0;
       }
@@ -481,11 +487,12 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
       invested: number;
       unrealized_pnl: number;
       unrealized_pnl_percentage: number;
+      xirr_percentage: number;
     },
   ) => {
     return (
       <Tr key={`expanded-${fund.mutual_fund_id}`}>
-        <Td colSpan={9} p={0}>
+        <Td colSpan={10} p={0}>
           <Collapse in={expandedRows.has(fund.mutual_fund_id)} animateOpacity>
             <ExpandedFundRow
               fund={fund}
@@ -621,17 +628,29 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                    P&L {getSortIcon("unrealized_pnl")}
                  </Flex>
                </Th>
-               <Th
-                 width="7%"
-                 isNumeric
-                 cursor="pointer"
-                 onClick={() => handleSort("unrealized_pnl_percentage")}
-               >
-                 <Flex align="center" gap={1} justify="flex-end">
-                   P&L % {getSortIcon("unrealized_pnl_percentage")}
-                 </Flex>
-               </Th>
-            </Tr>
+                <Th
+                  width="7%"
+                  isNumeric
+                  cursor="pointer"
+                  onClick={() => handleSort("unrealized_pnl_percentage")}
+                  whiteSpace="nowrap"
+                >
+                  <Flex align="center" gap={1} justify="flex-end">
+                    P&L % {getSortIcon("unrealized_pnl_percentage")}
+                  </Flex>
+                </Th>
+                <Th
+                  width="6%"
+                  isNumeric
+                  cursor="pointer"
+                  onClick={() => handleSort("xirr_percentage")}
+                  whiteSpace="nowrap"
+                >
+                  <Flex align="center" gap={1} justify="flex-end">
+                    XIRR % {getSortIcon("xirr_percentage")}
+                  </Flex>
+                </Th>
+             </Tr>
           </Thead>
           <Tbody>
             {sortedFunds.map((fund) => (
@@ -789,9 +808,44 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                           ).decimals
                         }
                       </Text>
-                    </HStack>
-                  </Td>
-                </Tr>
+                     </HStack>
+                   </Td>
+                   <Td isNumeric>
+                     <HStack spacing={0} align="baseline" justify="flex-end">
+                       <Text
+                         fontSize="sm"
+                         fontWeight="semibold"
+                         color={
+                           (fund.xirr_percentage || 0) >= 0
+                             ? "green.500"
+                             : "red.500"
+                         }
+                       >
+                         {
+                           splitPercentageForDisplay(
+                             fund.xirr_percentage || 0,
+                           ).main
+                         }
+                       </Text>
+                       <Text
+                         fontSize="xs"
+                         fontWeight="semibold"
+                         color={
+                           (fund.xirr_percentage || 0) >= 0
+                             ? "green.500"
+                             : "red.500"
+                         }
+                         opacity={0.7}
+                       >
+                         {
+                           splitPercentageForDisplay(
+                             fund.xirr_percentage || 0,
+                           ).decimals
+                         }
+                       </Text>
+                     </HStack>
+                   </Td>
+                 </Tr>
                 {renderExpandedRow(fund)}
               </React.Fragment>
             ))}
