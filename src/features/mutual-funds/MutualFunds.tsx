@@ -46,11 +46,9 @@ import { toastDefaults } from "@/components/shared/utils";
 
 
 
+/* eslint-disable no-unused-vars */
 interface MutualFundsProps {
   onAccountDataChange?: () => void;
-}
-
-const MutualFunds: FC<MutualFundsProps & {
   filters: {
     selectedAmc: string;
     selectedOwner: string;
@@ -61,7 +59,10 @@ const MutualFunds: FC<MutualFundsProps & {
     selectedOwner: string;
     showZeroBalance: boolean;
   }) => void;
-}> = (props) => {
+}
+/* eslint-enable no-unused-vars */
+
+const MutualFunds: FC<MutualFundsProps> = (props) => {
   const { onAccountDataChange, filters, onFiltersChange } = props;
   const { ledgerId } = useLedgerStore();
   const toast = useToast();
