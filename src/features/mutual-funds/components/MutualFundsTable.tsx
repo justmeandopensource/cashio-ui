@@ -520,19 +520,6 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
       {/* Filter Controls */}
       <Flex mb={4} gap={4} align="center" wrap="wrap">
         <Select
-          value={filters.selectedAmc}
-          onChange={(e) => onFiltersChange({ ...filters, selectedAmc: e.target.value })}
-          size="sm"
-          maxW="200px"
-        >
-          <option value="all">All AMCs</option>
-          {availableAmcs.map((amc) => (
-            <option key={amc.amc_id} value={amc.name}>
-              {amc.name}
-            </option>
-          ))}
-        </Select>
-        <Select
           value={filters.selectedOwner}
           onChange={(e) => onFiltersChange({ ...filters, selectedOwner: e.target.value })}
           size="sm"
@@ -546,6 +533,19 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                 {owner}
               </option>
             ))}
+        </Select>
+        <Select
+          value={filters.selectedAmc}
+          onChange={(e) => onFiltersChange({ ...filters, selectedAmc: e.target.value })}
+          size="sm"
+          maxW="200px"
+        >
+          <option value="all">All AMCs</option>
+          {availableAmcs.map((amc) => (
+            <option key={amc.amc_id} value={amc.name}>
+              {amc.name}
+            </option>
+          ))}
         </Select>
         <FormControl display="flex" alignItems="center" w="auto" ml="auto">
           <FormLabel
