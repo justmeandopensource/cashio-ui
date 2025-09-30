@@ -40,6 +40,11 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
   const { ledgerId } = useLedgerStore();
   const queryClient = useQueryClient();
   const [tabIndex, setTabIndex] = useState(0);
+  const [mutualFundsFilters, setMutualFundsFilters] = useState({
+    selectedAmc: "all",
+    selectedOwner: "all",
+    showZeroBalance: false,
+  });
 
   const handleCopyTransaction = async (transaction: any) => {
     onAddTransaction(undefined, transaction);
@@ -240,9 +245,9 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
               <TabPanel p={{ base: 2, md: 4 }}>
                {tabIndex === 2 && <PhysicalAssets />}
               </TabPanel>
-               <TabPanel p={{ base: 2, md: 4 }}>
-               {tabIndex === 3 && <MutualFunds onAccountDataChange={refreshAccountsData} />}
-               </TabPanel>
+                <TabPanel p={{ base: 2, md: 4 }}>
+                {tabIndex === 3 && <MutualFunds onAccountDataChange={refreshAccountsData} filters={mutualFundsFilters} onFiltersChange={setMutualFundsFilters} />}
+                </TabPanel>
             </TabPanels>
         </Tabs>
       </Box>

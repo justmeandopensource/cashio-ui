@@ -38,6 +38,16 @@ interface MutualFundsOverviewProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
+  filters: {
+    selectedAmc: string;
+    selectedOwner: string;
+    showZeroBalance: boolean;
+  };
+  onFiltersChange: (filters: {
+    selectedAmc: string;
+    selectedOwner: string;
+    showZeroBalance: boolean;
+  }) => void;
 }
 /* eslint-enable no-unused-vars */
 
@@ -51,9 +61,10 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   onUpdateNav,
   onCloseFund,
   onViewTransactions,
+  filters,
+  onFiltersChange,
 }) => {
   const { currencySymbol } = useLedgerStore();
-  const [selectedOwner, setSelectedOwner] = useState<string>("all");
   const [isBulkNavModalOpen, setIsBulkNavModalOpen] = useState(false);
   const toast = useToast();
   const emptyStateBg = useColorModeValue("gray.50", "gray.800");
@@ -63,11 +74,11 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
     typeof value === "string" ? parseFloat(value) : value;
 
   const filteredMutualFunds = useMemo(() => {
-    if (selectedOwner === "all") {
+    if (filters.selectedOwner === "all") {
       return mutualFunds;
     }
-    return mutualFunds.filter((fund) => fund.owner === selectedOwner);
-  }, [mutualFunds, selectedOwner]);
+    return mutualFunds.filter((fund) => fund.owner === filters.selectedOwner);
+  }, [mutualFunds, filters.selectedOwner]);
 
   const totalInvested = filteredMutualFunds.reduce(
     (sum, fund) => sum + toNumber(fund.total_invested_cash),
@@ -525,17 +536,17 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
              {/* Empty State for no funds but AMCs exist */}
            </Box>
          ) : (
-           <MutualFundsTable
-             amcs={amcs}
-             mutualFunds={mutualFunds}
-             onTradeUnits={onTradeUnits}
-             onTransferUnits={onTransferUnits}
-             onUpdateNav={onUpdateNav}
-             onCloseFund={onCloseFund}
-             onViewTransactions={onViewTransactions}
-             selectedOwner={selectedOwner}
-             onOwnerChange={setSelectedOwner}
-           />
+            <MutualFundsTable
+              amcs={amcs}
+              mutualFunds={mutualFunds}
+              onTradeUnits={onTradeUnits}
+              onTransferUnits={onTransferUnits}
+              onUpdateNav={onUpdateNav}
+              onCloseFund={onCloseFund}
+              onViewTransactions={onViewTransactions}
+              filters={filters}
+              onFiltersChange={onFiltersChange}
+            />
          )}
       </VStack>
       <BulkNavUpdateModal

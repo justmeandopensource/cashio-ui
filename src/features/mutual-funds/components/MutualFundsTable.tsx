@@ -279,8 +279,16 @@ interface MutualFundsTableProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
-  selectedOwner: string;
-  onOwnerChange: (owner: string) => void;
+  filters: {
+    selectedAmc: string;
+    selectedOwner: string;
+    showZeroBalance: boolean;
+  };
+  onFiltersChange: (filters: {
+    selectedAmc: string;
+    selectedOwner: string;
+    showZeroBalance: boolean;
+  }) => void;
 }
 /* eslint-enable no-unused-vars */
 
@@ -303,45 +311,41 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
   onUpdateNav,
   onCloseFund,
   onViewTransactions,
-  selectedOwner,
-  onOwnerChange,
+  filters,
+  onFiltersChange,
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
 
-  // State for sorting
-  const [sortField, setSortField] =
-    useState<SortField>("unrealized_pnl_percentage");
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+   // State for sorting
+   const [sortField, setSortField] =
+     useState<SortField>("unrealized_pnl_percentage");
+   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-  // State for filtering
-  const [selectedAmc, setSelectedAmc] = useState<string>("all");
-  const [showZeroBalance, setShowZeroBalance] = useState(false);
+   // Available AMCs based on selected owner
+   const availableAmcs = useMemo(() => {
+     if (filters.selectedOwner === "all") {
+       return amcs.slice().sort((a, b) => a.name.localeCompare(b.name));
+     } else {
+       const ownerFunds = mutualFunds.filter((fund) => fund.owner === filters.selectedOwner);
+       const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
+       return amcs
+         .filter((amc) => ownerAmcIds.has(amc.amc_id))
+         .sort((a, b) => a.name.localeCompare(b.name));
+     }
+   }, [amcs, mutualFunds, filters.selectedOwner]);
 
-  // Available AMCs based on selected owner
-  const availableAmcs = useMemo(() => {
-    if (selectedOwner === "all") {
-      return amcs.slice().sort((a, b) => a.name.localeCompare(b.name));
-    } else {
-      const ownerFunds = mutualFunds.filter((fund) => fund.owner === selectedOwner);
-      const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
-      return amcs
-        .filter((amc) => ownerAmcIds.has(amc.amc_id))
-        .sort((a, b) => a.name.localeCompare(b.name));
-    }
-  }, [amcs, mutualFunds, selectedOwner]);
-
-  // Reset AMC filter if selected AMC is not available for the selected owner
-  useEffect(() => {
-    if (selectedOwner !== "all" && selectedAmc !== "all") {
-      const selectedAmcId = amcs.find((amc) => amc.name === selectedAmc)?.amc_id;
-      const ownerFunds = mutualFunds.filter((fund) => fund.owner === selectedOwner);
-      const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
-      if (selectedAmcId && !ownerAmcIds.has(selectedAmcId)) {
-        setSelectedAmc("all");
-      }
-    }
-  }, [selectedOwner, selectedAmc, mutualFunds, amcs]);
+   // Reset AMC filter if selected AMC is not available for the selected owner
+   useEffect(() => {
+     if (filters.selectedOwner !== "all" && filters.selectedAmc !== "all") {
+       const selectedAmcId = amcs.find((amc) => amc.name === filters.selectedAmc)?.amc_id;
+       const ownerFunds = mutualFunds.filter((fund) => fund.owner === filters.selectedOwner);
+       const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
+       if (selectedAmcId && !ownerAmcIds.has(selectedAmcId)) {
+         onFiltersChange({ ...filters, selectedAmc: "all" });
+       }
+     }
+   }, [filters.selectedOwner, filters.selectedAmc, mutualFunds, amcs, filters, onFiltersChange]);
 
   // State for expanded rows
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
@@ -383,27 +387,27 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     });
   }, [mutualFunds, amcs]);
 
-  // Filter funds based on selected AMC, owner and zero balance toggle
-  const filteredFunds = useMemo(() => {
-    let funds = fundsWithAmc;
+   // Filter funds based on selected AMC, owner and zero balance toggle
+   const filteredFunds = useMemo(() => {
+     let funds = fundsWithAmc;
 
-    // AMC filter
-    if (selectedAmc !== "all") {
-      funds = funds.filter((fund) => fund.amc_name === selectedAmc);
-    }
+     // AMC filter
+     if (filters.selectedAmc !== "all") {
+       funds = funds.filter((fund) => fund.amc_name === filters.selectedAmc);
+     }
 
-    // Owner filter
-    if (selectedOwner !== "all") {
-      funds = funds.filter((fund) => fund.owner === selectedOwner);
-    }
+     // Owner filter
+     if (filters.selectedOwner !== "all") {
+       funds = funds.filter((fund) => fund.owner === filters.selectedOwner);
+     }
 
-    // Zero balance filter
-    if (!showZeroBalance) {
-      funds = funds.filter((fund) => toNumber(fund.total_units) > 0);
-    }
+     // Zero balance filter
+     if (!filters.showZeroBalance) {
+       funds = funds.filter((fund) => toNumber(fund.total_units) > 0);
+     }
 
-    return funds;
-  }, [fundsWithAmc, selectedAmc, selectedOwner, showZeroBalance]);
+     return funds;
+   }, [fundsWithAmc, filters.selectedAmc, filters.selectedOwner, filters.showZeroBalance]);
 
   // Sort funds
   const sortedFunds = useMemo(() => {
@@ -516,8 +520,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
       {/* Filter Controls */}
       <Flex mb={4} gap={4} align="center" wrap="wrap">
         <Select
-          value={selectedAmc}
-          onChange={(e) => setSelectedAmc(e.target.value)}
+          value={filters.selectedAmc}
+          onChange={(e) => onFiltersChange({ ...filters, selectedAmc: e.target.value })}
           size="sm"
           maxW="200px"
         >
@@ -529,8 +533,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
           ))}
         </Select>
         <Select
-          value={selectedOwner}
-          onChange={(e) => onOwnerChange(e.target.value)}
+          value={filters.selectedOwner}
+          onChange={(e) => onFiltersChange({ ...filters, selectedOwner: e.target.value })}
           size="sm"
           maxW="200px"
         >
@@ -554,8 +558,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
           </FormLabel>
           <Switch
             id="show-zero-balance"
-            isChecked={showZeroBalance}
-            onChange={(e) => setShowZeroBalance(e.target.checked)}
+            isChecked={filters.showZeroBalance}
+            onChange={(e) => onFiltersChange({ ...filters, showZeroBalance: e.target.checked })}
             size="sm"
             colorScheme="teal"
           />

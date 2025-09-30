@@ -50,7 +50,19 @@ interface MutualFundsProps {
   onAccountDataChange?: () => void;
 }
 
-const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
+const MutualFunds: FC<MutualFundsProps & {
+  filters: {
+    selectedAmc: string;
+    selectedOwner: string;
+    showZeroBalance: boolean;
+  };
+  onFiltersChange: (filters: {
+    selectedAmc: string;
+    selectedOwner: string;
+    showZeroBalance: boolean;
+  }) => void;
+}> = (props) => {
+  const { onAccountDataChange, filters, onFiltersChange } = props;
   const { ledgerId } = useLedgerStore();
   const toast = useToast();
   const queryClient = useQueryClient();
@@ -294,17 +306,19 @@ const MutualFunds: FC<MutualFundsProps> = ({ onAccountDataChange }) => {
                    <Spinner size="xl" />
                  </Box>
                ) : (
-                   <MutualFundsOverview
-                     amcs={amcs}
-                     mutualFunds={mutualFunds}
-                     onCreateAmc={handleCreateAmc}
-                     onCreateFund={handleCreateFund}
-                     onTradeUnits={handleTradeUnits}
-                     onTransferUnits={handleTransferUnits}
-                     onUpdateNav={handleUpdateNav}
-                     onCloseFund={handleCloseFund}
-                     onViewTransactions={handleViewTransactions}
-                   />
+                    <MutualFundsOverview
+                      amcs={amcs}
+                      mutualFunds={mutualFunds}
+                      onCreateAmc={handleCreateAmc}
+                      onCreateFund={handleCreateFund}
+                      onTradeUnits={handleTradeUnits}
+                      onTransferUnits={handleTransferUnits}
+                      onUpdateNav={handleUpdateNav}
+                      onCloseFund={handleCloseFund}
+                      onViewTransactions={handleViewTransactions}
+                     filters={filters}
+                      onFiltersChange={onFiltersChange}
+                    />
                )
              )}
            </TabPanel>
