@@ -1,4 +1,4 @@
-import { FC, useState, useMemo } from "react";
+import { FC, useState, useMemo, useEffect } from "react";
 import {
   Box,
   Text,
@@ -26,6 +26,7 @@ import {
 import useLedgerStore from "../../../components/shared/store";
 import MutualFundsTable from "./MutualFundsTable";
 import BulkNavUpdateModal from "./modals/BulkNavUpdateModal";
+import PortfolioChangeModal from "./modals/PortfolioChangeModal";
 
 /* eslint-disable no-unused-vars */
 interface MutualFundsOverviewProps {
@@ -66,6 +67,9 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
 }) => {
   const { currencySymbol } = useLedgerStore();
   const [isBulkNavModalOpen, setIsBulkNavModalOpen] = useState(false);
+  const [showChangeModal, setShowChangeModal] = useState(false);
+  const [oldStats, setOldStats] = useState<{totalValue: number, totalUnrealizedPnL: number} | null>(null);
+  const [portfolioChanges, setPortfolioChanges] = useState<{totalValueChange: number, totalValueChangePercent: number} | null>(null);
   const toast = useToast();
   const emptyStateBg = useColorModeValue("gray.50", "gray.800");
   const emptyStateTextColor = useColorModeValue("gray.600", "gray.400");
@@ -107,6 +111,21 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
     );
   }, [mutualFunds]);
 
+  // Calculate portfolio changes after NAV update
+  useEffect(() => {
+    if (showChangeModal && oldStats) {
+      const newTotalValue = filteredMutualFunds.reduce(
+        (sum, fund) => sum + toNumber(fund.current_value),
+        0
+      );
+
+      const totalValueChange = newTotalValue - oldStats.totalValue;
+      const totalValueChangePercent = oldStats.totalValue > 0 ? (totalValueChange / oldStats.totalValue) * 100 : 0;
+
+      setPortfolioChanges({ totalValueChange, totalValueChangePercent });
+    }
+  }, [mutualFunds, showChangeModal, oldStats, filteredMutualFunds]);
+
   const handleOpenBulkNavModal = () => {
     if (fundsWithCodes.length === 0) {
       toast({
@@ -119,6 +138,11 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
       });
       return;
     }
+    // Capture current stats before opening modal
+    setOldStats({
+      totalValue: totalCurrentValue,
+      totalUnrealizedPnL: totalUnrealizedPnL,
+    });
     setIsBulkNavModalOpen(true);
   };
 
@@ -130,6 +154,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
       duration: 3000,
       isClosable: true,
     });
+    setShowChangeModal(true);
   };
 
   return (
@@ -555,6 +580,19 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
         mutualFunds={fundsWithCodes}
         onSuccess={handleBulkNavSuccess}
       />
+      {portfolioChanges && (
+        <PortfolioChangeModal
+          isOpen={!!portfolioChanges}
+          onClose={() => {
+            setPortfolioChanges(null);
+            setShowChangeModal(false);
+            setOldStats(null);
+          }}
+          totalValueChange={portfolioChanges.totalValueChange}
+          totalValueChangePercent={portfolioChanges.totalValueChangePercent}
+          currencySymbol={currencySymbol || "₹"}
+        />
+      )}
     </Box>
   );
 };
