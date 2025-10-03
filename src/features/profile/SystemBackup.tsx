@@ -184,21 +184,22 @@ const SystemBackup: React.FC = () => {
       setIsRestoring(true);
       const checkFn = async () => {
         try {
-          await api.get("/api/sysinfo");
+          await queryClient.refetchQueries({ queryKey: ["backups"] });
           return true;
         } catch {
           return false;
         }
       };
       poll(checkFn, 60000, 3000) // 1 minute timeout for restore
-        .then(() =>
+        .then(() => {
           toast({
             ...toastDefaults,
             title: "Success",
             description: "Database restore completed successfully.",
             status: "success",
-          }),
-        )
+          });
+          queryClient.invalidateQueries({ queryKey: ["backups"] });
+        })
         .catch(() =>
           toast({
             ...toastDefaults,
