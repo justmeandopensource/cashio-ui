@@ -22,6 +22,9 @@ import {
   Switch,
   FormControl,
   FormLabel,
+  Input,
+  InputGroup,
+  InputLeftElement,
 } from "@chakra-ui/react";
 import {
   ChevronDown,
@@ -34,6 +37,7 @@ import {
   RefreshCw,
   XCircle,
   List,
+  Search,
 } from "lucide-react";
 import { MutualFund, Amc } from "../types";
 import {
@@ -279,16 +283,18 @@ interface MutualFundsTableProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
-  filters: {
-    selectedAmc: string;
-    selectedOwner: string;
-    showZeroBalance: boolean;
-  };
-  onFiltersChange: (filters: {
-    selectedAmc: string;
-    selectedOwner: string;
-    showZeroBalance: boolean;
-  }) => void;
+   filters: {
+     selectedAmc: string;
+     selectedOwner: string;
+     showZeroBalance: boolean;
+     searchTerm?: string;
+   };
+   onFiltersChange: (filters: {
+     selectedAmc: string;
+     selectedOwner: string;
+     showZeroBalance: boolean;
+     searchTerm?: string;
+   }) => void;
 }
 /* eslint-enable no-unused-vars */
 
@@ -387,27 +393,36 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     });
   }, [mutualFunds, amcs]);
 
-   // Filter funds based on selected AMC, owner and zero balance toggle
-   const filteredFunds = useMemo(() => {
-     let funds = fundsWithAmc;
+   // Filter funds based on selected AMC, owner, zero balance toggle, and search term
+    const filteredFunds = useMemo(() => {
+      let funds = fundsWithAmc;
 
-     // AMC filter
-     if (filters.selectedAmc !== "all") {
-       funds = funds.filter((fund) => fund.amc_name === filters.selectedAmc);
-     }
+      // Search filter
+      if (filters.searchTerm && filters.searchTerm.trim() !== "") {
+        const searchLower = filters.searchTerm.toLowerCase();
+        funds = funds.filter((fund) =>
+          fund.name.toLowerCase().includes(searchLower) ||
+          fund.amc_name.toLowerCase().includes(searchLower)
+        );
+      }
 
-     // Owner filter
-     if (filters.selectedOwner !== "all") {
-       funds = funds.filter((fund) => fund.owner === filters.selectedOwner);
-     }
+      // AMC filter
+      if (filters.selectedAmc !== "all") {
+        funds = funds.filter((fund) => fund.amc_name === filters.selectedAmc);
+      }
 
-     // Zero balance filter
-     if (!filters.showZeroBalance) {
-       funds = funds.filter((fund) => toNumber(fund.total_units) > 0);
-     }
+      // Owner filter
+      if (filters.selectedOwner !== "all") {
+        funds = funds.filter((fund) => fund.owner === filters.selectedOwner);
+      }
 
-     return funds;
-   }, [fundsWithAmc, filters.selectedAmc, filters.selectedOwner, filters.showZeroBalance]);
+      // Zero balance filter
+      if (!filters.showZeroBalance) {
+        funds = funds.filter((fund) => toNumber(fund.total_units) > 0);
+      }
+
+      return funds;
+    }, [fundsWithAmc, filters.selectedAmc, filters.selectedOwner, filters.showZeroBalance, filters.searchTerm]);
 
   // Sort funds
   const sortedFunds = useMemo(() => {
@@ -547,6 +562,16 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             </option>
           ))}
         </Select>
+        <InputGroup size="sm" maxW="300px">
+          <InputLeftElement>
+            <Search size={16} />
+          </InputLeftElement>
+          <Input
+            placeholder="Search funds..."
+            value={filters.searchTerm || ""}
+            onChange={(e) => onFiltersChange({ ...filters, searchTerm: e.target.value })}
+          />
+        </InputGroup>
         <FormControl display="flex" alignItems="center" w="auto" ml="auto">
           <FormLabel
             htmlFor="show-zero-balance"

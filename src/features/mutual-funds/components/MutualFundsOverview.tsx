@@ -39,16 +39,18 @@ interface MutualFundsOverviewProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
-  filters: {
-    selectedAmc: string;
-    selectedOwner: string;
-    showZeroBalance: boolean;
-  };
-  onFiltersChange: (filters: {
-    selectedAmc: string;
-    selectedOwner: string;
-    showZeroBalance: boolean;
-  }) => void;
+   filters: {
+     selectedAmc: string;
+     selectedOwner: string;
+     showZeroBalance: boolean;
+     searchTerm?: string;
+   };
+   onFiltersChange: (filters: {
+     selectedAmc: string;
+     selectedOwner: string;
+     showZeroBalance: boolean;
+     searchTerm?: string;
+   }) => void;
 }
 /* eslint-enable no-unused-vars */
 
@@ -561,17 +563,17 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
              {/* Empty State for no funds but AMCs exist */}
            </Box>
          ) : (
-            <MutualFundsTable
-              amcs={amcs}
-              mutualFunds={mutualFunds}
-              onTradeUnits={onTradeUnits}
-              onTransferUnits={onTransferUnits}
-              onUpdateNav={onUpdateNav}
-              onCloseFund={onCloseFund}
-              onViewTransactions={onViewTransactions}
-              filters={filters}
-              onFiltersChange={onFiltersChange}
-            />
+             <MutualFundsTable
+               amcs={amcs}
+               mutualFunds={mutualFunds}
+               onTradeUnits={onTradeUnits}
+               onTransferUnits={onTransferUnits}
+               onUpdateNav={onUpdateNav}
+               onCloseFund={onCloseFund}
+               onViewTransactions={onViewTransactions}
+               filters={filters}
+               onFiltersChange={onFiltersChange}
+             />
          )}
       </VStack>
       <BulkNavUpdateModal

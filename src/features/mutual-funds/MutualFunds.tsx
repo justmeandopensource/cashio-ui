@@ -49,16 +49,18 @@ import { toastDefaults } from "@/components/shared/utils";
 /* eslint-disable no-unused-vars */
 interface MutualFundsProps {
   onAccountDataChange?: () => void;
-  filters: {
-    selectedAmc: string;
-    selectedOwner: string;
-    showZeroBalance: boolean;
-  };
-  onFiltersChange: (filters: {
-    selectedAmc: string;
-    selectedOwner: string;
-    showZeroBalance: boolean;
-  }) => void;
+   filters: {
+     selectedAmc: string;
+     selectedOwner: string;
+     showZeroBalance: boolean;
+     searchTerm?: string;
+   };
+   onFiltersChange: (filters: {
+     selectedAmc: string;
+     selectedOwner: string;
+     showZeroBalance: boolean;
+     searchTerm?: string;
+   }) => void;
 }
 /* eslint-enable no-unused-vars */
 
@@ -307,19 +309,19 @@ const MutualFunds: FC<MutualFundsProps> = (props) => {
                    <Spinner size="xl" />
                  </Box>
                ) : (
-                    <MutualFundsOverview
-                      amcs={amcs}
-                      mutualFunds={mutualFunds}
-                      onCreateAmc={handleCreateAmc}
-                      onCreateFund={handleCreateFund}
-                      onTradeUnits={handleTradeUnits}
-                      onTransferUnits={handleTransferUnits}
-                      onUpdateNav={handleUpdateNav}
-                      onCloseFund={handleCloseFund}
-                      onViewTransactions={handleViewTransactions}
-                     filters={filters}
-                      onFiltersChange={onFiltersChange}
-                    />
+                     <MutualFundsOverview
+                       amcs={amcs}
+                       mutualFunds={mutualFunds}
+                       onCreateAmc={handleCreateAmc}
+                       onCreateFund={handleCreateFund}
+                       onTradeUnits={handleTradeUnits}
+                       onTransferUnits={handleTransferUnits}
+                       onUpdateNav={handleUpdateNav}
+                       onCloseFund={handleCloseFund}
+                       onViewTransactions={handleViewTransactions}
+                      filters={filters}
+                       onFiltersChange={onFiltersChange}
+                     />
                )
              )}
            </TabPanel>

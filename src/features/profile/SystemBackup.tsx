@@ -32,7 +32,6 @@ import {
   uploadBackup,
   downloadBackup,
 } from "./api";
-import api from "@/lib/api"; // Import api instance for polling
 import { toastDefaults } from "@/components/shared/utils";
 import { FaDatabase, FaTrash, FaRedo, FaPlus, FaUpload, FaDownload } from "react-icons/fa";
 
