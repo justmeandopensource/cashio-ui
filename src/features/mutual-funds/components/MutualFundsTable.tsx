@@ -25,6 +25,9 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  useBreakpointValue,
+  VStack,
+  SimpleGrid,
 } from "@chakra-ui/react";
 import {
   ChevronDown,
@@ -38,6 +41,7 @@ import {
   XCircle,
   List,
   Search,
+  ChevronUp,
 } from "lucide-react";
 import { MutualFund, Amc } from "../types";
 import {
@@ -324,6 +328,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
    // State for sorting
    const [sortField, setSortField] =
@@ -555,15 +560,125 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     );
   };
 
+  const MobileFundCard: React.FC<{ fund: typeof sortedFunds[0] }> = ({ fund }) => {
+    const [isExpanded, setIsExpanded] = useState(false);
+    const boxBg = useColorModeValue("gray.50", "gray.800");
+    const borderColor = useColorModeValue("gray.200", "gray.700");
+
+    const { realizedPnl } = calculateFundPnL(fund);
+
+    return (
+      <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "gray.700")} boxShadow="md">
+        <Box p={4} onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
+          <Flex justify="space-between" align="start">
+            <Box maxW="80%">
+              <HStack spacing={1} align="baseline" wrap="wrap">
+                <Text fontWeight="medium" noOfLines={2}>{fund.name}</Text>
+                {getPlanInitials(fund.plan) && ( <Text as="span" fontSize="xs" color="gray.500">({getPlanInitials(fund.plan)})</Text> )}
+                {getOwnerInitials(fund.owner) && ( <Text as="span" fontSize="xs" color="gray.500">[{getOwnerInitials(fund.owner)}]</Text> )}
+              </HStack>
+              <Text fontSize="sm" color={mutedColor}></Text>
+            </Box>
+            <IconButton
+              icon={isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+              variant="ghost"
+              size="sm"
+              aria-label="Expand row"
+            />
+          </Flex>
+          <SimpleGrid columns={2} spacing={4} mt={4}>
+            <Stat>
+              <StatLabel fontSize="xs" color={mutedColor}>Value</StatLabel>
+              <StatNumber>
+                <HStack spacing={0} align="baseline">
+                  <Text fontSize="lg" fontWeight="bold">
+                    {splitCurrencyForDisplay(fund.current_value, currencySymbol || "₹").main}
+                  </Text>
+                  <Text fontSize="sm" fontWeight="bold" opacity={0.7}>
+                    {splitCurrencyForDisplay(fund.current_value, currencySymbol || "₹").decimals}
+                  </Text>
+                </HStack>
+              </StatNumber>
+            </Stat>
+            <Stat>
+              <StatLabel fontSize="xs" color={mutedColor}>P&L</StatLabel>
+              <StatNumber>
+                <HStack spacing={0} align="baseline">
+                  <Text fontSize="lg" fontWeight="bold" color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}>
+                    {splitCurrencyForDisplay(Math.abs(fund.unrealized_pnl), currencySymbol || "₹").main}
+                  </Text>
+                  <Text fontSize="sm" fontWeight="bold" color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"} opacity={0.7}>
+                    {splitCurrencyForDisplay(Math.abs(fund.unrealized_pnl), currencySymbol || "₹").decimals}
+                  </Text>
+                </HStack>
+              </StatNumber>
+               <HStack spacing={0} align="baseline">
+                 <Text fontSize="xs" color={fund.unrealized_pnl_percentage >= 0 ? "green.500" : "red.500"}>
+                   {splitPercentageForDisplay(fund.unrealized_pnl_percentage).main}
+                 </Text>
+                 <Text fontSize="xs" color={fund.unrealized_pnl_percentage >= 0 ? "green.500" : "red.500"} opacity={0.7}>
+                   {splitPercentageForDisplay(fund.unrealized_pnl_percentage).decimals}
+                 </Text>
+               </HStack>
+            </Stat>
+          </SimpleGrid>
+        </Box>
+        <Collapse in={isExpanded} animateOpacity>
+          <Box
+            py={3}
+            px={4}
+            bg={boxBg}
+            borderTop="1px solid"
+            borderColor={borderColor}
+          >
+            <SimpleGrid columns={2} spacingX={4} spacingY={2} mb={4}>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>Invested</StatLabel>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm">{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7}>{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").decimals}</Text></HStack>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>Units</StatLabel>
+                <StatNumber fontSize="sm">{formatUnits(fund.total_units)}</StatNumber>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>NAV</StatLabel>
+                <StatNumber fontSize="sm">{currencySymbol || "₹"}{formatNav(fund.latest_nav)}</StatNumber>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>Avg. Cost</StatLabel>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm">{splitCurrencyForDisplay(toNumber(fund.average_cost_per_unit), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7}>{splitCurrencyForDisplay(toNumber(fund.average_cost_per_unit), currencySymbol || "₹").decimals}</Text></HStack>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>Realized P&L</StatLabel>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={realizedPnl >= 0 ? "green.500" : "red.500"}>{splitCurrencyForDisplay(Math.abs(realizedPnl), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" color={realizedPnl >= 0 ? "green.500" : "red.500"} opacity={0.7}>{splitCurrencyForDisplay(Math.abs(realizedPnl), currencySymbol || "₹").decimals}</Text></HStack>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>XIRR %</StatLabel>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={(fund.xirr_percentage || 0) >= 0 ? "green.500" : "red.500"}>{splitPercentageForDisplay(fund.xirr_percentage || 0).main}</StatNumber><Text fontSize="xs" color={(fund.xirr_percentage || 0) >= 0 ? "green.500" : "red.500"} opacity={0.7}>{splitPercentageForDisplay(fund.xirr_percentage || 0).decimals}</Text></HStack>
+              </Stat>
+            </SimpleGrid>
+            <Flex gap={3} mt={4} justify="space-around">
+              <IconButton size="sm" variant="ghost" icon={<Icon as={ShoppingCart} />} onClick={() => onTradeUnits(fund.mutual_fund_id)} aria-label="Buy/Sell" title="Buy/Sell" />
+              <IconButton size="sm" variant="ghost" icon={<Icon as={ArrowRightLeft} />} onClick={() => onTransferUnits(fund.mutual_fund_id)} isDisabled={toNumber(fund.total_units) <= 0} aria-label="Transfer" title="Transfer" />
+              <IconButton size="sm" variant="ghost" icon={<Icon as={List} />} onClick={() => onViewTransactions(fund.mutual_fund_id)} aria-label="Transactions" title="Transactions" />
+              <IconButton size="sm" variant="ghost" icon={<Icon as={RefreshCw} />} onClick={() => onUpdateNav(fund)} aria-label="Update NAV" title="Update NAV" />
+              <IconButton size="sm" variant="ghost" colorScheme="red" icon={<Icon as={XCircle} />} onClick={() => onCloseFund(fund.mutual_fund_id)} isDisabled={toNumber(fund.total_units) > 0} aria-label="Close" title="Close" />
+            </Flex>
+          </Box>
+        </Collapse>
+      </Box>
+    );
+  };
+
   return (
     <Box>
       {/* Filter Controls */}
-      <Flex mb={4} gap={4} align="center" wrap="wrap">
+      <Flex mb={4} gap={4} direction={{ base: "column", md: "row" }} align={{ md: "center" }}>
         <Select
           value={filters.selectedOwner}
           onChange={(e) => onFiltersChange({ ...filters, selectedOwner: e.target.value })}
           size="sm"
-          maxW="200px"
+          maxW={{ md: "200px" }}
         >
           <option value="all">All Owners</option>
           {Array.from(new Set(mutualFunds.map(fund => fund.owner).filter(Boolean)))
@@ -578,7 +693,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
           value={filters.selectedAmc}
           onChange={(e) => onFiltersChange({ ...filters, selectedAmc: e.target.value })}
           size="sm"
-          maxW="200px"
+          maxW={{ md: "200px" }}
         >
           <option value="all">All AMCs</option>
           {availableAmcs.map((amc) => (
@@ -591,15 +706,15 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
           value={filters.selectedAssetClass}
           onChange={(e) => onFiltersChange({ ...filters, selectedAssetClass: e.target.value })}
           size="sm"
-          maxW="200px"
+          maxW={{ md: "200px" }}
         >
-          <option value="all">All Asset Classes</option>
+          <option value="all">All Classes</option>
           <option value="Equity">Equity</option>
           <option value="Debt">Debt</option>
           <option value="Hybrid">Hybrid</option>
           <option value="Others">Others</option>
         </Select>
-        <InputGroup size="sm" maxW="300px">
+        <InputGroup size="sm" maxW={{ base: "full", md: "300px" }} flexGrow={1}>
           <InputLeftElement>
             <Search size={16} />
           </InputLeftElement>
@@ -609,14 +724,14 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             onChange={(e) => onFiltersChange({ ...filters, searchTerm: e.target.value })}
           />
         </InputGroup>
-        <FormControl display="flex" alignItems="center" w="auto" ml="auto">
+        <FormControl display="flex" alignItems="center" w="auto" ml={{ md: "auto" }}>
           <FormLabel
             htmlFor="show-zero-balance"
             mb="0"
             fontSize="sm"
             whiteSpace="nowrap"
           >
-            Show Zero Balance
+            Zero Bal
           </FormLabel>
           <Switch
             id="show-zero-balance"
@@ -628,296 +743,303 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
         </FormControl>
       </Flex>
 
-      {/* Table */}
-      <Box overflowX="auto">
-        <Table variant="simple" size="sm" minW="800px">
-          <Thead>
-            <Tr>
-              <Th width="2%"></Th>
-              <Th width="12%" cursor="pointer" onClick={() => handleSort("amc")}>
-                <Flex align="center" gap={1}>
-                  AMC {getSortIcon("amc")}
-                </Flex>
-              </Th>
-               <Th
-                  width="24%"
-                  cursor="pointer"
-                  onClick={() => handleSort("fund")}
-                >
+      {isMobile ? (
+        <VStack spacing={4} align="stretch" mt={4}>
+          {sortedFunds.map((fund) => (
+            <MobileFundCard key={fund.mutual_fund_id} fund={fund} />
+          ))}
+        </VStack>
+      ) : (
+        <Box overflowX="auto">
+          <Table variant="simple" size="sm" minW="800px">
+            <Thead>
+              <Tr>
+                <Th width="2%"></Th>
+                <Th width="12%" cursor="pointer" onClick={() => handleSort("amc")}>
                   <Flex align="center" gap={1}>
-                    Fund {getSortIcon("fund")}
+                    AMC {getSortIcon("amc")}
                   </Flex>
                 </Th>
+                 <Th
+                    width="24%"
+                    cursor="pointer"
+                    onClick={() => handleSort("fund")}
+                  >
+                    <Flex align="center" gap={1}>
+                      Fund {getSortIcon("fund")}
+                    </Flex>
+                  </Th>
 
-               <Th
-                 width="8%"
-                 isNumeric
-                 display={{ base: "none", lg: "table-cell" }}
-               >
-                 NAV
-               </Th>
-              <Th
-                width="8%"
-                isNumeric
-                display={{ base: "none", md: "table-cell" }}
-              >
-                Units
-              </Th>
-              <Th
-                width="10%"
-                isNumeric
-                cursor="pointer"
-                onClick={() => handleSort("invested")}
-                display={{ base: "none", md: "table-cell" }}
-              >
-                <Flex align="center" gap={1} justify="flex-end">
-                  Invested {getSortIcon("invested")}
-                </Flex>
-              </Th>
-              <Th
-                width="10%"
-                isNumeric
-                cursor="pointer"
-                onClick={() => handleSort("value")}
-              >
-                <Flex align="center" gap={1} justify="flex-end">
-                  Value {getSortIcon("value")}
-                </Flex>
-              </Th>
-               <Th
-                 width="10%"
-                 isNumeric
-                 cursor="pointer"
-                 onClick={() => handleSort("unrealized_pnl")}
-               >
-                 <Flex align="center" gap={1} justify="flex-end">
-                   P&L {getSortIcon("unrealized_pnl")}
-                 </Flex>
-               </Th>
+                 <Th
+                   width="8%"
+                   isNumeric
+                   display={{ base: "none", lg: "table-cell" }}
+                 >
+                   NAV
+                 </Th>
                 <Th
-                  width="7%"
+                  width="8%"
+                  isNumeric
+                  display={{ base: "none", md: "table-cell" }}
+                >
+                  Units
+                </Th>
+                <Th
+                  width="10%"
                   isNumeric
                   cursor="pointer"
-                  onClick={() => handleSort("unrealized_pnl_percentage")}
-                  whiteSpace="nowrap"
+                  onClick={() => handleSort("invested")}
+                  display={{ base: "none", md: "table-cell" }}
                 >
                   <Flex align="center" gap={1} justify="flex-end">
-                    P&L % {getSortIcon("unrealized_pnl_percentage")}
+                    Invested {getSortIcon("invested")}
                   </Flex>
                 </Th>
                 <Th
-                  width="6%"
+                  width="10%"
                   isNumeric
                   cursor="pointer"
-                  onClick={() => handleSort("xirr_percentage")}
-                  whiteSpace="nowrap"
+                  onClick={() => handleSort("value")}
                 >
                   <Flex align="center" gap={1} justify="flex-end">
-                    XIRR % {getSortIcon("xirr_percentage")}
+                    Value {getSortIcon("value")}
                   </Flex>
                 </Th>
-             </Tr>
-          </Thead>
-          <Tbody>
-            {sortedFunds.map((fund) => (
-              <React.Fragment key={fund.mutual_fund_id}>
-                <Tr
-                  _hover={{ bg: "gray.50", cursor: "pointer" }}
-                  onClick={() => toggleRowExpansion(fund.mutual_fund_id)}
-                >
-                  <Td>
-                    <IconButton
-                      icon={
-                        expandedRows.has(fund.mutual_fund_id) ? (
-                          <ChevronDown size={16} />
-                        ) : (
-                          <ChevronRight size={16} />
-                        )
-                      }
-                      variant="ghost"
-                      size="xs"
-                      aria-label="Expand row"
-                    />
-                  </Td>
-                  <Td fontWeight="medium">{fund.amc_name}</Td>
-                   <Td>
-                     <HStack spacing={1} align="baseline">
-                       <Text fontWeight="medium" noOfLines={1}>
-                         {fund.name}
-                       </Text>
-                       {getPlanInitials(fund.plan) && (
-                         <Text
-                           as="span"
-                           fontSize="xs"
-                           color="gray.500"
-                           fontWeight="normal"
-                         >
-                           ({getPlanInitials(fund.plan)})
-                         </Text>
-                       )}
-                       {getOwnerInitials(fund.owner) && (
-                         <Text
-                           as="span"
-                           fontSize="xs"
-                           color="gray.500"
-                           fontWeight="normal"
-                         >
-                           [{getOwnerInitials(fund.owner)}]
-                         </Text>
-                       )}
-                     </HStack>
+                 <Th
+                   width="10%"
+                   isNumeric
+                   cursor="pointer"
+                   onClick={() => handleSort("unrealized_pnl")}
+                 >
+                   <Flex align="center" gap={1} justify="flex-end">
+                     P&L {getSortIcon("unrealized_pnl")}
+                   </Flex>
+                 </Th>
+                  <Th
+                    width="7%"
+                    isNumeric
+                    cursor="pointer"
+                    onClick={() => handleSort("unrealized_pnl_percentage")}
+                    whiteSpace="nowrap"
+                  >
+                    <Flex align="center" gap={1} justify="flex-end">
+                      P&L % {getSortIcon("unrealized_pnl_percentage")}
+                    </Flex>
+                  </Th>
+                  <Th
+                    width="6%"
+                    isNumeric
+                    cursor="pointer"
+                    onClick={() => handleSort("xirr_percentage")}
+                    whiteSpace="nowrap"
+                  >
+                    <Flex align="center" gap={1} justify="flex-end">
+                      XIRR % {getSortIcon("xirr_percentage")}
+                    </Flex>
+                  </Th>
+               </Tr>
+            </Thead>
+            <Tbody>
+              {sortedFunds.map((fund) => (
+                <React.Fragment key={fund.mutual_fund_id}>
+                  <Tr
+                    _hover={{ bg: "gray.50", cursor: "pointer" }}
+                    onClick={() => toggleRowExpansion(fund.mutual_fund_id)}
+                  >
+                    <Td>
+                      <IconButton
+                        icon={
+                          expandedRows.has(fund.mutual_fund_id) ? (
+                            <ChevronDown size={16} />
+                          ) : (
+                            <ChevronRight size={16} />
+                          )
+                        }
+                        variant="ghost"
+                        size="xs"
+                        aria-label="Expand row"
+                      />
                     </Td>
-                   <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
-                     {currencySymbol || "₹"}
-                     {formatNav(fund.latest_nav)}
-                   </Td>
-                  <Td isNumeric display={{ base: "none", md: "table-cell" }}>
-                    {formatUnits(fund.total_units)}
-                  </Td>
-                  <Td isNumeric display={{ base: "none", md: "table-cell" }}>
-                    <HStack spacing={0} align="baseline" justify="flex-end">
-                      <Text fontSize="sm">
-                        {
-                          splitCurrencyForDisplay(
-                            fund.invested,
-                            currencySymbol || "₹",
-                          ).main
-                        }
-                      </Text>
-                      <Text fontSize="xs" opacity={0.7}>
-                        {
-                          splitCurrencyForDisplay(
-                            fund.invested,
-                            currencySymbol || "₹",
-                          ).decimals
-                        }
-                      </Text>
-                    </HStack>
-                  </Td>
-                  <Td isNumeric>
-                    <HStack spacing={0} align="baseline" justify="flex-end">
-                      <Text fontSize="sm">
-                        {
-                          splitCurrencyForDisplay(
-                            fund.current_value,
-                            currencySymbol || "₹",
-                          ).main
-                        }
-                      </Text>
-                      <Text fontSize="xs" opacity={0.7}>
-                        {
-                          splitCurrencyForDisplay(
-                            fund.current_value,
-                            currencySymbol || "₹",
-                          ).decimals
-                        }
-                      </Text>
-                    </HStack>
-                  </Td>
-                  <Td isNumeric>
-                    <HStack spacing={0} align="baseline" justify="flex-end">
-                      <Text
-                        fontSize="sm"
-                        color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}
-                      >
-                        {
-                          splitCurrencyForDisplay(
-                            Math.abs(fund.unrealized_pnl),
-                            currencySymbol || "₹",
-                          ).main
-                        }
-                      </Text>
-                      <Text
-                        fontSize="xs"
-                        color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}
-                        opacity={0.7}
-                      >
-                        {
-                          splitCurrencyForDisplay(
-                            Math.abs(fund.unrealized_pnl),
-                            currencySymbol || "₹",
-                          ).decimals
-                        }
-                      </Text>
-                    </HStack>
-                  </Td>
-                  <Td isNumeric>
-                    <HStack spacing={0} align="baseline" justify="flex-end">
-                      <Text
-                        fontSize="sm"
-                        fontWeight="semibold"
-                        color={
-                          fund.unrealized_pnl_percentage >= 0
-                            ? "green.500"
-                            : "red.500"
-                        }
-                      >
-                        {
-                          splitPercentageForDisplay(
-                            fund.unrealized_pnl_percentage,
-                          ).main
-                        }
-                      </Text>
-                      <Text
-                        fontSize="xs"
-                        fontWeight="semibold"
-                        color={
-                          fund.unrealized_pnl_percentage >= 0
-                            ? "green.500"
-                            : "red.500"
-                        }
-                        opacity={0.7}
-                      >
-                        {
-                          splitPercentageForDisplay(
-                            fund.unrealized_pnl_percentage,
-                          ).decimals
-                        }
-                      </Text>
-                     </HStack>
-                   </Td>
-                   <Td isNumeric>
-                     <HStack spacing={0} align="baseline" justify="flex-end">
-                       <Text
-                         fontSize="sm"
-                         fontWeight="semibold"
-                         color={
-                           (fund.xirr_percentage || 0) >= 0
-                             ? "green.500"
-                             : "red.500"
-                         }
-                       >
-                         {
-                           splitPercentageForDisplay(
-                             fund.xirr_percentage || 0,
-                           ).main
-                         }
-                       </Text>
-                       <Text
-                         fontSize="xs"
-                         fontWeight="semibold"
-                         color={
-                           (fund.xirr_percentage || 0) >= 0
-                             ? "green.500"
-                             : "red.500"
-                         }
-                         opacity={0.7}
-                       >
-                         {
-                           splitPercentageForDisplay(
-                             fund.xirr_percentage || 0,
-                           ).decimals
-                         }
-                       </Text>
-                     </HStack>
-                   </Td>
-                 </Tr>
-                {renderExpandedRow(fund)}
-              </React.Fragment>
-            ))}
-          </Tbody>
-        </Table>
-      </Box>
+                    <Td fontWeight="medium">{fund.amc_name}</Td>
+                     <Td>
+                       <HStack spacing={1} align="baseline">
+                         <Text fontWeight="medium" noOfLines={1}>
+                           {fund.name}
+                         </Text>
+                         {getPlanInitials(fund.plan) && (
+                           <Text
+                             as="span"
+                             fontSize="xs"
+                             color="gray.500"
+                             fontWeight="normal"
+                           >
+                             ({getPlanInitials(fund.plan)})
+                           </Text>
+                         )}
+                         {getOwnerInitials(fund.owner) && (
+                           <Text
+                             as="span"
+                             fontSize="xs"
+                             color="gray.500"
+                             fontWeight="normal"
+                           >
+                             [{getOwnerInitials(fund.owner)}]
+                           </Text>
+                         )}
+                       </HStack>
+                      </Td>
+                     <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
+                       {currencySymbol || "₹"}
+                       {formatNav(fund.latest_nav)}
+                     </Td>
+                    <Td isNumeric display={{ base: "none", md: "table-cell" }}>
+                      {formatUnits(fund.total_units)}
+                    </Td>
+                    <Td isNumeric display={{ base: "none", md: "table-cell" }}>
+                      <HStack spacing={0} align="baseline" justify="flex-end">
+                        <Text fontSize="sm">
+                          {
+                            splitCurrencyForDisplay(
+                              fund.invested,
+                              currencySymbol || "₹",
+                            ).main
+                          }
+                        </Text>
+                        <Text fontSize="xs" opacity={0.7}>
+                          {
+                            splitCurrencyForDisplay(
+                              fund.invested,
+                              currencySymbol || "₹",
+                            ).decimals
+                          }
+                        </Text>
+                      </HStack>
+                    </Td>
+                    <Td isNumeric>
+                      <HStack spacing={0} align="baseline" justify="flex-end">
+                        <Text fontSize="sm">
+                          {
+                            splitCurrencyForDisplay(
+                              fund.current_value,
+                              currencySymbol || "₹",
+                            ).main
+                          }
+                        </Text>
+                        <Text fontSize="xs" opacity={0.7}>
+                          {
+                            splitCurrencyForDisplay(
+                              fund.current_value,
+                              currencySymbol || "₹",
+                            ).decimals
+                          }
+                        </Text>
+                      </HStack>
+                    </Td>
+                    <Td isNumeric>
+                      <HStack spacing={0} align="baseline" justify="flex-end">
+                        <Text
+                          fontSize="sm"
+                          color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}
+                        >
+                          {
+                            splitCurrencyForDisplay(
+                              Math.abs(fund.unrealized_pnl),
+                              currencySymbol || "₹",
+                            ).main
+                          }
+                        </Text>
+                        <Text
+                          fontSize="xs"
+                          color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}
+                          opacity={0.7}
+                        >
+                          {
+                            splitCurrencyForDisplay(
+                              Math.abs(fund.unrealized_pnl),
+                              currencySymbol || "₹",
+                            ).decimals
+                          }
+                        </Text>
+                      </HStack>
+                    </Td>
+                    <Td isNumeric>
+                      <HStack spacing={0} align="baseline" justify="flex-end">
+                        <Text
+                          fontSize="sm"
+                          fontWeight="semibold"
+                          color={
+                            fund.unrealized_pnl_percentage >= 0
+                              ? "green.500"
+                              : "red.500"
+                          }
+                        >
+                          {
+                            splitPercentageForDisplay(
+                              fund.unrealized_pnl_percentage,
+                            ).main
+                          }
+                        </Text>
+                        <Text
+                          fontSize="xs"
+                          fontWeight="semibold"
+                          color={
+                            fund.unrealized_pnl_percentage >= 0
+                              ? "green.500"
+                              : "red.500"
+                          }
+                          opacity={0.7}
+                        >
+                          {
+                            splitPercentageForDisplay(
+                              fund.unrealized_pnl_percentage,
+                            ).decimals
+                          }
+                        </Text>
+                       </HStack>
+                     </Td>
+                     <Td isNumeric>
+                       <HStack spacing={0} align="baseline" justify="flex-end">
+                         <Text
+                           fontSize="sm"
+                           fontWeight="semibold"
+                           color={
+                             (fund.xirr_percentage || 0) >= 0
+                               ? "green.500"
+                               : "red.500"
+                           }
+                         >
+                           {
+                             splitPercentageForDisplay(
+                               fund.xirr_percentage || 0,
+                             ).main
+                           }
+                         </Text>
+                         <Text
+                           fontSize="xs"
+                           fontWeight="semibold"
+                           color={
+                             (fund.xirr_percentage || 0) >= 0
+                               ? "green.500"
+                               : "red.500"
+                           }
+                           opacity={0.7}
+                         >
+                           {
+                             splitPercentageForDisplay(
+                               fund.xirr_percentage || 0,
+                             ).decimals
+                           }
+                         </Text>
+                       </HStack>
+                     </Td>
+                   </Tr>
+                  {renderExpandedRow(fund)}
+                </React.Fragment>
+              ))}
+            </Tbody>
+          </Table>
+        </Box>
+      )}
 
       {sortedFunds.length === 0 && (
         <Box textAlign="center" py={8}>

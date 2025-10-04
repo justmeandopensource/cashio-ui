@@ -156,23 +156,21 @@ const FundCard: FC<FundCardProps> = ({
               </VStack>
             </HStack>
           </VStack>
-          <Badge
-            colorScheme={unrealizedPnl >= 0 ? "green" : "red"}
-            size="sm"
-            fontWeight="medium"
-            px={2}
-            py={0.5}
-            borderRadius="md"
-          >
-            <HStack spacing={0} align="baseline">
-              <Text fontSize="sm" fontWeight="semibold">
-                {splitPercentageForDisplay(unrealizedPercentage).main}
-              </Text>
-              <Text fontSize="xs" fontWeight="semibold" opacity={0.7}>
-                {splitPercentageForDisplay(unrealizedPercentage).decimals}%
-              </Text>
-            </HStack>
-          </Badge>
+           <Badge
+             colorScheme={unrealizedPnl >= 0 ? "green" : "red"}
+             size="sm"
+             fontWeight="medium"
+             px={2}
+             py={0.5}
+             borderRadius="md"
+           >
+             <Text fontSize="sm" fontWeight="semibold">
+               {splitPercentageForDisplay(unrealizedPercentage).main}
+               <Text as="span" fontSize="xs" opacity={0.7}>
+                 {splitPercentageForDisplay(unrealizedPercentage).decimals}
+               </Text>
+             </Text>
+           </Badge>
         </HStack>
 
           <Collapse in={isExpanded} animateOpacity>

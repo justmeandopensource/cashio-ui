@@ -207,8 +207,8 @@ export const splitPercentageForDisplay = (value: number): { main: string; decima
 
   if (parts.length === 2) {
     return {
-      main: `${parts[0]}.`,
-      decimals: parts[1]
+      main: parts[0],
+      decimals: `.${parts[1]}%`
     };
   }
 

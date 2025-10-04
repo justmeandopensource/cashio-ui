@@ -256,14 +256,14 @@ const AssetSummaryCard: FC<AssetSummaryCardProps> = ({
             py={0.5}
             borderRadius="md"
           >
-            <HStack spacing={0} align="baseline">
-              <Text fontSize="sm" fontWeight="semibold">
-                {splitPercentageForDisplay(unrealizedPnLPercentage).main}
-              </Text>
-              <Text fontSize="xs" fontWeight="semibold" opacity={0.7}>
-                {splitPercentageForDisplay(unrealizedPnLPercentage).decimals}%
-              </Text>
-            </HStack>
+             <HStack spacing={0} align="baseline">
+               <Text fontSize="sm" fontWeight="semibold">
+                 {splitPercentageForDisplay(unrealizedPnLPercentage).main}
+               </Text>
+               <Text fontSize="xs" fontWeight="semibold" opacity={0.7}>
+                 {splitPercentageForDisplay(unrealizedPnLPercentage).decimals}
+               </Text>
+             </HStack>
           </Badge>
         </HStack>
 

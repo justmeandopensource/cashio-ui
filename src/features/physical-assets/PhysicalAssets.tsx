@@ -417,7 +417,7 @@ const PhysicalAssets: FC = () => {
                                color={getPnLColor(totalPnL)}
                                opacity={0.7}
                              >
-                               {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                                {splitPercentageForDisplay(totalPnLPercentage).decimals}
                              </Text>
                            </HStack>
                          </VStack>
@@ -530,7 +530,7 @@ const PhysicalAssets: FC = () => {
                                color={getPnLColor(totalPnL)}
                                opacity={0.7}
                              >
-                               {splitPercentageForDisplay(totalPnLPercentage).decimals}%
+                                {splitPercentageForDisplay(totalPnLPercentage).decimals}
                              </Text>
                            </HStack>
                          </VStack>

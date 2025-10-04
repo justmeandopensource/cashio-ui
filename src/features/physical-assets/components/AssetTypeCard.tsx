@@ -335,18 +335,17 @@ const AssetTypeCard: FC<AssetTypeCardProps> = ({
                             ).main
                           }
                         </Text>
-                        <Text
-                          fontSize="xs"
-                          fontWeight="semibold"
-                          opacity={0.7}
-                        >
-                          {
-                            splitPercentageForDisplay(
-                              assetTypePnLPercentage,
-                            ).decimals
-                          }
-                          %
-                        </Text>
+                         <Text
+                           fontSize="xs"
+                           fontWeight="semibold"
+                           opacity={0.7}
+                         >
+                           {
+                             splitPercentageForDisplay(
+                               assetTypePnLPercentage,
+                             ).decimals
+                           }
+                         </Text>
                       </HStack>
                     </Badge>
                   </HStack>

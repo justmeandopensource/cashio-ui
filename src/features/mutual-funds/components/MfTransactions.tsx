@@ -180,55 +180,50 @@ const MfTransactions: FC<MfTransactionsProps> = ({
             transition="all 0.2s"
             _hover={{ bg: "gray.50" }}
           >
-            {/* Main row with essential info */}
-            <Flex justify="space-between" align="flex-start">
-              {/* Left side with date, fund and AMC */}
-              <VStack align="flex-start" spacing={1} maxW="70%">
-                <HStack spacing={2}>
-                  <Icon as={Calendar} color="gray.500" />
-                  <Text fontSize="sm" color="gray.600">
-                    {formatDate(transaction.transaction_date)}
-                  </Text>
-                  <Tooltip label={getTransactionTypeText(transaction.transaction_type)}>
-                    <Square
-                      size="6px"
-                      bg={getTransactionTypeColor(transaction.transaction_type) + ".400"}
-                      borderRadius="md"
-                    />
-                  </Tooltip>
-                </HStack>
+             {/* Main row with essential info */}
+             <VStack spacing={3} align="stretch">
+               {/* Top section with date and type */}
+               <HStack spacing={2}>
+                 <Icon as={Calendar} color="gray.500" />
+                 <Text fontSize="sm" color="gray.600">
+                   {formatDate(transaction.transaction_date)}
+                 </Text>
+                 <Tooltip label={getTransactionTypeText(transaction.transaction_type)}>
+                   <Square
+                     size="6px"
+                     bg={getTransactionTypeColor(transaction.transaction_type) + ".400"}
+                     borderRadius="md"
+                   />
+                 </Tooltip>
+               </HStack>
 
-                <Text fontWeight="medium">
-                  {transaction.mutual_fund?.name}
-                </Text>
+               {/* Fund name */}
+               <Text fontWeight="medium">
+                 {transaction.mutual_fund?.name}
+               </Text>
 
-                <HStack spacing={2} align="center">
-                  <Text fontSize="sm" color="gray.600">
-                    {transaction.mutual_fund?.amc?.name}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">•</Text>
-                  {transaction.transaction_type === 'switch_out' || transaction.transaction_type === 'switch_in' ? (
-                    <Text fontSize="sm" color="blue.600" fontWeight="medium">
-                      {transaction.target_fund_name}
-                    </Text>
-                  ) : (
-                    <ChakraLink
-                      as={Link}
-                      to={`/account/${transaction.account_id}`}
-                      color="blue.500"
-                      fontSize="sm"
-                      fontWeight="medium"
-                      _hover={{ textDecoration: "underline" }}
-                    >
-                      {transaction.account_name || `Account ${transaction.account_id}`}
-                    </ChakraLink>
-                  )}
-                </HStack>
-              </VStack>
+               {/* Account or target fund */}
+               {transaction.transaction_type === 'switch_out' || transaction.transaction_type === 'switch_in' ? (
+                 <Text fontSize="sm" color="blue.600" fontWeight="medium">
+                   {transaction.target_fund_name}
+                 </Text>
+               ) : (
+                 <ChakraLink
+                   as={Link}
+                   to={`/account/${transaction.account_id}`}
+                   color="blue.500"
+                   fontSize="sm"
+                   fontWeight="medium"
+                   _hover={{ textDecoration: "underline" }}
+                 >
+                   {transaction.account_name || `Account ${transaction.account_id}`}
+                 </ChakraLink>
+               )}
 
-               {/* Right side with amount and units */}
-               <VStack align="flex-end" spacing={1}>
-                  <HStack spacing={0} align="baseline" justify="flex-end">
+               {/* Financial details */}
+               <Flex justify="space-between" align="baseline">
+                 <VStack align="start" spacing={0.5}>
+                   <HStack spacing={0} align="baseline">
                      <Text
                        fontSize="sm"
                        fontWeight="semibold"
@@ -260,31 +255,33 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                      >
                        {splitCurrencyForDisplay(Number(transaction.amount_excluding_charges), currencySymbol || "₹").decimals}
                      </Text>
-                  </HStack>
-                  {Number(transaction.other_charges) > 0 && (
-                    <HStack spacing={0} align="baseline" justify="flex-end">
-                      <Text fontSize="xs" color="red.500" fontWeight="medium">
-                        +{currencySymbol || "₹"}{splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").main}{splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").decimals} charges
-                      </Text>
-                    </HStack>
-                  )}
-                 <Text fontSize="sm" color="gray.600" fontWeight="medium">
-                   {formatUnits(transaction.units)} units
-                 </Text>
-                 <Box
-                   bg="gray.100"
-                   color="gray.700"
-                   px={2}
-                   py={0.5}
-                   borderRadius="full"
-                   fontSize="xs"
-                   fontWeight="medium"
-                   display="inline-block"
-                 >
-                    {currencySymbol || "₹"}{formatNav(Number(transaction.nav_per_unit))}/unit
-                 </Box>
-               </VStack>
-            </Flex>
+                   </HStack>
+                   {Number(transaction.other_charges) > 0 && (
+                     <HStack spacing={0} align="baseline">
+                       <Text fontSize="xs" color="red.500" fontWeight="medium">
+                         {splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").main}{splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").decimals}
+                       </Text>
+                     </HStack>
+                   )}
+                 </VStack>
+                 <VStack align="end" spacing={0.5}>
+                   <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                     {formatUnits(transaction.units)} units
+                   </Text>
+                   <Box
+                     bg="gray.100"
+                     color="gray.700"
+                     px={2}
+                     py={0.5}
+                     borderRadius="full"
+                     fontSize="xs"
+                     fontWeight="medium"
+                   >
+                     {currencySymbol || "₹"}{formatNav(Number(transaction.nav_per_unit))}/unit
+                   </Box>
+                 </VStack>
+               </Flex>
+             </VStack>
 
             {/* Expandable section */}
             {isExpanded && (
@@ -358,62 +355,64 @@ const MfTransactions: FC<MfTransactionsProps> = ({
 
            {/* Search and Filters */}
            <Box>
-             <Flex
-               direction={{ base: "column", md: "row" }}
-               gap={{ base: 3, md: 4 }}
-               align={{ base: "stretch", md: "center" }}
-               wrap="wrap"
-               mb={4}
-             >
-               <InputGroup maxW={{ base: "full", md: "300px" }}>
-                 <InputLeftElement>
-                   <Search size={16} />
-                 </InputLeftElement>
-                 <Input
-                   placeholder="Search transactions..."
-                   value={searchTerm}
-                   onChange={(e) => setSearchTerm(e.target.value)}
-                 />
-               </InputGroup>
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                gap={{ base: 3, md: 4 }}
+                align={{ base: "stretch", md: "center" }}
+                wrap="wrap"
+                mb={4}
+              >
+                 <Select
+                   size="sm"
+                   maxW={{ base: "full", md: "150px" }}
+                   value={typeFilter}
+                   onChange={(e) => setTypeFilter(e.target.value)}
+                 >
+                   <option value="all">All Types</option>
+                   <option value="buy">Buy</option>
+                   <option value="sell">Sell</option>
+                   <option value="switch_out">Switch Out</option>
+                   <option value="switch_in">Switch In</option>
+                 </Select>
 
-                <Select
-                  maxW={{ base: "full", md: "150px" }}
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value)}
-                >
-                  <option value="all">All Types</option>
-                  <option value="buy">Buy</option>
-                  <option value="sell">Sell</option>
-                  <option value="switch_out">Switch Out</option>
-                  <option value="switch_in">Switch In</option>
-                </Select>
+                 <Select
+                   size="sm"
+                   maxW={{ base: "full", md: "200px" }}
+                   value={amcFilter}
+                   onChange={(e) => setAmcFilter(e.target.value)}
+                 >
+                   <option value="all">All AMCs</option>
+                   {amcs.map(amc => (
+                     <option key={amc.amc_id} value={amc.amc_id.toString()}>
+                       {amc.name}
+                     </option>
+                   ))}
+                 </Select>
 
-                <Select
-                  maxW={{ base: "full", md: "200px" }}
-                  value={amcFilter}
-                  onChange={(e) => setAmcFilter(e.target.value)}
-                >
-                  <option value="all">All AMCs</option>
-                  {amcs.map(amc => (
-                    <option key={amc.amc_id} value={amc.amc_id.toString()}>
-                      {amc.name}
-                    </option>
-                  ))}
-                </Select>
+                 <Select
+                   size="sm"
+                   maxW={{ base: "full", md: "200px" }}
+                   value={fundFilter}
+                   onChange={(e) => setFundFilter(e.target.value)}
+                 >
+                   <option value="all">All Funds</option>
+                   {mutualFunds.map(fund => (
+                     <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
+                       {fund.name}
+                     </option>
+                   ))}
+                 </Select>
 
-                <Select
-                  maxW={{ base: "full", md: "200px" }}
-                  value={fundFilter}
-                  onChange={(e) => setFundFilter(e.target.value)}
-                >
-                  <option value="all">All Funds</option>
-                  {mutualFunds.map(fund => (
-                    <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
-                      {fund.name}
-                    </option>
-                  ))}
-                </Select>
-
+                <InputGroup size="sm" maxW={{ base: "full", md: "300px" }}>
+                  <InputLeftElement>
+                    <Search size={16} />
+                  </InputLeftElement>
+                  <Input
+                    placeholder="Search transactions..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </InputGroup>
 
               </Flex>
 
