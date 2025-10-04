@@ -49,18 +49,20 @@ import { toastDefaults } from "@/components/shared/utils";
 /* eslint-disable no-unused-vars */
 interface MutualFundsProps {
   onAccountDataChange?: () => void;
-   filters: {
-     selectedAmc: string;
-     selectedOwner: string;
-     showZeroBalance: boolean;
-     searchTerm?: string;
-   };
-   onFiltersChange: (filters: {
-     selectedAmc: string;
-     selectedOwner: string;
-     showZeroBalance: boolean;
-     searchTerm?: string;
-   }) => void;
+    filters: {
+      selectedAmc: string;
+      selectedOwner: string;
+      selectedAssetClass: string;
+      showZeroBalance: boolean;
+      searchTerm?: string;
+    };
+    onFiltersChange: (filters: {
+      selectedAmc: string;
+      selectedOwner: string;
+      selectedAssetClass: string;
+      showZeroBalance: boolean;
+      searchTerm?: string;
+    }) => void;
 }
 /* eslint-enable no-unused-vars */
 

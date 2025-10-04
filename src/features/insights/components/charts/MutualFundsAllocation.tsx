@@ -12,7 +12,6 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  Grid,
   Select,
   FormControl,
 } from "@chakra-ui/react";
@@ -21,7 +20,6 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Tooltip,
 } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import { PieChart as PieChartIcon, TrendingUp } from "lucide-react";
@@ -30,18 +28,10 @@ import { formatNumberAsCurrency } from "@/components/shared/utils";
 import { getAmcSummaries, getMutualFunds } from "@/features/mutual-funds/api";
 import { AmcSummary, MutualFund } from "@/features/mutual-funds/types";
 
-// Color palette for pie chart segments
+// Softer, more modern color palette
 const COLORS = [
-  "#38B2AC", // teal
-  "#3182CE", // blue
-  "#805AD5", // purple
-  "#D53F8C", // pink
-  "#E53E3E", // red
-  "#DD6B20", // orange
-  "#38A169", // green
-  "#4299E1", // light blue
-  "#9F7AEA", // light purple
-  "#ED64A6", // light pink
+  "#81E6D9", "#90CDF4", "#B794F4", "#FBD38D", "#FBB6CE",
+  "#A3BFFA", "#D6BCFA", "#F6E05E", "#A0AEC0", "#FED7D7",
 ];
 
 interface MutualFundsAllocationProps {
@@ -59,13 +49,15 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
 }) => {
   const { currencySymbol } = useLedgerStore();
   const [selectedOwner, setSelectedOwner] = useState<string>("all");
+  const [hoveredItem, setHoveredItem] = useState<ChartData | null>(null);
 
-  // Color modes
+  // Color modes and theme
+
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
   const primaryTextColor = useColorModeValue("gray.800", "white");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
-  const tooltipBg = useColorModeValue("#fff", "#2d3748");
+  const legendHoverBg = useColorModeValue("gray.100", "gray.600");
 
   // Fetch mutual funds data
   const { data: mutualFunds = [], isLoading: isLoadingFunds } = useQuery<MutualFund[]>({
@@ -76,7 +68,7 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
   });
 
   // Fetch AMC summaries
-  const { data: amcSummaries, isLoading: isLoadingSummaries, isError } = useQuery<AmcSummary[]>({
+  const { data: amcSummaries, isLoading: isLoadingSummaries, isError } = useQuery<AmcSummary[]>({ 
     queryKey: ["amc-summaries", ledgerId],
     queryFn: () => getAmcSummaries(Number(ledgerId)),
     enabled: !!ledgerId,
@@ -99,6 +91,20 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
     return owners;
   }, [mutualFunds]);
 
+  const darkenColor = (hex: string, percent: number): string => {
+    let r = parseInt(hex.substring(1, 3), 16);
+    let g = parseInt(hex.substring(3, 5), 16);
+    let b = parseInt(hex.substring(5, 7), 16);
+
+    r = Math.floor(r * (1 - percent));
+    g = Math.floor(g * (1 - percent));
+    b = Math.floor(b * (1 - percent));
+
+    const toHex = (c: number) => ('00' + c.toString(16)).slice(-2);
+
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  };
+
   // Calculate AMC summaries from filtered funds
   const filteredAmcSummaries = useMemo(() => {
     if (!filteredFunds.length || !amcSummaries) return [];
@@ -108,23 +114,11 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
 
     return amcSummaries.map(amc => {
       const amcFunds = filteredFunds.filter(fund => fund.amc_id === amc.amc_id);
-      const totalUnits = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_units), 0);
-      const totalInvested = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_invested_cash), 0);
       const currentValue = amcFunds.reduce((sum, fund) => sum + toNumber(fund.current_value), 0);
-      const totalRealizedGain = amcFunds.reduce((sum, fund) => sum + toNumber(fund.total_realized_gain || 0), 0);
 
       return {
-        amc_id: amc.amc_id,
         name: amc.name,
-        total_funds: amcFunds.length,
-        total_units: totalUnits,
-        average_cost_per_unit: totalUnits > 0 ? totalInvested / totalUnits : 0,
-        latest_nav: 0, // Would need to calculate weighted average
         current_value: currentValue,
-        total_invested: totalInvested,
-        total_realized_gain: totalRealizedGain,
-        unrealized_pnl: currentValue - totalInvested,
-        unrealized_pnl_percentage: totalInvested > 0 ? ((currentValue - totalInvested) / totalInvested) * 100 : 0,
       };
     });
   }, [filteredFunds, amcSummaries]);
@@ -133,7 +127,6 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
   const chartData: ChartData[] = React.useMemo(() => {
     if (!filteredAmcSummaries || filteredAmcSummaries.length === 0) return [];
 
-    // Include AMCs with current value > 0
     const dataWithValues = filteredAmcSummaries
       .filter(amc => Number(amc.current_value) > 0)
       .map((amc) => ({
@@ -152,35 +145,6 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
 
   const totalPortfolioValue = chartData.reduce((sum, item) => sum + item.value, 0);
 
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload }: any) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <Box
-          bg={tooltipBg}
-          p={3}
-          borderRadius="md"
-          boxShadow="md"
-          border="1px solid"
-          borderColor="gray.200"
-        >
-          <Text fontWeight="bold" color={primaryTextColor}>
-            {data.name}
-          </Text>
-          <Text color={secondaryTextColor}>
-            Value: {formatNumberAsCurrency(data.value, currencySymbol as string)}
-          </Text>
-          <Text color={secondaryTextColor}>
-            Share: {data.percentage.toFixed(1)}%
-          </Text>
-        </Box>
-      );
-    }
-    return null;
-  };
-
-  // Render loading state
   if (isLoading) {
     return (
       <VStack spacing={4} align="stretch" bg={cardBg} p={6} borderRadius="lg">
@@ -189,53 +153,34 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
     );
   }
 
-  // Render error state
   if (isError) {
     return (
       <VStack spacing={4} align="center" bg={cardBg} p={6} borderRadius="lg">
         <Icon as={TrendingUp} color="red.500" boxSize={6} mb={4} />
-        <Text color="red.500" fontWeight="bold" fontSize="lg">
-          Unable to load mutual funds data
-        </Text>
+        <Text color="red.500" fontWeight="bold" fontSize="lg">Unable to load mutual funds data</Text>
       </VStack>
     );
   }
 
   return (
     <Box bg={bgColor} borderRadius="lg" p={{ base: 4, md: 6 }} boxShadow="lg">
-      {/* Header */}
       <VStack spacing={4} align="stretch" mb={6}>
-        <Flex
-          justifyContent="space-between"
-          alignItems="center"
-          direction={{ base: "column", md: "row" }}
-          gap={4}
-        >
+        <Flex justifyContent="space-between" alignItems="center" direction={{ base: "column", md: "row" }} gap={4}>
           <VStack align="start" spacing={1} flex={1}>
             <Flex alignItems="center" gap={3}>
               <Icon as={PieChartIcon} w={5} h={5} color={primaryTextColor} />
-              <Heading as="h2" size="md" color={primaryTextColor}>
-                Mutual Funds - Value by AMC
-              </Heading>
+              <Heading as="h2" size="md" color={primaryTextColor}>Mutual Funds - Value by AMC</Heading>
             </Flex>
             <Text color={secondaryTextColor} fontSize="sm" pl="2rem">
-              Current value distribution of mutual funds across Asset Management Companies
+              Current value distribution across Asset Management Companies
             </Text>
           </VStack>
-
           {availableOwners.length > 0 && (
             <FormControl maxW={{ base: "full", md: "200px" }}>
-              <Select
-                value={selectedOwner}
-                onChange={(e) => setSelectedOwner(e.target.value)}
-                size="sm"
-                bg={cardBg}
-              >
+              <Select value={selectedOwner} onChange={(e) => setSelectedOwner(e.target.value)} size="sm" bg={cardBg}>
                 <option value="all">All Owners</option>
                 {availableOwners.map((owner) => (
-                  <option key={owner} value={owner}>
-                    {owner}
-                  </option>
+                  <option key={owner} value={owner}>{owner}</option>
                 ))}
               </Select>
             </FormControl>
@@ -243,116 +188,101 @@ const MutualFundsAllocation: React.FC<MutualFundsAllocationProps> = ({
         </Flex>
       </VStack>
 
-      {/* Chart Section */}
       <Box height={{ base: "300px", md: "400px" }} width="full">
         {chartData.length > 0 ? (
-          <Flex height="100%">
-            <Box flex={2}>
+          <Flex height="100%" direction={{ base: "column", md: "row" }}>
+            <Box position="relative" flex={2}>
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
                     data={chartData}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
-                    label={({ name, percentage }) =>
-                      percentage > 5 ? `${name}: ${percentage.toFixed(1)}%` : ""
-                    }
-                    outerRadius={120}
+                    innerRadius="60%"
+                    outerRadius="85%"
                     fill="#8884d8"
                     dataKey="value"
+                    labelLine={false}
+                    label={false}
+                    onMouseEnter={(data) => setHoveredItem(data)}
+                    onMouseLeave={() => setHoveredItem(null)}
                   >
-                    {chartData.map((_entry, idx) => (
+                    {chartData.map((entry, idx) => (
                       <Cell
                         key={`cell-${idx}`}
                         fill={COLORS[idx % COLORS.length]}
+                        opacity={!hoveredItem || hoveredItem.name === entry.name ? 1 : 0.3}
+                        stroke={darkenColor(COLORS[idx % COLORS.length], 0.2)}
+                        strokeWidth={hoveredItem?.name === entry.name ? 3 : 0.5}
                       />
                     ))}
                   </Pie>
-                  <Tooltip content={<CustomTooltip />} />
                 </PieChart>
               </ResponsiveContainer>
+              <Center position="absolute" top={0} left={0} right={0} bottom={0} pointerEvents="none">
+                <VStack spacing={0}>
+                  {hoveredItem && (
+                    <>
+                      <Text fontWeight="bold" fontSize="lg" color={primaryTextColor} textAlign="center">{hoveredItem.name}</Text>
+                      <Text fontSize="md" color={primaryTextColor} mt={2}>{formatNumberAsCurrency(hoveredItem.value, currencySymbol as string)}</Text>
+                      <Text fontSize="sm" color={secondaryTextColor}>
+                        {hoveredItem.percentage.toFixed(1)}% of Portfolio
+                      </Text>
+                    </>
+                  )}
+                </VStack>
+              </Center>
             </Box>
-            <Box flex={1} pl={4} overflowY="auto">
-              <Text fontSize="sm" fontWeight="bold" color={primaryTextColor} mb={2}>
-                Legend
-              </Text>
-              <Grid templateColumns="repeat(2, 1fr)" gap={2}>
+            <Box flex={1} pl={{ base: 0, md: 4 }} pt={{ base: 4, md: 0 }} overflowY="auto" maxH="400px">
+              <Text fontSize="sm" fontWeight="bold" color={primaryTextColor} mb={3}>AMC Overview</Text>
+              <VStack spacing={2} align="stretch">
                 {chartData.map((item, idx) => (
-                  <Flex key={item.name} align="center" mb={1}>
-                    <Box
-                      w={3}
-                      h={3}
-                      bg={COLORS[idx % COLORS.length]}
-                      borderRadius="full"
-                      mr={2}
-                      flexShrink={0}
-                    />
-                    <Text fontSize="xs" color={secondaryTextColor} lineHeight="tight">
-                      {item.name} ({item.percentage.toFixed(1)}%)
-                    </Text>
-                  </Flex>
+                  <Box
+                    key={item.name}
+                    p={2}
+                    bg={hoveredItem && hoveredItem.name === item.name ? legendHoverBg : cardBg}
+                    borderRadius="md"
+                    onMouseEnter={() => setHoveredItem(item)}
+                    onMouseLeave={() => setHoveredItem(null)}
+                    transition="background-color 0.2s ease-in-out"
+                    cursor="pointer"
+                  >
+                    <Flex align="center">
+                      <Box w={3} h={3} bg={COLORS[idx % COLORS.length]} borderRadius="full" mr={2} flexShrink={0} />
+                      <Box flex={1}>
+                        <Text fontSize="xs" fontWeight="medium" color={primaryTextColor} isTruncated>{item.name}</Text>
+                        <Text fontSize="xs" color={secondaryTextColor}>
+                          {item.percentage.toFixed(1)}%
+                        </Text>
+                      </Box>
+                    </Flex>
+                  </Box>
                 ))}
-              </Grid>
+              </VStack>
             </Box>
           </Flex>
         ) : (
-          <Center
-            height="full"
-            bg={bgColor}
-            borderRadius="lg"
-            flexDirection="column"
-            textAlign="center"
-            p={6}
-          >
+          <Center height="full" bg={bgColor} borderRadius="lg" flexDirection="column" textAlign="center" p={6}>
             <Icon as={PieChartIcon} boxSize={6} color="tertiaryTextColor" mb={4} />
-            <Heading size="md" mb={2} color={secondaryTextColor}>
-              No Mutual Funds Data Available
-            </Heading>
-            <Text color={secondaryTextColor} fontSize="sm">
-              Add mutual fund investments to see your portfolio allocation.
-            </Text>
+            <Heading size="md" mb={2} color={secondaryTextColor}>No Mutual Funds Data Available</Heading>
+            <Text color={secondaryTextColor} fontSize="sm">Add mutual fund investments to see your portfolio allocation.</Text>
           </Center>
         )}
       </Box>
 
-
-
-      {/* Summary Stats */}
       {chartData.length > 0 && (
         <VStack spacing={4} mt={6} width="full">
-          <HStack
-            spacing={4}
-            width="full"
-            flexDirection={{ base: "column", md: "row" }}
-          >
-            <Box
-              bg={cardBg}
-              p={6}
-              borderRadius="lg"
-              width="full"
-              boxShadow="md"
-            >
+          <HStack spacing={4} width="full" flexDirection={{ base: "column", md: "row" }}>
+            <Box bg={cardBg} p={6} borderRadius="lg" width="full" boxShadow="md">
               <Stat>
                 <StatLabel color={secondaryTextColor}>Total Portfolio Value</StatLabel>
-                <StatNumber color={primaryTextColor}>
-                  {formatNumberAsCurrency(totalPortfolioValue, currencySymbol as string)}
-                </StatNumber>
+                <StatNumber color={primaryTextColor}>{formatNumberAsCurrency(totalPortfolioValue, currencySymbol as string)}</StatNumber>
               </Stat>
             </Box>
-
-            <Box
-              bg={cardBg}
-              p={6}
-              borderRadius="lg"
-              width="full"
-              boxShadow="md"
-            >
+            <Box bg={cardBg} p={6} borderRadius="lg" width="full" boxShadow="md">
               <Stat>
                 <StatLabel color={secondaryTextColor}>AMCs Invested In</StatLabel>
-                <StatNumber color={primaryTextColor}>
-                  {chartData.length}
-                </StatNumber>
+                <StatNumber color={primaryTextColor}>{chartData.length}</StatNumber>
               </Stat>
             </Box>
           </HStack>

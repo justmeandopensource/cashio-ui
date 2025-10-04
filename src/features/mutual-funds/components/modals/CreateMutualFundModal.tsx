@@ -64,14 +64,16 @@ const ASSET_SUB_CLASSES = {
     { value: "Flexi Cap", label: "Flexi Cap" },
     { value: "Multi Cap", label: "Multi Cap" },
     { value: "ELSS", label: "ELSS" },
+    { value: "Index", label: "Index" },
     { value: "Sectoral", label: "Sectoral" },
   ],
   Debt: [
     { value: "Liquid", label: "Liquid" },
+    { value: "Overnight", label: "Overnight" },
     { value: "Corporate Bond", label: "Corporate Bond" },
-    { value: "Banking & PSU", label: "Banking & PSU" },
-    { value: "Dhort Term", label: "Short Term" },
-    { value: "Ultra Short Term", label: "Ultra Short Term" },
+    { value: "Banking", label: "Banking" },
+    { value: "Short Duration", label: "Short Duration" },
+    { value: "Ultra Short Duration", label: "Ultra Short Duration" },
   ],
   Hybrid: [],
   Others: [],
@@ -93,6 +95,8 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
     plan: "",
     code: "",
     owner: "",
+    asset_class: "",
+    asset_sub_class: "",
     amc_id: "",
     notes: "",
   });
@@ -472,81 +476,78 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
                       Enter the owner name to allow same fund names for
                       different owners
                     </FormHelperText>
-                   </FormControl>
+                  </FormControl>
 
-                   {/* AMC Selection */}
-                   <FormControl
-                     isInvalid={!!errors.amc_id}
-                     display={selectedAmc ? "block" : "none"}
-                   >
-                     <FormLabel fontWeight="semibold" mb={2}>
-                       <HStack spacing={2}>
-                         <Building2 size={16} />
-                         <Text>Asset Management Company</Text>
-                       </HStack>
-                     </FormLabel>
-                     <Input
-                       value={selectedAmc?.name || ""}
-                       isReadOnly
-                       size="lg"
-                       bg={useColorModeValue("gray.100", "gray.600")}
-                       borderColor={inputBorderColor}
-                       borderWidth="2px"
-                       borderRadius="md"
-                       opacity={0.8}
-                       cursor="not-allowed"
-                     />
-                     <FormHelperText>
-                       This fund will be created under {selectedAmc?.name}
-                     </FormHelperText>
-                   </FormControl>
+                  {/* AMC Selection */}
+                  <FormControl
+                    isInvalid={!!errors.amc_id}
+                    display={selectedAmc ? "block" : "none"}
+                  >
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      <HStack spacing={2}>
+                        <Building2 size={16} />
+                        <Text>Asset Management Company</Text>
+                      </HStack>
+                    </FormLabel>
+                    <Input
+                      value={selectedAmc?.name || ""}
+                      isReadOnly
+                      size="lg"
+                      bg={useColorModeValue("gray.100", "gray.600")}
+                      borderColor={inputBorderColor}
+                      borderWidth="2px"
+                      borderRadius="md"
+                      opacity={0.8}
+                      cursor="not-allowed"
+                    />
+                    <FormHelperText>
+                      This fund will be created under {selectedAmc?.name}
+                    </FormHelperText>
+                  </FormControl>
 
-                   <FormControl
-                     isInvalid={!!errors.amc_id}
-                     display={selectedAmc ? "none" : "block"}
-                   >
-                     <FormLabel fontWeight="semibold" mb={2}>
-                       <HStack spacing={2}>
-                         <Building2 size={16} />
-                         <Text>Asset Management Company</Text>
-                         <Text as="span" color="red.500">
-                           *
-                         </Text>
-                       </HStack>
-                     </FormLabel>
-                     <Select
-                       value={formData.amc_id}
-                       onChange={(e) =>
-                         handleInputChange("amc_id", e.target.value)
-                       }
-                       placeholder="Select the AMC"
-                       size="lg"
-                       bg={inputBg}
-                       borderColor={inputBorderColor}
-                       borderWidth="2px"
-                       borderRadius="md"
-                       _hover={{ borderColor: "teal.300" }}
-                       _focus={{
-                         borderColor: focusBorderColor,
-                         boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                       }}
-                     >
-                       {amcs.map((amc) => (
-                         <option
-                           key={amc.amc_id}
-                           value={amc.amc_id.toString()}
-                         >
-                           {amc.name}
-                         </option>
-                       ))}
-                     </Select>
-                     <FormErrorMessage>{errors.amc_id}</FormErrorMessage>
-                     <FormHelperText>
-                       Choose the AMC that manages this mutual fund
-                     </FormHelperText>
-                   </FormControl>
+                  <FormControl
+                    isInvalid={!!errors.amc_id}
+                    display={selectedAmc ? "none" : "block"}
+                  >
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      <HStack spacing={2}>
+                        <Building2 size={16} />
+                        <Text>Asset Management Company</Text>
+                        <Text as="span" color="red.500">
+                          *
+                        </Text>
+                      </HStack>
+                    </FormLabel>
+                    <Select
+                      value={formData.amc_id}
+                      onChange={(e) =>
+                        handleInputChange("amc_id", e.target.value)
+                      }
+                      placeholder="Select the AMC"
+                      size="lg"
+                      bg={inputBg}
+                      borderColor={inputBorderColor}
+                      borderWidth="2px"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                    >
+                      {amcs.map((amc) => (
+                        <option key={amc.amc_id} value={amc.amc_id.toString()}>
+                          {amc.name}
+                        </option>
+                      ))}
+                    </Select>
+                    <FormErrorMessage>{errors.amc_id}</FormErrorMessage>
+                    <FormHelperText>
+                      Choose the AMC that manages this mutual fund
+                    </FormHelperText>
+                  </FormControl>
 
-                   {/* Asset Class */}
+                  {/* Asset Class */}
                   <FormControl isInvalid={!!errors.asset_class}>
                     <FormLabel fontWeight="semibold" mb={2}>
                       <HStack spacing={2}>
@@ -627,9 +628,9 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
                           Choose the asset sub-class for this mutual fund
                         </FormHelperText>
                       </FormControl>
-                     )}
+                    )}
 
-                   {/* Notes */}
+                  {/* Notes */}
                   <FormControl isInvalid={!!errors.notes}>
                     <FormLabel fontWeight="semibold" mb={2}>
                       <HStack spacing={2}>

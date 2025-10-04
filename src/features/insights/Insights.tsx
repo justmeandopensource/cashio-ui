@@ -42,6 +42,10 @@ const visualizationOptions = [
     label: "MF - Value by AMC",
   },
   {
+    value: "mutual-funds-asset-class-allocation",
+    label: "MF - Asset Class Allocation",
+  },
+  {
     value: "mutual-funds-yearly-investments",
     label: "MF - Yearly Investments",
   },
