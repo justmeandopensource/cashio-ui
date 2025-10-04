@@ -283,18 +283,20 @@ interface MutualFundsTableProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
-   filters: {
-     selectedAmc: string;
-     selectedOwner: string;
-     showZeroBalance: boolean;
-     searchTerm?: string;
-   };
-   onFiltersChange: (filters: {
-     selectedAmc: string;
-     selectedOwner: string;
-     showZeroBalance: boolean;
-     searchTerm?: string;
-   }) => void;
+    filters: {
+      selectedAmc: string;
+      selectedOwner: string;
+      selectedAssetClass: string;
+      showZeroBalance: boolean;
+      searchTerm?: string;
+    };
+    onFiltersChange: (filters: {
+      selectedAmc: string;
+      selectedOwner: string;
+      selectedAssetClass: string;
+      showZeroBalance: boolean;
+      searchTerm?: string;
+    }) => void;
 }
 /* eslint-enable no-unused-vars */
 
@@ -328,30 +330,48 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
      useState<SortField>("unrealized_pnl_percentage");
    const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
 
-   // Available AMCs based on selected owner
-   const availableAmcs = useMemo(() => {
-     if (filters.selectedOwner === "all") {
-       return amcs.slice().sort((a, b) => a.name.localeCompare(b.name));
-     } else {
-       const ownerFunds = mutualFunds.filter((fund) => fund.owner === filters.selectedOwner);
-       const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
-       return amcs
-         .filter((amc) => ownerAmcIds.has(amc.amc_id))
-         .sort((a, b) => a.name.localeCompare(b.name));
-     }
-   }, [amcs, mutualFunds, filters.selectedOwner]);
+    // Available AMCs based on selected owner and asset class
+    const availableAmcs = useMemo(() => {
+      let filteredFunds = mutualFunds;
 
-   // Reset AMC filter if selected AMC is not available for the selected owner
-   useEffect(() => {
-     if (filters.selectedOwner !== "all" && filters.selectedAmc !== "all") {
-       const selectedAmcId = amcs.find((amc) => amc.name === filters.selectedAmc)?.amc_id;
-       const ownerFunds = mutualFunds.filter((fund) => fund.owner === filters.selectedOwner);
-       const ownerAmcIds = new Set(ownerFunds.map((fund) => fund.amc_id));
-       if (selectedAmcId && !ownerAmcIds.has(selectedAmcId)) {
-         onFiltersChange({ ...filters, selectedAmc: "all" });
-       }
-     }
-   }, [filters.selectedOwner, filters.selectedAmc, mutualFunds, amcs, filters, onFiltersChange]);
+      // Apply owner filter
+      if (filters.selectedOwner !== "all") {
+        filteredFunds = filteredFunds.filter((fund) => fund.owner === filters.selectedOwner);
+      }
+
+      // Apply asset class filter
+      if (filters.selectedAssetClass !== "all") {
+        filteredFunds = filteredFunds.filter((fund) => fund.asset_class === filters.selectedAssetClass);
+      }
+
+      const amcIds = new Set(filteredFunds.map((fund) => fund.amc_id));
+      return amcs
+        .filter((amc) => amcIds.has(amc.amc_id))
+        .sort((a, b) => a.name.localeCompare(b.name));
+    }, [amcs, mutualFunds, filters.selectedOwner, filters.selectedAssetClass]);
+
+    // Reset AMC filter if selected AMC is not available for the selected owner and asset class
+    useEffect(() => {
+      if ((filters.selectedOwner !== "all" || filters.selectedAssetClass !== "all") && filters.selectedAmc !== "all") {
+        const selectedAmcId = amcs.find((amc) => amc.name === filters.selectedAmc)?.amc_id;
+        let filteredFunds = mutualFunds;
+
+        // Apply owner filter
+        if (filters.selectedOwner !== "all") {
+          filteredFunds = filteredFunds.filter((fund) => fund.owner === filters.selectedOwner);
+        }
+
+        // Apply asset class filter
+        if (filters.selectedAssetClass !== "all") {
+          filteredFunds = filteredFunds.filter((fund) => fund.asset_class === filters.selectedAssetClass);
+        }
+
+        const availableAmcIds = new Set(filteredFunds.map((fund) => fund.amc_id));
+        if (selectedAmcId && !availableAmcIds.has(selectedAmcId)) {
+          onFiltersChange({ ...filters, selectedAmc: "all" });
+        }
+      }
+    }, [filters.selectedOwner, filters.selectedAssetClass, filters.selectedAmc, mutualFunds, amcs, filters, onFiltersChange]);
 
   // State for expanded rows
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
@@ -416,13 +436,18 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
         funds = funds.filter((fund) => fund.owner === filters.selectedOwner);
       }
 
+      // Asset class filter
+      if (filters.selectedAssetClass !== "all") {
+        funds = funds.filter((fund) => fund.asset_class === filters.selectedAssetClass);
+      }
+
       // Zero balance filter
       if (!filters.showZeroBalance) {
         funds = funds.filter((fund) => toNumber(fund.total_units) > 0);
       }
 
       return funds;
-    }, [fundsWithAmc, filters.selectedAmc, filters.selectedOwner, filters.showZeroBalance, filters.searchTerm]);
+     }, [fundsWithAmc, filters.selectedAmc, filters.selectedOwner, filters.selectedAssetClass, filters.showZeroBalance, filters.searchTerm]);
 
   // Sort funds
   const sortedFunds = useMemo(() => {
@@ -561,6 +586,18 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               {amc.name}
             </option>
           ))}
+        </Select>
+        <Select
+          value={filters.selectedAssetClass}
+          onChange={(e) => onFiltersChange({ ...filters, selectedAssetClass: e.target.value })}
+          size="sm"
+          maxW="200px"
+        >
+          <option value="all">All Asset Classes</option>
+          <option value="Equity">Equity</option>
+          <option value="Debt">Debt</option>
+          <option value="Hybrid">Hybrid</option>
+          <option value="Others">Others</option>
         </Select>
         <InputGroup size="sm" maxW="300px">
           <InputLeftElement>

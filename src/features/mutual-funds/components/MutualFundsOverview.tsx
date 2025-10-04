@@ -39,18 +39,20 @@ interface MutualFundsOverviewProps {
   onUpdateNav: (fund: MutualFund) => void;
   onCloseFund: (fundId: number) => void;
   onViewTransactions: (fundId: number) => void;
-   filters: {
-     selectedAmc: string;
-     selectedOwner: string;
-     showZeroBalance: boolean;
-     searchTerm?: string;
-   };
-   onFiltersChange: (filters: {
-     selectedAmc: string;
-     selectedOwner: string;
-     showZeroBalance: boolean;
-     searchTerm?: string;
-   }) => void;
+    filters: {
+      selectedAmc: string;
+      selectedOwner: string;
+      selectedAssetClass: string;
+      showZeroBalance: boolean;
+      searchTerm?: string;
+    };
+    onFiltersChange: (filters: {
+      selectedAmc: string;
+      selectedOwner: string;
+      selectedAssetClass: string;
+      showZeroBalance: boolean;
+      searchTerm?: string;
+    }) => void;
 }
 /* eslint-enable no-unused-vars */
 

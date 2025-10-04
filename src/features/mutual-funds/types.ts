@@ -24,6 +24,8 @@ export interface MutualFund {
   plan?: string;
   code?: string;
   owner?: string;
+  asset_class?: string;
+  asset_sub_class?: string;
   amc_id: number;
   ledger_id: number;
   total_units: number | string;
@@ -45,6 +47,8 @@ export interface MutualFundCreate {
   plan?: string;
   code?: string;
   owner?: string;
+  asset_class?: string;
+  asset_sub_class?: string;
   amc_id: number;
   notes?: string;
 }

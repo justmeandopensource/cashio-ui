@@ -43,6 +43,7 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
   const [mutualFundsFilters, setMutualFundsFilters] = useState({
     selectedAmc: "all",
     selectedOwner: "all",
+    selectedAssetClass: "all",
     showZeroBalance: false,
   });
 
