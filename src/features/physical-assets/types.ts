@@ -109,16 +109,6 @@ export interface PhysicalAssetsMainProps {
   onAddTransaction?: () => void;
 }
 
-export interface AssetSummaryCardProps {
-  asset: PhysicalAsset;
-  currencySymbol: string;
-  // eslint-disable-next-line no-unused-vars
-  onBuySell: (_asset: PhysicalAsset) => void;
-  // eslint-disable-next-line no-unused-vars
-  onUpdatePrice: (_asset: PhysicalAsset) => void;
-  // eslint-disable-next-line no-unused-vars
-  onDelete?: (_asset: PhysicalAsset) => void;
-}
 
 export interface BuySellAssetModalProps {
   isOpen: boolean;
@@ -150,7 +140,13 @@ export interface UpdatePriceModalProps {
   onPriceUpdated: (_asset: PhysicalAsset) => void;
 }
 
-export interface AssetTransactionHistoryProps {}
+export interface AssetTransactionHistoryProps {
+  assetTypes: AssetType[];
+  physicalAssets: PhysicalAsset[];
+  transactions?: AssetTransaction[];
+  onDataChange: () => void;
+  initialAssetFilter?: string;
+}
 
 // Utility types
 export type TransactionType = "buy" | "sell";

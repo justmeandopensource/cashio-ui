@@ -34,8 +34,12 @@ import {
   HStack,
   Tooltip,
   Square,
+  Select,
+  Input,
+  InputGroup,
+  InputLeftElement,
 } from "@chakra-ui/react";
-import { AlertTriangle, Trash2, X, Calendar } from "lucide-react";
+import { AlertTriangle, Trash2, X, Calendar, Search } from "lucide-react";
 import { useAllAssetTransactions, useDeleteAssetTransaction } from "../api";
 import { AssetTransactionHistoryProps } from "../types";
 import {
@@ -51,7 +55,13 @@ import AssetTransactionNotesPopover from "./AssetTransactionNotesPopover";
 import EmptyStateTransactions from "./EmptyStateTransactions";
 
 
-const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
+const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
+  assetTypes,
+  physicalAssets,
+  transactions: propTransactions,
+  onDataChange,
+  initialAssetFilter,
+}) => {
   const { currencySymbol } = useLedgerStore();
   const { ledgerId } = useLedgerStore();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -65,13 +75,48 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
   // Responsive breakpoint
   const isMobile = useBreakpointValue({ base: true, md: false });
 
+  // State for filters
+  const [searchTerm, setSearchTerm] = useState("");
+  const [typeFilter, setTypeFilter] = useState<string>("all");
+  const [assetTypeFilter, setAssetTypeFilter] = useState<string>("all");
+  const [assetFilter, setAssetFilter] = useState<string>(initialAssetFilter || "all");
+
+  // Use prop transactions if provided, otherwise fetch all
   const {
-    data: transactions = [],
+    data: fetchedTransactions = [],
     isLoading,
     error,
   } = useAllAssetTransactions(Number(ledgerId) || 0);
 
+  const transactions = propTransactions || fetchedTransactions;
+
   const deleteAssetTransactionMutation = useDeleteAssetTransaction();
+
+  // Filter transactions (sorted by date descending by default)
+  const allFilteredTransactions = transactions
+    .filter(transaction => {
+      const matchesSearch = searchTerm === "" ||
+        transaction.physical_asset?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        transaction.account_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        transaction.physical_asset?.asset_type?.name.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesType = typeFilter === "all" || transaction.transaction_type === typeFilter;
+      const matchesAsset = assetFilter === "all" || transaction.physical_asset_id.toString() === assetFilter;
+      const matchesAssetType = assetTypeFilter === "all" || transaction.physical_asset?.asset_type_id.toString() === assetTypeFilter;
+
+      return matchesSearch && matchesType && matchesAsset && matchesAssetType;
+    })
+    .sort((a, b) => {
+      const dateComparison = new Date(b.transaction_date).getTime() - new Date(a.transaction_date).getTime();
+      if (dateComparison === 0) {
+        return b.asset_transaction_id - a.asset_transaction_id;
+      }
+      return dateComparison;
+    });
+
+  const filteredTransactions = assetFilter === "all" && allFilteredTransactions.length > 10
+    ? allFilteredTransactions.slice(0, 10)
+    : allFilteredTransactions;
 
   // Handle delete confirmation
   const handleDelete = async () => {
@@ -83,6 +128,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
       });
       setSelectedTransactionId(null); // Clear selected transaction ID
       onClose();
+      onDataChange(); // Call the onDataChange callback
       toast({
         ...toastDefaults,
         title: "Transaction Deleted",
@@ -102,19 +148,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
     }
   };
 
-  // Sort transactions by date (newest first) and then by ID for consistent ordering
-  const sortedTransactions = [...transactions].sort((a, b) => {
-    // First sort by transaction date (newest first)
-    const dateA = a.transaction_date ? new Date(a.transaction_date).getTime() : 0;
-    const dateB = b.transaction_date ? new Date(b.transaction_date).getTime() : 0;
 
-    if (dateA !== dateB) {
-      return dateB - dateA; // Newest first
-    }
-
-    // If dates are the same, sort by transaction ID (highest first for consistency)
-    return b.asset_transaction_id - a.asset_transaction_id;
-  });
 
   // Handle card expansion
   const handleCardToggle = (transactionId: number) => {
@@ -137,7 +171,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
   // Render mobile card view
   const renderMobileCards = () => (
     <VStack spacing={3} align="stretch">
-      {sortedTransactions.map((transaction) => {
+      {filteredTransactions.map((transaction) => {
         const isExpanded = expandedCardId === transaction.asset_transaction_id;
         const isBuy = transaction.transaction_type === "buy";
 
@@ -310,13 +344,97 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
     );
   }
 
-  if (sortedTransactions.length === 0) {
+  if (filteredTransactions.length === 0) {
     return <EmptyStateTransactions />;
   }
 
   return (
     <Box>
-      {isMobile ? (
+      <VStack spacing={6} align="stretch">
+        {/* Header */}
+        <Box mb={6} p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" boxShadow="sm">
+          <Flex
+            direction={{ base: "column", md: "row" }}
+            justify="space-between"
+            align={{ base: "start", md: "center" }}
+             gap={{ base: 4, md: 0 }}
+             mb={4}
+          >
+            <Flex align="center" mb={{ base: 2, md: 0 }}>
+               <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color="gray.700">
+                 Transactions
+               </Text>
+            </Flex>
+          </Flex>
+
+           {/* Search and Filters */}
+           <Box>
+              <Flex
+                direction={{ base: "column", md: "row" }}
+                gap={{ base: 3, md: 4 }}
+                align={{ base: "stretch", md: "center" }}
+                wrap="wrap"
+                mb={4}
+              >
+                 <Select
+                   size="sm"
+                   maxW={{ base: "full", md: "150px" }}
+                   value={typeFilter}
+                   onChange={(e) => setTypeFilter(e.target.value)}
+                 >
+                   <option value="all">All Types</option>
+                   <option value="buy">Buy</option>
+                   <option value="sell">Sell</option>
+                 </Select>
+
+                 <Select
+                   size="sm"
+                   maxW={{ base: "full", md: "200px" }}
+                   value={assetTypeFilter}
+                   onChange={(e) => setAssetTypeFilter(e.target.value)}
+                 >
+                   <option value="all">All Asset Types</option>
+                   {assetTypes.map(assetType => (
+                     <option key={assetType.asset_type_id} value={assetType.asset_type_id.toString()}>
+                       {assetType.name}
+                     </option>
+                   ))}
+                 </Select>
+
+                 <Select
+                   size="sm"
+                   maxW={{ base: "full", md: "200px" }}
+                   value={assetFilter}
+                   onChange={(e) => setAssetFilter(e.target.value)}
+                 >
+                   <option value="all">All Assets</option>
+                   {physicalAssets.map(asset => (
+                     <option key={asset.physical_asset_id} value={asset.physical_asset_id.toString()}>
+                       {asset.name}
+                     </option>
+                   ))}
+                 </Select>
+
+                <InputGroup size="sm" maxW={{ base: "full", md: "300px" }}>
+                  <InputLeftElement>
+                    <Search size={16} />
+                  </InputLeftElement>
+                  <Input
+                    placeholder="Search transactions..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                  />
+                </InputGroup>
+
+              </Flex>
+
+
+           </Box>
+        </Box>
+
+        {/* Transactions Table/Cards */}
+        <Box>
+          {isMobile ? (
         renderMobileCards()
       ) : (
         <Box overflowX="auto">
@@ -333,8 +451,8 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
                 <Th width="2%">Actions</Th>
               </Tr>
             </Thead>
-            <Tbody>
-              {sortedTransactions.map((transaction) => (
+             <Tbody>
+               {filteredTransactions.map((transaction) => (
                 <Tr
                   key={transaction.asset_transaction_id}
                   _hover={{ bg: "gray.100" }}
@@ -482,31 +600,31 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
             {selectedTransactionId && (
               <Box p={3} bg="gray.50" borderRadius="md">
                 <Text fontWeight="bold">
-                  {sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.physical_asset?.name || "Asset"}
+                  {filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.physical_asset?.name || "Asset"}
                 </Text>
                 <Text fontSize="sm" color="gray.600">
                   {selectedTransactionId && formatDate(
-                    sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_date || ""
+                    filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_date || ""
                   )}
                 </Text>
                  <HStack spacing={0} align="baseline">
                    <Text fontSize="sm" fontWeight="semibold" color={
-                     sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_type === "buy"
+                     filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_type === "buy"
                        ? "red.500"
                        : "green.500"
                    }>
                      {selectedTransactionId && splitCurrencyForDisplay(
-                       sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.total_amount || 0,
+                       filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.total_amount || 0,
                        currencySymbol || "$"
                      ).main}
                    </Text>
                    <Text fontSize="xs" fontWeight="semibold" opacity={0.7} color={
-                     sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_type === "buy"
+                     filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_type === "buy"
                        ? "red.500"
                        : "green.500"
                    }>
                      {selectedTransactionId && splitCurrencyForDisplay(
-                       sortedTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.total_amount || 0,
+                       filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.total_amount || 0,
                        currencySymbol || "$"
                      ).decimals}
                    </Text>
@@ -536,6 +654,8 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = () => {
           </ModalFooter>
         </ModalContent>
       </Modal>
+        </Box>
+      </VStack>
     </Box>
   );
 };
