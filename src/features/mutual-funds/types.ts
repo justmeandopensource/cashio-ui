@@ -182,6 +182,7 @@ export interface BulkNavUpdateRequest {
   updates: Array<{
     mutual_fund_id: number;
     latest_nav: number;
+    nav_date: string;
   }>;
 }
 

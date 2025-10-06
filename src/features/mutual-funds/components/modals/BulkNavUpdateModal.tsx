@@ -175,7 +175,7 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
   const handleApplySelected = () => {
     const updates = Array.from(selectedFunds).map((fundId) => {
       const comp = successfulComparisons.find((c) => c.fund.mutual_fund_id === fundId);
-      return { mutual_fund_id: fundId, latest_nav: comp!.fetchedNav! };
+      return { mutual_fund_id: fundId, latest_nav: comp!.fetchedNav!, nav_date: comp!.fetchedResult!.nav_date! };
     });
     bulkUpdateMutation.mutate({ updates });
   };
@@ -271,7 +271,7 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
                       <Td textAlign="center">
                         {c.fetchedResult?.success && Math.abs(c.changePercent || 0) > 10 && <Icon as={AlertTriangle} size={16} color="orange.500" />}
                       </Td>
-                      <Td>{c.fund.last_nav_update ? new Date(c.fund.last_nav_update).toLocaleDateString() : <Text as="span" color="gray.400">Never</Text>}</Td>
+                      <Td>{c.fetchedResult?.nav_date ? new Date(c.fetchedResult.nav_date.split('-').reverse().join('-')).toLocaleDateString() : (c.fund.last_nav_update ? new Date(c.fund.last_nav_update).toLocaleDateString() : <Text as="span" color="gray.400">Never</Text>)}</Td>
                     </Tr>
                   ))}
                 </Tbody>
