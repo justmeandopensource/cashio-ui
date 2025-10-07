@@ -405,8 +405,21 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
               border="2px dashed"
               borderColor="gray.300"
             >
-             {/* Empty State for no funds but AMCs exist */}
-           </Box>
+              <VStack spacing={4}>
+                <Icon as={TrendingUp} boxSize={16} color="gray.400" />
+                <VStack spacing={2}>
+                  <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+                    No Mutual Funds Yet
+                  </Text>
+                  <Text fontSize="md" color={emptyStateTextColor} maxW="400px">
+                    Create your first mutual fund to start tracking your portfolio
+                  </Text>
+                </VStack>
+                <Button colorScheme="teal" onClick={() => onCreateFund()} size="lg">
+                  Create Your First Fund
+                </Button>
+              </VStack>
+            </Box>
          ) : (
              <MutualFundsTable
                amcs={amcs}
