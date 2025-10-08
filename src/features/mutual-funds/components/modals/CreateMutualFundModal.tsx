@@ -76,7 +76,10 @@ const ASSET_SUB_CLASSES = {
     { value: "Ultra Short Duration", label: "Ultra Short Duration" },
   ],
   Hybrid: [],
-  Others: [],
+  Others: [
+    { value: "Gold", label: "Gold" },
+    { value: "Silver", label: "Silver" },
+  ],
 };
 
 const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
