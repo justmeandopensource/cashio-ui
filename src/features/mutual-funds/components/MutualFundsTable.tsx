@@ -97,8 +97,15 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
     nav_per_unit: toNumber(t.nav_per_unit),
   }));
 
-  const highestPurchaseCost = calculateHighestPurchaseCost(purchaseTransactions);
-  const lowestPurchaseCost = calculateLowestPurchaseCost(purchaseTransactions);
+   const highestPurchaseCost = calculateHighestPurchaseCost(purchaseTransactions);
+   const lowestPurchaseCost = calculateLowestPurchaseCost(purchaseTransactions);
+
+   // Compute transaction dates
+  const transactionDates = transactions.map(t => new Date(t.transaction_date)).filter(d => !isNaN(d.getTime()));
+  const firstTransactionDate = transactionDates.length > 0 ? new Date(Math.min(...transactionDates.map(d => d.getTime()))) : null;
+  const lastTransactionDate = transactionDates.length > 0 ? new Date(Math.max(...transactionDates.map(d => d.getTime()))) : null;
+  const navUpdatedDate = fund.updated_at ? new Date(fund.updated_at) : null;
+
   const boxBg = useColorModeValue("gray.50", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
 
@@ -225,6 +232,33 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
                 }
               </Text>
             </HStack>
+          </Stat>
+        </HStack>
+
+        <HStack spacing={{ base: 3, md: 5 }} wrap="wrap">
+          <Stat size="sm">
+            <StatLabel fontSize="2xs" color={mutedColor} whiteSpace="nowrap">
+              NAV Last Updated
+            </StatLabel>
+            <StatNumber fontSize="xs">
+              {navUpdatedDate ? navUpdatedDate.toISOString().slice(0, 10) : "--"}
+            </StatNumber>
+          </Stat>
+          <Stat size="sm">
+            <StatLabel fontSize="2xs" color={mutedColor} whiteSpace="nowrap">
+              First Transaction
+            </StatLabel>
+            <StatNumber fontSize="xs">
+              {isLoadingTransactions ? "..." : firstTransactionDate ? firstTransactionDate.toISOString().slice(0, 10) : "--"}
+            </StatNumber>
+          </Stat>
+          <Stat size="sm">
+            <StatLabel fontSize="2xs" color={mutedColor} whiteSpace="nowrap">
+              Last Transaction
+            </StatLabel>
+            <StatNumber fontSize="xs">
+              {isLoadingTransactions ? "..." : lastTransactionDate ? lastTransactionDate.toISOString().slice(0, 10) : "--"}
+            </StatNumber>
           </Stat>
         </HStack>
 
@@ -567,6 +601,17 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
 
     const { realizedPnl } = calculateFundPnL(fund);
 
+    const { data: transactions = [], isLoading: isLoadingTransactions } =
+      useFundTransactions(fund.ledger_id, fund.mutual_fund_id, {
+        enabled: isExpanded,
+      });
+
+    // Compute transaction dates
+    const transactionDates = transactions.map(t => new Date(t.transaction_date)).filter(d => !isNaN(d.getTime()));
+    const firstTransactionDate = transactionDates.length > 0 ? new Date(Math.min(...transactionDates.map(d => d.getTime()))) : null;
+    const lastTransactionDate = transactionDates.length > 0 ? new Date(Math.max(...transactionDates.map(d => d.getTime()))) : null;
+    const navUpdatedDate = fund.updated_at ? new Date(fund.updated_at) : null;
+
     return (
       <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "gray.700")} boxShadow="md">
         <Box p={4} onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
@@ -631,7 +676,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             borderTop="1px solid"
             borderColor={borderColor}
           >
-            <SimpleGrid columns={2} spacingX={4} spacingY={2} mb={4}>
+            <SimpleGrid columns={3} spacingX={4} spacingY={2} mb={4}>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Invested</StatLabel>
                 <HStack spacing={0} align="baseline"><StatNumber fontSize="sm">{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7}>{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").decimals}</Text></HStack>
@@ -655,6 +700,18 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>XIRR %</StatLabel>
                 <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={(fund.xirr_percentage || 0) >= 0 ? "green.500" : "red.500"}>{splitPercentageForDisplay(fund.xirr_percentage || 0).main}</StatNumber><Text fontSize="xs" color={(fund.xirr_percentage || 0) >= 0 ? "green.500" : "red.500"} opacity={0.7}>{splitPercentageForDisplay(fund.xirr_percentage || 0).decimals}</Text></HStack>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>NAV Updated</StatLabel>
+                <StatNumber fontSize="xs">{navUpdatedDate ? navUpdatedDate.toISOString().slice(0, 10) : "--"}</StatNumber>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>First Trans</StatLabel>
+                <StatNumber fontSize="xs">{isLoadingTransactions ? "..." : firstTransactionDate ? firstTransactionDate.toISOString().slice(0, 10) : "--"}</StatNumber>
+              </Stat>
+              <Stat size="sm">
+                <StatLabel fontSize="2xs" color={mutedColor}>Last Trans</StatLabel>
+                <StatNumber fontSize="xs">{isLoadingTransactions ? "..." : lastTransactionDate ? lastTransactionDate.toISOString().slice(0, 10) : "--"}</StatNumber>
               </Stat>
             </SimpleGrid>
             <Flex gap={3} mt={4} justify="space-around">
