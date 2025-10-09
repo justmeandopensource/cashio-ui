@@ -104,7 +104,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
   const transactionDates = transactions.map(t => new Date(t.transaction_date)).filter(d => !isNaN(d.getTime()));
   const firstTransactionDate = transactionDates.length > 0 ? new Date(Math.min(...transactionDates.map(d => d.getTime()))) : null;
   const lastTransactionDate = transactionDates.length > 0 ? new Date(Math.max(...transactionDates.map(d => d.getTime()))) : null;
-  const navUpdatedDate = fund.updated_at ? new Date(fund.updated_at) : null;
+  const navUpdatedDate = fund.last_nav_update ? new Date(fund.last_nav_update) : null;
 
   const boxBg = useColorModeValue("gray.50", "gray.800");
   const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -241,7 +241,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
               NAV Last Updated
             </StatLabel>
             <StatNumber fontSize="xs">
-              {navUpdatedDate ? navUpdatedDate.toISOString().slice(0, 10) : "--"}
+              {navUpdatedDate ? `${navUpdatedDate.getFullYear()}-${String(navUpdatedDate.getMonth() + 1).padStart(2, '0')}-${String(navUpdatedDate.getDate()).padStart(2, '0')}` : "--"}
             </StatNumber>
           </Stat>
           <Stat size="sm">
@@ -249,7 +249,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
               First Transaction
             </StatLabel>
             <StatNumber fontSize="xs">
-              {isLoadingTransactions ? "..." : firstTransactionDate ? firstTransactionDate.toISOString().slice(0, 10) : "--"}
+              {isLoadingTransactions ? "..." : firstTransactionDate ? `${firstTransactionDate.getFullYear()}-${String(firstTransactionDate.getMonth() + 1).padStart(2, '0')}-${String(firstTransactionDate.getDate()).padStart(2, '0')}` : "--"}
             </StatNumber>
           </Stat>
           <Stat size="sm">
@@ -257,7 +257,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
               Last Transaction
             </StatLabel>
             <StatNumber fontSize="xs">
-              {isLoadingTransactions ? "..." : lastTransactionDate ? lastTransactionDate.toISOString().slice(0, 10) : "--"}
+              {isLoadingTransactions ? "..." : lastTransactionDate ? `${lastTransactionDate.getFullYear()}-${String(lastTransactionDate.getMonth() + 1).padStart(2, '0')}-${String(lastTransactionDate.getDate()).padStart(2, '0')}` : "--"}
             </StatNumber>
           </Stat>
         </HStack>
@@ -610,7 +610,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     const transactionDates = transactions.map(t => new Date(t.transaction_date)).filter(d => !isNaN(d.getTime()));
     const firstTransactionDate = transactionDates.length > 0 ? new Date(Math.min(...transactionDates.map(d => d.getTime()))) : null;
     const lastTransactionDate = transactionDates.length > 0 ? new Date(Math.max(...transactionDates.map(d => d.getTime()))) : null;
-    const navUpdatedDate = fund.updated_at ? new Date(fund.updated_at) : null;
+    const navUpdatedDate = fund.last_nav_update ? new Date(fund.last_nav_update) : null;
 
     return (
       <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "gray.700")} boxShadow="md">
@@ -703,15 +703,15 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>NAV Updated</StatLabel>
-                <StatNumber fontSize="xs">{navUpdatedDate ? navUpdatedDate.toISOString().slice(0, 10) : "--"}</StatNumber>
+                <StatNumber fontSize="xs">{navUpdatedDate ? `${navUpdatedDate.getFullYear()}-${String(navUpdatedDate.getMonth() + 1).padStart(2, '0')}-${String(navUpdatedDate.getDate()).padStart(2, '0')}` : "--"}</StatNumber>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>First Trans</StatLabel>
-                <StatNumber fontSize="xs">{isLoadingTransactions ? "..." : firstTransactionDate ? firstTransactionDate.toISOString().slice(0, 10) : "--"}</StatNumber>
+                 <StatNumber fontSize="xs">{isLoadingTransactions ? "..." : firstTransactionDate ? `${firstTransactionDate.getFullYear()}-${String(firstTransactionDate.getMonth() + 1).padStart(2, '0')}-${String(firstTransactionDate.getDate()).padStart(2, '0')}` : "--"}</StatNumber>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Last Trans</StatLabel>
-                <StatNumber fontSize="xs">{isLoadingTransactions ? "..." : lastTransactionDate ? lastTransactionDate.toISOString().slice(0, 10) : "--"}</StatNumber>
+                 <StatNumber fontSize="xs">{isLoadingTransactions ? "..." : lastTransactionDate ? `${lastTransactionDate.getFullYear()}-${String(lastTransactionDate.getMonth() + 1).padStart(2, '0')}-${String(lastTransactionDate.getDate()).padStart(2, '0')}` : "--"}</StatNumber>
               </Stat>
             </SimpleGrid>
             <Flex gap={3} mt={4} justify="space-around">
