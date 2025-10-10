@@ -45,6 +45,8 @@ interface Account {
   account_id: string;
   name: string;
   type: string;
+  net_balance?: number;
+  is_group: boolean;
 }
 
 interface Transaction {
@@ -95,10 +97,19 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const [accounts, setAccounts] = useState<Account[]>([]);
   const [destinationAccounts, setDestinationAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [selectedAccountBalance, setSelectedAccountBalance] = useState<number>(0);
   const toast = useToast();
   const queryClient = useQueryClient();
 
   const { ledgerId, currencySymbol } = useLedgerStore();
+
+  function formatCurrency(amount: number) {
+    const locale = currencySymbol === "₹" ? "en-IN" : "en-US";
+    return `${currencySymbol}${Math.abs(amount).toLocaleString(locale, {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })}`;
+  }
 
   // Modern theme colors - matching CreateTransactionModal
   const bgColor = useColorModeValue("white", "gray.800");
@@ -140,9 +151,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const fetchAccounts = useCallback(async () => {
     try {
       const response = await api.get<Account[]>(
-        `/ledger/${ledgerId}/accounts?ignore_group=true`,
+        `/ledger/${ledgerId}/accounts`,
       );
-      setAccounts(response.data);
+      setAccounts(response.data.filter(a => !a.is_group));
     } catch (error) {
       const axiosError = error as AxiosError<{ detail: string }>;
       if (axiosError.response?.status !== 401) {
@@ -176,6 +187,15 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       }
       fetchLedgers();
       fetchAccounts();
+    } else {
+      // Clear state when modal is closed
+      setFromAccountId("");
+      setToAccountId("");
+      setAmount("");
+      setNotes("");
+      setIsDifferentLedger(false);
+      setDestinationLedgerId("");
+      setDestinationAmount("");
     }
   }, [isOpen, resetForm, fetchLedgers, fetchAccounts, initialData]);
 
@@ -183,9 +203,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     async (ledgerId: string) => {
       try {
         const response = await api.get<Account[]>(
-          `/ledger/${ledgerId}/accounts?ignore_group=true`,
+          `/ledger/${ledgerId}/accounts`,
         );
-        setDestinationAccounts(response.data);
+        setDestinationAccounts(response.data.filter(a => !a.is_group));
       } catch (error) {
         const axiosError = error as AxiosError<{ detail: string }>;
         if (axiosError.response?.status !== 401) {
@@ -207,6 +227,18 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
     }
   }, [isDifferentLedger, destinationLedgerId, fetchDestinationAccounts]);
 
+  useEffect(() => {
+    if (fromAccountId) {
+      api.get(`/ledger/${ledgerId}/account/${fromAccountId}`)
+        .then(response => {
+          setSelectedAccountBalance(response.data.net_balance || 0);
+        })
+        .catch(() => setSelectedAccountBalance(0));
+    } else {
+      setSelectedAccountBalance(0);
+    }
+  }, [fromAccountId, ledgerId]);
+
   // Filter out the current ledger from the "destination ledger" dropdown
   const getFilteredLedgers = (ledgers: Ledger[]) => {
     return ledgers.filter((ledger) => ledger.ledger_id != ledgerId);
@@ -216,6 +248,8 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const getFilteredAccounts = (accounts: Account[]) => {
     return accounts.filter((account) => account.account_id != fromAccountId);
   };
+
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -328,160 +362,163 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
            overflow="auto"
            justifyContent={{ base: "space-between", sm: "flex-start" }}
          >
-           <form id="transfer-funds-form" onSubmit={handleSubmit}>
-             <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
-            {/* Basic Info Card */}
-            <Box
-              bg={cardBg}
-              p={{ base: 4, sm: 6 }}
-              borderRadius="md"
-              border="1px solid"
-              borderColor={borderColor}
-            >
-              <VStack spacing={5} align="stretch">
-                <Stack direction={{ base: "column", md: "row" }} spacing={4}>
-                  {/* Date Picker */}
-                  <FormControl flex="1" isRequired>
-                    <FormLabel fontWeight="semibold" mb={2}>
-                      Date
-                    </FormLabel>
-                    <Box
-                      sx={{
-                        ".react-datepicker-wrapper": {
-                          width: "100%",
-                        },
-                        ".react-datepicker__input-container input": {
-                          width: "100%",
-                          height: "48px",
-                          borderWidth: "2px",
-                          borderColor: inputBorderColor,
-                          borderRadius: "md",
-                          bg: inputBg,
-                          fontSize: "lg",
-                          _hover: { borderColor: "teal.300" },
-                          _focus: {
-                            borderColor: focusBorderColor,
-                            boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                          },
-                        },
-                      }}
-                    >
-                      <ChakraDatePicker
-                        selected={date}
-                        onChange={(date: Date | null) => {
-                          if (date) {
-                            setDate(date);
-                          }
-                        }}
-                        shouldCloseOnSelect={true}
-                        data-testid="transferfundsmodal-date-picker"
-                      />
-                    </Box>
-                  </FormControl>
+            <form id="transfer-funds-form" onSubmit={handleSubmit}>
+              <VStack spacing={{ base: 5, sm: 6 }} align="stretch" w="100%">
+             {/* From Account Selection (only shown if no accountId) */}
+             {!accountId && (
+               <Box
+                 bg={cardBg}
+                 p={{ base: 4, sm: 6 }}
+                 borderRadius="md"
+                 border="1px solid"
+                 borderColor={borderColor}
+               >
+                 <FormControl isRequired>
+                   <FormLabel fontWeight="semibold" mb={2}>
+                     From Account
+                   </FormLabel>
+                   <Select
+                     value={fromAccountId}
+                     onChange={(e) => setFromAccountId(e.target.value)}
+                     placeholder="Select source account"
+                     borderWidth="2px"
+                     borderColor={inputBorderColor}
+                     bg={inputBg}
+                     size="lg"
+                     borderRadius="md"
+                     _hover={{ borderColor: "teal.300" }}
+                     _focus={{
+                       borderColor: focusBorderColor,
+                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                     }}
+                     data-testid="transferfundsmodal-from-account-dropdown"
+                     autoFocus
+                   >
+                     <optgroup label="Asset Accounts">
+                       {accounts
+                         .filter((account) => account.type === "asset")
+                         .map((account) => (
+                           <option
+                             key={account.account_id}
+                             value={account.account_id}
+                           >
+                             {account.name}
+                           </option>
+                         ))}
+                     </optgroup>
+                     <optgroup label="Liability Accounts">
+                       {accounts
+                         .filter((account) => account.type === "liability")
+                         .map((account) => (
+                           <option
+                             key={account.account_id}
+                             value={account.account_id}
+                           >
+                             {account.name}
+                           </option>
+                         ))}
+                     </optgroup>
+                   </Select>
+                   <FormHelperText mt={2}>
+                     Choose which account to transfer from
+                   </FormHelperText>
+                 </FormControl>
+               </Box>
+             )}
 
-                  {/* Amount Input */}
-                  <FormControl flex="1" isRequired>
-                    <FormLabel fontWeight="semibold" mb={2}>
-                      Amount
-                    </FormLabel>
-                    <InputGroup size="lg">
-                      <InputLeftAddon
-                        bg={inputBorderColor}
-                        borderWidth="2px"
-                        borderColor={inputBorderColor}
-                        color="gray.600"
-                        fontWeight="semibold"
-                      >
-                        {currencySymbol}
-                      </InputLeftAddon>
-                      <Input
-                        type="text"
-                        inputMode="decimal"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        onKeyDown={(e) => handleNumericInput(e, amount)}
-                        onPaste={(e) => handleNumericPaste(e, setAmount)}
-                        placeholder="0.00"
-                        borderWidth="2px"
-                        borderColor={inputBorderColor}
-                        bg={inputBg}
-                        borderRadius="md"
-                        _hover={{ borderColor: "teal.300" }}
-                        _focus={{
-                          borderColor: focusBorderColor,
-                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                        }}
-                        autoFocus
-                      />
-                    </InputGroup>
-                    <FormHelperText mt={2}>
-                      Enter the transfer amount
-                    </FormHelperText>
-                  </FormControl>
-                </Stack>
-              </VStack>
-            </Box>
+             {/* Basic Info Card */}
+             <Box
+               bg={cardBg}
+               p={{ base: 4, sm: 6 }}
+               borderRadius="md"
+               border="1px solid"
+               borderColor={borderColor}
+             >
+               <VStack spacing={5} align="stretch">
+                 <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+                   {/* Date Picker */}
+                   <FormControl flex="1" isRequired>
+                     <FormLabel fontWeight="semibold" mb={2}>
+                       Date
+                     </FormLabel>
+                     <Box
+                       sx={{
+                         ".react-datepicker-wrapper": {
+                           width: "100%",
+                         },
+                         ".react-datepicker__input-container input": {
+                           width: "100%",
+                           height: "48px",
+                           borderWidth: "2px",
+                           borderColor: inputBorderColor,
+                           borderRadius: "md",
+                           bg: inputBg,
+                           fontSize: "lg",
+                           _hover: { borderColor: "teal.300" },
+                           _focus: {
+                             borderColor: focusBorderColor,
+                             boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                           },
+                         },
+                       }}
+                     >
+                       <ChakraDatePicker
+                         selected={date}
+                         onChange={(date: Date | null) => {
+                           if (date) {
+                             setDate(date);
+                           }
+                         }}
+                         shouldCloseOnSelect={true}
+                         data-testid="transferfundsmodal-date-picker"
+                       />
+                     </Box>
+                   </FormControl>
 
-            {/* From Account Selection (only shown if no accountId) */}
-            {!accountId && (
-              <Box
-                bg={cardBg}
-                p={{ base: 4, sm: 6 }}
-                borderRadius="md"
-                border="1px solid"
-                borderColor={borderColor}
-              >
-                <FormControl isRequired>
-                  <FormLabel fontWeight="semibold" mb={2}>
-                    From Account
-                  </FormLabel>
-                  <Select
-                    value={fromAccountId}
-                    onChange={(e) => setFromAccountId(e.target.value)}
-                    placeholder="Select source account"
-                    borderWidth="2px"
-                    borderColor={inputBorderColor}
-                    bg={inputBg}
-                    size="lg"
-                    borderRadius="md"
-                    _hover={{ borderColor: "teal.300" }}
-                    _focus={{
-                      borderColor: focusBorderColor,
-                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                    }}
-                    data-testid="transferfundsmodal-from-account-dropdown"
-                  >
-                    <optgroup label="Asset Accounts">
-                      {accounts
-                        .filter((account) => account.type === "asset")
-                        .map((account) => (
-                          <option
-                            key={account.account_id}
-                            value={account.account_id}
-                          >
-                            {account.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                    <optgroup label="Liability Accounts">
-                      {accounts
-                        .filter((account) => account.type === "liability")
-                        .map((account) => (
-                          <option
-                            key={account.account_id}
-                            value={account.account_id}
-                          >
-                            {account.name}
-                          </option>
-                        ))}
-                    </optgroup>
-                  </Select>
-                  <FormHelperText mt={2}>
-                    Choose which account to transfer from
-                  </FormHelperText>
-                </FormControl>
-              </Box>
-            )}
+                   {/* Amount Input */}
+                   <FormControl flex="1" isRequired>
+                     <FormLabel fontWeight="semibold" mb={2}>
+                       Amount
+                     </FormLabel>
+                     <InputGroup size="lg">
+                       <InputLeftAddon
+                         bg={inputBorderColor}
+                         borderWidth="2px"
+                         borderColor={inputBorderColor}
+                         color="gray.600"
+                         fontWeight="semibold"
+                       >
+                         {currencySymbol}
+                       </InputLeftAddon>
+                       <Input
+                         type="text"
+                         inputMode="decimal"
+                         value={amount}
+                         onChange={(e) => setAmount(e.target.value)}
+                         onKeyDown={(e) => handleNumericInput(e, amount)}
+                         onPaste={(e) => handleNumericPaste(e, setAmount)}
+                         placeholder="0.00"
+                         borderWidth="2px"
+                         borderColor={inputBorderColor}
+                         bg={inputBg}
+                         borderRadius="md"
+                         _hover={{ borderColor: "teal.300" }}
+                         _focus={{
+                           borderColor: focusBorderColor,
+                           boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                         }}
+                          autoFocus={!!accountId}
+                       />
+                     </InputGroup>
+                     <FormHelperText mt={2}>
+                       {fromAccountId
+                         ? `Available funds: ${formatCurrency(selectedAccountBalance)}`
+                         : "Enter the transfer amount"}
+                     </FormHelperText>
+                   </FormControl>
+                 </Stack>
+               </VStack>
+             </Box>
 
             {/* Different Ledger Toggle Card */}
             <Box
