@@ -249,6 +249,7 @@ const Ledger = () => {
           onClose={() => {
             setIsTransferModalOpen(false);
             setTransactionToCopy(undefined);
+            setSelectedAccountId(undefined);
           }}
           accountId={selectedAccountId}
           onTransferCompleted={() => {
