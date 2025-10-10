@@ -37,16 +37,20 @@ const currencies: Currency[] = [
 interface CreateLedgerModalProps {
   isOpen: boolean;
   onClose: () => void;
-   handleCreateLedger: (
-     // eslint-disable-next-line no-unused-vars
-     newLedgerName: string,
-     // eslint-disable-next-line no-unused-vars
-     currencySymbol: string,
-     // eslint-disable-next-line no-unused-vars
-     description: string,
-     // eslint-disable-next-line no-unused-vars
-     notes: string,
-   ) => void;
+  handleCreateLedger: (
+    // eslint-disable-next-line no-unused-vars
+    newLedgerName: string,
+    // eslint-disable-next-line no-unused-vars
+    currencySymbol: string,
+    // eslint-disable-next-line no-unused-vars
+    description: string,
+    // eslint-disable-next-line no-unused-vars
+    notes: string,
+    // eslint-disable-next-line no-unused-vars
+    navServiceType: string,
+    // eslint-disable-next-line no-unused-vars
+    apiKey: string,
+  ) => void;
 }
 
 const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
@@ -58,6 +62,8 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
   const [selectedCurrency, setSelectedCurrency] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+  const [navServiceType, setNavServiceType] = useState<string>("india");
+  const [apiKey, setApiKey] = useState<string>("");
   const toast = useToast();
 
   // Modern color scheme
@@ -78,14 +84,32 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
       return;
     }
 
+    if (navServiceType === "uk" && !apiKey.trim()) {
+      toast({
+        description: "API key is required for UK mutual fund service.",
+        status: "warning",
+        ...toastDefaults,
+      });
+      return;
+    }
+
     // Call the handleCreateLedger function passed from the parent
-    handleCreateLedger(newLedgerName, selectedCurrency, description, notes);
+    handleCreateLedger(
+      newLedgerName,
+      selectedCurrency,
+      description,
+      notes,
+      navServiceType,
+      apiKey,
+    );
 
     // Reset the form fields
     setNewLedgerName("");
     setSelectedCurrency("");
     setDescription("");
     setNotes("");
+    setNavServiceType("india");
+    setApiKey("");
 
     // Close the modal
     onClose();
@@ -186,7 +210,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                     value={newLedgerName}
                     onChange={(e) => setNewLedgerName(e.target.value)}
                     autoFocus
-                     onKeyDown={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     borderWidth="2px"
                     borderColor={inputBorderColor}
                     bg={inputBg}
@@ -232,6 +256,61 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                     Select the primary currency for this ledger
                   </FormHelperText>
                 </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Mutual Fund Service
+                  </FormLabel>
+                  <Select
+                    value={navServiceType}
+                    onChange={(e) => setNavServiceType(e.target.value)}
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                  >
+                    <option value="india">
+                      Indian Mutual Funds (MFAPI.in)
+                    </option>
+                    <option value="uk">UK Mutual Funds (Alpha Vantage)</option>
+                  </Select>
+                  <FormHelperText mt={2}>
+                    Select the mutual fund data service for this ledger
+                  </FormHelperText>
+                </FormControl>
+
+                {navServiceType === "uk" && (
+                  <FormControl isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Alpha Vantage API Key
+                    </FormLabel>
+                    <Input
+                      type="password"
+                      placeholder="Enter your Alpha Vantage API key"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      size="lg"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                    />
+                    <FormHelperText mt={2}>
+                      Required for UK mutual fund data.
+                    </FormHelperText>
+                  </FormControl>
+                )}
               </VStack>
             </Box>
 
@@ -263,9 +342,9 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
                     }}
                   />
-                   <FormHelperText mt={2}>
-                     A brief overview of this ledger&apos;s purpose
-                   </FormHelperText>
+                  <FormHelperText mt={2}>
+                    A brief overview of this ledger&apos;s purpose
+                  </FormHelperText>
                 </FormControl>
 
                 <FormControl>

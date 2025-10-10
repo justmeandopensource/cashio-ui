@@ -355,16 +355,16 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                        </Button>
                      )}
                    </HStack>
-                  <InputGroup size="lg">
-                    <InputLeftAddon
-                      bg={inputBorderColor}
-                      borderWidth="2px"
-                      borderColor={inputBorderColor}
-                      color="gray.600"
-                      fontWeight="semibold"
-                    >
-                      ₹
-                    </InputLeftAddon>
+                   <InputGroup size="lg">
+                     <InputLeftAddon
+                       bg={inputBorderColor}
+                       borderWidth="2px"
+                       borderColor={inputBorderColor}
+                       color="gray.600"
+                       fontWeight="semibold"
+                     >
+                       {currencySymbol || "₹"}
+                     </InputLeftAddon>
                     <Input
                       type="text"
                       value={formData.nav}

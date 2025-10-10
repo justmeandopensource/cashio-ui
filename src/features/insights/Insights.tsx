@@ -103,6 +103,8 @@ const Insights = () => {
         selectedLedger.currency_symbol,
         selectedLedger.description || "",
         selectedLedger.notes || "",
+        "",
+        undefined,
         selectedLedger.created_at || "",
         selectedLedger.updated_at || "",
       );

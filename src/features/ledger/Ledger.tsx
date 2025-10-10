@@ -29,6 +29,8 @@ const Ledger = () => {
     currencySymbol,
     description,
     notes,
+    navServiceType,
+    apiKey,
     createdAt,
     updatedAt,
     setLedger,
@@ -95,6 +97,8 @@ const Ledger = () => {
     currency_symbol: string;
     description: string;
     notes: string;
+    nav_service_type: string;
+    api_key: string;
     created_at: string;
     updated_at: string;
   }) => {
@@ -105,6 +109,8 @@ const Ledger = () => {
         data.currency_symbol,
         data.description,
         data.notes,
+        data.nav_service_type,
+        data.api_key,
         data.created_at,
         data.updated_at,
       );
@@ -180,6 +186,8 @@ const Ledger = () => {
           currentCurrencySymbol={currencySymbol as string}
           currentDescription={description || ""}
           currentNotes={notes || ""}
+          currentNavServiceType={navServiceType || "india"}
+          currentApiKey={apiKey || ""}
           onUpdateCompleted={handleUpdateCompleted}
         />
       )}

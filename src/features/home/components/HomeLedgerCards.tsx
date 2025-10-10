@@ -26,10 +26,12 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
     currencySymbol: string,
     description: string,
     notes: string,
+    navServiceType: string,
+    apiKey: string | undefined,
     createdAt: string,
     updatedAt: string,
   ) => {
-    setLedger(ledgerId, ledgerName, currencySymbol, description, notes, createdAt, updatedAt);
+    setLedger(ledgerId, ledgerName, currencySymbol, description, notes, navServiceType, apiKey, createdAt, updatedAt);
     navigate(`/ledger`);
   };
 
@@ -73,6 +75,8 @@ const HomeLedgerCards = ({ ledgers = [], onOpen }: HomeLedgerCardsProps) => {
                     ledger.currency_symbol,
                     ledger.description,
                     ledger.notes,
+                    "",
+                    undefined,
                     ledger.created_at,
                     ledger.updated_at,
                   )

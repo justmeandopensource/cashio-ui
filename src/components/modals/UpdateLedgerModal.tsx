@@ -44,15 +44,19 @@ interface UpdateLedgerModalProps {
   currentCurrencySymbol: string;
   currentDescription: string;
   currentNotes: string;
-   // eslint-disable-next-line no-unused-vars
-   onUpdateCompleted: (data: {
-     name: string;
-     currency_symbol: string;
-     description: string;
-     notes: string;
-     created_at: string;
-     updated_at: string;
-   }) => void;
+  currentNavServiceType: string;
+  currentApiKey: string;
+  // eslint-disable-next-line no-unused-vars
+  onUpdateCompleted: (data: {
+    name: string;
+    currency_symbol: string;
+    description: string;
+    notes: string;
+    nav_service_type: string;
+    api_key: string;
+    created_at: string;
+    updated_at: string;
+  }) => void;
 }
 
 interface UpdateLedgerPayload {
@@ -60,6 +64,8 @@ interface UpdateLedgerPayload {
   currency_symbol?: string;
   description?: string;
   notes?: string;
+  nav_service_type?: string;
+  api_key?: string;
 }
 
 const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
@@ -69,6 +75,8 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
   currentCurrencySymbol,
   currentDescription,
   currentNotes,
+  currentNavServiceType,
+  currentApiKey,
   onUpdateCompleted,
 }) => {
   const [ledgerName, setLedgerName] = useState<string>(currentLedgerName);
@@ -79,6 +87,10 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
     currentDescription ?? "",
   );
   const [notes, setNotes] = useState<string>(currentNotes ?? "");
+  const [navServiceType, setNavServiceType] = useState<string>(
+    currentNavServiceType,
+  );
+  const [apiKey, setApiKey] = useState<string>(currentApiKey ?? "");
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
 
@@ -86,7 +98,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
   React.useEffect(() => {
     setDescription(currentDescription ?? "");
     setNotes(currentNotes ?? "");
-  }, [currentDescription, currentNotes]);
+    setNavServiceType(currentNavServiceType);
+    setApiKey(currentApiKey ?? "");
+  }, [currentDescription, currentNotes, currentNavServiceType, currentApiKey]);
 
   const { ledgerId } = useLedgerStore();
 
@@ -108,6 +122,15 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
       return;
     }
 
+    if (navServiceType === "uk" && !apiKey.trim()) {
+      toast({
+        description: "API key is required for UK mutual fund service.",
+        status: "warning",
+        ...toastDefaults,
+      });
+      return;
+    }
+
     const payload: UpdateLedgerPayload = {};
 
     if (ledgerName !== currentLedgerName) {
@@ -121,6 +144,12 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
     }
     if (notes !== currentNotes) {
       payload.notes = notes;
+    }
+    if (navServiceType !== currentNavServiceType) {
+      payload.nav_service_type = navServiceType;
+    }
+    if (apiKey !== (currentApiKey ?? "")) {
+      payload.api_key = apiKey;
     }
 
     if (Object.keys(payload).length === 0) {
@@ -168,7 +197,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
     ledgerName !== currentLedgerName ||
     selectedCurrency !== currentCurrencySymbol ||
     description !== (currentDescription ?? "") ||
-    notes !== (currentNotes ?? "");
+    notes !== (currentNotes ?? "") ||
+    navServiceType !== currentNavServiceType ||
+    apiKey !== (currentApiKey ?? "");
 
   return (
     <Modal
@@ -258,7 +289,7 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
                     value={ledgerName}
                     onChange={(e) => setLedgerName(e.target.value)}
                     autoFocus
-                     onKeyDown={handleKeyPress}
+                    onKeyDown={handleKeyPress}
                     borderWidth="2px"
                     borderColor={inputBorderColor}
                     bg={inputBg}
@@ -306,6 +337,63 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
                     Update the primary currency for this ledger
                   </FormHelperText>
                 </FormControl>
+
+                <FormControl isRequired>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    Mutual Fund Service
+                  </FormLabel>
+                  <Select
+                    value={navServiceType}
+                    onChange={(e) => setNavServiceType(e.target.value)}
+                    borderWidth="2px"
+                    borderColor={inputBorderColor}
+                    bg={inputBg}
+                    size="lg"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                    isDisabled={isLoading}
+                  >
+                    <option value="india">
+                      Indian Mutual Funds (MFAPI.in)
+                    </option>
+                    <option value="uk">UK Mutual Funds (Alpha Vantage)</option>
+                  </Select>
+                  <FormHelperText mt={2}>
+                    Update the mutual fund data service for this ledger
+                  </FormHelperText>
+                </FormControl>
+
+                {navServiceType === "uk" && (
+                  <FormControl isRequired>
+                    <FormLabel fontWeight="semibold" mb={2}>
+                      Alpha Vantage API Key
+                    </FormLabel>
+                    <Input
+                      type="password"
+                      placeholder="Enter your Alpha Vantage API key"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      borderWidth="2px"
+                      borderColor={inputBorderColor}
+                      bg={inputBg}
+                      size="lg"
+                      borderRadius="md"
+                      _hover={{ borderColor: "teal.300" }}
+                      _focus={{
+                        borderColor: focusBorderColor,
+                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                      }}
+                      isDisabled={isLoading}
+                    />
+                    <FormHelperText mt={2}>
+                      Required for UK mutual fund data.
+                    </FormHelperText>
+                  </FormControl>
+                )}
               </VStack>
             </Box>
 
@@ -338,9 +426,9 @@ const UpdateLedgerModal: React.FC<UpdateLedgerModalProps> = ({
                     }}
                     isDisabled={isLoading}
                   />
-                   <FormHelperText mt={2}>
-                     A brief overview of this ledger&apos;s purpose
-                   </FormHelperText>
+                  <FormHelperText mt={2}>
+                    A brief overview of this ledger&apos;s purpose
+                  </FormHelperText>
                 </FormControl>
 
                 <FormControl>

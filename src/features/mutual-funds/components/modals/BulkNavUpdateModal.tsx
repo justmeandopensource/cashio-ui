@@ -53,7 +53,7 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
   mutualFunds,
   onSuccess,
 }) => {
-  const { ledgerId } = useLedgerStore();
+  const { ledgerId, currencySymbol } = useLedgerStore();
   const queryClient = useQueryClient();
   const [selectedFunds, setSelectedFunds] = useState<Set<number>>(new Set());
   const [results, setResults] = useState<Map<string, NavFetchResult>>(
@@ -253,12 +253,12 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
                       </Td>
                       <Td><Text fontWeight="medium">{c.fund.name}</Text></Td>
                       <Td><Text fontSize="sm" color="gray.600">{c.fund.code}</Text></Td>
-                      <Td isNumeric><Text fontWeight="semibold" color="gray.600">₹{c.currentNav.toFixed(2)}</Text></Td>
+                       <Td isNumeric><Text fontWeight="semibold" color="gray.600">{currencySymbol || "₹"}{c.currentNav.toFixed(2)}</Text></Td>
                       <Td isNumeric>
                         {c.isFetching ? (
                           <Spinner size="xs" color="teal.500" />
                         ) : c.fetchedNav !== null ? (
-                          <Text fontWeight={c.isUpToDate ? "normal" : "semibold"} color="black">₹{c.fetchedNav.toFixed(2)}</Text>
+                           <Text fontWeight={c.isUpToDate ? "normal" : "semibold"} color="black">{currencySymbol || "₹"}{c.fetchedNav.toFixed(2)}</Text>
                         ) : (
                           <Text color="gray.400">-</Text>
                         )}

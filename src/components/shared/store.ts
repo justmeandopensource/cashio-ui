@@ -7,10 +7,12 @@ interface LedgerState {
   currencySymbol: string | undefined;
   description: string | undefined;
   notes: string | undefined;
+  navServiceType: string | undefined;
+  apiKey: string | undefined;
   createdAt: string | undefined;
   updatedAt: string | undefined;
   // eslint-disable-next-line no-unused-vars
-  setLedger: (id: string, name: string, symbol: string, description: string, notes: string, createdAt: string, updatedAt: string) => void;
+  setLedger: (id: string, name: string, symbol: string, description: string, notes: string, navServiceType: string, apiKey: string | undefined, createdAt: string, updatedAt: string) => void;
   clearLedger: () => void;
 }
 
@@ -22,15 +24,19 @@ const useLedgerStore = create<LedgerState>()(
       currencySymbol: undefined,
       description: undefined,
       notes: undefined,
+      navServiceType: undefined,
+      apiKey: undefined,
       createdAt: undefined,
       updatedAt: undefined,
-      setLedger: (id, name, symbol, description, notes, createdAt, updatedAt) =>
+      setLedger: (id, name, symbol, description, notes, navServiceType, apiKey, createdAt, updatedAt) =>
         set({
           ledgerId: id,
           ledgerName: name,
           currencySymbol: symbol,
           description: description,
           notes: notes,
+          navServiceType: navServiceType,
+          apiKey: apiKey || undefined,
           createdAt: createdAt,
           updatedAt: updatedAt,
         }),
@@ -41,6 +47,8 @@ const useLedgerStore = create<LedgerState>()(
           currencySymbol: undefined,
           description: undefined,
           notes: undefined,
+          navServiceType: undefined,
+          apiKey: undefined,
           createdAt: undefined,
           updatedAt: undefined,
         }),
@@ -54,6 +62,8 @@ const useLedgerStore = create<LedgerState>()(
         currencySymbol: state.currencySymbol,
         description: state.description,
         notes: state.notes,
+        navServiceType: state.navServiceType,
+        apiKey: state.apiKey,
         createdAt: state.createdAt,
         updatedAt: state.updatedAt,
       }),
