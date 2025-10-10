@@ -7,6 +7,8 @@ import {
   ModalBody,
   VStack,
   Input,
+  InputGroup,
+  InputRightElement,
   Button,
   useToast,
   FormControl,
@@ -19,7 +21,7 @@ import {
   HStack,
   Icon,
 } from "@chakra-ui/react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Eye, EyeOff } from "lucide-react";
 import { toastDefaults } from "../shared/utils";
 
 interface Currency {
@@ -64,6 +66,7 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
   const [notes, setNotes] = useState<string>("");
   const [navServiceType, setNavServiceType] = useState<string>("india");
   const [apiKey, setApiKey] = useState<string>("");
+  const [showApiKey, setShowApiKey] = useState<boolean>(false);
   const toast = useToast();
 
   // Modern color scheme
@@ -285,32 +288,46 @@ const CreateLedgerModal: React.FC<CreateLedgerModalProps> = ({
                   </FormHelperText>
                 </FormControl>
 
-                {navServiceType === "uk" && (
-                  <FormControl isRequired>
-                    <FormLabel fontWeight="semibold" mb={2}>
-                      Alpha Vantage API Key
-                    </FormLabel>
-                    <Input
-                      type="password"
-                      placeholder="Enter your Alpha Vantage API key"
-                      value={apiKey}
-                      onChange={(e) => setApiKey(e.target.value)}
-                      borderWidth="2px"
-                      borderColor={inputBorderColor}
-                      bg={inputBg}
-                      size="lg"
-                      borderRadius="md"
-                      _hover={{ borderColor: "teal.300" }}
-                      _focus={{
-                        borderColor: focusBorderColor,
-                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                      }}
-                    />
-                    <FormHelperText mt={2}>
-                      Required for UK mutual fund data.
-                    </FormHelperText>
-                  </FormControl>
-                )}
+                 {navServiceType === "uk" && (
+                   <FormControl isRequired>
+                     <FormLabel fontWeight="semibold" mb={2}>
+                       Alpha Vantage API Key
+                     </FormLabel>
+                     <InputGroup size="lg">
+                       <Input
+                         type={showApiKey ? "text" : "password"}
+                         placeholder="Enter your Alpha Vantage API key"
+                         value={apiKey}
+                         onChange={(e) => setApiKey(e.target.value)}
+                         borderWidth="2px"
+                         borderColor={inputBorderColor}
+                         bg={inputBg}
+                         borderRadius="md"
+                         _hover={{ borderColor: "teal.300" }}
+                         _focus={{
+                           borderColor: focusBorderColor,
+                           boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                         }}
+                       />
+                       <InputRightElement height="100%">
+                         <Button
+                           variant="ghost"
+                           onClick={() => setShowApiKey(!showApiKey)}
+                           _hover={{ bg: "transparent" }}
+                           size="sm"
+                           aria-label={
+                             showApiKey ? "Hide API key" : "Show API key"
+                           }
+                         >
+                           <Icon as={showApiKey ? EyeOff : Eye} boxSize={4} />
+                         </Button>
+                       </InputRightElement>
+                     </InputGroup>
+                     <FormHelperText mt={2}>
+                       Required for UK mutual fund data.
+                     </FormHelperText>
+                   </FormControl>
+                 )}
               </VStack>
             </Box>
 

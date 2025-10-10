@@ -19,7 +19,8 @@ import LedgerDetailsModal from "@components/modals/LedgerDetailsModal";
 import { useState } from "react";
 import CreateTransactionModal from "@components/modals/CreateTransactionModal";
 const TransferFundsModal = lazy(() => import("@components/modals/TransferFundsModal"));
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
+import api from "@/lib/api";
 
 const Ledger = () => {
   const navigate = useNavigate();
@@ -36,6 +37,30 @@ const Ledger = () => {
     setLedger,
   } = useLedgerStore();
   const queryClient = useQueryClient();
+
+  // Fetch ledger details to ensure store has correct navServiceType and apiKey
+  useQuery({
+    queryKey: ["ledger", ledgerId],
+    queryFn: async () => {
+      if (!ledgerId) return null;
+      const response = await api.get(`/ledger/${ledgerId}`);
+      const data = response.data;
+      // Update store with fetched data
+      setLedger(
+        data.ledger_id || ledgerId,
+        data.name,
+        data.currency_symbol,
+        data.description,
+        data.notes,
+        data.nav_service_type,
+        data.api_key,
+        data.created_at,
+        data.updated_at,
+      );
+      return data;
+    },
+    enabled: !!ledgerId,
+  });
 
   const {
     isOpen: isUpdateLedgerModalOpen,
