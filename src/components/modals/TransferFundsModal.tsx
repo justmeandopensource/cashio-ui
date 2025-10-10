@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Modal,
   ModalOverlay,
@@ -95,6 +96,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
   const [destinationAccounts, setDestinationAccounts] = useState<Account[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const toast = useToast();
+  const queryClient = useQueryClient();
 
   const { ledgerId, currencySymbol } = useLedgerStore();
 
@@ -231,6 +233,9 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
       };
 
       await api.post(`/ledger/${ledgerId}/transaction/transfer`, payload);
+
+      // Invalidate accounts queries for both source and destination ledgers
+      await queryClient.invalidateQueries({ queryKey: ["accounts"] });
 
       toast({
         description: "Transfer completed successfully.",

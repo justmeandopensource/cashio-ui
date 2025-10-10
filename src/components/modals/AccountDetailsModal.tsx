@@ -70,7 +70,8 @@ const AccountDetailsModal: React.FC<AccountDetailsModalProps> = ({
   };
 
   const formatCurrency = (amount: number) => {
-    return `${currencySymbol}${Math.abs(amount).toLocaleString("en-US", {
+    const locale = currencySymbol === "₹" ? "en-IN" : "en-US";
+    return `${currencySymbol}${Math.abs(amount).toLocaleString(locale, {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     })}`;
