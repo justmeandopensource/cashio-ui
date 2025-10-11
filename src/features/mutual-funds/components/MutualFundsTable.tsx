@@ -58,6 +58,10 @@ import {
 const toNumber = (value: number | string): number => typeof value === 'string' ? parseFloat(value) : value;
 import { useFundTransactions } from "../api";
 import useLedgerStore from "../../../components/shared/store";
+import AmcDetailsModal from "./modals/AmcDetailsModal";
+import UpdateAmcModal from "./modals/UpdateAmcModal";
+import MutualFundDetailsModal from "./modals/MutualFundDetailsModal";
+import UpdateMutualFundModal from "./modals/UpdateMutualFundModal";
 
 // Expanded Fund Row Component
 /* eslint-disable no-unused-vars */
@@ -365,9 +369,17 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
   const isMobile = useBreakpointValue({ base: true, md: false });
 
    // State for sorting
-   const [sortField, setSortField] =
-     useState<SortField>("unrealized_pnl_percentage");
-   const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+    const [sortField, setSortField] =
+      useState<SortField>("unrealized_pnl_percentage");
+    const [sortDirection, setSortDirection] = useState<SortDirection>("desc");
+
+    // Modal states
+    const [selectedAmc, setSelectedAmc] = useState<Amc | null>(null);
+    const [selectedFund, setSelectedFund] = useState<MutualFund | null>(null);
+    const [isAmcDetailsModalOpen, setIsAmcDetailsModalOpen] = useState(false);
+    const [isUpdateAmcModalOpen, setIsUpdateAmcModalOpen] = useState(false);
+    const [isFundDetailsModalOpen, setIsFundDetailsModalOpen] = useState(false);
+    const [isUpdateFundModalOpen, setIsUpdateFundModalOpen] = useState(false);
 
     // Available AMCs based on selected owner and asset class
     const availableAmcs = useMemo(() => {
@@ -559,6 +571,66 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     setExpandedRows(newExpanded);
   };
 
+  // Modal handlers
+  const handleAmcClick = (amc: Amc) => {
+    setSelectedAmc(amc);
+    setIsAmcDetailsModalOpen(true);
+  };
+
+  const handleFundClick = (fund: MutualFund) => {
+    setSelectedFund(fund);
+    setIsFundDetailsModalOpen(true);
+  };
+
+  const handleEditAmc = () => {
+    setIsAmcDetailsModalOpen(false);
+    setIsUpdateAmcModalOpen(true);
+  };
+
+  const handleEditFund = () => {
+    setIsFundDetailsModalOpen(false);
+    setIsUpdateFundModalOpen(true);
+  };
+
+  const handleAmcDetailsClose = () => {
+    setIsAmcDetailsModalOpen(false);
+    // Don't reset selectedAmc - let the edit modal handle it
+  };
+
+  const handleUpdateAmcClose = () => {
+    setIsUpdateAmcModalOpen(false);
+    setSelectedAmc(null);
+  };
+
+  const handleFundDetailsClose = () => {
+    setIsFundDetailsModalOpen(false);
+    // Don't reset selectedFund - let the edit modal handle it
+  };
+
+  const handleUpdateFundClose = () => {
+    setIsUpdateFundModalOpen(false);
+    setSelectedFund(null);
+  };
+
+  const handleUpdateCompleted = () => {
+    // Close all modals and reset state
+    setIsAmcDetailsModalOpen(false);
+    setIsUpdateAmcModalOpen(false);
+    setIsFundDetailsModalOpen(false);
+    setIsUpdateFundModalOpen(false);
+    setSelectedAmc(null);
+    setSelectedFund(null);
+  };
+
+  // Clean up selected items when all modals are closed
+  useEffect(() => {
+    const hasAnyModalOpen = isAmcDetailsModalOpen || isUpdateAmcModalOpen || isFundDetailsModalOpen || isUpdateFundModalOpen;
+    if (!hasAnyModalOpen) {
+      setSelectedAmc(null);
+      setSelectedFund(null);
+    }
+  }, [isAmcDetailsModalOpen, isUpdateAmcModalOpen, isFundDetailsModalOpen, isUpdateFundModalOpen]);
+
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) return <ArrowUpDown size={14} />;
     return sortDirection === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
@@ -594,7 +666,12 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     );
   };
 
-  const MobileFundCard: React.FC<{ fund: typeof sortedFunds[0] }> = ({ fund }) => {
+  /* eslint-disable no-unused-vars */
+  const MobileFundCard: React.FC<{
+    fund: typeof sortedFunds[0];
+    onAmcClick: (amc: Amc) => void;
+    onFundClick: (fund: MutualFund) => void;
+  }> = ({ fund, onAmcClick, onFundClick }) => {
     const [isExpanded, setIsExpanded] = useState(false);
     const boxBg = useColorModeValue("gray.50", "gray.800");
     const borderColor = useColorModeValue("gray.200", "gray.700");
@@ -613,24 +690,46 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     const navUpdatedDate = fund.last_nav_update ? new Date(fund.last_nav_update) : null;
 
     return (
-      <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "gray.700")} boxShadow="md">
-        <Box p={4} onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
-          <Flex justify="space-between" align="start">
-            <Box maxW="80%">
-              <HStack spacing={1} align="baseline" wrap="wrap">
-                <Text fontWeight="medium" noOfLines={2}>{fund.name}</Text>
-                {getPlanInitials(fund.plan) && ( <Text as="span" fontSize="xs" color="gray.500">({getPlanInitials(fund.plan)})</Text> )}
-                {getOwnerInitials(fund.owner) && ( <Text as="span" fontSize="xs" color="gray.500">[{getOwnerInitials(fund.owner)}]</Text> )}
-              </HStack>
-              <Text fontSize="sm" color={mutedColor}></Text>
-            </Box>
-            <IconButton
-              icon={isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
-              variant="ghost"
-              size="sm"
-              aria-label="Expand row"
-            />
-          </Flex>
+        <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "gray.700")} boxShadow="md">
+          <Box p={4}>
+            <Flex justify="space-between" align="start">
+              <Box maxW="80%">
+                <HStack spacing={1} align="baseline" wrap="wrap">
+                  <Text
+                    fontWeight="medium"
+                    noOfLines={2}
+                    color="teal.500"
+                    cursor="pointer"
+                    _hover={{ textDecoration: "underline" }}
+                    onClick={() => onFundClick(fund)}
+                  >
+                    {fund.name}
+                  </Text>
+                  {getPlanInitials(fund.plan) && ( <Text as="span" fontSize="xs" color="gray.500">({getPlanInitials(fund.plan)})</Text> )}
+                  {getOwnerInitials(fund.owner) && ( <Text as="span" fontSize="xs" color="gray.500">[{getOwnerInitials(fund.owner)}]</Text> )}
+                </HStack>
+                <Text
+                  fontSize="sm"
+                  color="teal.500"
+                  cursor="pointer"
+                  _hover={{ textDecoration: "underline" }}
+                  onClick={() => {
+                    const amc = amcs.find(a => a.amc_id === fund.amc_id);
+                    if (amc) onAmcClick(amc);
+                  }}
+                >
+                  {fund.amc_name}
+                </Text>
+              </Box>
+              <IconButton
+                icon={isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
+                variant="ghost"
+                size="sm"
+                aria-label="Expand row"
+                onClick={() => setIsExpanded(!isExpanded)}
+                cursor="pointer"
+              />
+            </Flex>
           <SimpleGrid columns={2} spacing={4} mt={4}>
             <Stat>
               <StatLabel fontSize="xs" color={mutedColor}>Value</StatLabel>
@@ -726,6 +825,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
       </Box>
     );
   };
+  /* eslint-enable no-unused-vars */
 
   return (
     <Box>
@@ -803,7 +903,12 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
       {isMobile ? (
         <VStack spacing={4} align="stretch" mt={4}>
           {sortedFunds.map((fund) => (
-            <MobileFundCard key={fund.mutual_fund_id} fund={fund} />
+            <MobileFundCard
+              key={fund.mutual_fund_id}
+              fund={fund}
+              onAmcClick={handleAmcClick}
+              onFundClick={handleFundClick}
+            />
           ))}
         </VStack>
       ) : (
@@ -899,52 +1004,71 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             <Tbody>
               {sortedFunds.map((fund) => (
                 <React.Fragment key={fund.mutual_fund_id}>
-                  <Tr
-                    _hover={{ bg: "gray.50", cursor: "pointer" }}
-                    onClick={() => toggleRowExpansion(fund.mutual_fund_id)}
-                  >
-                    <Td>
-                      <IconButton
-                        icon={
-                          expandedRows.has(fund.mutual_fund_id) ? (
-                            <ChevronDown size={16} />
-                          ) : (
-                            <ChevronRight size={16} />
-                          )
-                        }
-                        variant="ghost"
-                        size="xs"
-                        aria-label="Expand row"
-                      />
-                    </Td>
-                    <Td fontWeight="medium">{fund.amc_name}</Td>
+                   <Tr _hover={{ bg: "gray.50" }}>
                      <Td>
-                       <HStack spacing={1} align="baseline">
-                         <Text fontWeight="medium" noOfLines={1}>
-                           {fund.name}
-                         </Text>
-                         {getPlanInitials(fund.plan) && (
-                           <Text
-                             as="span"
-                             fontSize="xs"
-                             color="gray.500"
-                             fontWeight="normal"
-                           >
-                             ({getPlanInitials(fund.plan)})
-                           </Text>
-                         )}
-                         {getOwnerInitials(fund.owner) && (
-                           <Text
-                             as="span"
-                             fontSize="xs"
-                             color="gray.500"
-                             fontWeight="normal"
-                           >
-                             [{getOwnerInitials(fund.owner)}]
-                           </Text>
-                         )}
-                       </HStack>
-                      </Td>
+                       <IconButton
+                         icon={
+                           expandedRows.has(fund.mutual_fund_id) ? (
+                             <ChevronDown size={16} />
+                           ) : (
+                             <ChevronRight size={16} />
+                           )
+                         }
+                         variant="ghost"
+                         size="xs"
+                         aria-label="Expand row"
+                         onClick={() => toggleRowExpansion(fund.mutual_fund_id)}
+                         cursor="pointer"
+                       />
+                     </Td>
+                     <Td fontWeight="medium">
+                       <Text
+                         as="span"
+                         color="teal.500"
+                         cursor="pointer"
+                         _hover={{ textDecoration: "underline" }}
+                         onClick={() => {
+                           const amc = amcs.find(a => a.amc_id === fund.amc_id);
+                           if (amc) handleAmcClick(amc);
+                         }}
+                       >
+                         {fund.amc_name}
+                       </Text>
+                     </Td>
+                      <Td>
+                        <HStack spacing={1} align="baseline">
+                          <Text
+                            fontWeight="medium"
+                            noOfLines={1}
+                            color="teal.500"
+                            cursor="pointer"
+                            _hover={{ textDecoration: "underline" }}
+                            onClick={() => handleFundClick(fund)}
+                          >
+                            {fund.name}
+                          </Text>
+                          {getPlanInitials(fund.plan) && (
+                            <Text
+                              as="span"
+                              fontSize="xs"
+                              color="gray.500"
+                              fontWeight="normal"
+                            >
+                              ({getPlanInitials(fund.plan)})
+                            </Text>
+                          )}
+                          {getOwnerInitials(fund.owner) && (
+                            <Text
+                              as="span"
+                              fontSize="xs"
+                              color="gray.500"
+                              fontWeight="normal"
+                            >
+                              [{getOwnerInitials(fund.owner)}]
+                            </Text>
+                          )}
+                        </HStack>
+                       </Td>
                      <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
                        {currencySymbol || "₹"}
                        {formatNav(fund.latest_nav)}
@@ -1104,6 +1228,44 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             No mutual funds found matching the current filter.
           </Text>
         </Box>
+      )}
+
+      {/* Modals */}
+      {selectedAmc && (
+        <AmcDetailsModal
+          isOpen={isAmcDetailsModalOpen}
+          onClose={handleAmcDetailsClose}
+          amc={selectedAmc}
+          onEditAmc={handleEditAmc}
+        />
+      )}
+
+      {selectedAmc && (
+        <UpdateAmcModal
+          isOpen={isUpdateAmcModalOpen}
+          onClose={handleUpdateAmcClose}
+          amc={selectedAmc}
+          onUpdateCompleted={handleUpdateCompleted}
+        />
+      )}
+
+      {selectedFund && (
+        <MutualFundDetailsModal
+          isOpen={isFundDetailsModalOpen}
+          onClose={handleFundDetailsClose}
+          fund={selectedFund}
+          onEditFund={handleEditFund}
+        />
+      )}
+
+      {selectedFund && (
+        <UpdateMutualFundModal
+          isOpen={isUpdateFundModalOpen}
+          onClose={handleUpdateFundClose}
+          fund={selectedFund}
+          amcs={amcs}
+          onUpdateCompleted={handleUpdateCompleted}
+        />
       )}
     </Box>
   );
