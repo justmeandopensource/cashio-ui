@@ -4,7 +4,7 @@ import {
   ModalOverlay,
   ModalContent,
   ModalBody,
-  ModalCloseButton,
+  ModalFooter,
   VStack,
   HStack,
   Box,
@@ -16,7 +16,7 @@ import {
   Icon,
   Button,
 } from "@chakra-ui/react";
-import { TrendingUp, FileText, Edit } from "lucide-react";
+import { TrendingUp, FileText, Edit, X } from "lucide-react";
 import { MutualFund } from "../../types";
 
 interface MutualFundDetailsModalProps {
@@ -35,6 +35,7 @@ const MutualFundDetailsModal: React.FC<MutualFundDetailsModalProps> = ({
   const bgColor = useColorModeValue("white", "gray.800");
   const borderColor = useColorModeValue("gray.100", "gray.700");
   const cardBg = useColorModeValue("gray.50", "gray.700");
+  const inputBg = useColorModeValue("white", "gray.700");
   const textSecondary = useColorModeValue("gray.600", "gray.400");
   const textMuted = useColorModeValue("gray.500", "gray.500");
   const iconColor = useColorModeValue("teal.500", "teal.300");
@@ -42,7 +43,9 @@ const MutualFundDetailsModal: React.FC<MutualFundDetailsModalProps> = ({
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Not available";
     try {
-      return new Date(dateString).toLocaleDateString("en-US", {
+      // Parse as UTC and convert to local time
+      const utcDate = new Date(dateString + (dateString.includes('Z') ? '' : 'Z'));
+      return utcDate.toLocaleString("en-US", {
         year: "numeric",
         month: "short",
         day: "numeric",
@@ -82,17 +85,7 @@ const MutualFundDetailsModal: React.FC<MutualFundDetailsModalProps> = ({
           px={{ base: 4, sm: 8 }}
           py={{ base: 6, sm: 6 }}
           pt={{ base: 12, sm: 6 }}
-          position="relative"
         >
-          <ModalCloseButton
-            color="white"
-            _hover={{ bg: "whiteAlpha.200" }}
-            size="lg"
-            borderRadius="full"
-            top={{ base: 4, sm: 6 }}
-            right={{ base: 4, sm: 6 }}
-          />
-
           <HStack spacing={{ base: 3, sm: 4 }} align="start">
             <Box
               p={{ base: 2, sm: 3 }}
@@ -138,8 +131,16 @@ const MutualFundDetailsModal: React.FC<MutualFundDetailsModalProps> = ({
           </HStack>
         </Box>
 
-        <ModalBody p={{ base: 4, sm: 8 }} flex="1" overflow="auto">
-          <VStack spacing={{ base: 4, sm: 6 }} align="stretch">
+        <ModalBody
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 4, sm: 6 }}
+          flex="1"
+          display="flex"
+          flexDirection="column"
+          overflow="auto"
+          justifyContent={{ base: "space-between", sm: "flex-start" }}
+        >
+          <VStack spacing={{ base: 4, sm: 6 }} align="stretch" w="100%">
 
 
             {/* Fund Details */}
@@ -352,19 +353,73 @@ const MutualFundDetailsModal: React.FC<MutualFundDetailsModalProps> = ({
               </VStack>
             </Box>
 
+          </VStack>
+
+          {/* Mobile-only action buttons that stay at bottom */}
+          <Box display={{ base: "block", sm: "none" }} mt={6}>
             {onEditFund && (
               <Button
                 leftIcon={<Edit size={20} />}
                 colorScheme="teal"
                 size="lg"
-                width="full"
+                width="100%"
+                mb={3}
                 onClick={onEditFund}
+                borderRadius="md"
               >
                 Edit Mutual Fund
               </Button>
             )}
-          </VStack>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              size="lg"
+              width="100%"
+              borderRadius="md"
+              borderWidth="2px"
+              _hover={{ bg: cardBg }}
+              leftIcon={<X />}
+            >
+              Cancel
+            </Button>
+          </Box>
         </ModalBody>
+
+        {/* Desktop-only footer */}
+        <ModalFooter
+          display={{ base: "none", sm: "flex" }}
+          px={8}
+          py={6}
+          bg={cardBg}
+          borderTop="1px solid"
+          borderColor={borderColor}
+        >
+          {onEditFund && (
+            <Button
+              leftIcon={<Edit size={20} />}
+              colorScheme="teal"
+              mr={3}
+              onClick={onEditFund}
+              px={8}
+              py={3}
+              borderRadius="md"
+            >
+              Edit Mutual Fund
+            </Button>
+          )}
+          <Button
+            variant="outline"
+            onClick={onClose}
+            borderWidth="2px"
+            _hover={{ bg: inputBg }}
+            px={6}
+            py={3}
+            borderRadius="md"
+            leftIcon={<X />}
+          >
+            Cancel
+          </Button>
+        </ModalFooter>
       </ModalContent>
     </Modal>
   );

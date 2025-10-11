@@ -25,6 +25,40 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { updateMutualFund } from "../../api";
 import { MutualFund, Amc } from "../../types";
 import { Edit, Check, X, TrendingUp, FileText, Building2 } from "lucide-react";
+
+const ASSET_CLASSES = [
+  { value: "Equity", label: "Equity" },
+  { value: "Debt", label: "Debt" },
+  { value: "Hybrid", label: "Hybrid" },
+  { value: "Others", label: "Others" },
+];
+
+const ASSET_SUB_CLASSES = {
+  Equity: [
+    { value: "Large Cap", label: "Large Cap" },
+    { value: "Large & Mid Cap", label: "Large & Mid Cap" },
+    { value: "Mid Cap", label: "Mid Cap" },
+    { value: "Small Cap", label: "Small Cap" },
+    { value: "Flexi Cap", label: "Flexi Cap" },
+    { value: "Multi Cap", label: "Multi Cap" },
+    { value: "ELSS", label: "ELSS" },
+    { value: "Index", label: "Index" },
+    { value: "Sectoral", label: "Sectoral" },
+  ],
+  Debt: [
+    { value: "Liquid", label: "Liquid" },
+    { value: "Overnight", label: "Overnight" },
+    { value: "Corporate Bond", label: "Corporate Bond" },
+    { value: "Banking", label: "Banking" },
+    { value: "Short Duration", label: "Short Duration" },
+    { value: "Ultra Short Duration", label: "Ultra Short Duration" },
+  ],
+  Hybrid: [],
+  Others: [
+    { value: "Gold", label: "Gold" },
+    { value: "Silver", label: "Silver" },
+  ],
+};
 import { toastDefaults } from "@/components/shared/utils";
 
 interface UpdateMutualFundModalProps {
@@ -40,6 +74,8 @@ interface FormData {
   plan: string;
   code: string;
   owner: string;
+  asset_class: string;
+  asset_sub_class: string;
   amc_id: string;
   notes: string;
 }
@@ -56,6 +92,8 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
     plan: fund.plan || "",
     code: fund.code || "",
     owner: fund.owner || "",
+    asset_class: fund.asset_class || "",
+    asset_sub_class: fund.asset_sub_class || "",
     amc_id: fund.amc_id.toString(),
     notes: fund.notes || "",
   });
@@ -86,6 +124,8 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
         plan: fund.plan || "",
         code: fund.code || "",
         owner: fund.owner || "",
+        asset_class: fund.asset_class || "",
+        asset_sub_class: fund.asset_sub_class || "",
         amc_id: fund.amc_id.toString(),
         notes: fund.notes || "",
       });
@@ -99,6 +139,8 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
       plan?: string;
       code?: string;
       owner?: string;
+      asset_class?: string;
+      asset_sub_class?: string;
       amc_id?: number;
       notes?: string;
     }) => updateMutualFund(fund.ledger_id, fund.mutual_fund_id, updateData),
@@ -149,6 +191,8 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
       newErrors.owner = "Owner must be less than 100 characters";
     }
 
+
+
     if (!formData.amc_id) {
       newErrors.amc_id = "Please select an AMC";
     }
@@ -171,6 +215,8 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
       plan?: string;
       code?: string;
       owner?: string;
+      asset_class?: string;
+      asset_sub_class?: string;
       amc_id?: number;
       notes?: string;
     } = {};
@@ -180,6 +226,8 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
     if (formData.plan !== (fund.plan || "")) payload.plan = formData.plan.trim() || undefined;
     if (formData.code !== (fund.code || "")) payload.code = formData.code.trim() || undefined;
     if (formData.owner !== (fund.owner || "")) payload.owner = formData.owner.trim() || undefined;
+    if (formData.asset_class !== (fund.asset_class || "")) payload.asset_class = formData.asset_class.trim() || undefined;
+    if (formData.asset_sub_class !== (fund.asset_sub_class || "")) payload.asset_sub_class = formData.asset_sub_class.trim() || undefined;
     if (parseInt(formData.amc_id) !== fund.amc_id) payload.amc_id = parseInt(formData.amc_id);
     if (formData.notes !== (fund.notes || "")) payload.notes = formData.notes.trim() || undefined;
 
@@ -197,7 +245,16 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
   };
 
   const handleInputChange = (field: keyof FormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormData((prev) => {
+      const newData = { ...prev, [field]: value };
+
+      // Clear sub-class when asset class changes
+      if (field === "asset_class" && value !== prev.asset_class) {
+        newData.asset_sub_class = "";
+      }
+
+      return newData;
+    });
 
     // Clear error for this field when user starts typing
     if (errors[field]) {
@@ -211,6 +268,8 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
     formData.plan !== (fund.plan || "") ||
     formData.code !== (fund.code || "") ||
     formData.owner !== (fund.owner || "") ||
+    formData.asset_class !== (fund.asset_class || "") ||
+    formData.asset_sub_class !== (fund.asset_sub_class || "") ||
     formData.amc_id !== fund.amc_id.toString() ||
     formData.notes !== (fund.notes || "");
 
@@ -427,6 +486,94 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
                   Enter the owner name to allow same fund names for different owners
                 </FormHelperText>
               </FormControl>
+            </Box>
+
+            {/* Asset Classification Card */}
+            <Box
+              bg={cardBg}
+              p={{ base: 4, sm: 6 }}
+              borderRadius="md"
+              border="1px solid"
+              borderColor={borderColor}
+            >
+              <VStack spacing={5} align="stretch">
+                {/* Asset Class */}
+                <FormControl isInvalid={!!errors.asset_class}>
+                  <FormLabel fontWeight="semibold" mb={2}>
+                    <HStack spacing={2}>
+                      <FileText size={16} />
+                      <Text>Asset Class (Optional)</Text>
+                    </HStack>
+                  </FormLabel>
+                  <Select
+                    value={formData.asset_class}
+                    onChange={(e) => handleInputChange("asset_class", e.target.value)}
+                    placeholder="Select asset class"
+                    size="lg"
+                    bg={inputBg}
+                    borderColor={inputBorderColor}
+                    borderWidth="2px"
+                    borderRadius="md"
+                    _hover={{ borderColor: "teal.300" }}
+                    _focus={{
+                      borderColor: focusBorderColor,
+                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                    }}
+                  >
+                    {ASSET_CLASSES.map((assetClass) => (
+                      <option key={assetClass.value} value={assetClass.value}>
+                        {assetClass.label}
+                      </option>
+                    ))}
+                  </Select>
+                  <FormErrorMessage>{errors.asset_class}</FormErrorMessage>
+                  <FormHelperText>
+                    Choose the asset class for this mutual fund
+                  </FormHelperText>
+                </FormControl>
+
+                {/* Asset Sub Class */}
+                {formData.asset_class &&
+                  ASSET_SUB_CLASSES[
+                    formData.asset_class as keyof typeof ASSET_SUB_CLASSES
+                  ]?.length > 0 && (
+                    <FormControl isInvalid={!!errors.asset_sub_class}>
+                      <FormLabel fontWeight="semibold" mb={2}>
+                        <HStack spacing={2}>
+                          <FileText size={16} />
+                          <Text>Asset Sub-Class (Optional)</Text>
+                        </HStack>
+                      </FormLabel>
+                      <Select
+                        value={formData.asset_sub_class}
+                        onChange={(e) => handleInputChange("asset_sub_class", e.target.value)}
+                        placeholder="Select asset sub-class"
+                        size="lg"
+                        bg={inputBg}
+                        borderColor={inputBorderColor}
+                        borderWidth="2px"
+                        borderRadius="md"
+                        _hover={{ borderColor: "teal.300" }}
+                        _focus={{
+                          borderColor: focusBorderColor,
+                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                        }}
+                      >
+                        {ASSET_SUB_CLASSES[
+                          formData.asset_class as keyof typeof ASSET_SUB_CLASSES
+                        ].map((subClass) => (
+                          <option key={subClass.value} value={subClass.value}>
+                            {subClass.label}
+                          </option>
+                        ))}
+                      </Select>
+                      <FormErrorMessage>{errors.asset_sub_class}</FormErrorMessage>
+                      <FormHelperText>
+                        Choose the asset sub-class for this mutual fund
+                      </FormHelperText>
+                    </FormControl>
+                  )}
+              </VStack>
             </Box>
 
             {/* AMC Selection Card */}

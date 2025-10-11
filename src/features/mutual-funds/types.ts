@@ -5,6 +5,7 @@ export interface Amc {
   notes?: string;
   ledger_id: number;
   created_at: string;
+  updated_at: string;
 }
 
 export interface AmcCreate {
@@ -58,6 +59,8 @@ export interface MutualFundUpdate {
   plan?: string;
   code?: string;
   owner?: string;
+  asset_class?: string;
+  asset_sub_class?: string;
   amc_id?: number;
   notes?: string;
 }
