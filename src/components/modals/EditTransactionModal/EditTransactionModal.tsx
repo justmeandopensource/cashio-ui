@@ -30,6 +30,8 @@ import { AxiosError } from "axios";
 import ChakraDatePicker from "@components/shared/ChakraDatePicker";
 import FormSplits from "../CreateTransactionModal/FormSplits";
 import FormNotes from "@/components/shared/FormNotes";
+import FormStore from "@/components/shared/FormStore";
+import FormLocation from "@/components/shared/FormLocation";
 import FormTags from "@/components/shared/FormTags";
 import useLedgerStore from "@/components/shared/store";
 import { Edit, Check, X } from "lucide-react";
@@ -75,6 +77,8 @@ interface InitialTransactionState {
   type: "expense" | "income";
   categoryId: string;
   notes: string;
+  store: string;
+  location: string;
   amount: string;
   isSplit: boolean;
   splits: Split[];
@@ -95,6 +99,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
   const [type, setType] = useState<"expense" | "income">("expense");
   const [categoryId, setCategoryId] = useState<string>("");
   const [notes, setNotes] = useState<string>("");
+  const [store, setStore] = useState<string>("");
+  const [location, setLocation] = useState<string>("");
   const [amount, setAmount] = useState<string>("");
   const [isSplit, setIsSplit] = useState<boolean>(false);
   const [splits, setSplits] = useState<Split[]>([]);
@@ -154,6 +160,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           : transaction.debit.toString();
       const initialDate = new Date(transaction.date);
       const initialNotes = transaction.notes || "";
+      const initialStore = transaction.store || "";
+      const initialLocation = transaction.location || "";
       const initialTags = transaction.tags || [];
       const initialCategoryId = transaction.category_id
         ? String(transaction.category_id)
@@ -162,6 +170,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
 
       setDate(initialDate);
       setNotes(initialNotes);
+      setStore(initialStore);
+      setLocation(initialLocation);
       setTags(initialTags);
       setType(initialType);
       setCategoryId(initialCategoryId);
@@ -175,6 +185,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
             type: initialType,
             categoryId: initialCategoryId,
             notes: initialNotes,
+            store: initialStore,
+            location: initialLocation,
             amount: initialAmount,
             isSplit: initialIsSplit,
             splits: fetchedSplits,
@@ -187,6 +199,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
           type: initialType,
           categoryId: initialCategoryId,
           notes: initialNotes,
+          store: initialStore,
+          location: initialLocation,
           amount: initialAmount,
           isSplit: initialIsSplit,
           splits: [],
@@ -307,6 +321,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
         type: type,
         date: date.toISOString(),
         notes: notes,
+        store: store,
+        location: location,
         credit: type === "income" ? parseFloat(amount) || 0 : 0,
         debit: type === "expense" ? parseFloat(amount) || 0 : 0,
         is_split: isSplit,
@@ -359,6 +375,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
       type !== initialTransactionState.type ||
       categoryId !== initialTransactionState.categoryId ||
       notes !== initialTransactionState.notes ||
+      store !== initialTransactionState.store ||
+      location !== initialTransactionState.location ||
       parseFloat(amount) !== parseFloat(initialTransactionState.amount) ||
       isSplit !== initialTransactionState.isSplit
     ) {
@@ -396,6 +414,8 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
     type,
     categoryId,
     notes,
+    store,
+    location,
     amount,
     isSplit,
     splits,
@@ -732,7 +752,7 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
               </Box>
             )}
 
-            {/* Notes and Tags Card */}
+            {/* Notes, Store, Location and Tags Card */}
             <Box
               bg={cardBg}
               p={{ base: 4, sm: 6 }}
@@ -748,6 +768,24 @@ const EditTransactionModal: React.FC<EditTransactionModalProps> = ({
                   setNotes={setNotes}
                   borderColor={inputBorderColor}
                 />
+
+                {/* Store and Location - only for expense transactions */}
+                {type === "expense" && (
+                  <Stack direction={{ base: "column", md: "row" }} spacing={4}>
+                    <FormStore
+                      ledgerId={ledgerId as string}
+                      store={store}
+                      setStore={setStore}
+                      borderColor={inputBorderColor}
+                    />
+                    <FormLocation
+                      ledgerId={ledgerId as string}
+                      location={location}
+                      setLocation={setLocation}
+                      borderColor={inputBorderColor}
+                    />
+                  </Stack>
+                )}
 
                 {/* Tags Input */}
                 <FormTags

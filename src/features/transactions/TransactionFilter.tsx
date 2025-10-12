@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable no-unused-vars */
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Button,
@@ -31,6 +32,10 @@ import { Filter, X, CheckCircle, RotateCcw } from "lucide-react";
 import FormTags from "@/components/shared/FormTags";
 import config from "@/config";
 import ChakraDatePicker from "@/components/shared/ChakraDatePicker";
+import { useToast, Popover, PopoverTrigger, PopoverContent, PopoverBody } from "@chakra-ui/react";
+import { AxiosError } from "axios";
+import api from "@/lib/api";
+import { toastDefaults } from "@/components/shared/utils";
 
 interface Tag {
   name: string;
@@ -54,6 +59,8 @@ interface Filters {
   tags: Tag[];
   tags_match: "any" | "all";
   search_text: string;
+  store: string;
+  location: string;
   transaction_type: "" | "income" | "expense" | "transfer";
   from_date: Date | null;
   to_date: Date | null;
@@ -63,11 +70,209 @@ interface TransactionFilterProps {
   ledgerId: string;
   accountId?: string;
   initialFilters?: Partial<Filters>;
-  // eslint-disable-next-line no-unused-vars
   onApplyFilters: (filters: Partial<Filters>) => void;
   currentFilters?: Partial<Filters>;
   onResetFilters?: () => void;
 }
+
+// Store/Location Filter Component
+interface StoreLocationFilterProps {
+  label: string;
+  filterValue: string;
+  onChange: (value: string) => void;
+  ledgerId: string;
+  field: "store" | "location";
+  inputBorderColor: string;
+  inputBg: string;
+  focusBorderColor: string;
+}
+
+const StoreLocationFilter: React.FC<StoreLocationFilterProps> = ({
+  label,
+  filterValue,
+  onChange,
+  ledgerId,
+  field,
+  inputBorderColor,
+  inputBg,
+  focusBorderColor,
+}) => {
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
+  const toast = useToast();
+
+  // Debounce function
+  const debounce = (func: Function, delay: number) => {
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    return (...args: any[]) => {
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+
+      timeoutId = setTimeout(() => {
+        func(...args);
+      }, delay);
+    };
+  };
+
+  const fetchSuggestions = useCallback(
+    async (searchText: string) => {
+      if (searchText.length >= 3) {
+        try {
+          const endpoint = field === "store" ? "store/suggestions" : "location/suggestions";
+          const response = await api.get(
+            `/ledger/${ledgerId}/transaction/${endpoint}`,
+            {
+              params: { search_text: searchText },
+            }
+          );
+          setSuggestions(Array.from(new Set(response.data)));
+          setShowSuggestions(true);
+        } catch (error) {
+          const apiError = error as AxiosError<{ detail?: string }>;
+          toast({
+            description:
+              apiError.response?.data?.detail ||
+              `Failed to fetch ${field} suggestions.`,
+            status: "error",
+            ...toastDefaults,
+          });
+        }
+      } else {
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setHighlightedIndex(-1);
+      }
+    },
+    [ledgerId, field, toast]
+  );
+
+  const debouncedFetchSuggestions = useMemo(
+    () => debounce(fetchSuggestions, 500),
+    [fetchSuggestions]
+  );
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (suggestions.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev < suggestions.length - 1 ? prev + 1 : 0
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setHighlightedIndex((prev) =>
+          prev > 0 ? prev - 1 : suggestions.length - 1
+        );
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (highlightedIndex >= 0 && highlightedIndex < suggestions.length) {
+          handleSuggestionClick(suggestions[highlightedIndex]);
+        }
+        break;
+      case "Escape":
+        e.preventDefault();
+        setSuggestions([]);
+        setShowSuggestions(false);
+        setHighlightedIndex(-1);
+        break;
+    }
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    onChange(newValue);
+    debouncedFetchSuggestions(newValue);
+    setHighlightedIndex(-1);
+  };
+
+  const handleSuggestionClick = (suggestion: string) => {
+    onChange(suggestion);
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setHighlightedIndex(-1);
+  };
+
+  return (
+    <FormControl>
+      <FormLabel fontWeight="semibold" mb={2}>
+        {label}
+      </FormLabel>
+      <Popover
+        isOpen={showSuggestions && suggestions.length > 0}
+        onClose={() => {
+          setShowSuggestions(false);
+          setHighlightedIndex(-1);
+        }}
+        placement="bottom-start"
+        matchWidth
+        closeOnBlur={false}
+        returnFocusOnClose={false}
+      >
+        <PopoverTrigger>
+          <Input
+            placeholder={`Filter by ${label.toLowerCase()}`}
+            value={filterValue}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            borderWidth="2px"
+            borderColor={inputBorderColor}
+            bg={inputBg}
+            size="lg"
+            borderRadius="md"
+            _hover={{ borderColor: "teal.300" }}
+            _focus={{
+              borderColor: focusBorderColor,
+              boxShadow: `0 0 0 1px ${focusBorderColor}`,
+            }}
+          />
+        </PopoverTrigger>
+        <PopoverContent
+          borderColor={inputBorderColor}
+          bg="white"
+          shadow="lg"
+          maxH="200px"
+          overflowY="auto"
+          _focus={{ boxShadow: "none" }}
+          autoFocus={false}
+          width="100%"
+          onKeyDown={(e) => {
+            handleKeyDown(e);
+            e.stopPropagation();
+          }}
+        >
+          <PopoverBody p={1}>
+            {suggestions.map((suggestion, index) => (
+              <Box
+                key={index}
+                p={2}
+                cursor="pointer"
+                borderRadius="md"
+                bg={index === highlightedIndex ? "teal.100" : "transparent"}
+                _hover={{
+                  bg: index === highlightedIndex ? "teal.100" : "gray.100",
+                }}
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  handleSuggestionClick(suggestion);
+                }}
+                onMouseEnter={() => setHighlightedIndex(index)}
+              >
+                {suggestion}
+              </Box>
+            ))}
+          </PopoverBody>
+        </PopoverContent>
+      </Popover>
+    </FormControl>
+  );
+};
 
 const TransactionFilter: React.FC<TransactionFilterProps> = ({
   ledgerId,
@@ -94,6 +299,8 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
     tags: [],
     tags_match: "any",
     search_text: "",
+    store: "",
+    location: "",
     transaction_type: "",
     from_date: null,
     to_date: null,
@@ -131,6 +338,8 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
         tags: normalizedTags,
         tags_match: currentFilters.tags_match || "any",
         search_text: currentFilters.search_text || "",
+        store: currentFilters.store || "",
+        location: currentFilters.location || "",
         transaction_type: currentFilters.transaction_type || "",
         from_date: currentFilters.from_date
           ? new Date(currentFilters.from_date)
@@ -211,6 +420,14 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
       if (filters.search_text !== (currentFilters.search_text || ""))
         return true;
 
+      // Check store
+      if (filters.store !== (currentFilters.store || ""))
+        return true;
+
+      // Check location
+      if (filters.location !== (currentFilters.location || ""))
+        return true;
+
       // Check transaction_type
       if (filters.transaction_type !== (currentFilters.transaction_type || ""))
         return true;
@@ -277,6 +494,8 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
       tags: [],
       tags_match: "any",
       search_text: "",
+      store: "",
+      location: "",
       transaction_type: "",
       from_date: null,
       to_date: null,
@@ -341,6 +560,8 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
     if (currentFilters.category_id) count++;
     if (currentFilters.tags && currentFilters.tags.length > 0) count++;
     if (currentFilters.search_text) count++;
+    if (currentFilters.store) count++;
+    if (currentFilters.location) count++;
     if (currentFilters.transaction_type) count++;
     if (currentFilters.from_date) count++;
     if (currentFilters.to_date) count++;
@@ -635,37 +856,73 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                 </VStack>
               </Box>
 
-              {/* Search Notes Card */}
-              <Box
-                bg={cardBg}
-                p={{ base: 4, sm: 6 }}
-                borderRadius="md"
-                border="1px solid"
-                borderColor={borderColor}
-              >
-                <FormControl>
-                  <FormLabel fontWeight="semibold" mb={2}>
-                    Search Notes
-                  </FormLabel>
-                  <Input
-                    placeholder="Search in transaction notes"
-                    value={filters.search_text}
-                    onChange={(e) =>
-                      handleInputChange("search_text", e.target.value)
-                    }
-                    borderWidth="2px"
-                    borderColor={inputBorderColor}
-                    bg={inputBg}
-                    size="lg"
-                    borderRadius="md"
-                    _hover={{ borderColor: "teal.300" }}
-                    _focus={{
-                      borderColor: focusBorderColor,
-                      boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                    }}
-                  />
-                </FormControl>
-              </Box>
+               {/* Search Notes Card */}
+               <Box
+                 bg={cardBg}
+                 p={{ base: 4, sm: 6 }}
+                 borderRadius="md"
+                 border="1px solid"
+                 borderColor={borderColor}
+               >
+                 <FormControl>
+                   <FormLabel fontWeight="semibold" mb={2}>
+                     Search Notes
+                   </FormLabel>
+                   <Input
+                     placeholder="Search in transaction notes"
+                     value={filters.search_text}
+                     onChange={(e) =>
+                       handleInputChange("search_text", e.target.value)
+                     }
+                     borderWidth="2px"
+                     borderColor={inputBorderColor}
+                     bg={inputBg}
+                     size="lg"
+                     borderRadius="md"
+                     _hover={{ borderColor: "teal.300" }}
+                     _focus={{
+                       borderColor: focusBorderColor,
+                       boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                     }}
+                   />
+                 </FormControl>
+               </Box>
+
+                {/* Store and Location Filter Card */}
+                <Box
+                  bg={cardBg}
+                  p={{ base: 4, sm: 6 }}
+                  borderRadius="md"
+                  border="1px solid"
+                  borderColor={borderColor}
+                >
+                  <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
+                    <GridItem>
+                       <StoreLocationFilter
+                         label="Store"
+                         filterValue={filters.store}
+                         onChange={(value) => handleInputChange("store", value)}
+                        ledgerId={ledgerId}
+                        field="store"
+                        inputBorderColor={inputBorderColor}
+                        inputBg={inputBg}
+                        focusBorderColor={focusBorderColor}
+                      />
+                    </GridItem>
+                    <GridItem>
+                       <StoreLocationFilter
+                         label="Location"
+                         filterValue={filters.location}
+                         onChange={(value) => handleInputChange("location", value)}
+                        ledgerId={ledgerId}
+                        field="location"
+                        inputBorderColor={inputBorderColor}
+                        inputBg={inputBg}
+                        focusBorderColor={focusBorderColor}
+                      />
+                    </GridItem>
+                  </Grid>
+                </Box>
 
               {/* Transaction Type Card */}
               <Box

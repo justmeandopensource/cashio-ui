@@ -58,6 +58,8 @@ interface Transaction {
   date: string;
   category_name: string;
   notes?: string;
+  store?: string;
+  location?: string;
   account_id?: string;
   account_name?: string;
   is_split: boolean;
@@ -197,7 +199,27 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                 {transaction.account_name}
               </ChakraLink>
             )}
-          </VStack>
+
+            {/* Store and Location - displayed at bottom of visible area */}
+            {(transaction.store || transaction.location) && (
+              <Box mt={1}>
+                <Tag
+                  size="sm"
+                  borderRadius="full"
+                  bg="blue.50"
+                  color="blue.700"
+                  border="1px solid"
+                  borderColor="blue.200"
+                  fontSize="xs"
+                  fontWeight="medium"
+                >
+                  <TagLabel>
+                    {[transaction.store, transaction.location].filter(Boolean).join(", ")}
+                  </TagLabel>
+                </Tag>
+              </Box>
+            )}
+           </VStack>
 
            {/* Right side with amount */}
            <Box textAlign="right">

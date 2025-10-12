@@ -71,6 +71,8 @@ interface Transaction {
   is_asset_transaction: boolean;
   is_mf_transaction: boolean;
   notes?: string;
+  store?: string;
+  location?: string;
   credit: number;
   debit: number;
   transfer_id?: string;
@@ -179,27 +181,45 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                   )}
                 </Td>
               )}
-              <Td>
-                <Box>
-                  {transaction.notes && <Text mb={transaction.tags && transaction.tags.length > 0 ? 2 : 0}>{transaction.notes}</Text>}
-                  {transaction.tags && transaction.tags.length > 0 && (
-                    <Wrap spacing={2}>
-                      {transaction.tags.map((tag) => (
-                        <WrapItem key={tag.tag_id}>
-                          <Tag
-                            size="sm"
-                            borderRadius="md"
-                            bg="gray.200"
-                            color="gray.800"
-                          >
-                            <TagLabel>{tag.name}</TagLabel>
-                          </Tag>
-                        </WrapItem>
-                      ))}
-                    </Wrap>
-                  )}
-                </Box>
-              </Td>
+               <Td>
+                 <Box>
+                   {transaction.notes && <Text mb={((transaction.store || transaction.location) || (transaction.tags && transaction.tags.length > 0)) ? 2 : 0}>{transaction.notes}</Text>}
+                   {(transaction.store || transaction.location) && (
+                     <Box mb={transaction.tags && transaction.tags.length > 0 ? 2 : 0}>
+                       <Tag
+                         size="sm"
+                         borderRadius="full"
+                         bg="blue.50"
+                         color="blue.700"
+                         border="1px solid"
+                         borderColor="blue.200"
+                         fontSize="xs"
+                         fontWeight="medium"
+                       >
+                         <TagLabel>
+                           {[transaction.store, transaction.location].filter(Boolean).join(", ")}
+                         </TagLabel>
+                       </Tag>
+                     </Box>
+                   )}
+                   {transaction.tags && transaction.tags.length > 0 && (
+                     <Wrap spacing={2}>
+                       {transaction.tags.map((tag) => (
+                         <WrapItem key={tag.tag_id}>
+                           <Tag
+                             size="sm"
+                             borderRadius="md"
+                             bg="gray.200"
+                             color="gray.800"
+                           >
+                             <TagLabel>{tag.name}</TagLabel>
+                           </Tag>
+                         </WrapItem>
+                       ))}
+                     </Wrap>
+                   )}
+                 </Box>
+               </Td>
                <Td width="3%">
                  <Flex gap={1} flexWrap="wrap">
                    {transaction.is_split && (
