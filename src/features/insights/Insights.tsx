@@ -46,6 +46,10 @@ const visualizationOptions = [
     label: "Expense by Location",
   },
   {
+    value: "expense-calendar-heatmap",
+    label: "Expense Calendar Heatmap",
+  },
+  {
     value: "mutual-funds-allocation",
     label: "MF - Value by AMC",
   },

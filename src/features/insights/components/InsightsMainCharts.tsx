@@ -11,6 +11,7 @@ const MutualFundsAllocation = lazy(() => import("./charts/MutualFundsAllocation"
 const MutualFundsAssetClassAllocation = lazy(() => import("./charts/MutualFundsAssetClassAllocation"));
 const MutualFundsYearlyInvestments = lazy(() => import("./charts/MutualFundsYearlyInvestments"));
 const MutualFundsCorpus = lazy(() => import("./charts/MutualFundsCorpus"));
+const ExpenseCalendarHeatmap = lazy(() => import("./charts/ExpenseCalendarHeatmap"));
 
 interface InsightsMainChartsProps {
   ledgerId?: string;
@@ -61,6 +62,8 @@ const InsightsMainCharts = ({
         return <MutualFundsYearlyInvestments ledgerId={ledgerId} />;
       case "mutual-funds-corpus":
         return <MutualFundsCorpus ledgerId={ledgerId} />;
+      case "expense-calendar-heatmap":
+        return <ExpenseCalendarHeatmap ledgerId={ledgerId} />;
       default:
         return (
           <Box
