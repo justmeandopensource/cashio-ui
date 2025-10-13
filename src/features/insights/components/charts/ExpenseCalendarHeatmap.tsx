@@ -11,6 +11,7 @@ import {
   Center,
   Select,
   FormControl,
+  Tooltip,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, TrendingUp } from "lucide-react";
@@ -37,7 +38,6 @@ interface ExpenseCalendarHeatmapProps {
 const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerId }) => {
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
-  const [hoveredValue, setHoveredValue] = useState<any>(null);
   const { currencySymbol } = useLedgerStore();
 
   const bgColor = useColorModeValue("white", "gray.800");
@@ -98,14 +98,7 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
     return "color-github-7"; // $1000+
   };
 
-  // Custom tooltip
-  const titleForValue = (value: any) => {
-    if (!value) return "No expenses";
-    const dateStr = value.date instanceof Date
-      ? value.date.toISOString().split('T')[0]
-      : value.date;
-    return `${dateStr}: ${formatNumberAsCurrency(value.count, currencySymbol as string)}`;
-  };
+
 
   if (isLoading) {
     return (
@@ -128,7 +121,7 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
 
   return (
     <Box bg={bgColor} borderRadius="lg" p={{ base: 4, md: 6 }} boxShadow="lg">
-      <VStack spacing={4} align="stretch" mb={6}>
+      <VStack spacing={4} align="stretch">
         <Flex justifyContent="space-between" alignItems="center" direction={{ base: "column", md: "row" }} gap={4}>
           <VStack align="start" spacing={1} flex={1}>
             <Flex alignItems="center" gap={3}>
@@ -158,19 +151,40 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
         </Flex>
       </VStack>
 
-      <Box height={{ base: "300px", md: "400px" }} width="full" mb={8}>
+       <Box width="full" mb={12} mt={12}>
         {heatmapValues.length > 0 ? (
           <Center>
-            <Box className="react-calendar-heatmap" minH="300px" w="full">
-              <CalendarHeatmap
-                startDate={new Date(selectedYear, 0, 1)}
-                endDate={new Date(selectedYear, 11, 31)}
-                values={heatmapValues}
-                classForValue={getClassForValue}
-                onMouseOver={(event, value) => setHoveredValue(value)}
-                onMouseLeave={(event, value) => setHoveredValue(null)}
-                showWeekdayLabels
-                gutterSize={2}
+            <Box className="react-calendar-heatmap" w="full">
+               <CalendarHeatmap
+                 startDate={new Date(selectedYear, 0, 1)}
+                 endDate={new Date(selectedYear, 11, 31)}
+                 values={heatmapValues}
+                 classForValue={getClassForValue}
+                 showWeekdayLabels={false}
+                 showMonthLabels={true}
+                 gutterSize={2}
+                 transformDayElement={(rect: any, value, _index) => {
+                  const dateStr = value?.date instanceof Date
+                    ? new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(value.date)
+                    : value?.date;
+                   if (!value || value.count === 0) {
+                     // @ts-ignore
+                     return rect;
+                   }
+
+                  const tooltipLabel = (
+                    <VStack spacing={0} align="center">
+                      <Text fontWeight="bold" fontSize="md">{formatNumberAsCurrency(value.count, currencySymbol as string)}</Text>
+                      <Text fontSize="sm">{dateStr}</Text>
+                    </VStack>
+                  );
+
+                  return (
+                    <Tooltip label={tooltipLabel} placement="top" hasArrow>
+                      {rect}
+                    </Tooltip>
+                  );
+                }}
               />
             </Box>
           </Center>
@@ -187,37 +201,7 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
         )}
       </Box>
 
-      {/* Hover Tooltip - Always rendered to prevent layout shifts */}
-      <Center mt={2} minH="60px">
-        <Box
-          bg={cardBg}
-          borderRadius="lg"
-          p={3}
-          boxShadow="md"
-          border="1px solid"
-          borderColor="gray.200"
-          _dark={{ borderColor: "gray.600" }}
-          opacity={hoveredValue ? 1 : 0}
-          transition="opacity 0.2s ease-in-out"
-          pointerEvents={hoveredValue ? "auto" : "none"}
-        >
-          <VStack spacing={1} align="center">
-            <Text fontSize="sm" color={secondaryTextColor}>
-              {hoveredValue ? (
-                hoveredValue.date instanceof Date
-                  ? hoveredValue.date.toISOString().split('T')[0]
-                  : hoveredValue.date
-              ) : "Hover over a cell"}
-            </Text>
-            <Text fontSize="lg" fontWeight="bold" color={primaryTextColor}>
-              {hoveredValue
-                ? formatNumberAsCurrency(hoveredValue.count, currencySymbol as string)
-                : "$0.00"
-              }
-            </Text>
-          </VStack>
-        </Box>
-      </Center>
+
 
       {/* Legend */}
       <Box mb={6}>
@@ -227,42 +211,54 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
         <HStack spacing={4} wrap="wrap">
           <HStack spacing={2}>
             <Box w={3} h={3} bg="#eeeeee" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$0</Text>
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}0`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#d6e685" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$1-9</Text>
+            <Box w={3} h={3} bg="#B2F5EA" borderRadius="sm" />
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}1-9`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#8cc665" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$10-49</Text>
+            <Box w={3} h={3} bg="#81E6D9" borderRadius="sm" />
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}10-49`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#44a340" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$50-99</Text>
+            <Box w={3} h={3} bg="#4FD1C5" borderRadius="sm" />
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}50-99`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#1e6823" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$100-199</Text>
+            <Box w={3} h={3} bg="#38B2AC" borderRadius="sm" />
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}100-199`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#006d32" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$200-499</Text>
+            <Box w={3} h={3} bg="#2C7A7B" borderRadius="sm" />
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}200-499`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#00441b" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$500-999</Text>
+            <Box w={3} h={3} bg="#234E52" borderRadius="sm" />
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}500-999`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#003d1a" borderRadius="sm" />
-            <Text fontSize="xs" color={secondaryTextColor}>$1000+</Text>
+            <Box w={3} h={3} bg="#1D4044" borderRadius="sm" />
+            <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}1000+`}</Text>
           </HStack>
         </HStack>
       </Box>
 
       {/* Custom CSS for additional heatmap colors */}
       <style dangerouslySetInnerHTML={{
-        __html: '.react-calendar-heatmap .color-github-5 { fill: #006d32; } .react-calendar-heatmap .color-github-6 { fill: #00441b; } .react-calendar-heatmap .color-github-7 { fill: #003d1a; }'
+        __html: `
+          .react-calendar-heatmap .color-github-1 { fill: #B2F5EA; }
+          .react-calendar-heatmap .color-github-2 { fill: #81E6D9; }
+          .react-calendar-heatmap .color-github-3 { fill: #4FD1C5; }
+          .react-calendar-heatmap .color-github-4 { fill: #38B2AC; }
+          .react-calendar-heatmap .color-github-5 { fill: #2C7A7B; }
+          .react-calendar-heatmap .color-github-6 { fill: #234E52; }
+          .react-calendar-heatmap .color-github-7 { fill: #1D4044; }
+           .react-calendar-heatmap text.weekday-label,
+           .react-calendar-heatmap text.month-label {
+             font-size: 8px;
+           }
+        `
       }} />
 
     </Box>
