@@ -185,7 +185,7 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
                  showWeekdayLabels={false}
                  showMonthLabels={true}
                  gutterSize={2}
-                 transformDayElement={(rect: any, value, _index) => {
+                  transformDayElement={(rect: any, value) => {
                   const dateStr = value?.date instanceof Date
                     ? new Intl.DateTimeFormat('en-US', { weekday: 'short', month: 'short', day: 'numeric' }).format(value.date)
                     : value?.date;

@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import Layout from "@components/Layout";
 import InsightsMain from "./components/InsightsMain";
 import PageContainer from "@components/shared/PageContainer";
@@ -69,12 +69,13 @@ const visualizationOptions = [
 
 const Insights = () => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const { ledgerId, setLedger } = useLedgerStore();
   const [selectedLedgerId, setSelectedLedgerId] = useState<string | undefined>(
     ledgerId,
   );
   const [selectedVisualization, setSelectedVisualization] = useState<string>(
-    "current-month-overview",
+    searchParams.get("visualization") || "current-month-overview",
   );
 
 
@@ -103,6 +104,13 @@ const Insights = () => {
     setSelectedLedgerId(ledgerId);
   }, [ledgerId]);
 
+  useEffect(() => {
+    const visualizationFromUrl = searchParams.get("visualization");
+    if (visualizationFromUrl && visualizationFromUrl !== selectedVisualization) {
+      setSelectedVisualization(visualizationFromUrl);
+    }
+  }, [searchParams, selectedVisualization]);
+
   const handleLedgerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newLedgerId = e.target.value;
     const selectedLedger = ledgers?.find(
@@ -122,6 +130,12 @@ const Insights = () => {
       );
     }
     setSelectedLedgerId(newLedgerId);
+  };
+
+  const handleVisualizationChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newVisualization = e.target.value;
+    setSelectedVisualization(newVisualization);
+    setSearchParams({ visualization: newVisualization });
   };
 
   const handleLogout = (): void => {
@@ -169,7 +183,7 @@ const Insights = () => {
               <FormControl>
                 <Select
                   value={selectedVisualization}
-                  onChange={(e) => setSelectedVisualization(e.target.value)}
+                  onChange={handleVisualizationChange}
                   icon={<ChevronDown />}
                   variant="ghost"
                   color="white"
