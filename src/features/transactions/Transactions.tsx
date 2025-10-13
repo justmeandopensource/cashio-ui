@@ -1,4 +1,5 @@
-import React, { useState, lazy, Suspense } from "react";
+import React, { useState, lazy, Suspense, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import {
   Box,
@@ -99,23 +100,43 @@ const Transactions: React.FC<TransactionsProps> = ({
     null,
   );
 
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<Filters>({});
   const [pagination, setPagination] = useState<Pagination>({
     total_pages: 1,
     current_page: 1,
   });
 
+  useEffect(() => {
+    const newFilters: Filters = {};
+    for (const key of searchParams.keys()) {
+        if (key === 'tab') continue;
+        if (key === 'tags') {
+            newFilters.tags = searchParams.getAll('tags');
+        } else {
+            newFilters[key] = searchParams.get(key);
+        }
+    }
+    setFilters(newFilters);
+  }, [searchParams]);
+
   // Add state to track if filters are active
   const hasActiveFilters = Object.keys(filters).length > 0;
 
   const handleApplyFilters = (newFilters: Filters) => {
-    setFilters(newFilters);
     setPagination((prev) => ({ ...prev, current_page: 1 }));
+    const cleanedFilters: { [key: string]: any } = {};
+    Object.entries(newFilters).forEach(([key, value]) => {
+        if (value !== '' && value !== null && (!Array.isArray(value) || value.length > 0)) {
+            cleanedFilters[key] = value;
+        }
+    });
+    setSearchParams(cleanedFilters as any);
   };
 
   const handleResetFilters = () => {
-    setFilters({});
     setPagination((prev) => ({ ...prev, current_page: 1 }));
+    setSearchParams({});
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
@@ -150,9 +171,10 @@ const Transactions: React.FC<TransactionsProps> = ({
       ledgerId,
       accountId,
       pagination.current_page,
-      { ...filters },
+      filters,
     ],
-    queryFn: async () => {
+    queryFn: async ({ queryKey }) => {
+      const [,,,, filtersFromKey] = queryKey as [string, string, string | undefined, number, Filters];
       const params = new URLSearchParams();
       params.append("page", pagination.current_page.toString());
       params.append("per_page", "50");
@@ -161,13 +183,13 @@ const Transactions: React.FC<TransactionsProps> = ({
         params.append("account_id", accountId);
       }
 
-      Object.entries(filters).forEach(([key, value]) => {
+      Object.entries(filtersFromKey).forEach(([key, value]) => {
         if (key === "tags" && Array.isArray(value)) {
           value.forEach((tag) => {
             params.append("tags", tag);
           });
         } else if (value !== null && value !== undefined && value !== "") {
-          params.append(key, value);
+          params.append(key, value as string);
         }
       });
 

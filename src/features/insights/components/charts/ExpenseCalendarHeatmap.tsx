@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Box,
   VStack,
@@ -39,6 +40,26 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
   const currentYear = new Date().getFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const { currencySymbol } = useLedgerStore();
+  const navigate = useNavigate();
+
+  const handleCellClick = (value: any) => {
+    if (value && value.date) {
+      const date = new Date(value.date);
+
+      // Set from_date to start of day
+      const fromDate = new Date(date);
+      fromDate.setHours(0, 0, 0, 0);
+
+      // Set to_date to end of day
+      const toDate = new Date(date);
+      toDate.setHours(23, 59, 59, 999);
+
+      const fromDateISO = fromDate.toISOString();
+      const toDateISO = toDate.toISOString();
+
+      navigate(`/ledger?tab=transactions&from_date=${fromDateISO}&to_date=${toDateISO}&transaction_type=expense`);
+    }
+  };
 
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
@@ -156,6 +177,7 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
           <Center>
             <Box className="react-calendar-heatmap" w="full">
                <CalendarHeatmap
+                 onClick={handleCellClick}
                  startDate={new Date(selectedYear, 0, 1)}
                  endDate={new Date(selectedYear, 11, 31)}
                  values={heatmapValues}

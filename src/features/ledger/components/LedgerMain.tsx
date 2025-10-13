@@ -1,4 +1,5 @@
-import { FC, useState } from "react";
+import { FC, useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Badge,
@@ -39,7 +40,14 @@ interface LedgerMainProps {
 const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) => {
   const { ledgerId } = useLedgerStore();
   const queryClient = useQueryClient();
-  const [tabIndex, setTabIndex] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [tabIndex, setTabIndex] = useState(() => {
+    const tab = searchParams.get("tab");
+    if (tab === "transactions") return 1;
+    if (tab === "physical-assets") return 2;
+    if (tab === "mutual-funds") return 3;
+    return 0;
+  });
   const [mutualFundsFilters, setMutualFundsFilters] = useState({
     selectedAmc: "all",
     selectedOwner: "all",
@@ -85,6 +93,17 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
 
   const handleTabChange = (index: number) => {
     setTabIndex(index);
+    const newSearchParams = new URLSearchParams(searchParams);
+    if (index === 1) {
+      newSearchParams.set("tab", "transactions");
+    } else if (index === 2) {
+      newSearchParams.set("tab", "physical-assets");
+    } else if (index === 3) {
+      newSearchParams.set("tab", "mutual-funds");
+    } else {
+      newSearchParams.delete("tab");
+    }
+    setSearchParams(newSearchParams);
   };
 
   const accountsCount = accounts

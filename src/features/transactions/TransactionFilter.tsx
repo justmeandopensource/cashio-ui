@@ -521,8 +521,24 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
         if (value) {
           // Ensure value is a Date object before formatting
           const dateValue = value instanceof Date ? value : new Date(value);
-          // Format date to YYYY-MM-DD format for API
-          (cleanedFilters as any)[key] = dateValue.toISOString().split("T")[0];
+
+          // Check if from_date and to_date are the same day
+          const isSameDay = filters.from_date && filters.to_date &&
+            (filters.from_date instanceof Date ? filters.from_date : new Date(filters.from_date)).toDateString() ===
+            (filters.to_date instanceof Date ? filters.to_date : new Date(filters.to_date)).toDateString();
+
+          if (isSameDay) {
+            if (key === "to_date") {
+              // Set to_date to end of day when same as from_date
+              dateValue.setHours(23, 59, 59, 999);
+            } else if (key === "from_date") {
+              // Set from_date to start of day
+              dateValue.setHours(0, 0, 0, 0);
+            }
+          }
+
+          // Format date to ISO datetime string for API
+          (cleanedFilters as any)[key] = dateValue.toISOString();
         }
         return;
       }
