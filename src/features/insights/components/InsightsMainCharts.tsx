@@ -5,6 +5,8 @@ const IncomeExpenseTrend = lazy(() => import("./charts/IncomeExpenseTrend"));
 const CurrentMonthOverview = lazy(() => import("./charts/CurrentMonthOverview"));
 const CategoryTrend = lazy(() => import("./charts/CategoryTrend"));
 const TagTrend = lazy(() => import("./charts/TagTrend"));
+const ExpenseByStore = lazy(() => import("./charts/ExpenseByStore"));
+const ExpenseByLocation = lazy(() => import("./charts/ExpenseByLocation"));
 const MutualFundsAllocation = lazy(() => import("./charts/MutualFundsAllocation"));
 const MutualFundsAssetClassAllocation = lazy(() => import("./charts/MutualFundsAssetClassAllocation"));
 const MutualFundsYearlyInvestments = lazy(() => import("./charts/MutualFundsYearlyInvestments"));
@@ -47,6 +49,10 @@ const InsightsMainCharts = ({
         return <CategoryTrend />;
       case "tag-trend":
         return <TagTrend />;
+      case "expense-by-store":
+        return <ExpenseByStore ledgerId={ledgerId} />;
+      case "expense-by-location":
+        return <ExpenseByLocation ledgerId={ledgerId} />;
       case "mutual-funds-allocation":
         return <MutualFundsAllocation ledgerId={ledgerId} />;
       case "mutual-funds-asset-class-allocation":

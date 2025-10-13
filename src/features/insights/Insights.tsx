@@ -38,6 +38,14 @@ const visualizationOptions = [
     label: "Tag Trend",
   },
   {
+    value: "expense-by-store",
+    label: "Expense by Store",
+  },
+  {
+    value: "expense-by-location",
+    label: "Expense by Location",
+  },
+  {
     value: "mutual-funds-allocation",
     label: "MF - Value by AMC",
   },
