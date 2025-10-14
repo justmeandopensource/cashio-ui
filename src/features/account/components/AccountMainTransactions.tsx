@@ -1,4 +1,5 @@
 import React from "react";
+import { Card, CardBody, useColorModeValue } from "@chakra-ui/react";
 import Transactions from "@/features/transactions/Transactions";
 
 interface Account {
@@ -22,14 +23,20 @@ const AccountMainTransactions: React.FC<AccountMainTransactionsProps> = ({
   onTransactionUpdated,
   onCopyTransaction,
 }) => {
+  const cardBg = useColorModeValue("primaryBg", "cardDarkBg");
+
   return (
-    <Transactions
-      accountId={account.account_id}
-      onAddTransaction={onAddTransaction}
-      onTransactionDeleted={onTransactionDeleted}
-      onTransactionUpdated={onTransactionUpdated}
-      onCopyTransaction={onCopyTransaction}
-    />
+    <Card bg={cardBg}>
+      <CardBody>
+        <Transactions
+          accountId={account.account_id}
+          onAddTransaction={onAddTransaction}
+          onTransactionDeleted={onTransactionDeleted}
+          onTransactionUpdated={onTransactionUpdated}
+          onCopyTransaction={onCopyTransaction}
+        />
+      </CardBody>
+    </Card>
   );
 };
 

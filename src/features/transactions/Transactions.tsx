@@ -314,9 +314,8 @@ const Transactions: React.FC<TransactionsProps> = ({
     deleteMutation.mutate(transactionId);
   };
 
-  const boxBg = useColorModeValue("secondaryBg", "cardDarkBg");
+  const boxBg = useColorModeValue(undefined, "cardDarkBg");
   const skeletonBg = useColorModeValue("primaryBg", "primaryBg");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
   const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   if (shouldFetch && isTransactionsLoading) {

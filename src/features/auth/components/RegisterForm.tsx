@@ -94,6 +94,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
   const inputBg = useColorModeValue("white", "gray.700");
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Validation errors
   const nameError = touched.full_name && !full_name;
@@ -153,7 +154,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         bg={bgColor}
         borderRadius={{ base: 0, sm: "xl" }}
         boxShadow={{ base: "none", sm: "2xl" }}
-        maxW={{ base: "full", sm: "lg" }}
+        maxW={{ base: "full", sm: "md" }}
         w="full"
         borderWidth={{ base: 0, sm: "1px" }}
         borderColor={borderColor}
@@ -162,13 +163,13 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
         minH={{ base: "100vh", sm: "auto" }}
       >
         {/* Modern gradient header matching CreateLedgerModal - Left Justified */}
-          <Box
-            bgGradient="linear(135deg, teal.400, teal.600)"
-            color="white"
-            px={{ base: 4, sm: 8 }}
-            py={{ base: 6, sm: 8 }}
-            position="relative"
-          >
+        <Box
+          bgGradient="linear(135deg, teal.400, teal.600)"
+          color="white"
+          px={{ base: 4, sm: 8 }}
+          py={{ base: 6, sm: 8 }}
+          position="relative"
+        >
           <HStack
             spacing={{ base: 3, sm: 4 }}
             align="center"
@@ -356,9 +357,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                       Valid email is required
                     </FormErrorMessage>
                   ) : (
-                     <FormHelperText mt={2}>
-                       We&apos;ll use this for account verification and updates
-                     </FormHelperText>
+                    <FormHelperText mt={2}>
+                      We&apos;ll use this for account verification and updates
+                    </FormHelperText>
                   )}
                 </FormControl>
 
@@ -414,7 +415,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                         <Text
                           fontSize="sm"
                           fontWeight="medium"
-                          color="gray.600"
+                          color={tertiaryTextColor}
                         >
                           Password strength
                         </Text>
@@ -442,8 +443,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
                     </FormErrorMessage>
                   ) : (
                     <FormHelperText mt={2}>
-                      Use at least 8 characters with a mix of letters, numbers,
-                      and symbols
+                      Use mix of letters, numbers, and symbols
                     </FormHelperText>
                   )}
                 </FormControl>
@@ -481,15 +481,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({
             </Button>
 
             {/* Footer link */}
-            <Box
-              bg={cardBg}
-              p={4}
-              borderRadius="md"
-              border="1px solid"
-              borderColor={borderColor}
-              textAlign="center"
-            >
-              <Text fontSize="sm" color="gray.600">
+            <Box textAlign="center" py={4}>
+              <Text fontSize="sm" color={tertiaryTextColor}>
                 Already have an account?{" "}
                 <RouterLink to="/login">
                   <Text

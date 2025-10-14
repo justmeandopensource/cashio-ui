@@ -61,7 +61,7 @@ const PhysicalAssetsOverview: FC<PhysicalAssetsOverviewProps> = ({
   onFiltersChange,
 }) => {
   const { currencySymbol } = useLedgerStore();
-  const emptyStateBg = useColorModeValue("gray.50", "cardDarkBg");
+  const emptyStateBg = useColorModeValue("secondaryBg", "cardDarkBg");
   const emptyStateTextColor = useColorModeValue("gray.600", "gray.400");
   const emptyStateHeadingColor = useColorModeValue("gray.700", "gray.200");
   const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");

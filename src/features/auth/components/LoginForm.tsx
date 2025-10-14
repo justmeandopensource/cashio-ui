@@ -67,6 +67,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   const inputBg = useColorModeValue("white", "gray.700");
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   const handleSubmit = (event: React.FormEvent<HTMLDivElement>) => {
     event.preventDefault();
@@ -287,15 +288,8 @@ const LoginForm: React.FC<LoginFormProps> = ({
             </Button>
 
             {/* Footer link */}
-            <Box
-              bg={cardBg}
-              p={4}
-              borderRadius="md"
-              border="1px solid"
-              borderColor={borderColor}
-              textAlign="center"
-            >
-              <Text fontSize="sm" color="gray.600">
+            <Box textAlign="center" py={4}>
+              <Text fontSize="sm" color={tertiaryTextColor}>
                 New to Cashio?{" "}
                 <RouterLink to="/register">
                   <Text

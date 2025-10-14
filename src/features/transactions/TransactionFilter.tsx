@@ -291,6 +291,7 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
   const inputBg = useColorModeValue("white", "gray.700");
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // State for filter form values
   const [filters, setFilters] = useState<Filters>({
@@ -994,9 +995,9 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                   <Grid templateColumns="repeat(2, 1fr)" gap={4}>
                     <GridItem>
                       <FormControl>
-                        <FormLabel fontSize="sm" color="gray.600" mb={1}>
-                          From Date
-                        </FormLabel>
+                         <FormLabel fontSize="sm" color={tertiaryTextColor} mb={1}>
+                           From Date
+                         </FormLabel>
                         <ChakraDatePicker
                           selected={filters.from_date}
                           onChange={(date) =>
@@ -1009,9 +1010,9 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                     </GridItem>
                     <GridItem>
                       <FormControl>
-                        <FormLabel fontSize="sm" color="gray.600" mb={1}>
-                          To Date
-                        </FormLabel>
+                         <FormLabel fontSize="sm" color={tertiaryTextColor} mb={1}>
+                           To Date
+                         </FormLabel>
                         <ChakraDatePicker
                           selected={filters.to_date}
                           onChange={(date) =>
@@ -1055,7 +1056,12 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
                 borderRadius="md"
                 leftIcon={<X />}
                 borderWidth="2px"
-                _hover={{ bg: cardBg }}
+                borderColor={useColorModeValue("gray.300", "gray.600")}
+                color={useColorModeValue("gray.600", "gray.200")}
+                _hover={{
+                  bg: useColorModeValue("gray.50", "gray.600"),
+                  borderColor: useColorModeValue("gray.400", "gray.500"),
+                }}
               >
                 Cancel
               </Button>
@@ -1096,7 +1102,12 @@ const TransactionFilter: React.FC<TransactionFilterProps> = ({
               py={3}
               borderRadius="md"
               borderWidth="2px"
-              _hover={{ bg: inputBg }}
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
+              _hover={{
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
+              }}
             >
               Cancel
             </Button>
