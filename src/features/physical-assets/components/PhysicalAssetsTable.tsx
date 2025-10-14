@@ -93,8 +93,9 @@ const ExpandedAssetRow: React.FC<ExpandedAssetRowProps> = ({
 
   const highestPurchasePrice = calculateHighestPurchasePrice(purchaseTransactions);
   const lowestPurchasePrice = calculateLowestPurchasePrice(purchaseTransactions);
-  const boxBg = useColorModeValue("gray.50", "gray.800");
+  const boxBg = useColorModeValue("gray.50", "cardDarkBg");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
 
   return (
     <Box
@@ -118,7 +119,7 @@ const ExpandedAssetRow: React.FC<ExpandedAssetRowProps> = ({
               Lowest Cost
             </StatLabel>
             <HStack spacing={0} align="baseline">
-              <StatNumber fontSize="sm">
+              <StatNumber fontSize="sm" color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? "..."
                   : lowestPurchasePrice !== null
@@ -128,7 +129,7 @@ const ExpandedAssetRow: React.FC<ExpandedAssetRowProps> = ({
                     ).main
                   : "--"}
               </StatNumber>
-              <Text fontSize="xs" opacity={0.7}>
+              <Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? ""
                   : lowestPurchasePrice !== null
@@ -145,7 +146,7 @@ const ExpandedAssetRow: React.FC<ExpandedAssetRowProps> = ({
               Avg. Cost
             </StatLabel>
             <HStack spacing={0} align="baseline">
-              <StatNumber fontSize="sm">
+              <StatNumber fontSize="sm" color={tertiaryTextColor}>
                 {
                   splitCurrencyForDisplay(
                     toNumber(asset.average_cost_per_unit),
@@ -153,7 +154,7 @@ const ExpandedAssetRow: React.FC<ExpandedAssetRowProps> = ({
                   ).main
                 }
               </StatNumber>
-              <Text fontSize="xs" opacity={0.7}>
+              <Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>
                 {
                   splitCurrencyForDisplay(
                     toNumber(asset.average_cost_per_unit),
@@ -168,7 +169,7 @@ const ExpandedAssetRow: React.FC<ExpandedAssetRowProps> = ({
               Highest Cost
             </StatLabel>
             <HStack spacing={0} align="baseline">
-              <StatNumber fontSize="sm">
+              <StatNumber fontSize="sm" color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? "..."
                   : highestPurchasePrice !== null
@@ -178,7 +179,7 @@ const ExpandedAssetRow: React.FC<ExpandedAssetRowProps> = ({
                     ).main
                   : "--"}
               </StatNumber>
-              <Text fontSize="xs" opacity={0.7}>
+              <Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? ""
                   : highestPurchasePrice !== null
@@ -265,6 +266,7 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
 
    // State for sorting
    const [sortField, setSortField] =
@@ -439,14 +441,14 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
     const borderColor = useColorModeValue("gray.200", "gray.700");
 
     return (
-      <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "gray.700")} boxShadow="md">
+      <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "cardDarkBg")} boxShadow="md">
         <Box p={4} onClick={() => setIsExpanded(!isExpanded)} cursor="pointer">
           <Flex justify="space-between" align="start">
             <Box maxW="80%">
               <HStack spacing={1} align="baseline" wrap="wrap">
-                <Text fontWeight="medium" noOfLines={2}>{asset.name}</Text>
+                <Text fontWeight="medium" noOfLines={2} color={tertiaryTextColor}>{asset.name}</Text>
               </HStack>
-              <Text fontSize="sm" color={mutedColor}>{asset.asset_type_name}</Text>
+              <Text fontSize="sm" color={tertiaryTextColor}>{asset.asset_type_name}</Text>
             </Box>
             <IconButton
               icon={isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -460,7 +462,7 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
               <StatLabel fontSize="xs" color={mutedColor}>Value</StatLabel>
               <StatNumber>
                 <HStack spacing={0} align="baseline">
-                  <Text fontSize="lg" fontWeight="bold">
+                  <Text fontSize="lg" fontWeight="bold" color={tertiaryTextColor}>
                     {splitCurrencyForDisplay(asset.current_value, currencySymbol || "₹").main}
                   </Text>
                   <Text fontSize="sm" fontWeight="bold" opacity={0.7}>
@@ -503,19 +505,19 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
             <SimpleGrid columns={2} spacingX={4} spacingY={2} mb={4}>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Current Price</StatLabel>
-                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm">{splitCurrencyForDisplay(toNumber(asset.latest_price_per_unit), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7}>{splitCurrencyForDisplay(toNumber(asset.latest_price_per_unit), currencySymbol || "₹").decimals}</Text></HStack>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={tertiaryTextColor}>{splitCurrencyForDisplay(toNumber(asset.latest_price_per_unit), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>{splitCurrencyForDisplay(toNumber(asset.latest_price_per_unit), currencySymbol || "₹").decimals}</Text></HStack>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Quantity</StatLabel>
-                <StatNumber fontSize="sm">{splitQuantityForDisplay(asset.total_quantity).main}{splitQuantityForDisplay(asset.total_quantity).decimals} {asset.asset_type?.unit_symbol}</StatNumber>
+                <StatNumber fontSize="sm" color={tertiaryTextColor}>{splitQuantityForDisplay(asset.total_quantity).main}{splitQuantityForDisplay(asset.total_quantity).decimals} {asset.asset_type?.unit_symbol}</StatNumber>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Invested</StatLabel>
-                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm">{splitCurrencyForDisplay(asset.invested, currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7}>{splitCurrencyForDisplay(asset.invested, currencySymbol || "₹").decimals}</Text></HStack>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={tertiaryTextColor}>{splitCurrencyForDisplay(asset.invested, currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>{splitCurrencyForDisplay(asset.invested, currencySymbol || "₹").decimals}</Text></HStack>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Avg. Cost</StatLabel>
-                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm">{splitCurrencyForDisplay(toNumber(asset.average_cost_per_unit), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7}>{splitCurrencyForDisplay(toNumber(asset.average_cost_per_unit), currencySymbol || "₹").decimals}</Text></HStack>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={tertiaryTextColor}>{splitCurrencyForDisplay(toNumber(asset.average_cost_per_unit), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>{splitCurrencyForDisplay(toNumber(asset.average_cost_per_unit), currencySymbol || "₹").decimals}</Text></HStack>
               </Stat>
             </SimpleGrid>
             <Flex gap={3} mt={4} justify="space-around">
@@ -584,8 +586,8 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
           ))}
         </VStack>
       ) : (
-        <Box overflowX="auto">
-          <Table variant="simple" size="sm" minW="800px">
+        <Box overflowX="auto" bg={useColorModeValue("primaryBg", "cardDarkBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+          <Table variant="simple" size="sm" minW="800px" borderColor={useColorModeValue("gray.200", "gray.500")}>
             <Thead>
               <Tr>
                 <Th width="2%"></Th>
@@ -666,7 +668,7 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
               {sortedAssets.map((asset) => (
                 <React.Fragment key={asset.physical_asset_id}>
                   <Tr
-                    _hover={{ bg: "gray.50", cursor: "pointer" }}
+                    _hover={{ bg: useColorModeValue("secondaryBg", "secondaryBg"), cursor: "pointer" }}
                     onClick={() => toggleRowExpansion(asset.physical_asset_id)}
                   >
                     <Td>
@@ -683,17 +685,17 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
                         aria-label="Expand row"
                       />
                     </Td>
-                    <Td fontWeight="medium">{asset.asset_type_name}</Td>
+                    <Td fontWeight="medium" color={tertiaryTextColor}>{asset.asset_type_name}</Td>
                      <Td>
                        <HStack spacing={1} align="baseline">
-                         <Text fontWeight="medium" noOfLines={1}>
+                         <Text fontWeight="medium" noOfLines={1} color={tertiaryTextColor}>
                            {asset.name}
                          </Text>
                        </HStack>
                       </Td>
                       <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
                         <HStack spacing={0} align="baseline" justify="flex-end">
-                          <Text fontSize="sm">
+                          <Text fontSize="sm" color={tertiaryTextColor}>
                             {
                               splitCurrencyForDisplay(
                                 toNumber(asset.latest_price_per_unit),
@@ -712,11 +714,11 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
                         </HStack>
                       </Td>
                       <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
-                        {splitQuantityForDisplay(asset.total_quantity).main}{splitQuantityForDisplay(asset.total_quantity).decimals} {asset.asset_type?.unit_symbol}
+                        <Text fontSize="sm" color={tertiaryTextColor}>{splitQuantityForDisplay(asset.total_quantity).main}{splitQuantityForDisplay(asset.total_quantity).decimals} {asset.asset_type?.unit_symbol}</Text>
                       </Td>
                     <Td isNumeric display={{ base: "none", md: "table-cell" }}>
                       <HStack spacing={0} align="baseline" justify="flex-end">
-                        <Text fontSize="sm">
+                        <Text fontSize="sm" color={tertiaryTextColor}>
                           {
                             splitCurrencyForDisplay(
                               asset.invested,
@@ -736,7 +738,7 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
                     </Td>
                     <Td isNumeric>
                       <HStack spacing={0} align="baseline" justify="flex-end">
-                        <Text fontSize="sm">
+                        <Text fontSize="sm" color={tertiaryTextColor}>
                           {
                             splitCurrencyForDisplay(
                               asset.current_value,

@@ -70,9 +70,10 @@ const ExpenseByLocation: React.FC<ExpenseByLocationProps> = ({ ledgerId }) => {
 
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
   const legendHoverBg = useColorModeValue("gray.100", "gray.600");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Fetch expense by location data
   const { data, isLoading, isError } = useQuery<ExpenseByLocationResponse>({
@@ -227,7 +228,7 @@ const ExpenseByLocation: React.FC<ExpenseByLocationProps> = ({ ledgerId }) => {
           </Flex>
         ) : (
           <Center height="full" bg={bgColor} borderRadius="lg" flexDirection="column" textAlign="center" p={6}>
-            <Icon as={PieChartIcon} boxSize={6} color="tertiaryTextColor" mb={4} />
+            <Icon as={PieChartIcon} boxSize={6} color={tertiaryTextColor} mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Location Data Available
             </Heading>

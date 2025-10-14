@@ -73,11 +73,12 @@ const MutualFundsAssetClassAllocation: React.FC<MutualFundsAssetClassAllocationP
   const [hoveredItem, setHoveredItem] = useState<AssetClassData | SubClassData | null>(null);
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
 
   const legendHoverBg = useColorModeValue("gray.100", "gray.600");
   const subLegendHoverBg = useColorModeValue("gray.200", "gray.500");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Get color for asset class
   const getColorForAssetClass = (assetClass: string): string => {
@@ -370,7 +371,7 @@ const MutualFundsAssetClassAllocation: React.FC<MutualFundsAssetClassAllocationP
           </Flex>
         ) : (
           <Center height="full" bg={bgColor} borderRadius="lg" flexDirection="column" textAlign="center" p={6}>
-            <Icon as={PieChartIcon} boxSize={6} color="tertiaryTextColor" mb={4} />
+            <Icon as={PieChartIcon} boxSize={6} color={tertiaryTextColor} mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>No Mutual Funds Data Available</Heading>
             <Text color={secondaryTextColor} fontSize="sm">Add mutual fund investments to see your asset class allocation.</Text>
           </Center>

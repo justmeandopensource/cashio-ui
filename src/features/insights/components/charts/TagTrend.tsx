@@ -78,12 +78,13 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
   // Color modes
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
   const customTooltipColor = useColorModeValue("white", "gray.700");
   const breakdownBgColor = useColorModeValue("white", "gray.600");
   const borderColor = useColorModeValue("gray.200", "gray.600");
   const buttonColorScheme = "teal";
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Format the tag names for the API query
   const getTagNamesParam = () => {
@@ -253,7 +254,7 @@ const TagTrendAnalysis: React.FC<TagTrendAnalysisProps> = () => {
       {!isLoading && !isError && !data && (
         <Center p={10} bg={cardBg} borderRadius="lg">
           <VStack spacing={4}>
-            <Icon as={PieChartIcon} boxSize={16} color="tertiaryTextColor" />
+            <Icon as={PieChartIcon} boxSize={16} color={tertiaryTextColor} />
             <Text color={secondaryTextColor} fontWeight="medium" fontSize="lg">
               Select tags to analyze your spending trends
             </Text>

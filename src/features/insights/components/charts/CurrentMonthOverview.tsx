@@ -17,6 +17,7 @@ import {
   GridItem,
   Collapse,
   Flex,
+  useColorMode,
 } from "@chakra-ui/react";
 import { ResponsiveContainer, Treemap, Tooltip } from "recharts";
 import { useQuery } from "@tanstack/react-query";
@@ -26,7 +27,7 @@ import useLedgerStore from "@/components/shared/store";
 import { formatNumberAsCurrency } from "@/components/shared/utils";
 
 // Soft, pleasant color palette
-const INCOME_COLORS = [
+const INCOME_COLORS_LIGHT = [
   "#6FD6B0", // Soft Teal
   "#5ECBBC", // Mint Green
   "#4EBFB9", // Sea Green
@@ -35,7 +36,16 @@ const INCOME_COLORS = [
   "#1E9BAD", // Blue-Green
 ];
 
-const EXPENSE_COLORS = [
+const INCOME_COLORS_DARK = [
+  "#004d40", // Darker Teal
+  "#00695c",
+  "#00897b",
+  "#26a69a",
+  "#4db6ac",
+  "#80cbc4", // Lighter Teal
+];
+
+const EXPENSE_COLORS_LIGHT = [
   "#F5845A", // Warm Coral
   "#E97B4E", // Burnt Orange
   "#EB6D3F", // Deep Tangerine
@@ -48,6 +58,15 @@ const EXPENSE_COLORS = [
   "#E99B6C", // Soft Copper
   "#C76D5D", // Dark Salmon
   "#F3A062", // Warm Amber
+];
+
+const EXPENSE_COLORS_DARK = [
+  "#4A0000", // Very dark red, almost black
+  "#660000",
+  "#800000", // Maroon
+  "#990000",
+  "#B30000",
+  "#CC0000", // Darker red
 ];
 
 interface CategoryData {
@@ -77,13 +96,24 @@ interface CustomizedTreemapContentProps {
   height?: number;
   index?: number;
   colors: string[];
+  strokeColor: string;
 }
 
-const NestedCategoryBreakdown: React.FC<{
+interface NestedCategoryBreakdownProps {
   categories: CategoryData[];
   type: "income" | "expense";
   currencySymbol: string;
-}> = ({ categories, type, currencySymbol }) => {
+  primaryTextColor: string;
+  secondaryTextColor: string;
+}
+
+const NestedCategoryBreakdown: React.FC<NestedCategoryBreakdownProps> = ({
+  categories,
+  type,
+  currencySymbol,
+  primaryTextColor,
+  secondaryTextColor,
+}) => {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
 
   const toggleCategory = (categoryName: string) => {
@@ -98,8 +128,10 @@ const NestedCategoryBreakdown: React.FC<{
     const isExpanded = expandedCategories.includes(category.name);
     const hasChildren = category.children && category.children.length > 0;
 
-    const textColor =
-      level === 0 ? `${type === "income" ? "teal" : "red"}.700` : "primaryTextColor";
+    const categoryTextColor = useColorModeValue(
+      level === 0 ? `${type === "income" ? "teal" : "red"}.700` : primaryTextColor,
+      level === 0 ? `${type === "income" ? "teal" : "red"}.400` : secondaryTextColor,
+    );
 
     return (
       <Box key={category.name}>
@@ -113,25 +145,26 @@ const NestedCategoryBreakdown: React.FC<{
           onClick={
             hasChildren ? () => toggleCategory(category.name) : undefined
           }
-          _hover={
-            hasChildren || level === 0
-              ? { bg: `${type === "income" ? "teal" : "red"}.100` }
-              : { bg: "gray.200" }
-          }
+          _hover={{
+            bg: useColorModeValue(
+              `${type === "income" ? "teal" : "red"}.100`,
+              `${type === "income" ? "teal" : "red"}.800`,
+            ),
+          }}
         >
           {hasChildren && (
             <Icon
               as={isExpanded ? ChevronDown : ChevronRight}
               mr={2}
-              color={textColor}
+              color={categoryTextColor}
             />
           )}
           <Box flex={1}>
-            <Text fontWeight="medium" color={textColor} fontSize="sm">
+            <Text fontWeight="medium" color={categoryTextColor} fontSize="sm">
               {category.name}
             </Text>
           </Box>
-          <Text color={textColor}>
+          <Text color={categoryTextColor}>
             {formatNumberAsCurrency(category.value, currencySymbol)}
           </Text>
         </Flex>
@@ -191,6 +224,7 @@ class CustomizedTreemapContent extends PureComponent<CustomizedTreemapContentPro
       height = 0,
       index = 0,
       colors,
+      strokeColor,
     } = this.props;
 
     return (
@@ -209,7 +243,7 @@ class CustomizedTreemapContent extends PureComponent<CustomizedTreemapContentPro
                     )
                   ]
                 : "#ffffff00",
-            stroke: "#fff",
+            stroke: strokeColor,
             strokeWidth: 2 / (depth + 1e-10),
             strokeOpacity: 1 / (depth + 1e-10),
           }}
@@ -224,9 +258,14 @@ const CurrentMonthOverview: React.FC = () => {
   // Color modes
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
   const customToolTipBorderColor = useColorModeValue("gray.200", "gray.600");
+  const treemapStrokeColor = useColorModeValue("#fff", "gray.800");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+
+  const incomeColors = useColorModeValue(INCOME_COLORS_LIGHT, INCOME_COLORS_DARK);
+  const expenseColors = useColorModeValue(EXPENSE_COLORS_LIGHT, EXPENSE_COLORS_DARK);
 
   // Currency symbol from global store
   const { ledgerId, currencySymbol } = useLedgerStore();
@@ -368,10 +407,10 @@ const CurrentMonthOverview: React.FC = () => {
         <Box bg={cardBg} p={6} borderRadius="lg" width="full" boxShadow="md">
           <VStack align="stretch" spacing={4}>
             <HStack justifyContent="space-between">
-              <Heading size="md" color="red.500">
+              <Heading size="md" color={useColorModeValue("red.500", "red.400")}>
                 Expenses
               </Heading>
-              <Icon as={TrendingDown} color="red.500" size={24} />
+              <Icon as={TrendingDown} color={useColorModeValue("red.500", "red.400")} size={24} />
             </HStack>
 
             <Stat>
@@ -420,9 +459,12 @@ const CurrentMonthOverview: React.FC = () => {
                       data={data.income_categories_breakdown}
                       dataKey="value"
                       aspectRatio={4 / 3}
-                      stroke="#fff"
+                      stroke={treemapStrokeColor}
                       content={
-                        <CustomizedTreemapContent colors={INCOME_COLORS} />
+                        <CustomizedTreemapContent
+                          colors={incomeColors}
+                          strokeColor={treemapStrokeColor}
+                        />
                       }
                     >
                       <Tooltip content={<CustomTooltip />} />
@@ -444,7 +486,7 @@ const CurrentMonthOverview: React.FC = () => {
                   display="flex"
                   alignItems="center"
                 >
-                  <Icon as={PieChart} mr={2} color="red.500" />
+                  <Icon as={PieChart} mr={2} color={useColorModeValue("red.500", "red.400")} />
                   Expense Breakdown
                 </Heading>
                 <Box height="300px" width="full">
@@ -453,9 +495,12 @@ const CurrentMonthOverview: React.FC = () => {
                       data={data.expense_categories_breakdown}
                       dataKey="value"
                       aspectRatio={4 / 3}
-                      stroke="#fff"
+                      stroke={treemapStrokeColor}
                       content={
-                        <CustomizedTreemapContent colors={EXPENSE_COLORS} />
+                        <CustomizedTreemapContent
+                          colors={expenseColors}
+                          strokeColor={treemapStrokeColor}
+                        />
                       }
                     >
                       <Tooltip content={<CustomTooltip />} />
@@ -473,6 +518,8 @@ const CurrentMonthOverview: React.FC = () => {
                 categories={data.income_categories_breakdown}
                 type="income"
                 currencySymbol={currencySymbol as string}
+                primaryTextColor={primaryTextColor}
+                secondaryTextColor={secondaryTextColor}
               />
             </GridItem>
           )}
@@ -483,6 +530,8 @@ const CurrentMonthOverview: React.FC = () => {
                 categories={data.expense_categories_breakdown}
                 type="expense"
                 currencySymbol={currencySymbol as string}
+                primaryTextColor={primaryTextColor}
+                secondaryTextColor={secondaryTextColor}
               />
             </GridItem>
           )}
@@ -500,7 +549,7 @@ const CurrentMonthOverview: React.FC = () => {
             textAlign="center"
             p={6}
           >
-            <Icon as={BarChart2} boxSize={16} color="tertiaryTextColor" mb={4} />
+            <Icon as={BarChart2} boxSize={16} color={secondaryTextColor} mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Financial Data Available
             </Heading>

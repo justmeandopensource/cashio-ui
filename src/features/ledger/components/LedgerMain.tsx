@@ -12,6 +12,7 @@ import {
   TabPanel,
   TabPanels,
   Tabs,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import LedgerMainAccounts from "./LedgerMainAccounts";
 import LedgerMainTransactions from "./LedgerMainTransactions";
@@ -20,8 +21,6 @@ import MutualFunds from "@features/mutual-funds/MutualFunds";
 import api from "@/lib/api";
 import { AlignLeft, CreditCard, Coins, TrendingUp } from "lucide-react";
 import useLedgerStore from "@/components/shared/store";
-
-
 
 interface Account {
   account_id: string;
@@ -59,6 +58,14 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
     onAddTransaction(undefined, transaction);
   };
 
+  const tabBg = useColorModeValue("primaryBg", "gray.700");
+  const tabBorderColor = useColorModeValue("tertiaryBg", "gray.600");
+  const selectedTabColor = useColorModeValue("brand.700", "brand.200");
+  const selectedTabBg = useColorModeValue("brand.50", "brand.900");
+  const selectedTabBorderColor = useColorModeValue("brand.400", "brand.500");
+  const hoverTabBg = useColorModeValue("brand.100", "brand.800");
+  const tabColor = useColorModeValue("gray.600", "gray.400");
+
   const { data: accounts, isError, isLoading } = useQuery<Account[]>({
     queryKey: ["accounts", ledgerId],
     queryFn: async () => {
@@ -87,9 +94,9 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
     });
   };
 
-  if (isError) {
-    return null;
-  }
+  const accountsCount = accounts
+    ? accounts.filter((account) => !account.is_group).length
+    : 0;
 
   const handleTabChange = (index: number) => {
     setTabIndex(index);
@@ -106,169 +113,173 @@ const LedgerMain: FC<LedgerMainProps> = ({ onAddTransaction, onTransferFunds }) 
     setSearchParams(newSearchParams);
   };
 
-  const accountsCount = accounts
-    ? accounts.filter((account) => !account.is_group).length
-    : 0;
+  if (isError) {
+    return null;
+  }
 
   return (
     <Box>
-      <Box borderRadius="lg" boxShadow="lg" bg="white" overflow="hidden">
+      <Box borderRadius="lg" boxShadow="lg" bg={tabBg} overflow="hidden">
         <Tabs
           variant="soft-rounded"
-          colorScheme="teal"
+          colorScheme="brand"
           size={{ base: "md", md: "md" }}
           index={tabIndex}
           onChange={handleTabChange}
         >
-           <Box
-             p={{ base: 2, md: 4 }}
-             borderBottom="1px solid"
-             borderColor="gray.200"
-           >
-              <Box>
-                <TabList
-                  minW={{ base: "auto", md: "auto" }}
-                  borderBottom="none"
-                  justifyContent={{ base: "space-around", md: "flex-start" }}
-                >
-                  <Tab
-                    px={{ base: 4, md: 6 }}
-                    py={4}
-                    fontWeight="medium"
-                    borderRadius="md"
-                    whiteSpace="nowrap"
-                    flex={{ base: 1, md: "none" }}
-                    _selected={{
-                      color: "teal.700",
-                      bg: "teal.50",
-                      fontWeight: "semibold",
-                      border: "1px solid",
-                      borderColor: "teal.400",
-                    }}
-                    _hover={{
-                      bg: "teal.25",
-                    }}
-                  >
-                    <Flex align="center" justify="center">
-                      <Icon as={CreditCard} mr={{ base: 0, md: 2 }} />
-                      <Text display={{ base: "none", md: "block" }}>Accounts</Text>
-                      {accountsCount > 0 && (
-                        <Badge ml={{ base: 0, md: 2 }} colorScheme="teal" borderRadius="full" px={2} display={{ base: "none", md: "inline-flex" }}>
-                          {accountsCount}
-                        </Badge>
-                      )}
-                    </Flex>
-                  </Tab>
-                  <Tab
-                    px={{ base: 4, md: 6 }}
-                    py={4}
-                    fontWeight="medium"
-                    borderRadius="md"
-                    whiteSpace="nowrap"
-                    flex={{ base: 1, md: "none" }}
-                    _selected={{
-                      color: "teal.700",
-                      bg: "teal.50",
-                      fontWeight: "semibold",
-                      border: "1px solid",
-                      borderColor: "teal.400",
-                    }}
-                    _hover={{
-                      bg: "teal.25",
-                    }}
-                  >
-                    <Flex align="center" justify="center">
-                      <Icon as={AlignLeft} mr={{ base: 0, md: 2 }} />
-                      <Text display={{ base: "none", md: "block" }}>Transactions</Text>
-                    </Flex>
-                  </Tab>
-                   <Tab
-                     px={{ base: 4, md: 6 }}
-                     py={4}
-                     fontWeight="medium"
-                     borderRadius="md"
-                     whiteSpace="nowrap"
-                     flex={{ base: 1, md: "none" }}
-                     _selected={{
-                       color: "teal.700",
-                       bg: "teal.50",
-                       fontWeight: "semibold",
-                       border: "1px solid",
-                       borderColor: "teal.400",
-                     }}
-                     _hover={{
-                       bg: "teal.25",
-                     }}
-                   >
-                     <Flex align="center" justify="center">
-                       <Icon as={Coins} mr={{ base: 0, md: 2 }} />
-                       <Text display={{ base: "none", md: "block" }}>Physical Assets</Text>
-                     </Flex>
-                   </Tab>
-                   <Tab
-                     px={{ base: 4, md: 6 }}
-                     py={4}
-                     fontWeight="medium"
-                     borderRadius="md"
-                     whiteSpace="nowrap"
-                     flex={{ base: 1, md: "none" }}
-                     _selected={{
-                       color: "teal.700",
-                       bg: "teal.50",
-                       fontWeight: "semibold",
-                       border: "1px solid",
-                       borderColor: "teal.400",
-                     }}
-                     _hover={{
-                       bg: "teal.25",
-                     }}
-                   >
-                     <Flex align="center" justify="center">
-                       <Icon as={TrendingUp} mr={{ base: 0, md: 2 }} />
-                       <Text display={{ base: "none", md: "block" }}>Mutual Funds</Text>
-                     </Flex>
-                   </Tab>
-                </TabList>
-             </Box>
-           </Box>
-           <TabPanels>
-             <TabPanel p={{ base: 2, md: 4 }}>
-               {tabIndex === 0 && (
-                 <LedgerMainAccounts
-                   accounts={accounts || []}
-                   isLoading={isLoading}
-                   onAddTransaction={onAddTransaction}
-                   onTransferFunds={onTransferFunds}
-                 />
-               )}
-             </TabPanel>
-             <TabPanel p={{ base: 2, md: 4 }}>
-               {tabIndex === 1 && (
-                 <LedgerMainTransactions
-                   onAddTransaction={onAddTransaction}
-                    onTransactionDeleted={async () => {
-                      await refreshAccountsData();
-                      await queryClient.invalidateQueries({
-                        queryKey: [`transactions-count`, ledgerId],
-                      });
-                      await refreshInsightsData();
-                    }}
-                   onTransactionUpdated={async () => {
-                     await refreshAccountsData();
-                     await refreshInsightsData();
+          <Box
+            p={{ base: 2, md: 4 }}
+            borderBottom="1px solid"
+            borderColor={tabBorderColor}
+          >
+            <Box>
+              <TabList
+                minW={{ base: "auto", md: "auto" }}
+                borderBottom="none"
+                justifyContent={{ base: "space-around", md: "flex-start" }}
+              >
+                 <Tab
+                   px={{ base: 4, md: 6 }}
+                   py={4}
+                   fontWeight="medium"
+                   borderRadius="md"
+                   whiteSpace="nowrap"
+                   flex={{ base: 1, md: "none" }}
+                   _selected={{
+                     color: selectedTabColor,
+                     bg: selectedTabBg,
+                     fontWeight: "semibold",
+                     border: "1px solid",
+                     borderColor: selectedTabBorderColor,
                    }}
-                   onCopyTransaction={handleCopyTransaction}
-                   shouldFetch={tabIndex === 1}
-                 />
-               )}
-             </TabPanel>
-              <TabPanel p={{ base: 2, md: 4 }}>
-               {tabIndex === 2 && <PhysicalAssets />}
-              </TabPanel>
-                <TabPanel p={{ base: 2, md: 4 }}>
-                {tabIndex === 3 && <MutualFunds onAccountDataChange={refreshAccountsData} filters={mutualFundsFilters} onFiltersChange={setMutualFundsFilters} />}
-                </TabPanel>
-            </TabPanels>
+                   color={tabColor}
+                   _hover={{
+                     bg: hoverTabBg,
+                   }}
+                 >
+                  <Flex align="center" justify="center">
+                    <Icon as={CreditCard} mr={{ base: 0, md: 2 }} />
+                    <Text display={{ base: "none", md: "block" }}>Accounts</Text>
+                    {accountsCount > 0 && (
+                      <Badge ml={{ base: 0, md: 2 }} colorScheme="brand" borderRadius="full" px={2} display={{ base: "none", md: "inline-flex" }}>
+                        {accountsCount}
+                      </Badge>
+                    )}
+                  </Flex>
+                </Tab>
+                <Tab
+                  px={{ base: 4, md: 6 }}
+                  py={4}
+                  fontWeight="medium"
+                  borderRadius="md"
+                  whiteSpace="nowrap"
+                  flex={{ base: 1, md: "none" }}
+                  _selected={{
+                    color: selectedTabColor,
+                    bg: selectedTabBg,
+                    fontWeight: "semibold",
+                    border: "1px solid",
+                    borderColor: selectedTabBorderColor,
+                  }}
+                  color={tabColor}
+                  _hover={{
+                    bg: hoverTabBg,
+                  }}
+                >
+                  <Flex align="center" justify="center">
+                    <Icon as={AlignLeft} mr={{ base: 0, md: 2 }} />
+                    <Text display={{ base: "none", md: "block" }}>Transactions</Text>
+                  </Flex>
+                </Tab>
+                <Tab
+                  px={{ base: 4, md: 6 }}
+                  py={4}
+                  fontWeight="medium"
+                  borderRadius="md"
+                  whiteSpace="nowrap"
+                  flex={{ base: 1, md: "none" }}
+                  _selected={{
+                    color: selectedTabColor,
+                    bg: selectedTabBg,
+                    fontWeight: "semibold",
+                    border: "1px solid",
+                    borderColor: selectedTabBorderColor,
+                  }}
+                  color={tabColor}
+                  _hover={{
+                    bg: hoverTabBg,
+                  }}
+                >
+                  <Flex align="center" justify="center">
+                    <Icon as={Coins} mr={{ base: 0, md: 2 }} />
+                    <Text display={{ base: "none", md: "block" }}>Physical Assets</Text>
+                  </Flex>
+                </Tab>
+                <Tab
+                  px={{ base: 4, md: 6 }}
+                  py={4}
+                  fontWeight="medium"
+                  borderRadius="md"
+                  whiteSpace="nowrap"
+                  flex={{ base: 1, md: "none" }}
+                  _selected={{
+                    color: selectedTabColor,
+                    bg: selectedTabBg,
+                    fontWeight: "semibold",
+                    border: "1px solid",
+                    borderColor: selectedTabBorderColor,
+                  }}
+                  color={tabColor}
+                  _hover={{
+                    bg: hoverTabBg,
+                  }}
+                >
+                  <Flex align="center" justify="center">
+                    <Icon as={TrendingUp} mr={{ base: 0, md: 2 }} />
+                    <Text display={{ base: "none", md: "block" }}>Mutual Funds</Text>
+                  </Flex>
+                </Tab>
+              </TabList>
+            </Box>
+          </Box>
+          <TabPanels>
+            <TabPanel p={{ base: 2, md: 4 }}>
+              {tabIndex === 0 && (
+                <LedgerMainAccounts
+                  accounts={accounts || []}
+                  isLoading={isLoading}
+                  onAddTransaction={onAddTransaction}
+                  onTransferFunds={onTransferFunds}
+                />
+              )}
+            </TabPanel>
+            <TabPanel p={{ base: 2, md: 4 }}>
+              {tabIndex === 1 && (
+                <LedgerMainTransactions
+                  onAddTransaction={onAddTransaction}
+                  onTransactionDeleted={async () => {
+                    await refreshAccountsData();
+                    await queryClient.invalidateQueries({
+                      queryKey: [`transactions-count`, ledgerId],
+                    });
+                    await refreshInsightsData();
+                  }}
+                  onTransactionUpdated={async () => {
+                    await refreshAccountsData();
+                    await refreshInsightsData();
+                  }}
+                  onCopyTransaction={handleCopyTransaction}
+                  shouldFetch={tabIndex === 1}
+                />
+              )}
+            </TabPanel>
+            <TabPanel p={{ base: 2, md: 4 }}>
+              {tabIndex === 2 && <PhysicalAssets />}
+            </TabPanel>
+            <TabPanel p={{ base: 2, md: 4 }}>
+              {tabIndex === 3 && <MutualFunds onAccountDataChange={refreshAccountsData} filters={mutualFundsFilters} onFiltersChange={setMutualFundsFilters} />}
+            </TabPanel>
+          </TabPanels>
         </Tabs>
       </Box>
     </Box>

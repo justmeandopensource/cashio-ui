@@ -291,7 +291,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                   }}
                 />
               <FormErrorMessage>{errors.quantity}</FormErrorMessage>
-              <FormHelperText>
+              <FormHelperText color={useColorModeValue("gray.500", "gray.400")}>
                 {type === "buy" ? "Current Holdings" : "Available to Sell"}:{" "}
                 {asset.total_quantity} {asset.asset_type?.unit_symbol}
               </FormHelperText>
@@ -310,14 +310,13 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                 </HStack>
               </FormLabel>
               <InputGroup size="lg">
-                <InputLeftAddon
-                  bg={inputBorderColor}
-                  borderWidth="2px"
-                  borderColor={inputBorderColor}
-                  color="gray.600"
-                  fontWeight="semibold"
-                 >
-                   {currencySymbol || "$"}
+                                 <InputLeftAddon
+                                   bg={inputBorderColor}
+                                   borderWidth="2px"
+                                   borderColor={inputBorderColor}
+                                   color={useColorModeValue("gray.600", "gray.200")}
+                                   fontWeight="semibold"
+                                  >                   {currencySymbol || "$"}
                  </InputLeftAddon>
                 <Input
                   type="number"
@@ -342,7 +341,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                 />
               </InputGroup>
               <FormErrorMessage>{errors.price_per_unit}</FormErrorMessage>
-                <FormHelperText>
+                <FormHelperText color={useColorModeValue("gray.500", "gray.400")}>
                   Total: {formatCurrencyWithSymbol(totalAmount, currencySymbol || "$")}
                 </FormHelperText>
             </FormControl>
@@ -364,7 +363,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
               {accountsLoading ? (
                 <HStack justify="center" p={4}>
                   <Spinner size="sm" />
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontSize="sm" color={useColorModeValue("gray.500", "gray.400")}>
                     Loading accounts...
                   </Text>
                 </HStack>
@@ -413,7 +412,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                 </Select>
               )}
               <FormErrorMessage>{errors.account_id}</FormErrorMessage>
-              <FormHelperText>
+              <FormHelperText color={useColorModeValue("gray.500", "gray.400")}>
                 {type === "buy"
                   ? "Account to deduct funds from"
                   : "Account to receive funds"}
@@ -464,7 +463,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                  />
                </Box>
                <FormErrorMessage>{errors.transaction_date}</FormErrorMessage>
-               <FormHelperText>Transaction date</FormHelperText>
+               <FormHelperText color={useColorModeValue("gray.500", "gray.400")}>Transaction date</FormHelperText>
              </FormControl>
           </Stack>
 
@@ -491,7 +490,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
               }}
               resize="vertical"
             />
-            <FormHelperText>
+            <FormHelperText color={useColorModeValue("gray.500", "gray.400")}>
               Additional details about this {type} transaction
             </FormHelperText>
           </FormControl>
@@ -554,11 +553,11 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
           flex={1}
           borderRadius="md"
           borderWidth="2px"
-          borderColor="gray.300"
-          color="gray.600"
+          borderColor={useColorModeValue("gray.300", "gray.600")}
+          color={useColorModeValue("gray.600", "gray.200")}
           _hover={{
-            bg: "gray.50",
-            borderColor: "gray.400",
+            bg: useColorModeValue("gray.50", "gray.600"),
+            borderColor: useColorModeValue("gray.400", "gray.500"),
             transform: "translateY(-2px)",
           }}
           isDisabled={isLoading}
@@ -677,7 +676,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                   fontWeight: "bold",
                 }}
                 _hover={{
-                  bg: "teal.50",
+                  bg: useColorModeValue("teal.50", "teal.700"),
                   _selected: { bg: "teal.400" },
                 }}
                 borderRadius="sm"
@@ -698,7 +697,7 @@ const BuySellAssetModal: FC<BuySellAssetModalProps> = ({
                   fontWeight: "bold",
                 }}
                 _hover={{
-                  bg: "red.50",
+                  bg: useColorModeValue("red.50", "red.700"),
                   _selected: { bg: "red.300" },
                 }}
                 borderRadius="sm"

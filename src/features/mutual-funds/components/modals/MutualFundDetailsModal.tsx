@@ -377,7 +377,12 @@ const MutualFundDetailsModal: React.FC<MutualFundDetailsModalProps> = ({
               width="100%"
               borderRadius="md"
               borderWidth="2px"
-              _hover={{ bg: cardBg }}
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
+              _hover={{
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
+              }}
               leftIcon={<X />}
             >
               Cancel
@@ -411,7 +416,12 @@ const MutualFundDetailsModal: React.FC<MutualFundDetailsModalProps> = ({
             variant="outline"
             onClick={onClose}
             borderWidth="2px"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
             px={6}
             py={3}
             borderRadius="md"

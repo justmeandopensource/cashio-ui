@@ -22,6 +22,7 @@ import {
   Badge,
   Flex,
   useToast,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import useLedgerStore from "@/components/shared/store";
 
@@ -238,7 +239,11 @@ const MutualFunds: FC<MutualFundsProps> = (props) => {
     }
   };
 
-
+  const selectedTabColor = useColorModeValue("brand.700", "brand.200");
+  const selectedTabBg = useColorModeValue("brand.50", "brand.900");
+  const selectedTabBorderColor = useColorModeValue("brand.400", "brand.500");
+  const hoverTabBg = useColorModeValue("brand.100", "brand.800");
+  const tabColor = useColorModeValue("gray.600", "gray.400");
 
   if (!ledgerId) {
     return <Box>No ledger selected</Box>;
@@ -248,67 +253,70 @@ const MutualFunds: FC<MutualFundsProps> = (props) => {
     <Box>
       <Tabs
         variant="soft-rounded"
-        colorScheme="teal"
+        colorScheme="brand"
         size={{ base: "md", md: "md" }}
         index={subTabIndex}
         onChange={handleSubTabChange}
       >
         <Box p={{ base: 2, md: 4 }}>
-          <TabList borderBottom="none">
-            <Tab
-              px={{ base: 4, md: 6 }}
-              py={4}
-              fontWeight="medium"
-              borderRadius="md"
-              whiteSpace="nowrap"
-              _selected={{
-                color: "teal.700",
-                bg: "teal.50",
-                fontWeight: "semibold",
-                border: "1px solid",
-                borderColor: "teal.400",
-              }}
-              _hover={{
-                bg: "teal.25",
-              }}
-            >
-              <Flex align="center">
-                <Text>Overview</Text>
-                {mutualFunds.length > 0 && (
-                  <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
-                    {mutualFunds.length}
-                  </Badge>
-                )}
-              </Flex>
-            </Tab>
-            <Tab
-              px={{ base: 4, md: 6 }}
-              py={4}
-              fontWeight="medium"
-              borderRadius="md"
-              whiteSpace="nowrap"
-              _selected={{
-                color: "teal.700",
-                bg: "teal.50",
-                fontWeight: "semibold",
-                border: "1px solid",
-                borderColor: "teal.400",
-              }}
-              _hover={{
-                bg: "teal.25",
-              }}
-            >
-              Transactions
-            </Tab>
-          </TabList>
+           <TabList borderBottom="none">
+                            <Tab
+                            px={{ base: 4, md: 6 }}
+                            py={4}
+                            fontWeight="medium"
+                            borderRadius="md"
+                            whiteSpace="nowrap"
+                            color={tabColor}
+                            _selected={{
+                              color: selectedTabColor,
+                              bg: selectedTabBg,
+                              fontWeight: "semibold",
+                              border: "1px solid",
+                              borderColor: selectedTabBorderColor,
+                            }}
+                            _hover={{
+                              bg: hoverTabBg,
+                            }}
+                          >
+                            <Flex align="center">
+                              <Text>Overview</Text>
+                             {mutualFunds.length > 0 && (
+                               <Badge ml={2} colorScheme="brand" borderRadius="full" px={2}>
+                                 {mutualFunds.length}
+                               </Badge>
+                             )}
+                           </Flex>
+                         </Tab>
+                          <Tab
+                            px={{ base: 4, md: 6 }}
+                            py={4}
+                            fontWeight="medium"
+                            borderRadius="md"
+                            whiteSpace="nowrap"
+                            color={tabColor}
+                            _selected={{
+                              color: selectedTabColor,
+                              bg: selectedTabBg,
+                              fontWeight: "semibold",
+                              border: "1px solid",
+                              borderColor: selectedTabBorderColor,
+                            }}
+                            _hover={{
+                              bg: hoverTabBg,
+                            }}
+                          >
+                            <Flex align="center">
+                              <Text>Transactions</Text>
+                            </Flex>
+                          </Tab>          </TabList>
         </Box>
 
          <TabPanels>
            <TabPanel p={{ base: 2, md: 4 }}>
-             {subTabIndex === 0 && (
-               isLoading ? (
+             {subTabIndex === 0 &&
+               (isLoading ? (
                  <Box display="flex" justifyContent="center" py={10}>
-                   <Spinner size="xl" />
+                   <Spinner size="xl" color={selectedTabColor} />
                  </Box>
                ) : (
                      <MutualFundsOverview
@@ -324,8 +332,7 @@ const MutualFunds: FC<MutualFundsProps> = (props) => {
                       filters={filters}
                        onFiltersChange={onFiltersChange}
                      />
-               )
-             )}
+               ))}
            </TabPanel>
            <TabPanel p={{ base: 2, md: 4 }}>
              {subTabIndex === 1 && (
@@ -455,7 +462,7 @@ const MutualFunds: FC<MutualFundsProps> = (props) => {
               Cancel
             </Button>
             <Button
-              colorScheme="teal"
+              colorScheme="brand"
               onClick={() => {
                 setIsAmcWarningOpen(false);
                 onCreateAmcModalOpen();

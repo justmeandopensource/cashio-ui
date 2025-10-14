@@ -447,11 +447,11 @@ const CreatePhysicalAssetModal: FC<CreatePhysicalAssetModalProps> = ({
                 flex={{ base: "none", md: 1 }}
                 borderRadius="md"
                 borderWidth="2px"
-                borderColor="gray.300"
-                color="gray.600"
+                borderColor={useColorModeValue("gray.300", "gray.600")}
+                color={useColorModeValue("gray.600", "gray.200")}
                 _hover={{
-                  bg: "gray.50",
-                  borderColor: "gray.400",
+                  bg: useColorModeValue("gray.50", "gray.600"),
+                  borderColor: useColorModeValue("gray.400", "gray.500"),
                   transform: "translateY(-2px)",
                 }}
                 isDisabled={isLoading}

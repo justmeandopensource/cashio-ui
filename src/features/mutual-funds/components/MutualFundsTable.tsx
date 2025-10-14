@@ -110,8 +110,9 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
   const lastTransactionDate = transactionDates.length > 0 ? new Date(Math.max(...transactionDates.map(d => d.getTime()))) : null;
   const navUpdatedDate = fund.last_nav_update ? new Date(fund.last_nav_update) : null;
 
-  const boxBg = useColorModeValue("gray.50", "gray.800");
+  const boxBg = useColorModeValue("gray.50", "cardDarkBg");
   const borderColor = useColorModeValue("gray.200", "gray.700");
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
 
   return (
     <Box
@@ -135,7 +136,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
               Lowest Cost
             </StatLabel>
             <HStack spacing={0} align="baseline">
-              <StatNumber fontSize="sm">
+              <StatNumber fontSize="sm" color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? "..."
                   : lowestPurchaseCost !== null
@@ -145,7 +146,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
                     ).main
                   : "--"}
               </StatNumber>
-              <Text fontSize="xs" opacity={0.7}>
+              <Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? ""
                   : lowestPurchaseCost !== null
@@ -162,7 +163,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
               Avg. Cost
             </StatLabel>
             <HStack spacing={0} align="baseline">
-              <StatNumber fontSize="sm">
+              <StatNumber fontSize="sm" color={tertiaryTextColor}>
                 {
                   splitCurrencyForDisplay(
                     toNumber(fund.average_cost_per_unit),
@@ -170,7 +171,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
                   ).main
                 }
               </StatNumber>
-              <Text fontSize="xs" opacity={0.7}>
+              <Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>
                 {
                   splitCurrencyForDisplay(
                     toNumber(fund.average_cost_per_unit),
@@ -185,7 +186,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
               Highest Cost
             </StatLabel>
             <HStack spacing={0} align="baseline">
-              <StatNumber fontSize="sm">
+              <StatNumber fontSize="sm" color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? "..."
                   : highestPurchaseCost !== null
@@ -195,7 +196,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
                     ).main
                   : "--"}
               </StatNumber>
-              <Text fontSize="xs" opacity={0.7}>
+              <Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>
                 {isLoadingTransactions
                   ? ""
                   : highestPurchaseCost !== null
@@ -244,7 +245,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
             <StatLabel fontSize="2xs" color={mutedColor} whiteSpace="nowrap">
               NAV Last Updated
             </StatLabel>
-            <StatNumber fontSize="xs">
+            <StatNumber fontSize="xs" color={tertiaryTextColor}>
               {navUpdatedDate ? `${navUpdatedDate.getFullYear()}-${String(navUpdatedDate.getMonth() + 1).padStart(2, '0')}-${String(navUpdatedDate.getDate()).padStart(2, '0')}` : "--"}
             </StatNumber>
           </Stat>
@@ -252,7 +253,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
             <StatLabel fontSize="2xs" color={mutedColor} whiteSpace="nowrap">
               First Transaction
             </StatLabel>
-            <StatNumber fontSize="xs">
+            <StatNumber fontSize="xs" color={tertiaryTextColor}>
               {isLoadingTransactions ? "..." : firstTransactionDate ? `${firstTransactionDate.getFullYear()}-${String(firstTransactionDate.getMonth() + 1).padStart(2, '0')}-${String(firstTransactionDate.getDate()).padStart(2, '0')}` : "--"}
             </StatNumber>
           </Stat>
@@ -260,7 +261,7 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
             <StatLabel fontSize="2xs" color={mutedColor} whiteSpace="nowrap">
               Last Transaction
             </StatLabel>
-            <StatNumber fontSize="xs">
+            <StatNumber fontSize="xs" color={tertiaryTextColor}>
               {isLoadingTransactions ? "..." : lastTransactionDate ? `${lastTransactionDate.getFullYear()}-${String(lastTransactionDate.getMonth() + 1).padStart(2, '0')}-${String(lastTransactionDate.getDate()).padStart(2, '0')}` : "--"}
             </StatNumber>
           </Stat>
@@ -366,7 +367,9 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
+  const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
 
    // State for sorting
     const [sortField, setSortField] =
@@ -690,7 +693,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
     const navUpdatedDate = fund.last_nav_update ? new Date(fund.last_nav_update) : null;
 
     return (
-        <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "gray.700")} boxShadow="md">
+        <Box borderWidth="1px" borderRadius="lg" overflow="hidden" bg={useColorModeValue("white", "cardDarkBg")} boxShadow="md">
           <Box p={4}>
             <Flex justify="space-between" align="start">
               <Box maxW="80%">
@@ -735,7 +738,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               <StatLabel fontSize="xs" color={mutedColor}>Value</StatLabel>
               <StatNumber>
                 <HStack spacing={0} align="baseline">
-                  <Text fontSize="lg" fontWeight="bold">
+                  <Text fontSize="lg" fontWeight="bold" color={tertiaryTextColor}>
                     {splitCurrencyForDisplay(fund.current_value, currencySymbol || "₹").main}
                   </Text>
                   <Text fontSize="sm" fontWeight="bold" opacity={0.7}>
@@ -778,15 +781,15 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             <SimpleGrid columns={3} spacingX={4} spacingY={2} mb={4}>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Invested</StatLabel>
-                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm">{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7}>{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").decimals}</Text></HStack>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={tertiaryTextColor}>{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" opacity={0.7} color={tertiaryTextColor}>{splitCurrencyForDisplay(fund.invested, currencySymbol || "₹").decimals}</Text></HStack>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Units</StatLabel>
-                <StatNumber fontSize="sm">{formatUnits(fund.total_units)}</StatNumber>
+                <StatNumber fontSize="sm" color={tertiaryTextColor}>{formatUnits(fund.total_units)}</StatNumber>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>NAV</StatLabel>
-                <StatNumber fontSize="sm">{currencySymbol || "₹"}{formatNav(fund.latest_nav)}</StatNumber>
+                <StatNumber fontSize="sm" color={tertiaryTextColor}>{currencySymbol || "₹"}{formatNav(fund.latest_nav)}</StatNumber>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Avg. Cost</StatLabel>
@@ -913,7 +916,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
         </VStack>
       ) : (
         <Box overflowX="auto">
-          <Table variant="simple" size="sm" minW="800px">
+          <Table variant="simple" size="sm" minW="800px" borderColor={useColorModeValue("gray.200", "gray.500")}>
             <Thead>
               <Tr>
                 <Th width="2%"></Th>
@@ -1004,7 +1007,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             <Tbody>
               {sortedFunds.map((fund) => (
                 <React.Fragment key={fund.mutual_fund_id}>
-                   <Tr _hover={{ bg: "gray.50" }}>
+                   <Tr _hover={{ bg: tableHoverBg }}>
                      <Td>
                        <IconButton
                          icon={
@@ -1070,15 +1073,17 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                         </HStack>
                        </Td>
                      <Td isNumeric display={{ base: "none", lg: "table-cell" }}>
-                       {currencySymbol || "₹"}
-                       {formatNav(fund.latest_nav)}
+                       <Text fontSize="sm" color={tertiaryTextColor}>
+                         {currencySymbol || "₹"}
+                         {formatNav(fund.latest_nav)}
+                       </Text>
                      </Td>
                     <Td isNumeric display={{ base: "none", md: "table-cell" }}>
-                      {formatUnits(fund.total_units)}
+                      <Text fontSize="sm" color={tertiaryTextColor}>{formatUnits(fund.total_units)}</Text>
                     </Td>
                     <Td isNumeric display={{ base: "none", md: "table-cell" }}>
                       <HStack spacing={0} align="baseline" justify="flex-end">
-                        <Text fontSize="sm">
+                        <Text fontSize="sm" color={tertiaryTextColor}>
                           {
                             splitCurrencyForDisplay(
                               fund.invested,
@@ -1098,7 +1103,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                     </Td>
                     <Td isNumeric>
                       <HStack spacing={0} align="baseline" justify="flex-end">
-                        <Text fontSize="sm">
+                        <Text fontSize="sm" color={tertiaryTextColor}>
                           {
                             splitCurrencyForDisplay(
                               fund.current_value,

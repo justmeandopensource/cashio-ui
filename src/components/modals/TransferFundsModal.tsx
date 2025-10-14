@@ -419,7 +419,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                          ))}
                      </optgroup>
                    </Select>
-                   <FormHelperText mt={2}>
+                   <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
                      Choose which account to transfer from
                    </FormHelperText>
                  </FormControl>
@@ -485,7 +485,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                          bg={inputBorderColor}
                          borderWidth="2px"
                          borderColor={inputBorderColor}
-                         color="gray.600"
+                         color={useColorModeValue("gray.600", "gray.200")}
                          fontWeight="semibold"
                        >
                          {currencySymbol}
@@ -510,7 +510,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                           autoFocus={!!accountId}
                        />
                      </InputGroup>
-                     <FormHelperText mt={2}>
+                     <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
                        {fromAccountId
                          ? `Available funds: ${formatCurrency(selectedAccountBalance)}`
                          : "Enter the transfer amount"}
@@ -533,7 +533,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                   <Text fontWeight="semibold" mb={1}>
                     Transfer to Different Ledger
                   </Text>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
                     Enable to transfer funds to another ledger with different
                     currency
                   </Text>
@@ -556,7 +556,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
               borderColor="teal.200"
             >
               <VStack spacing={5} align="stretch">
-                <Text fontWeight="bold" color="teal.700" mb={2}>
+                <Text fontWeight="bold" color={useColorModeValue("teal.700", "teal.300")} mb={2}>
                   Destination
                 </Text>
 
@@ -599,7 +599,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         </option>
                       ))}
                     </Select>
-                    <FormHelperText mt={2}>
+                    <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
                       Choose the destination ledger
                     </FormHelperText>
                   </FormControl>
@@ -655,7 +655,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         ))}
                     </optgroup>
                   </Select>
-                  <FormHelperText mt={2}>
+                  <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
                     Choose which account to transfer to
                   </FormHelperText>
                 </FormControl>
@@ -671,7 +671,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         bg={inputBorderColor}
                         borderWidth="2px"
                         borderColor={inputBorderColor}
-                        color="gray.600"
+                        color={useColorModeValue("gray.600", "gray.200")}
                         fontWeight="semibold"
                       >
                         {destinationCurrencySymbol || currencySymbol}
@@ -699,7 +699,7 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
                         }}
                       />
                     </InputGroup>
-                    <FormHelperText mt={2}>
+                    <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
                       Enter amount in destination currency
                     </FormHelperText>
                   </FormControl>
@@ -762,7 +762,12 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
               isDisabled={isLoading}
               leftIcon={<X />}
               borderWidth="2px"
-              _hover={{ bg: cardBg }}
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
+              _hover={{
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
+              }}
             >
               Cancel
             </Button>
@@ -813,7 +818,12 @@ const TransferFundsModal: React.FC<TransferFundsModalProps> = ({
             py={3}
             borderRadius="md"
             borderWidth="2px"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
           >
             Cancel
           </Button>

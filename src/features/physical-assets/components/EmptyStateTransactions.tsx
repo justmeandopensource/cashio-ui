@@ -7,8 +7,9 @@ import {
 } from "@chakra-ui/react";
 
 const EmptyStateTransactions: FC = () => {
-  const bgColor = useColorModeValue("gray.50", "gray.800");
+  const bgColor = useColorModeValue("gray.50", "cardDarkBg");
   const textColor = useColorModeValue("gray.600", "gray.400");
+  const headingColor = useColorModeValue("gray.700", "gray.200");
 
   return (
     <Box
@@ -16,12 +17,11 @@ const EmptyStateTransactions: FC = () => {
       textAlign="center"
       bg={bgColor}
       borderRadius="lg"
-      border="2px dashed"
-      borderColor="gray.300"
+      boxShadow="sm"
     >
       <VStack spacing={4}>
         <VStack spacing={2}>
-          <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+          <Text fontSize="lg" fontWeight="semibold" color={headingColor}>
             No Transactions Yet
           </Text>
           <Text fontSize="sm" color={textColor} maxW="300px">

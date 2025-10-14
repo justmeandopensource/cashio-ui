@@ -285,7 +285,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
               <Stack direction={{ base: "column", md: "row" }} spacing={4}>
                 <Box flex={1}>
                   <HStack spacing={2} mb={2}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
+                    <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.600", "gray.300")}>
                       Current Price
                     </Text>
                   </HStack>
@@ -297,7 +297,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                        {splitCurrencyForDisplay(Number(fund.latest_nav), currencySymbol || "₹").decimals}
                      </Text>
                   </HStack>
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontSize="sm" color={useColorModeValue("gray.500", "gray.400")}>
                     per unit
                   </Text>
                 </Box>
@@ -306,18 +306,17 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                   <Box flex={1}>
                     <HStack spacing={2} mb={2}>
                       <Clock size={16} />
-                      <Text fontSize="sm" fontWeight="medium" color="gray.600">
+                      <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.600", "gray.300")}>
                         Last Updated
                       </Text>
                     </HStack>
                     <Text fontSize="md" fontWeight="semibold">
                       {format(new Date(fund.last_nav_update), "MMM dd, yyyy")}
                     </Text>
-                    <Text fontSize="sm" color="gray.500">
-                      {format(new Date(fund.last_nav_update), "h:mm a")}
-                    </Text>
-                  </Box>
-                )}
+                                          <Text fontSize="sm" color={useColorModeValue("gray.500", "gray.400")}>
+                                            {format(new Date(fund.last_nav_update), "h:mm a")}
+                                          </Text>
+                                        </Box>                )}
               </Stack>
             </Box>
 
@@ -360,7 +359,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                        bg={inputBorderColor}
                        borderWidth="2px"
                        borderColor={inputBorderColor}
-                       color="gray.600"
+                       color={useColorModeValue("gray.600", "gray.200")}
                        fontWeight="semibold"
                      >
                        {currencySymbol || "₹"}
@@ -384,7 +383,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                     />
                   </InputGroup>
                   <FormErrorMessage>{errors.nav}</FormErrorMessage>
-                  <FormHelperText>
+                  <FormHelperText color={useColorModeValue("gray.500", "gray.400")}>
                     Enter the latest NAV per unit from your fund statement
                   </FormHelperText>
                 </FormControl>
@@ -420,7 +419,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                     </HStack>
                     <HStack justify="space-between" align="center">
                       <VStack align="start" spacing={1}>
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
                           New NAV
                         </Text>
                         <HStack spacing={0} align="baseline">
@@ -442,7 +441,7 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
                         </HStack>
                       </VStack>
                       <VStack align="end" spacing={1}>
-                        <Text fontSize="sm" color="gray.600">
+                        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
                           Value Change
                         </Text>
                         <Badge
@@ -535,11 +534,11 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
               width="100%"
               borderRadius="md"
               borderWidth="2px"
-              borderColor="gray.300"
-              color="gray.600"
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
               _hover={{
-                bg: "gray.50",
-                borderColor: "gray.400",
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
                 transform: "translateY(-2px)",
               }}
               isDisabled={updateNavMutation.isPending}
@@ -592,7 +591,12 @@ const UpdateNavModal: FC<UpdateNavModalProps> = ({
             py={3}
             borderRadius="md"
             borderWidth="2px"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
           >
             Cancel
           </Button>

@@ -34,6 +34,7 @@ import {
   Badge,
   Link as ChakraLink,
   useBreakpointValue,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { CreditCard, Trash2, Edit, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -132,9 +133,35 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
     }
   };
 
+  const hoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const accountLinkColor = useColorModeValue("brand.500", "brand.300");
+  const storeTagBg = useColorModeValue("brand.50", "brand.900");
+  const storeTagColor = useColorModeValue("brand.700", "brand.200");
+  const storeTagBorderColor = useColorModeValue("brand.200", "brand.700");
+  const tagBg = useColorModeValue("tertiaryBg", "tertiaryBg");
+  const tagColor = useColorModeValue("primaryTextColor", "primaryTextColor");
+  const popoverBg = useColorModeValue("brand.100", "brand.800");
+  const popoverArrowBg = useColorModeValue("brand.100", "brand.800");
+  const popoverHeaderBg = useColorModeValue(
+    "linear(to-r, brand.400, brand.600)",
+    "linear(to-r, brand.600, brand.800)"
+  );
+  const popoverItemBorderColor = useColorModeValue("brand.200", "brand.700");
+  const popoverItemHoverBg = useColorModeValue("brand.50", "brand.900");
+  const popoverItemColor = useColorModeValue("brand.900", "brand.100");
+  const creditColor = useColorModeValue("brand.500", "brand.300");
+  const debitColor = useColorModeValue("red.500", "red.300");
+  const editIconColor = useColorModeValue("blue.500", "blue.300");
+  const editIconHoverColor = useColorModeValue("blue.600", "blue.400");
+  const copyIconColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+  const copyIconHoverColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+  const deleteIconColor = useColorModeValue("red.500", "red.300");
+  const deleteIconHoverColor = useColorModeValue("red.600", "red.400");
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+
   return (
     <>
-      <Table variant="simple" size="sm">
+      <Table variant="simple" size="sm" borderColor={useColorModeValue("gray.200", "gray.500")}>
         <Thead>
           <Tr>
             <Th width="8%">Date</Th>
@@ -163,19 +190,19 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
             .map((transaction) => (
             <Tr
               key={transaction.transaction_id}
-              _hover={{ bg: "gray.100" }}
+              _hover={{ bg: hoverBg }}
               sx={{
                 "&:hover .action-icons": {
                   opacity: 1,
                 },
               }}
             >
-              <Td width="8%">{formatDate(transaction.date)}</Td>
-              <Td width="15%">{transaction.category_name}</Td>
+              <Td width="8%"><Text color={tertiaryTextColor}>{formatDate(transaction.date)}</Text></Td>
+              <Td width="15%"><Text color={tertiaryTextColor}>{transaction.category_name}</Text></Td>
               {showAccountName && (
                 <Td width="12%">
                   {transaction.account_name && transaction.account_id && (
-                    <ChakraLink as={Link} to={`/account/${transaction.account_id}`} color="blue.500">
+                    <ChakraLink as={Link} to={`/account/${transaction.account_id}`} color={accountLinkColor}>
                       {transaction.account_name}
                     </ChakraLink>
                   )}
@@ -183,16 +210,16 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
               )}
                <Td>
                  <Box>
-                   {transaction.notes && <Text mb={((transaction.store || transaction.location) || (transaction.tags && transaction.tags.length > 0)) ? 2 : 0}>{transaction.notes}</Text>}
+                   {transaction.notes && <Text mb={((transaction.store || transaction.location) || (transaction.tags && transaction.tags.length > 0)) ? 2 : 0} color={tertiaryTextColor}>{transaction.notes}</Text>}
                    {(transaction.store || transaction.location) && (
                      <Box mb={transaction.tags && transaction.tags.length > 0 ? 2 : 0}>
                        <Tag
                          size="sm"
                          borderRadius="full"
-                         bg="blue.50"
-                         color="blue.700"
+                         bg={storeTagBg}
+                         color={storeTagColor}
                          border="1px solid"
-                         borderColor="blue.200"
+                         borderColor={storeTagBorderColor}
                          fontSize="xs"
                          fontWeight="medium"
                        >
@@ -209,8 +236,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                            <Tag
                              size="sm"
                              borderRadius="md"
-                             bg="gray.200"
-                             color="gray.800"
+                             bg={tagBg}
+                             color={tagColor}
                            >
                              <TagLabel>{tag.name}</TagLabel>
                            </Tag>
@@ -245,14 +272,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                          </Badge>
                        </PopoverTrigger>
                     <PopoverContent
-                      bg="teal.100"
+                      bg={popoverBg}
                       color="white"
                       minW="400px"
                       maxW="800px"
                       width="auto"
                       overflow="hidden"
                     >
-                      <PopoverArrow bg="teal.100" />
+                      <PopoverArrow bg={popoverArrowBg} />
                       <PopoverBody p={0}>
                         {isSplitLoading ? (
                           <Flex justify="center" align="center" minH="100px">
@@ -261,7 +288,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         ) : (
                           <Box>
                             <Flex
-                              bgGradient="linear(to-r, teal.400, teal.600)"
+                              bgGradient={popoverHeaderBg}
                               p={2}
                               fontWeight="bold"
                             >
@@ -280,13 +307,13 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                                 key={split.split_id}
                                 p={3}
                                 borderBottomWidth="1px"
-                                borderColor="teal.200"
-                                _hover={{ bg: "teal.50" }}
+                                borderColor={popoverItemBorderColor}
+                                _hover={{ bg: popoverItemHoverBg }}
                                 align="center"
                               >
                                 <Box
                                   flex="2"
-                                  color="teal.900"
+                                  color={popoverItemColor}
                                   fontWeight="medium"
                                 >
                                   {split.category_name}
@@ -294,15 +321,15 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                                 <Box
                                   flex="1"
                                   textAlign="right"
-                                  color="teal.900"
+                                  color={popoverItemColor}
                                   fontWeight="bold"
                                 >
                                   {formatNumberAsCurrency(
                                     split.debit,
-                                    currencySymbol as string,
+                                    currencySymbol as string
                                   )}
                                 </Box>
-                                <Box flex="3" ml={4} color="teal.900">
+                                <Box flex="3" ml={4} color={popoverItemColor}>
                                   {split.notes || "-"}
                                 </Box>
                               </Flex>
@@ -354,10 +381,10 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         TRANS
                       </Badge>
                     </PopoverTrigger>
-                    <PopoverContent bg="teal.100" color="white" maxW="300px">
-                      <PopoverArrow bg="teal.100" />
+                    <PopoverContent bg={popoverBg} color="white" maxW="300px">
+                      <PopoverArrow bg={popoverArrowBg} />
                       <PopoverHeader
-                        bgGradient="linear(to-r, teal.400, teal.600)"
+                        bgGradient={popoverHeaderBg}
                         color="white"
                         borderTopRadius="md"
                         py={3}
@@ -383,14 +410,14 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                               p={4}
                               borderWidth="1px"
                               borderRadius="md"
-                              bg="teal.50"
+                              bg={popoverItemHoverBg}
                               boxShadow="sm"
                               textAlign="center"
                             >
                               <Text
                                 fontSize="lg"
                                 fontWeight="bold"
-                                color="teal.900"
+                                color={popoverItemColor}
                                 mb={2}
                               >
                                 {transaction.debit > 0
@@ -399,7 +426,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                                   : transferDetails.source_account_name ||
                                     "N/A"}
                               </Text>
-                              <Text fontSize="sm" color="teal.700">
+                              <Text fontSize="sm" color={popoverItemColor}>
                                 {transaction.debit > 0
                                   ? transferDetails.destination_ledger_name ||
                                     "N/A"
@@ -408,7 +435,7 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                             </Box>
                           </Stack>
                         ) : (
-                          <Text color="teal.900">
+                          <Text color={popoverItemColor}>
                             No transfer details available.
                           </Text>
                         )}
@@ -420,20 +447,20 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                </Td>
               <Td width="10%" isNumeric>
                 {transaction.credit !== 0 && (
-                  <Text color="teal.500">
+                  <Text color={creditColor}>
                     {formatNumberAsCurrency(
                       transaction.credit,
-                      currencySymbol as string,
+                      currencySymbol as string
                     )}
                   </Text>
                 )}
               </Td>
               <Td width="10%" isNumeric>
                 {transaction.debit !== 0 && (
-                  <Text color="red.500">
+                  <Text color={debitColor}>
                     {formatNumberAsCurrency(
                       transaction.debit,
-                      currencySymbol as string,
+                      currencySymbol as string
                     )}
                   </Text>
                 )}
@@ -454,8 +481,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                           <Icon
                             as={Edit}
                             boxSize={4}
-                            color="blue.500"
-                            _hover={{ color: "blue.600" }}
+                            color={editIconColor}
+                            _hover={{ color: editIconHoverColor }}
                             transition="opacity 0.2s"
                             data-testid="transactiontable-edit-icon"
                           />
@@ -467,8 +494,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                           <Icon
                             as={Copy}
                             boxSize={4}
-                            color="gray.500"
-                            _hover={{ color: "gray.600" }}
+                            color={copyIconColor}
+                            _hover={{ color: copyIconHoverColor }}
                             transition="opacity 0.2s"
                             data-testid="transactiontable-copy-icon"
                           />
@@ -486,8 +513,8 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                         <Icon
                           as={Trash2}
                           boxSize={4}
-                          color="red.500"
-                          _hover={{ color: "red.600" }}
+                          color={deleteIconColor}
+                          _hover={{ color: deleteIconHoverColor }}
                           transition="opacity 0.2s"
                           data-testid="transactiontable-trash-icon"
                         />

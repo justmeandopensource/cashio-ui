@@ -17,8 +17,8 @@ interface HomeMainHeaderProps {
 
 const HomeMainHeader: FC<HomeMainHeaderProps> = ({ onCreateLedger }) => {
   const gradientBg = useColorModeValue(
-    "linear(135deg, teal.500, teal.600)",
-    "linear(135deg, teal.600, teal.700)",
+    "linear(135deg, brand.500, brand.600)",
+    "linear(135deg, brand.600, brand.700)"
   );
 
   return (

@@ -5,7 +5,7 @@ import Layout from "@components/Layout";
 import AccountMain from "@features/account/components/AccountMain";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
-import { Button, Box, Text, HStack, Badge, Flex } from "@chakra-ui/react";
+import { Button, Box, Text, HStack, Badge, Flex, useColorModeValue } from "@chakra-ui/react";
 import { lazy, Suspense } from "react";
 import { Building, ShieldAlert, ChevronLeft } from "lucide-react";
 import { formatNumberAsCurrency } from "@components/shared/utils";
@@ -43,6 +43,18 @@ const Account: React.FC = () => {
     useState<boolean>(false);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState<boolean>(false);
 
+  const greenColor = useColorModeValue("green.500", "green.300");
+  const greenBgColor = useColorModeValue("green.50", "green.900");
+  const greenBorderColor = useColorModeValue("green.200", "green.700");
+  const redColor = useColorModeValue("red.500", "red.300");
+  const redBgColor = useColorModeValue("red.50", "red.900");
+  const redBorderColor = useColorModeValue("red.200", "red.700");
+  const grayColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+  const grayBgColor = useColorModeValue("secondaryBg", "secondaryBg");
+  const grayBorderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
+  const buttonBg = useColorModeValue("buttonPrimaryBg", "buttonPrimaryBg");
+  const buttonHoverBg = useColorModeValue("buttonPrimaryHoverBg", "buttonPrimaryHoverBg");
+
   // Function to get balance color based on balance value and account type
   const getBalanceStyling = (balance: number, accountType?: string) => {
     // For asset accounts: Positive = Good (green), Negative = Bad (red)
@@ -51,14 +63,14 @@ const Account: React.FC = () => {
 
     if (balance > 0) {
       return isPositiveGood
-        ? { color: "green.500", bgColor: "green.50", borderColor: "green.200" }
-        : { color: "red.500", bgColor: "red.50", borderColor: "red.200" };
+        ? { color: greenColor, bgColor: greenBgColor, borderColor: greenBorderColor }
+        : { color: redColor, bgColor: redBgColor, borderColor: redBorderColor };
     } else if (balance < 0) {
       return isPositiveGood
-        ? { color: "red.500", bgColor: "red.50", borderColor: "red.200" }
-        : { color: "green.500", bgColor: "green.50", borderColor: "green.200" };
+        ? { color: redColor, bgColor: redBgColor, borderColor: redBorderColor }
+        : { color: greenColor, bgColor: greenBgColor, borderColor: greenBorderColor };
     } else {
-      return { color: "gray.500", bgColor: "gray.50", borderColor: "gray.200" };
+      return { color: grayColor, bgColor: grayBgColor, borderColor: grayBorderColor };
     }
   };
 
@@ -69,7 +81,7 @@ const Account: React.FC = () => {
     onClose: onDetailsModalClose,
   } = useDisclosure();
   const [transactionToCopy, setTransactionToCopy] = useState<any | undefined>(
-    undefined,
+    undefined
   );
 
   const handleCopyTransaction = async (transaction: any) => {
@@ -96,7 +108,7 @@ const Account: React.FC = () => {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },
+      }
     );
 
     if (!response.ok) {
@@ -227,18 +239,18 @@ const Account: React.FC = () => {
               <Button
                 color="white"
                 variant="ghost"
-                bg="whiteAlpha.100"
+                bg={buttonBg}
                 onClick={() => setIsCreateModalOpen(true)}
-                _hover={{ bg: "whiteAlpha.300" }}
+                _hover={{ bg: buttonHoverBg }}
               >
                 Add Transaction
               </Button>
               <Button
                 color="white"
                 variant="ghost"
-                bg="whiteAlpha.100"
+                bg={buttonBg}
                 onClick={() => setIsTransferModalOpen(true)}
-                _hover={{ bg: "whiteAlpha.300" }}
+                _hover={{ bg: buttonHoverBg }}
               >
                 Transfer Funds
               </Button>

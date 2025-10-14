@@ -24,6 +24,7 @@ import { Plus,
 import CreateCategoryModal from "@components/modals/CreateCategoryModal";
 import config from "@/config";
 import { toastDefaults } from "@/components/shared/utils";
+import { useColorModeValue } from "@chakra-ui/react";
 
 // Define TypeScript interfaces
 interface Category {
@@ -42,6 +43,19 @@ const CategoriesMain: React.FC = () => {
   const [parentCategoryId, setParentCategoryId] = useState<string | null>(null);
   const toast = useToast();
   const queryClient = useQueryClient();
+
+  const primaryBg = useColorModeValue("gray.50", "primaryBg");
+  const cardBg = useColorModeValue("white", "cardDarkBg");
+  const hoverBg = useColorModeValue("gray.50", "secondaryBg");
+  const groupCategoryBg = useColorModeValue("teal.50", "teal.900");
+  const groupCategoryTextColor = useColorModeValue("teal.600", "teal.300");
+  const normalCategoryTextColor = useColorModeValue("secondaryTextColor", "primaryTextColor");
+  const iconColor = useColorModeValue("teal.500", "teal.300");
+  const iconHoverColor = useColorModeValue("teal.600", "teal.400");
+  const errorTextColor = useColorModeValue("red.500", "red.300");
+  const emptyStateTextColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+  const emptyStateHeadingColor = useColorModeValue("primaryTextColor", "primaryTextColor");
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
 
   // Listen for create category events from the header
   useEffect(() => {
@@ -105,16 +119,16 @@ const CategoriesMain: React.FC = () => {
         <React.Fragment key={category.category_id}>
           {/* Row for the current category */}
           <Tr
-            bg={category.is_group ? "teal.50" : "transparent"}
-            _hover={!category.is_group ? { bg: "gray.50" } : undefined} // No hover for group categories
+            bg={category.is_group ? groupCategoryBg : "transparent"}
+            _hover={!category.is_group ? { bg: hoverBg } : undefined} // No hover for group categories
           >
             <Td pl={`${level * 24 + 8}px`}>
               {!category.is_group ? (
-                <Text fontWeight="normal" color="secondaryTextColor" fontSize="sm">
+                <Text fontWeight="normal" color={tertiaryTextColor} fontSize="sm">
                   {category.name}
                 </Text>
               ) : (
-                <Text fontWeight="bold" color="teal.600" fontSize="md">
+                <Text fontWeight="bold" color={groupCategoryTextColor} fontSize="md">
                   {category.name}
                 </Text>
               )}
@@ -135,8 +149,8 @@ const CategoriesMain: React.FC = () => {
                     <Icon
                       as={Plus}
                       boxSize={4}
-                      color="teal.500"
-                      _hover={{ color: "teal.600" }}
+                      color={iconColor}
+                      _hover={{ color: iconHoverColor }}
                     />
                   </ChakraLink>
                 )}
@@ -163,7 +177,7 @@ const CategoriesMain: React.FC = () => {
   if (isCategoriesLoading) {
     return (
       <Box textAlign="center" py={10}>
-        <Spinner size="xl" color="teal.500" />
+        <Spinner size="xl" color={iconColor} />
       </Box>
     );
   }
@@ -176,7 +190,7 @@ const CategoriesMain: React.FC = () => {
     });
     return (
       <Box textAlign="center" py={10}>
-        <Text color="red.500" mb={4}>
+        <Text color={errorTextColor} mb={4}>
           There was an error loading your categories.
         </Text>
         <Button onClick={refreshCategories} colorScheme="teal" leftIcon={<RefreshCw size={16} />}>
@@ -188,12 +202,12 @@ const CategoriesMain: React.FC = () => {
 
   return (
     <Box>
-      <Box bg="gray.50" p={6} borderRadius="lg">
+      <Box bg={primaryBg} p={6} borderRadius="lg">
       {/* Responsive Grid for Income and Expense Categories */}
       <SimpleGrid columns={{ base: 1, md: 1, lg: 2 }} spacing={6}>
         {/* Income Categories Table */}
         <Box
-          bg="white"
+          bg={cardBg}
           p={4}
           borderRadius="md"
           boxShadow="sm"
@@ -206,8 +220,8 @@ const CategoriesMain: React.FC = () => {
             mb={4}
           >
             <HStack spacing={2}>
-              <Icon as={ArrowUpCircle} boxSize={6} color="teal.500" />
-              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+              <Icon as={ArrowUpCircle} boxSize={6} color={iconColor} />
+              <Text fontSize="xl" fontWeight="bold" color={iconColor}>
                 Income Categories
               </Text>
             </HStack>
@@ -218,17 +232,17 @@ const CategoriesMain: React.FC = () => {
               <Icon
                 as={Plus}
                 boxSize={5}
-                color="teal.500"
-                _hover={{ color: "teal.600" }}
+                color={iconColor}
+                _hover={{ color: iconHoverColor }}
               />
             </ChakraLink>
           </Box>
           {incomeCategories.length === 0 ? (
             <Box textAlign="center" py={10} px={6}>
-              <Text fontSize="xl" fontWeight="bold" mb={2}>
+              <Text fontSize="xl" fontWeight="bold" mb={2} color={emptyStateHeadingColor}>
                 No Income Categories Found
               </Text>
-              <Text color="secondaryTextColor" mb={6}>
+              <Text color={emptyStateTextColor} mb={6}>
                 You do not have any income categories yet.
               </Text>
               <Button
@@ -247,7 +261,7 @@ const CategoriesMain: React.FC = () => {
 
         {/* Expense Categories Table */}
         <Box
-          bg="white"
+          bg={cardBg}
           p={4}
           borderRadius="md"
           boxShadow="sm"
@@ -260,8 +274,8 @@ const CategoriesMain: React.FC = () => {
             mb={4}
           >
             <HStack spacing={2}>
-              <Icon as={ArrowDownCircle} boxSize={6} color="teal.500" />
-              <Text fontSize="xl" fontWeight="bold" color="teal.500">
+              <Icon as={ArrowDownCircle} boxSize={6} color={iconColor} />
+              <Text fontSize="xl" fontWeight="bold" color={iconColor}>
                 Expense Categories
               </Text>
             </HStack>
@@ -272,17 +286,17 @@ const CategoriesMain: React.FC = () => {
               <Icon
                 as={Plus}
                 boxSize={5}
-                color="teal.500"
-                _hover={{ color: "teal.600" }}
+                color={iconColor}
+                _hover={{ color: iconHoverColor }}
               />
             </ChakraLink>
           </Box>
           {expenseCategories.length === 0 ? (
             <Box textAlign="center" py={10} px={6}>
-              <Text fontSize="xl" fontWeight="bold" mb={2}>
+              <Text fontSize="xl" fontWeight="bold" mb={2} color={emptyStateHeadingColor}>
                 No Expense Categories Found
               </Text>
-              <Text color="secondaryTextColor" mb={6}>
+              <Text color={emptyStateTextColor} mb={6}>
                 You do not have any expense categories yet.
               </Text>
               <Button

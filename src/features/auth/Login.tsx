@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError, AxiosResponse } from "axios";
-import { Flex, useToast } from "@chakra-ui/react";
+import { Flex, useToast, useColorModeValue } from "@chakra-ui/react";
 import LoginForm from "@features/auth/components/LoginForm";
 import api from "@/lib/api";
 
@@ -68,12 +68,14 @@ const Login: React.FC = () => {
     loginMutation.mutate(formDetails);
   };
 
+  const pageBg = useColorModeValue("primaryBg", "primaryBg");
+
   return (
     <Flex
       align="center"
       justify={{ base: "flex-start", md: "center" }}
       minH="100vh"
-      bg={{ base: "white", md: "gray.50" }}
+      bg={pageBg}
       px={0}
     >
       <LoginForm

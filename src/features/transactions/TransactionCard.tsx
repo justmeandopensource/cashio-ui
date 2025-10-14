@@ -23,6 +23,7 @@ import {
   Button,
   useBreakpointValue,
   Link as ChakraLink,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { Calendar, Tag as TagIcon, Info, CreditCard, Trash2, MessageSquare, Edit, Copy } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -113,7 +114,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
   const amount = formatAmount(
     transaction.credit,
     transaction.debit,
-    currencySymbol as string,
+    currencySymbol as string
   );
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -133,6 +134,20 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     }
   };
 
+  const cardBg = useColorModeValue("primaryBg", "cardDarkBg");
+  const hoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const splitColor = useColorModeValue("split", "split");
+  const transferColor = useColorModeValue("transfer", "transfer");
+  const assetColor = useColorModeValue("asset", "asset");
+  const mutualFundColor = useColorModeValue("mutualFund", "mutualFund");
+  const accountLinkColor = useColorModeValue("brand.500", "brand.300");
+  const storeTagBg = useColorModeValue("brand.50", "brand.900");
+  const storeTagColor = useColorModeValue("brand.700", "brand.200");
+  const storeTagBorderColor = useColorModeValue("brand.200", "brand.700");
+  const splitBg = useColorModeValue("splitBg", "splitBg");
+  const transferBg = useColorModeValue("transferBg", "transferBg");
+  const modalBg = useColorModeValue("secondaryBg", "secondaryBg");
+
   return (
     <>
       <Box
@@ -140,12 +155,12 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
         borderWidth="1px"
         borderRadius="lg"
         mb={3}
-        bg="white"
+        bg={cardBg}
         boxShadow="sm"
         onClick={toggleExpand}
         cursor="pointer"
         transition="all 0.2s"
-        _hover={{ bg: "gray.50" }}
+        _hover={{ bg: hoverBg }}
       >
         {/* Main row with essential info */}
         <Flex justify="space-between" align="flex-start">
@@ -162,22 +177,22 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                 <HStack spacing={1}>
                   {transaction.is_split && (
                     <Tooltip label="Split Transaction">
-                      <Square size="8px" bg="purple.400" borderRadius="md" />
+                      <Square size="8px" bg={splitColor} borderRadius="md" />
                     </Tooltip>
                   )}
                   {transaction.is_transfer && (
                     <Tooltip label="Transfer">
-                      <Square size="8px" bg="blue.400" borderRadius="md" />
+                      <Square size="8px" bg={transferColor} borderRadius="md" />
                     </Tooltip>
                   )}
                     {transaction.is_asset_transaction && (
                       <Tooltip label="Asset Transaction">
-                        <Square size="8px" bg="orange.400" borderRadius="md" />
+                        <Square size="8px" bg={assetColor} borderRadius="md" />
                       </Tooltip>
                     )}
                     {transaction.is_mf_transaction && (
                       <Tooltip label="Mutual Fund Transaction">
-                        <Square size="8px" bg="green.400" borderRadius="md" />
+                        <Square size="8px" bg={mutualFundColor} borderRadius="md" />
                       </Tooltip>
                     )}
                 </HStack>
@@ -195,7 +210,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
 
             {/* Account name - displayed when showAccountName is true */}
             {showAccountName && transaction.account_name && transaction.account_id && (
-              <ChakraLink as={Link} to={`/account/${transaction.account_id}`} fontSize="sm" color="blue.500" mt={1}>
+              <ChakraLink as={Link} to={`/account/${transaction.account_id}`} fontSize="sm" color={accountLinkColor} mt={1}>
                 {transaction.account_name}
               </ChakraLink>
             )}
@@ -206,10 +221,10 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                 <Tag
                   size="sm"
                   borderRadius="full"
-                  bg="blue.50"
-                  color="blue.700"
+                  bg={storeTagBg}
+                  color={storeTagColor}
                   border="1px solid"
-                  borderColor="blue.200"
+                  borderColor={storeTagBorderColor}
                   fontSize="xs"
                   fontWeight="medium"
                 >
@@ -248,7 +263,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                         size="sm"
                         borderRadius="md"
                         variant="subtle"
-                        colorScheme="teal"
+                        colorScheme="brand"
                       >
                         <TagLabel>{tag.name}</TagLabel>
                       </Tag>
@@ -283,7 +298,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                       borderWidth="1px"
                       borderRadius="md"
                       p={2}
-                      bg="purple.50"
+                      bg={splitBg}
                     >
                       {splitTransactions.map((split) => (
                         <Box
@@ -304,7 +319,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                             <Text fontSize="sm" fontWeight="bold">
                               {formatNumberAsCurrency(
                                 split.debit,
-                                currencySymbol as string,
+                                currencySymbol as string
                               )}
                             </Text>
                           </Flex>
@@ -356,7 +371,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                   <TransferDetailsSkeleton />
                 ) : (
                   transferDetails && (
-                    <Box borderWidth="1px" borderRadius="md" p={3} bg="blue.50">
+                    <Box borderWidth="1px" borderRadius="md" p={3} bg={transferBg}>
                       <Text fontSize="sm" fontWeight="medium" mb={1}>
                         {transaction.debit > 0
                           ? "Transferred to:"
@@ -439,7 +454,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
           <ModalCloseButton />
           <ModalBody>
             <Text>Are you sure you want to delete this transaction?</Text>
-            <Box mt={4} p={3} bg="gray.50" borderRadius="md">
+            <Box mt={4} p={3} bg={modalBg} borderRadius="md">
               <Text fontWeight="bold">{transaction.category_name}</Text>
               <Text>{formatDate(transaction.date)}</Text>
                <Text fontWeight="bold" color={amount.color}>

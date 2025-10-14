@@ -30,6 +30,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  useColorModeValue,
   useDisclosure,
   useToast,
   VStack,
@@ -70,6 +71,14 @@ const PhysicalAssets: FC = () => {
   // Responsive modal settings
   const modalSize = useBreakpointValue({ base: "full", md: "md" });
   const isMobile = useBreakpointValue({ base: true, md: false });
+
+  // Tab colors
+  const selectedTabColor = useColorModeValue("brand.700", "brand.200");
+  const selectedTabBg = useColorModeValue("brand.50", "brand.900");
+  const selectedTabBorderColor = useColorModeValue("brand.400", "brand.500");
+  const hoverTabBg = useColorModeValue("brand.100", "brand.800");
+  const tabColor = useColorModeValue("gray.600", "gray.400");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Modal states
   const {
@@ -205,56 +214,58 @@ const PhysicalAssets: FC = () => {
 
   return (
     <Box>
-      <Tabs variant="soft-rounded" colorScheme="teal" size={{ base: "md", md: "md" }} index={tabIndex} onChange={handleTabChange}>
+      <Tabs variant="soft-rounded" colorScheme="brand" size={{ base: "md", md: "md" }} index={tabIndex} onChange={handleTabChange}>
         <Box p={{ base: 2, md: 4 }}>
-          <TabList borderBottom="none">
-            <Tab
-              px={{ base: 4, md: 6 }}
-              py={4}
-              fontWeight="medium"
-              borderRadius="md"
-              whiteSpace="nowrap"
-              _selected={{
-                color: "teal.700",
-                bg: "teal.50",
-                fontWeight: "semibold",
-                border: "1px solid",
-                borderColor: "teal.400",
-              }}
-              _hover={{
-                bg: "teal.25",
-              }}
-            >
-              <Flex align="center">
-                <Text>Overview</Text>
-                {assets.length > 0 && (
-                  <Badge ml={2} colorScheme="teal" borderRadius="full" px={2}>
-                    {assets.length}
-                  </Badge>
-                )}
-              </Flex>
-            </Tab>
-            <Tab
-              px={{ base: 4, md: 6 }}
-              py={4}
-              fontWeight="medium"
-              borderRadius="md"
-              whiteSpace="nowrap"
-              _selected={{
-                color: "teal.700",
-                bg: "teal.50",
-                fontWeight: "semibold",
-                border: "1px solid",
-                borderColor: "teal.400",
-              }}
-              _hover={{
-                bg: "teal.25",
-              }}
-            >
-              <Flex align="center">
-                <Text>Transactions</Text>
-              </Flex>
-            </Tab>
+            <TabList borderBottom="none">
+              <Tab
+                px={{ base: 4, md: 6 }}
+                py={4}
+                fontWeight="medium"
+                borderRadius="md"
+                whiteSpace="nowrap"
+                color={tabColor}
+                _selected={{
+                  color: selectedTabColor,
+                  bg: selectedTabBg,
+                  fontWeight: "semibold",
+                  border: "1px solid",
+                  borderColor: selectedTabBorderColor,
+                }}
+                _hover={{
+                  bg: hoverTabBg,
+                }}
+              >
+                <Flex align="center">
+                  <Text>Overview</Text>
+                 {assets.length > 0 && (
+                   <Badge ml={2} colorScheme="brand" borderRadius="full" px={2}>
+                     {assets.length}
+                   </Badge>
+                 )}
+               </Flex>
+             </Tab>
+             <Tab
+               px={{ base: 4, md: 6 }}
+               py={4}
+               fontWeight="medium"
+               borderRadius="md"
+               whiteSpace="nowrap"
+               color={tabColor}
+               _selected={{
+                 color: selectedTabColor,
+                 bg: selectedTabBg,
+                 fontWeight: "semibold",
+                 border: "1px solid",
+                 borderColor: selectedTabBorderColor,
+               }}
+               _hover={{
+                 bg: hoverTabBg,
+               }}
+             >
+               <Flex align="center">
+                 <Text color={tertiaryTextColor}>Transactions</Text>
+               </Flex>
+             </Tab>
           </TabList>
         </Box>
 
@@ -281,11 +292,11 @@ const PhysicalAssets: FC = () => {
                  assetsLoading ? (
                    <Box p={8} textAlign="center">
                      <VStack spacing={4}>
-                       <Spinner size="lg" color="teal.500" />
-                       <Text color="gray.600" fontSize="lg">
+                       <Spinner size="lg" color={selectedTabColor} />
+                       <Text color={tabColor} fontSize="lg">
                          Loading transaction history...
                        </Text>
-                       <Text color="gray.500" fontSize="sm">
+                       <Text color={tabColor} fontSize="sm">
                          This may take a moment for large portfolios
                        </Text>
                      </VStack>

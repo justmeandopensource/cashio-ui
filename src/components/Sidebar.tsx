@@ -32,11 +32,11 @@ export const MobileHeader: React.FC<{
   onMenuOpen: () => void;
   title?: string;
 }> = ({ onMenuOpen, title = "Dashboard" }) => {
-  const headerBg = useColorModeValue("white", "gray.900");
-  const borderColor = useColorModeValue("gray.100", "gray.700");
+  const headerBg = useColorModeValue("primaryBg", "primaryBg");
+  const borderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
   const gradientBg = useColorModeValue(
-    "linear(135deg, teal.500, teal.600)",
-    "linear(135deg, teal.600, teal.700)",
+    "linear(135deg, brand.500, brand.600)",
+    "linear(135deg, brand.600, brand.700)"
   );
 
   return (
@@ -72,7 +72,7 @@ export const MobileHeader: React.FC<{
 
         <Heading
           size="md"
-          color="gray.700"
+          color={useColorModeValue("gray.700", "gray.200")}
           fontWeight="semibold"
           textAlign="center"
           flex="1"
@@ -93,17 +93,17 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Modern color scheme
-  const sidebarBg = useColorModeValue("white", "gray.900");
-  const sidebarColor = useColorModeValue("gray.800", "gray.100");
-  const borderColor = useColorModeValue("gray.100", "gray.700");
-  const activeBg = useColorModeValue("teal.50", "teal.900");
-  const activeColor = useColorModeValue("teal.700", "teal.200");
-  const hoverBg = useColorModeValue("gray.50", "gray.800");
-  const cardBg = useColorModeValue("gray.50", "gray.800");
+   // Modern color scheme
+   const sidebarBg = useColorModeValue("bodyBg", "bodyBg");
+   const sidebarColor = useColorModeValue("primaryTextColor", "primaryTextColor");
+   const borderColor = useColorModeValue("tertiaryBg", "gray.700");
+   const activeBg = useColorModeValue("brand.100", "brand.700");
+  const activeColor = useColorModeValue("brand.700", "brand.200");
+  const hoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const cardBg = useColorModeValue("bodyBg", "bodyBg");
   const gradientBg = useColorModeValue(
-    "linear(135deg, teal.500, teal.600)",
-    "linear(135deg, teal.600, teal.700)",
+    "linear(135deg, brand.500, brand.600)",
+    "linear(135deg, brand.600, brand.700)"
   );
 
   const menuItems = [
@@ -160,7 +160,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
         _focus={{ boxShadow: "outline" }}
         border="1px solid transparent"
         _focusVisible={{
-          borderColor: "teal.500",
+          borderColor: "brand.500",
           boxShadow: "0 0 0 3px rgba(56, 178, 172, 0.1)",
         }}
       >
@@ -172,7 +172,7 @@ const Sidebar: React.FC<SidebarProps> = ({ handleLogout }) => {
             transform="translateY(-50%)"
             width="4px"
             height="24px"
-            bg="teal.500"
+            bg="brand.500"
             borderRadius="full"
             boxShadow="0 0 8px rgba(56, 178, 172, 0.3)"
           />

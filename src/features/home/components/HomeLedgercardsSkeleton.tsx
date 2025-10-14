@@ -9,7 +9,7 @@ import {
 
 const HomeLedgerCardsSkeleton = () => {
   const skeletonCards = Array(2).fill(0);
-  const bgColor = useColorModeValue("teal.50", "teal.800");
+  const bgColor = useColorModeValue("brand.50", "brand.900");
 
   return (
     <Box mb={8}>

@@ -351,11 +351,11 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
               width="100%"
               borderRadius="md"
               borderWidth="2px"
-              borderColor="gray.300"
-              color="gray.600"
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
               _hover={{
-                bg: cardBg,
-                borderColor: "gray.400",
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
               }}
               isDisabled={isLoading}
               leftIcon={<X />}
@@ -408,8 +408,12 @@ const CreateAmcModal: FC<CreateAmcModalProps> = ({
             py={3}
             borderRadius="md"
             borderWidth="2px"
-            borderColor="gray.300"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
           >
             Cancel
           </Button>

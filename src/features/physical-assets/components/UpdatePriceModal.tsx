@@ -243,7 +243,7 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
               <Stack direction={{ base: "column", md: "row" }} spacing={4}>
                 <Box flex={1}>
                   <HStack spacing={2} mb={2}>
-                    <Text fontSize="sm" fontWeight="medium" color="gray.600">
+                    <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.600", "gray.300")}>
                       Current Price
                     </Text>
                   </HStack>
@@ -255,7 +255,7 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                        {splitCurrencyForDisplay(currentPrice, currencySymbol || "$").decimals}
                      </Text>
                   </HStack>
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontSize="sm" color={useColorModeValue("gray.500", "gray.400")}>
                     per {asset.asset_type?.unit_symbol}
                   </Text>
                 </Box>
@@ -264,7 +264,7 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                   <Box flex={1}>
                     <HStack spacing={2} mb={2}>
                       <Clock size={16} />
-                      <Text fontSize="sm" fontWeight="medium" color="gray.600">
+                      <Text fontSize="sm" fontWeight="medium" color={useColorModeValue("gray.600", "gray.300")}>
                         Last Updated
                       </Text>
                     </HStack>
@@ -274,11 +274,10 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                         "MMM dd, yyyy",
                       )}
                     </Text>
-                    <Text fontSize="sm" color="gray.500">
-                      {format(new Date(asset.last_price_update), "h:mm a")}
-                    </Text>
-                  </Box>
-                )}
+                                          <Text fontSize="sm" color={useColorModeValue("gray.500", "gray.400")}>
+                                            {format(new Date(asset.last_price_update), "h:mm a")}
+                                          </Text>
+                                        </Box>                )}
               </Stack>
             </Box>
 
@@ -306,7 +305,7 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                       bg={inputBorderColor}
                       borderWidth="2px"
                       borderColor={inputBorderColor}
-                      color="gray.600"
+                      color={useColorModeValue("gray.600", "gray.200")}
                       fontWeight="semibold"
                     >
                       {currencySymbol}
@@ -364,7 +363,7 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                       </HStack>
                       <HStack justify="space-between" align="center">
                         <VStack align="start" spacing={1}>
-                          <Text fontSize="sm" color="gray.600">
+                          <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
                             Change Amount
                           </Text>
                           <HStack spacing={0} align="baseline">
@@ -386,7 +385,7 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                           </HStack>
                         </VStack>
                         <VStack align="end" spacing={1}>
-                          <Text fontSize="sm" color="gray.600">
+                          <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
                             Percentage
                           </Text>
                           <Badge
@@ -461,11 +460,11 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
               width="100%"
               borderRadius="md"
               borderWidth="2px"
-              borderColor="gray.300"
-              color="gray.600"
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
               _hover={{
-                bg: "gray.50",
-                borderColor: "gray.400",
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
                 transform: "translateY(-2px)",
               }}
               isDisabled={isLoading}
@@ -518,7 +517,12 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
             py={3}
             borderRadius="md"
             borderWidth="2px"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
           >
             Cancel
           </Button>

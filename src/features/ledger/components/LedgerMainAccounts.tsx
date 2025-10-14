@@ -18,6 +18,7 @@ import {
   CardHeader,
   Stack,
   Spinner,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { Link as RouterLink } from "react-router-dom";
 import { Plus, Repeat, Eye, EyeOff, Building, ShieldAlert } from "lucide-react";
@@ -52,7 +53,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { currencySymbol } = useLedgerStore();
   const [accountType, setAccountType] = useState<"asset" | "liability" | null>(
-    null,
+    null
   );
   const [parentAccountId, setParentAccountId] = useState<string | null>(null);
   const [showZeroBalanceAssets, setShowZeroBalanceAssets] = useState(false);
@@ -65,7 +66,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   // Separate accounts into Assets and Liabilities
   const assetAccounts = accounts.filter((account) => account.type === "asset");
   const liabilityAccounts = accounts.filter(
-    (account) => account.type === "liability",
+    (account) => account.type === "liability"
   );
 
   // Toggle expansion of group accounts
@@ -81,22 +82,22 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   const getBalanceColor = (
     balance: number,
     accountType: "asset" | "liability",
-    isGroup: boolean,
+    isGroup: boolean
   ) => {
     if (accountType === "asset") {
-      if (isGroup && balance >= 0) {
-        return "teal.600";
-      } else if (balance < 0) {
+      if (balance >= 0) {
+        return isGroup ? "green.400" : "green.500";
+      } else {
         return "red.400";
       }
     } else if (accountType === "liability") {
-      if (isGroup && balance < 0) {
-        return "teal.600";
-      } else if (balance > 0) {
+      if (balance <= 0) {
+        return isGroup ? "green.400" : "green.500";
+      } else {
         return "red.400";
       }
     }
-    return "gray.700";
+    return "secondaryTextColor";
   };
 
   // Function to compute the balance for group accounts
@@ -104,7 +105,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
     let totalBalance = 0;
 
     const childAccounts = accounts.filter(
-      (account) => account.parent_account_id === accountId,
+      (account) => account.parent_account_id === accountId
     );
 
     childAccounts.forEach((childAccount) => {
@@ -121,19 +122,31 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   // Open modal for creating a new account
   const handleCreateAccountClick = (
     type: "asset" | "liability",
-    parentId: string | null = null,
+    parentId: string | null = null
   ) => {
     setAccountType(type);
     setParentAccountId(parentId);
     onOpen();
   };
 
+  const groupBg = useColorModeValue("teal.50", "teal.900");
+  const hoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const groupColor = useColorModeValue("brand.600", "brand.200");
+  const iconColor = useColorModeValue("brand.500", "brand.300");
+  const hoverIconColor = useColorModeValue("brand.600", "brand.400");
+  const cardBg = useColorModeValue("primaryBg", "cardDarkBg");
+  const cardBorderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
+  const groupCardBg = useColorModeValue("teal.50", "teal.900");
+  const groupCardBorderColor = useColorModeValue("brand.200", "brand.700");
+  const groupTextColor = useColorModeValue("brand.700", "brand.200");
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+
   // Function to render accounts in table format (for larger screens)
   const renderAccountsTable = (
     accounts: Account[],
     parentId: string | null = null,
     level: number = 0,
-    showZeroBalance: boolean,
+    showZeroBalance: boolean
   ) => {
     return accounts
       .filter((account) => account.parent_account_id === parentId)
@@ -142,7 +155,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
           showZeroBalance ||
           (account.is_group
             ? computeGroupBalance(account.account_id) !== 0
-            : account.net_balance !== 0),
+            : account.net_balance !== 0)
       )
       .map((account) => {
         const balance = account.is_group
@@ -151,23 +164,24 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
         const balanceColor = getBalanceColor(
           balance,
           account.type,
-          account.is_group,
+          account.is_group
         );
+
+        const trSx = !account.is_group
+          ? {
+              "&:hover .action-icons": {
+                opacity: 1,
+              },
+            }
+          : {};
+
         return (
           <React.Fragment key={account.account_id}>
             <Tr
-              bg={account.is_group ? "teal.50" : "transparent"}
-              _hover={{ bg: "gray.50" }}
+              bg={account.is_group ? groupBg : "transparent"}
+              _hover={{ bg: hoverBg }}
               position="relative"
-              sx={
-                !account.is_group
-                  ? {
-                      "&:hover .action-icons": {
-                        opacity: 1,
-                      },
-                    }
-                  : {}
-              }
+              sx={trSx}
             >
               <Td pl={`${level * 24 + 8}px`}>
                 {!account.is_group ? (
@@ -178,15 +192,15 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                   >
                     <Text
                       fontWeight="normal"
-                      color="secondaryTextColor"
+                      color={tertiaryTextColor}
                       fontSize="sm"
-                      _hover={{ color: "teal.500" }}
+                      _hover={{ color: "brand.500" }}
                     >
                       {account.name}
                     </Text>
                   </ChakraLink>
                 ) : (
-                  <Text fontWeight="bold" color="teal.600" fontSize="md">
+                  <Text fontWeight="bold" color={groupColor} fontSize="md">
                     {account.name}
                   </Text>
                 )}
@@ -207,7 +221,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       onClick={() =>
                         handleCreateAccountClick(
                           account.type,
-                          account.account_id,
+                          account.account_id
                         )
                       }
                       _hover={{ textDecoration: "none" }}
@@ -216,8 +230,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       <Icon
                         as={Plus}
                         size={16}
-                        color="teal.500"
-                        _hover={{ color: "teal.600" }}
+                        color={iconColor}
+                        _hover={{ color: hoverIconColor }}
                       />
                     </ChakraLink>
                   )}
@@ -235,8 +249,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         <Icon
                           as={Plus}
                           size={16}
-                          color="teal.500"
-                          _hover={{ color: "teal.600" }}
+                          color={iconColor}
+                          _hover={{ color: hoverIconColor }}
                         />
                       </ChakraLink>
                       <ChakraLink
@@ -246,8 +260,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         <Icon
                           as={Repeat}
                           size={16}
-                          color="teal.500"
-                          _hover={{ color: "teal.600" }}
+                          color={iconColor}
+                          _hover={{ color: hoverIconColor }}
                         />
                       </ChakraLink>
                     </Flex>
@@ -259,7 +273,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
               accounts,
               account.account_id,
               level + 1,
-              showZeroBalance,
+              showZeroBalance
             )}
           </React.Fragment>
         );
@@ -271,7 +285,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
     accounts: Account[],
     parentId: string | null = null,
     level: number = 0,
-    showZeroBalance: boolean,
+    showZeroBalance: boolean
   ) => {
     const filteredAccounts = accounts
       .filter((account) => account.parent_account_id === parentId)
@@ -280,7 +294,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
           showZeroBalance ||
           (account.is_group
             ? computeGroupBalance(account.account_id) !== 0
-            : account.net_balance !== 0),
+            : account.net_balance !== 0)
       );
 
     if (filteredAccounts.length === 0) return null;
@@ -299,10 +313,10 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
           const balanceColor = getBalanceColor(
             balance,
             account.type,
-            account.is_group,
+            account.is_group
           );
           const hasChildren = accounts.some(
-            (a) => a.parent_account_id === account.account_id,
+            (a) => a.parent_account_id === account.account_id
           );
           const isExpanded = expandedGroups[account.account_id];
 
@@ -310,8 +324,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
             <Card
               key={account.account_id}
               variant={account.is_group ? "filled" : "outline"}
-              bg={account.is_group ? "teal.50" : "white"}
-              borderColor={account.is_group ? "teal.200" : "gray.200"}
+              bg={account.is_group ? groupCardBg : cardBg}
+              borderColor={account.is_group ? groupCardBorderColor : cardBorderColor}
               size="sm"
               boxShadow="sm"
               _hover={{ boxShadow: "md" }}
@@ -337,13 +351,13 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         >
                           <Text
                             fontWeight={account.is_group ? "medium" : "normal"}
-                            color={account.is_group ? "teal.700" : "secondaryTextColor"}
+                            color={account.is_group ? groupTextColor : tertiaryTextColor}
                           >
                             {account.name}
                           </Text>
                         </ChakraLink>
                       ) : (
-                        <Text fontWeight="medium" color="teal.700">
+                        <Text fontWeight="medium" color={groupTextColor}>
                           {account.name}
                         </Text>
                       )}
@@ -354,7 +368,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                     >
                       {formatNumberAsCurrency(
                         balance,
-                        currencySymbol as string,
+                        currencySymbol as string
                       )}
                     </Text>
                   </Flex>
@@ -370,8 +384,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         <Icon
                           as={Plus}
                           size={16}
-                          color="teal.500"
-                          _hover={{ color: "teal.600" }}
+                          color={iconColor}
+                          _hover={{ color: hoverIconColor }}
                         />
                       </ChakraLink>
                       <ChakraLink
@@ -384,8 +398,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         <Icon
                           as={Repeat}
                           size={16}
-                          color="teal.500"
-                          _hover={{ color: "teal.600" }}
+                          color={iconColor}
+                          _hover={{ color: hoverIconColor }}
                         />
                       </ChakraLink>
                     </Flex>
@@ -395,7 +409,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         e.stopPropagation();
                         handleCreateAccountClick(
                           account.type,
-                          account.account_id,
+                          account.account_id
                         );
                       }}
                       _hover={{ textDecoration: "none" }}
@@ -403,8 +417,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       <Icon
                         as={Plus}
                         size={16}
-                        color="teal.500"
-                        _hover={{ color: "teal.600" }}
+                        color={iconColor}
+                        _hover={{ color: hoverIconColor }}
                       />
                     </ChakraLink>
                   )}
@@ -416,7 +430,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                     accounts,
                     account.account_id,
                     level + 1,
-                    showZeroBalance,
+                    showZeroBalance
                   )}
                 </Box>
               )}
@@ -445,7 +459,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
         leftIcon={<Plus />}
         onClick={onClick}
         size="sm"
-        colorScheme="teal"
+        colorScheme="brand"
       >
         {buttonText}
       </Button>
@@ -455,26 +469,26 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   // Loading state component
   const LoadingState: React.FC = () => (
     <Box textAlign="center" py={10}>
-      <Spinner size="xl" color="teal.500" />
+      <Spinner size="xl" color="brand.500" />
     </Box>
   );
 
   if (isLoading) {
     return (
-      <Box bg="gray.50" p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+      <Box bg={useColorModeValue("gray.50", "primaryBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
         <LoadingState />
       </Box>
     );
   }
 
   return (
-    <Box bg="gray.50" p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+    <Box bg={useColorModeValue("gray.50", "primaryBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
       <SimpleGrid
         columns={{ base: 1, md: 1, lg: 2 }}
         spacing={{ base: 4, md: 6 }}
       >
         <Box
-          bg="white"
+          bg={cardBg}
           p={{ base: 3, md: 4 }}
           borderRadius="md"
           boxShadow="sm"
@@ -487,8 +501,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
             flexWrap={{ base: "wrap", sm: "nowrap" }}
           >
             <Flex align="center" gap={2}>
-              <Icon as={Building} size={20} color="teal.500" />
-              <Heading size="md" color="teal.500" mb={{ base: 1, sm: 0 }}>
+              <Icon as={Building} size={20} color={iconColor} />
+              <Heading size="md" color={groupColor} mb={{ base: 1, sm: 0 }}>
                 Assets
               </Heading>
             </Flex>
@@ -496,7 +510,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
               <Button
                 size="xs"
                 variant="ghost"
-                colorScheme="teal"
+                colorScheme="brand"
                 onClick={() => setShowZeroBalanceAssets(!showZeroBalanceAssets)}
                 leftIcon={showZeroBalanceAssets ? <EyeOff size={14} /> : <Eye size={14} />}
               >
@@ -507,7 +521,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
               <IconButton
                 icon={<Plus />}
                 size="sm"
-                colorScheme="teal"
+                colorScheme="brand"
                 variant="ghost"
                 aria-label="Add Asset Account"
                 data-testid="ledgermainaccounts-add-asset-account-plus-icon"
@@ -535,7 +549,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       assetAccounts,
                       null,
                       0,
-                      showZeroBalanceAssets,
+                      showZeroBalanceAssets
                     )}
                   </Tbody>
                 </Table>
@@ -545,14 +559,14 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                   assetAccounts,
                   null,
                   0,
-                  showZeroBalanceAssets,
+                  showZeroBalanceAssets
                 )}
               </Box>
             </>
           )}
         </Box>
         <Box
-          bg="white"
+          bg={cardBg}
           p={{ base: 3, md: 4 }}
           borderRadius="md"
           boxShadow="sm"
@@ -565,8 +579,8 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
             flexWrap={{ base: "wrap", sm: "nowrap" }}
           >
             <Flex align="center" gap={2}>
-              <Icon as={ShieldAlert} size={20} color="teal.500" />
-              <Heading size="md" color="teal.500" mb={{ base: 1, sm: 0 }}>
+              <Icon as={ShieldAlert} size={20} color={iconColor} />
+              <Heading size="md" color={groupColor} mb={{ base: 1, sm: 0 }}>
                 Liabilities
               </Heading>
             </Flex>
@@ -574,7 +588,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
               <Button
                 size="xs"
                 variant="ghost"
-                colorScheme="teal"
+                colorScheme="brand"
                 onClick={() =>
                   setShowZeroBalanceLiabilities(!showZeroBalanceLiabilities)
                 }
@@ -587,7 +601,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
               <IconButton
                 icon={<Plus />}
                 size="sm"
-                colorScheme="teal"
+                colorScheme="brand"
                 variant="ghost"
                 aria-label="Add Liability Account"
                 data-testid="ledgermainaccounts-add-liability-account-plus-icon"
@@ -615,7 +629,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                       liabilityAccounts,
                       null,
                       0,
-                      showZeroBalanceLiabilities,
+                      showZeroBalanceLiabilities
                     )}
                   </Tbody>
                 </Table>
@@ -625,7 +639,7 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                   liabilityAccounts,
                   null,
                   0,
-                  showZeroBalanceLiabilities,
+                  showZeroBalanceLiabilities
                 )}
               </Box>
             </>

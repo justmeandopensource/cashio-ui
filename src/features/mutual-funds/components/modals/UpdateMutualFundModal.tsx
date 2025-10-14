@@ -694,7 +694,13 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
               isDisabled={isLoading}
               leftIcon={<X />}
               borderWidth="2px"
-              _hover={{ bg: cardBg }}
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
+              _hover={{
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
+              }}
+              transition="all 0.2s"
             >
               Cancel
             </Button>
@@ -738,7 +744,12 @@ const UpdateMutualFundModal: React.FC<UpdateMutualFundModalProps> = ({
             py={3}
             borderRadius="md"
             borderWidth="2px"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
           >
             Cancel
           </Button>

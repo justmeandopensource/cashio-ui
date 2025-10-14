@@ -34,9 +34,36 @@ import {
 } from "./api";
 import { toastDefaults } from "@/components/shared/utils";
 import { FaDatabase, FaTrash, FaRedo, FaPlus, FaUpload, FaDownload } from "react-icons/fa";
+import { useColorModeValue } from "@chakra-ui/react";
 
 const SystemBackup: React.FC = () => {
   const toast = useToast();
+
+   const textColor = useColorModeValue("gray.700", "gray.200");
+   const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+   const cardBg = useColorModeValue("white", "cardDarkBg");
+   const cardBorderColor = useColorModeValue("gray.200", "gray.700");
+   const errorCardBg = useColorModeValue("red.50", "red.900");
+   const errorCardBorderColor = useColorModeValue("red.200", "red.700");
+   const errorCardIconBg = useColorModeValue("red.100", "red.800");
+   const errorCardIconColor = useColorModeValue("red.600", "red.300");
+   const errorCardTextColor = useColorModeValue("red.700", "red.300");
+   const infoCardBg = useColorModeValue("gray.50", "gray.800");
+   const infoCardBorderColor = useColorModeValue("gray.200", "gray.700");
+   const infoCardIconBg = useColorModeValue("gray.200", "gray.700");
+   const infoCardIconColor = useColorModeValue("gray.500", "gray.400");
+   const infoCardTextColor = useColorModeValue("gray.600", "gray.300");
+   const blueIconBg = useColorModeValue("blue.100", "blue.900");
+   const blueIconColor = useColorModeValue("blue.600", "blue.300");
+   const redButtonHoverBg = useColorModeValue("red.50", "red.900");
+   const modalBg = useColorModeValue("white", "gray.700");
+   const modalBorderColor = useColorModeValue("gray.200", "gray.600");
+   const modalTextColor = useColorModeValue("gray.700", "gray.200");
+   const modalTagColor = useColorModeValue("blue", "blue");
+   const modalWarningColor = useColorModeValue("red.500", "red.300");
+   const modalCancelButtonHoverBg = useColorModeValue("gray.50", "gray.600");
+   const modalCancelButtonBorderColor = useColorModeValue("gray.300", "gray.600");
+   const modalCancelButtonColor = useColorModeValue("gray.600", "gray.200");
   const queryClient = useQueryClient();
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [fileToUpload, setFileToUpload] = useState<File | null>(null);
@@ -298,14 +325,14 @@ const SystemBackup: React.FC = () => {
             w={12}
             h={12}
             borderRadius="full"
-            bg="blue.100"
+            bg={blueIconBg}
             display="flex"
             alignItems="center"
             justifyContent="center"
           >
-            <Icon as={FaDatabase} color="blue.600" boxSize={6} />
+            <Icon as={FaDatabase} color={blueIconColor} boxSize={6} />
           </Box>
-          <Text color="gray.600" fontSize="lg">
+          <Text color={infoCardTextColor} fontSize="lg">
             Loading backups...
           </Text>
         </VStack>
@@ -337,20 +364,20 @@ const SystemBackup: React.FC = () => {
 
       <Box px={{ base: 6, md: 8 }} py={{ base: 6, md: 8 }}>
         <VStack spacing={8} align="stretch" maxW="4xl">
-          {/* Header Section */}
-          <Box>
-            <Heading size="md">Database Backup Management</Heading>
-            <Text mt={2} fontSize="sm" color="gray.500">
-              Create new backups, upload existing ones, or restore from
-              available backup files.
-            </Text>
-          </Box>
-
-           {/* Action Buttons Section */}
+           {/* Header Section */}
            <Box>
-             <Text fontSize="sm" fontWeight="600" color="gray.700" mb={4}>
-               Backup Actions
+             <Heading size="md" color={tertiaryTextColor}>Database Backup Management</Heading>
+             <Text mt={2} fontSize="sm" color={tertiaryTextColor}>
+               Create new backups, upload existing ones, or restore from
+               available backup files.
              </Text>
+           </Box>
+
+            {/* Action Buttons Section */}
+            <Box>
+              <Text fontSize="sm" fontWeight="600" color={tertiaryTextColor} mb={4}>
+                Backup Actions
+              </Text>
              <VStack spacing={4} align="stretch">
                <HStack
                  spacing={4}
@@ -368,9 +395,7 @@ const SystemBackup: React.FC = () => {
                    fontWeight="600"
                    borderRadius="md"
                    px={8}
-                   bgGradient="linear(to-r, blue.500, blue.600)"
                    _hover={{
-                     bgGradient: "linear(to-r, blue.600, blue.700)",
                      transform: "translateY(-1px)",
                      shadow: "lg",
                    }}
@@ -393,9 +418,7 @@ const SystemBackup: React.FC = () => {
                    fontWeight="600"
                    borderRadius="md"
                    px={8}
-                   bgGradient="linear(to-r, teal.500, teal.600)"
                    _hover={{
-                     bgGradient: "linear(to-r, teal.600, teal.700)",
                      transform: "translateY(-1px)",
                      shadow: "lg",
                    }}
@@ -418,19 +441,19 @@ const SystemBackup: React.FC = () => {
              </VStack>
            </Box>
 
-          <Divider borderColor="gray.200" />
+          <Divider borderColor={cardBorderColor} />
 
-          {/* Available Backups Section */}
-          <Box>
-            <Text fontSize="sm" fontWeight="600" color="gray.700" mb={4}>
-              Available Backups
-            </Text>
+           {/* Available Backups Section */}
+           <Box>
+             <Text fontSize="sm" fontWeight="600" color={tertiaryTextColor} mb={4}>
+               Available Backups
+             </Text>
             {isError && (
               <Card
-                bg="red.50"
+                bg={errorCardBg}
                 borderRadius="md"
                 border="1px"
-                borderColor="red.200"
+                borderColor={errorCardBorderColor}
               >
                 <CardBody px={6} py={4}>
                   <HStack spacing={3}>
@@ -438,16 +461,16 @@ const SystemBackup: React.FC = () => {
                       w={8}
                       h={8}
                       borderRadius="md"
-                      bg="red.100"
+                      bg={errorCardIconBg}
                       display="flex"
                       alignItems="center"
                       justifyContent="center"
                     >
-                      <Text fontSize="lg" color="red.600">
+                      <Text fontSize="lg" color={errorCardIconColor}>
                         ⚠️
                       </Text>
                     </Box>
-                    <Text color="red.700" fontWeight="500">
+                    <Text color={errorCardTextColor} fontWeight="500">
                       Error fetching backups. Please try again.
                     </Text>
                   </HStack>
@@ -460,10 +483,10 @@ const SystemBackup: React.FC = () => {
                 {backups.map((file) => (
                   <Card
                     key={file}
-                    bg="white"
+                    bg={cardBg}
                     borderRadius="md"
                     border="1px"
-                    borderColor="gray.200"
+                    borderColor={cardBorderColor}
                     shadow="sm"
                   >
                     <CardBody px={6} py={4}>
@@ -477,7 +500,7 @@ const SystemBackup: React.FC = () => {
                             w={10}
                             h={10}
                             borderRadius="md"
-                            bg="blue.100"
+                            bg={blueIconBg}
                             display="flex"
                             alignItems="center"
                             justifyContent="center"
@@ -485,19 +508,19 @@ const SystemBackup: React.FC = () => {
                           >
                             <Icon
                               as={FaDatabase}
-                              color="blue.600"
+                              color={blueIconColor}
                               boxSize={5}
                             />
                           </Box>
                           <Box flex={1} minW={0}>
-                            <Text
-                              fontSize="md"
-                              fontWeight="600"
-                              color="gray.900"
-                              isTruncated
-                            >
-                              {file}
-                            </Text>
+                             <Text
+                               fontSize="md"
+                               fontWeight="600"
+                               color={tertiaryTextColor}
+                               isTruncated
+                             >
+                               {file}
+                             </Text>
                           </Box>
                         </HStack>
                         <HStack spacing={2} flexShrink={0}>
@@ -557,7 +580,7 @@ const SystemBackup: React.FC = () => {
                             fontSize="sm"
                             fontWeight="500"
                             _hover={{
-                              bg: "red.50",
+                              bg: redButtonHoverBg,
                               transform: "translateY(-1px)",
                               shadow: "md",
                             }}
@@ -578,10 +601,10 @@ const SystemBackup: React.FC = () => {
 
             {backups?.length === 0 && !isLoading && (
               <Card
-                bg="gray.50"
+                bg={infoCardBg}
                 borderRadius="md"
                 border="1px"
-                borderColor="gray.200"
+                borderColor={infoCardBorderColor}
               >
                 <CardBody px={6} py={8}>
                   <VStack spacing={3}>
@@ -589,19 +612,19 @@ const SystemBackup: React.FC = () => {
                       w={12}
                       h={12}
                       borderRadius="full"
-                      bg="gray.200"
+                      bg={infoCardIconBg}
                       display="flex"
                       alignItems="center"
                       justifyContent="center"
                     >
-                      <Icon as={FaDatabase} color="gray.500" boxSize={6} />
+                      <Icon as={FaDatabase} color={infoCardIconColor} boxSize={6} />
                     </Box>
-                    <Text color="gray.600" fontSize="md" textAlign="center">
-                      No backups found
-                    </Text>
-                    <Text color="gray.500" fontSize="sm" textAlign="center">
-                      Create your first backup to get started.
-                    </Text>
+                     <Text color={tertiaryTextColor} fontSize="md" textAlign="center">
+                       No backups found
+                     </Text>
+                     <Text color={tertiaryTextColor} fontSize="sm" textAlign="center">
+                       Create your first backup to get started.
+                     </Text>
                   </VStack>
                 </CardBody>
               </Card>
@@ -613,23 +636,27 @@ const SystemBackup: React.FC = () => {
       {/* Restore Confirmation Modal */}
       <Modal isOpen={isRestoreOpen} onClose={onRestoreClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Confirm Restore</ModalHeader>
+        <ModalContent bg={modalBg} borderColor={modalBorderColor}>
+          <ModalHeader color={textColor}>Confirm Restore</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>
+            <Text color={modalTextColor}>
               Are you sure you want to restore the database from{" "}
-              <Tag colorScheme="blue" size="sm">
+              <Tag colorScheme={modalTagColor} size="sm">
                 {selectedFile}
               </Tag>
               ?
             </Text>
-            <Text mt={4} fontWeight="bold" color="red.500">
+            <Text mt={4} fontWeight="bold" color={modalWarningColor}>
               This action is irreversible and will overwrite all current data.
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onRestoreClose}>
+            <Button variant="ghost" mr={3} onClick={onRestoreClose}
+              borderColor={modalCancelButtonBorderColor}
+              color={modalCancelButtonColor}
+              _hover={{ bg: modalCancelButtonHoverBg }}
+            >
               Cancel
             </Button>
             <Button
@@ -646,22 +673,26 @@ const SystemBackup: React.FC = () => {
       {/* Upload and Restore Confirmation Modal */}
       <Modal isOpen={isUploadRestoreOpen} onClose={onUploadRestoreClose}>
         <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Confirm Upload and Restore</ModalHeader>
+        <ModalContent bg={modalBg} borderColor={modalBorderColor}>
+          <ModalHeader color={textColor}>Confirm Upload and Restore</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Text>You are about to upload and restore the database from:</Text>
+            <Text color={modalTextColor}>You are about to upload and restore the database from:</Text>
             <Tag mt={2} colorScheme="green" size="sm">
               {fileToUpload?.name}
             </Tag>
-            <Text mt={4} fontWeight="bold" color="red.500">
+            <Text mt={4} fontWeight="bold" color={modalWarningColor}>
               This will first upload the file, and then immediately begin the
               restore process, overwriting all current data. Are you sure you
               want to proceed?
             </Text>
           </ModalBody>
           <ModalFooter>
-            <Button variant="ghost" mr={3} onClick={onUploadRestoreClose}>
+            <Button variant="ghost" mr={3} onClick={onUploadRestoreClose}
+              borderColor={modalCancelButtonBorderColor}
+              color={modalCancelButtonColor}
+              _hover={{ bg: modalCancelButtonHoverBg }}
+            >
               Cancel
             </Button>
             <Button

@@ -13,6 +13,7 @@ import {
   Select,
   FormControl,
   Tooltip,
+  useColorMode,
 } from "@chakra-ui/react";
 import { useQuery } from "@tanstack/react-query";
 import { Calendar, TrendingUp } from "lucide-react";
@@ -41,6 +42,7 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const { currencySymbol } = useLedgerStore();
   const navigate = useNavigate();
+  const { colorMode } = useColorMode();
 
   const handleCellClick = (value: any) => {
     if (value && value.date) {
@@ -63,8 +65,9 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
 
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Generate year options (current year and previous 4 years)
   const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
@@ -106,17 +109,17 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
   // Define color classes based on expense amount
   const getClassForValue = (value: any) => {
     if (!value) {
-      return "color-github-0";
+      return colorMode === "dark" ? "color-dark-0" : "color-github-0";
     }
     const amount = value.count;
-    if (amount <= 0) return "color-github-0";
-    if (amount < 10) return "color-github-1";
-    if (amount < 50) return "color-github-2";
-    if (amount < 100) return "color-github-3";
-    if (amount < 200) return "color-github-4";
-    if (amount < 500) return "color-github-5";
-    if (amount < 1000) return "color-github-6";
-    return "color-github-7"; // $1000+
+    if (amount <= 0) return colorMode === "dark" ? "color-dark-0" : "color-github-0";
+    if (amount < 10) return colorMode === "dark" ? "color-dark-1" : "color-github-1";
+    if (amount < 50) return colorMode === "dark" ? "color-dark-2" : "color-github-2";
+    if (amount < 100) return colorMode === "dark" ? "color-dark-3" : "color-github-3";
+    if (amount < 200) return colorMode === "dark" ? "color-dark-4" : "color-github-4";
+    if (amount < 500) return colorMode === "dark" ? "color-dark-5" : "color-github-5";
+    if (amount < 1000) return colorMode === "dark" ? "color-dark-6" : "color-github-6";
+    return colorMode === "dark" ? "color-dark-7" : "color-github-7"; // $1000+
   };
 
 
@@ -232,35 +235,35 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
         </Text>
         <HStack spacing={4} wrap="wrap">
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#eeeeee" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#eeeeee", "gray.700")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}0`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#B2F5EA" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#B2F5EA", "teal.900")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}1-9`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#81E6D9" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#81E6D9", "teal.800")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}10-49`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#4FD1C5" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#4FD1C5", "teal.700")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}50-99`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#38B2AC" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#38B2AC", "teal.600")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}100-199`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#2C7A7B" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#2C7A7B", "teal.500")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}200-499`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#234E52" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#234E52", "teal.400")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}500-999`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg="#1D4044" borderRadius="sm" />
+            <Box w={3} h={3} bg={useColorModeValue("#1D4044", "teal.300")} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}1000+`}</Text>
           </HStack>
         </HStack>
@@ -276,6 +279,16 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
           .react-calendar-heatmap .color-github-5 { fill: #2C7A7B; }
           .react-calendar-heatmap .color-github-6 { fill: #234E52; }
           .react-calendar-heatmap .color-github-7 { fill: #1D4044; }
+
+          .react-calendar-heatmap .color-dark-0 { fill: var(--chakra-colors-gray-700); }
+          .react-calendar-heatmap .color-dark-1 { fill: var(--chakra-colors-teal-900); }
+          .react-calendar-heatmap .color-dark-2 { fill: var(--chakra-colors-teal-800); }
+          .react-calendar-heatmap .color-dark-3 { fill: var(--chakra-colors-teal-700); }
+          .react-calendar-heatmap .color-dark-4 { fill: var(--chakra-colors-teal-600); }
+          .react-calendar-heatmap .color-dark-5 { fill: var(--chakra-colors-teal-500); }
+          .react-calendar-heatmap .color-dark-6 { fill: var(--chakra-colors-teal-400); }
+          .react-calendar-heatmap .color-dark-7 { fill: var(--chakra-colors-teal-300); }
+
            .react-calendar-heatmap text.weekday-label,
            .react-calendar-heatmap text.month-label {
              font-size: 8px;

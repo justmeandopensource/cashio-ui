@@ -400,7 +400,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                   bg={inputBorderColor}
                   borderWidth="2px"
                   borderColor={inputBorderColor}
-                  color="gray.600"
+                  color={useColorModeValue("gray.600", "gray.200")}
                   fontWeight="semibold"
                 >
                   {currencySymbol || "₹"}
@@ -571,7 +571,7 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                   bg={inputBorderColor}
                   borderWidth="2px"
                   borderColor={inputBorderColor}
-                  color="gray.600"
+                  color={useColorModeValue("gray.600", "gray.200")}
                   fontWeight="semibold"
                 >
                   {currencySymbol || "₹"}
@@ -735,11 +735,11 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           width="100%"
           borderRadius="md"
           borderWidth="2px"
-          borderColor="gray.300"
-          color="gray.600"
+          borderColor={useColorModeValue("gray.300", "gray.600")}
+          color={useColorModeValue("gray.600", "gray.200")}
           _hover={{
-            bg: cardBg,
-            borderColor: "gray.400",
+            bg: useColorModeValue("gray.50", "gray.600"),
+            borderColor: useColorModeValue("gray.400", "gray.500"),
           }}
           isDisabled={transactionMutation.isPending}
           transition="all 0.2s"
@@ -861,10 +861,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                     borderColor: "teal.500",
                     fontWeight: "bold",
                   }}
-                  _hover={{
-                    bg: "teal.50",
-                    _selected: { bg: "teal.400" },
-                  }}
+                                  _hover={{
+                                    bg: useColorModeValue("teal.50", "teal.700"),
+                                    _selected: { bg: "teal.400" },                  }}
                   borderRadius="sm"
                   fontSize="md"
                   py={3}
@@ -882,10 +881,9 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                     borderColor: "red.400",
                     fontWeight: "bold",
                   }}
-                  _hover={{
-                    bg: "red.50",
-                    _selected: { bg: "red.300" },
-                  }}
+                                  _hover={{
+                                    bg: useColorModeValue("red.50", "red.700"),
+                                    _selected: { bg: "red.300" },                  }}
                   borderRadius="sm"
                   fontSize="md"
                   py={3}
@@ -954,7 +952,12 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
             py={3}
             borderRadius="md"
             borderWidth="2px"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
           >
             Cancel
           </Button>

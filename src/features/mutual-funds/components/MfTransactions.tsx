@@ -64,11 +64,11 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   initialFundFilter,
 }) => {
   const { ledgerId, currencySymbol } = useLedgerStore();
-  const cardBg = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
-  const mutedColor = useColorModeValue("gray.600", "gray.400");
-  const emptyStateBg = useColorModeValue("gray.50", "gray.800");
-  const emptyStateTextColor = useColorModeValue("gray.600", "gray.400");
+   const cardBg = useColorModeValue("primaryBg", "cardDarkBg");
+   const mutedColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+  const emptyStateBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const emptyStateTextColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // State for filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -161,6 +161,29 @@ const MfTransactions: FC<MfTransactionsProps> = ({
     setOpenPopoverId(null);
   };
 
+  const hoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const iconColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+  const transactionTypeIndicatorColor = (type: MfTransaction['transaction_type']) => {
+    switch (type) {
+      case 'buy': return useColorModeValue("green.400", "green.300");
+      case 'sell': return useColorModeValue("red.400", "red.300");
+      case 'switch_out': return useColorModeValue("purple.400", "purple.300");
+      case 'switch_in': return useColorModeValue("orange.400", "orange.300");
+      default: return useColorModeValue("gray.400", "gray.300");
+    }
+  };
+  const accountLinkColor = useColorModeValue("brand.500", "brand.300");
+   const navBg = useColorModeValue("secondaryBg", "secondaryBg");
+   const notesBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const notesColor = useColorModeValue("primaryTextColor", "primaryTextColor");
+   const headerBg = useColorModeValue("primaryBg", "cardDarkBg");
+  const headerColor = useColorModeValue("primaryTextColor", "primaryTextColor");
+  const emptyStateBorderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
+  const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+  const deleteIconColor = useColorModeValue("red.500", "red.300");
+  const deleteIconHoverColor = useColorModeValue("red.600", "red.400");
+  const modalDeleteBg = useColorModeValue("secondaryBg", "secondaryBg");
+
   // Render mobile card view
   const renderMobileCards = () => (
     <VStack spacing={3} align="stretch">
@@ -173,45 +196,45 @@ const MfTransactions: FC<MfTransactionsProps> = ({
             p={4}
             borderWidth="1px"
             borderRadius="lg"
-            bg="white"
+            bg={cardBg}
             boxShadow="sm"
             onClick={() => handleCardToggle(transaction.mf_transaction_id)}
             cursor="pointer"
             transition="all 0.2s"
-            _hover={{ bg: "gray.50" }}
+            _hover={{ bg: hoverBg }}
           >
              {/* Main row with essential info */}
              <VStack spacing={3} align="stretch">
                {/* Top section with date and type */}
                <HStack spacing={2}>
-                 <Icon as={Calendar} color="gray.500" />
-                 <Text fontSize="sm" color="gray.600">
+                 <Icon as={Calendar} color={iconColor} />
+                 <Text fontSize="sm" color={tertiaryTextColor}>
                    {formatDate(transaction.transaction_date)}
                  </Text>
                  <Tooltip label={getTransactionTypeText(transaction.transaction_type)}>
                    <Square
                      size="6px"
-                     bg={getTransactionTypeColor(transaction.transaction_type) + ".400"}
+                     bg={transactionTypeIndicatorColor(transaction.transaction_type)}
                      borderRadius="md"
                    />
                  </Tooltip>
                </HStack>
 
                {/* Fund name */}
-               <Text fontWeight="medium">
+               <Text fontWeight="medium" color={tertiaryTextColor}>
                  {transaction.mutual_fund?.name}
                </Text>
 
                {/* Account or target fund */}
                {transaction.transaction_type === 'switch_out' || transaction.transaction_type === 'switch_in' ? (
-                 <Text fontSize="sm" color="blue.600" fontWeight="medium">
+                 <Text fontSize="sm" color={accountLinkColor} fontWeight="medium">
                    {transaction.target_fund_name}
                  </Text>
                ) : (
                  <ChakraLink
                    as={Link}
                    to={`/account/${transaction.account_id}`}
-                   color="blue.500"
+                   color={accountLinkColor}
                    fontSize="sm"
                    fontWeight="medium"
                    _hover={{ textDecoration: "underline" }}
@@ -258,19 +281,19 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                    </HStack>
                    {Number(transaction.other_charges) > 0 && (
                      <HStack spacing={0} align="baseline">
-                       <Text fontSize="xs" color="red.500" fontWeight="medium">
+                       <Text fontSize="xs" color={deleteIconColor} fontWeight="medium">
                          {splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").main}{splitCurrencyForDisplay(Number(transaction.other_charges), currencySymbol || "₹").decimals}
                        </Text>
                      </HStack>
                    )}
                  </VStack>
                  <VStack align="end" spacing={0.5}>
-                   <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                   <Text fontSize="sm" color={tertiaryTextColor} fontWeight="medium">
                      {formatUnits(transaction.units)} units
                    </Text>
                    <Box
-                     bg="gray.100"
-                     color="gray.700"
+                     bg={navBg}
+                     color={tertiaryTextColor}
                      px={2}
                      py={0.5}
                      borderRadius="full"
@@ -295,8 +318,8 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                 <Box mb={2}>
                   <Text
                     fontSize="sm"
-                    color="gray.700"
-                    bg="gray.50"
+                    color={notesColor}
+                    bg={notesBg}
                     p={2}
                     borderRadius="md"
                     whiteSpace="pre-wrap"
@@ -337,88 +360,88 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   return (
     <Box>
       <VStack spacing={6} align="stretch">
-        {/* Header */}
-        <Box mb={6} p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" boxShadow="sm">
-          <Flex
-            direction={{ base: "column", md: "row" }}
-            justify="space-between"
-            align={{ base: "start", md: "center" }}
-             gap={{ base: 4, md: 0 }}
-             mb={4}
-          >
-            <Flex align="center" mb={{ base: 2, md: 0 }}>
-               <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color="gray.700">
-                 Transactions
-               </Text>
-            </Flex>
-          </Flex>
+         {/* Header */}
+         <Box mb={6} p={{ base: 4, md: 6 }} bg={headerBg} borderRadius="lg" boxShadow="sm">
+           <Flex
+             direction={{ base: "column", md: "row" }}
+             justify="space-between"
+             align={{ base: "start", md: "center" }}
+              gap={{ base: 4, md: 0 }}
+              mb={4}
+           >
+             <Flex align="center" mb={{ base: 2, md: 0 }}>
+                <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color={tertiaryTextColor}>
+                  Transactions
+                </Text>
+             </Flex>
+           </Flex>
 
-           {/* Search and Filters */}
-           <Box>
-              <Flex
-                direction={{ base: "column", md: "row" }}
-                gap={{ base: 3, md: 4 }}
-                align={{ base: "stretch", md: "center" }}
-                wrap="wrap"
-                mb={4}
-              >
-                 <Select
-                   size="sm"
-                   maxW={{ base: "full", md: "150px" }}
-                   value={typeFilter}
-                   onChange={(e) => setTypeFilter(e.target.value)}
-                 >
-                   <option value="all">All Types</option>
-                   <option value="buy">Buy</option>
-                   <option value="sell">Sell</option>
-                   <option value="switch_out">Switch Out</option>
-                   <option value="switch_in">Switch In</option>
-                 </Select>
+            {/* Search and Filters */}
+            <Box>
+               <Flex
+                 direction={{ base: "column", md: "row" }}
+                 gap={{ base: 3, md: 4 }}
+                 align={{ base: "stretch", md: "center" }}
+                 wrap="wrap"
+                 mb={4}
+               >
+                  <Select
+                    size="sm"
+                    maxW={{ base: "full", md: "150px" }}
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value)}
+                  >
+                    <option value="all">All Types</option>
+                    <option value="buy">Buy</option>
+                    <option value="sell">Sell</option>
+                    <option value="switch_out">Switch Out</option>
+                    <option value="switch_in">Switch In</option>
+                  </Select>
 
-                 <Select
-                   size="sm"
-                   maxW={{ base: "full", md: "200px" }}
-                   value={amcFilter}
-                   onChange={(e) => setAmcFilter(e.target.value)}
-                 >
-                   <option value="all">All AMCs</option>
-                   {amcs.map(amc => (
-                     <option key={amc.amc_id} value={amc.amc_id.toString()}>
-                       {amc.name}
-                     </option>
-                   ))}
-                 </Select>
+                  <Select
+                    size="sm"
+                    maxW={{ base: "full", md: "200px" }}
+                    value={amcFilter}
+                    onChange={(e) => setAmcFilter(e.target.value)}
+                  >
+                    <option value="all">All AMCs</option>
+                    {amcs.map(amc => (
+                      <option key={amc.amc_id} value={amc.amc_id.toString()}>
+                        {amc.name}
+                      </option>
+                    ))}
+                  </Select>
 
-                 <Select
-                   size="sm"
-                   maxW={{ base: "full", md: "200px" }}
-                   value={fundFilter}
-                   onChange={(e) => setFundFilter(e.target.value)}
-                 >
-                   <option value="all">All Funds</option>
-                   {mutualFunds.map(fund => (
-                     <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
-                       {fund.name}
-                     </option>
-                   ))}
-                 </Select>
+                  <Select
+                    size="sm"
+                    maxW={{ base: "full", md: "200px" }}
+                    value={fundFilter}
+                    onChange={(e) => setFundFilter(e.target.value)}
+                  >
+                    <option value="all">All Funds</option>
+                    {mutualFunds.map(fund => (
+                      <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
+                        {fund.name}
+                      </option>
+                    ))}
+                  </Select>
 
-                <InputGroup size="sm" maxW={{ base: "full", md: "300px" }}>
-                  <InputLeftElement>
-                    <Search size={16} />
-                  </InputLeftElement>
-                  <Input
-                    placeholder="Search transactions..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
-                </InputGroup>
+                 <InputGroup size="sm" maxW={{ base: "full", md: "300px" }}>
+                   <InputLeftElement>
+                     <Search size={16} />
+                   </InputLeftElement>
+                   <Input
+                     placeholder="Search transactions..."
+                     value={searchTerm}
+                     onChange={(e) => setSearchTerm(e.target.value)}
+                   />
+                 </InputGroup>
 
-              </Flex>
+               </Flex>
 
 
-          </Box>
-        </Box>
+            </Box>
+         </Box>
 
 
 
@@ -430,11 +453,11 @@ const MfTransactions: FC<MfTransactionsProps> = ({
             bg={emptyStateBg}
             borderRadius="lg"
             border="2px dashed"
-            borderColor="gray.300"
+            borderColor={emptyStateBorderColor}
           >
             <VStack spacing={4}>
               <VStack spacing={2}>
-                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                <Text fontSize="lg" fontWeight="semibold" color={headerColor}>
                   No Transactions Yet
                 </Text>
                 <Text fontSize="sm" color={emptyStateTextColor} maxW="300px">
@@ -450,11 +473,11 @@ const MfTransactions: FC<MfTransactionsProps> = ({
             bg={emptyStateBg}
             borderRadius="lg"
             border="2px dashed"
-            borderColor="gray.300"
+            borderColor={emptyStateBorderColor}
           >
             <VStack spacing={4}>
               <VStack spacing={2}>
-                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                <Text fontSize="lg" fontWeight="semibold" color={headerColor}>
                   No Transactions Yet
                 </Text>
                 <Text fontSize="sm" color={emptyStateTextColor} maxW="300px">
@@ -470,11 +493,11 @@ const MfTransactions: FC<MfTransactionsProps> = ({
             bg={emptyStateBg}
             borderRadius="lg"
             border="2px dashed"
-            borderColor="gray.300"
+            borderColor={emptyStateBorderColor}
           >
             <VStack spacing={4}>
               <VStack spacing={2}>
-                <Text fontSize="lg" fontWeight="semibold" color="gray.700">
+                <Text fontSize="lg" fontWeight="semibold" color={headerColor}>
                   No Transactions Recorded Yet
                 </Text>
                 <Text fontSize="sm" color={emptyStateTextColor} maxW="300px">
@@ -485,13 +508,13 @@ const MfTransactions: FC<MfTransactionsProps> = ({
           </Box>
          ) : (
            /* Transactions Table/Cards */
-           <Card bg={cardBg} borderColor={borderColor} borderWidth={1}>
+           <Card bg={cardBg}>
              <CardBody>
                {isMobile ? (
                  renderMobileCards()
                ) : (
                  <Box overflowX="auto">
-                   <Table variant="simple" size="sm">
+                   <Table variant="simple" size="sm" borderColor={useColorModeValue("gray.200", "gray.500")}>
                       <Thead>
                         <Tr>
                           <Th>Date</Th>
@@ -510,7 +533,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                         {filteredTransactions.map(transaction => (
                           <Tr
                             key={transaction.mf_transaction_id}
-                            _hover={{ bg: "gray.100" }}
+                            _hover={{ bg: tableHoverBg }}
                             onMouseLeave={handleRowMouseLeave}
                             sx={{
                               "&:hover .action-icons": {
@@ -519,17 +542,17 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                             }}
                           >
                             <Td>
-                              <Text fontSize="sm">
+                              <Text fontSize="sm" color={tertiaryTextColor}>
                                 {formatDate(transaction.transaction_date)}
                               </Text>
                             </Td>
                             <Td>
-                              <Text fontSize="sm" fontWeight="medium">
+                              <Text fontSize="sm" fontWeight="medium" color={tertiaryTextColor}>
                                 {transaction.mutual_fund?.name}
                               </Text>
                             </Td>
                             <Td>
-                              <Text fontSize="sm" fontWeight="medium">
+                              <Text fontSize="sm" fontWeight="medium" color={tertiaryTextColor}>
                                 {transaction.mutual_fund?.amc?.name}
                               </Text>
                             </Td>
@@ -539,10 +562,10 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                               </Badge>
                             </Td>
                             <Td isNumeric>
-                              <Text fontSize="sm">{formatUnits(transaction.units)}</Text>
+                              <Text fontSize="sm" color={tertiaryTextColor}>{formatUnits(transaction.units)}</Text>
                             </Td>
                               <Td isNumeric>
-                                <Text fontSize="sm">{currencySymbol || "₹"}{formatNav(Number(transaction.nav_per_unit))}</Text>
+                                <Text fontSize="sm" color={tertiaryTextColor}>{currencySymbol || "₹"}{formatNav(Number(transaction.nav_per_unit))}</Text>
                               </Td>
                               <Td isNumeric>
                                  <HStack spacing={0} align="baseline" justify="flex-end">
@@ -595,7 +618,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                                      <Text
                                        fontSize="sm"
                                        fontWeight="semibold"
-                                       color="red.500"
+                                       color={deleteIconColor}
                                      >
                                        {splitCurrencyForDisplay(
                                          Number(transaction.other_charges),
@@ -606,7 +629,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                                        fontSize="xs"
                                        fontWeight="semibold"
                                        opacity={0.7}
-                                       color="red.500"
+                                       color={deleteIconColor}
                                      >
                                        {splitCurrencyForDisplay(
                                          Number(transaction.other_charges),
@@ -625,7 +648,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                                   <ChakraLink
                                     as={Link}
                                     to={`/account/${transaction.account_id}`}
-                                    color="blue.500"
+                                    color={accountLinkColor}
                                     fontSize="sm"
                                     fontWeight="medium"
                                     _hover={{ textDecoration: "underline" }}
@@ -657,8 +680,8 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                                     <Icon
                                       as={Trash2}
                                       boxSize={4}
-                                      color="red.500"
-                                      _hover={{ color: "red.600" }}
+                                      color={deleteIconColor}
+                                      _hover={{ color: deleteIconHoverColor }}
                                       transition="opacity 0.2s"
                                     />
                                   </ChakraLink>
@@ -694,11 +717,11 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                 Are you sure you want to delete this transaction? This action cannot be undone and will reverse all associated financial transactions.
               </Text>
              {transactionToDelete && (
-               <Box p={3} bg="gray.50" borderRadius="md">
+               <Box p={3} bg={modalDeleteBg} borderRadius="md">
                  <Text fontWeight="bold">
                    {transactionToDelete.mutual_fund?.name}
                  </Text>
-                  <Text fontSize="sm" color="gray.600">
+                  <Text fontSize="sm" color={mutedColor}>
                     {formatDate(transactionToDelete.transaction_date)}
                   </Text>
                   <VStack align="start" spacing={1}>
@@ -734,13 +757,13 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                         >
                            {splitCurrencyForDisplay(Number(transactionToDelete.amount_excluding_charges), currencySymbol || "₹").decimals}
                         </Text>
-                      <Text fontSize="xs" color="gray.600" ml={1}>
+                      <Text fontSize="xs" color={mutedColor} ml={1}>
                         (excl. charges)
                       </Text>
                     </HStack>
                      {Number(transactionToDelete.other_charges) > 0 && (
                        <HStack spacing={0} align="baseline">
-                         <Text fontSize="xs" color="red.500" fontWeight="medium">
+                         <Text fontSize="xs" color={deleteIconColor} fontWeight="medium">
                            +{currencySymbol || "₹"}{splitCurrencyForDisplay(Number(transactionToDelete.other_charges), currencySymbol || "₹").main}{splitCurrencyForDisplay(Number(transactionToDelete.other_charges), currencySymbol || "₹").decimals} charges
                          </Text>
                        </HStack>

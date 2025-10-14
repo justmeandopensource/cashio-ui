@@ -23,6 +23,7 @@ const InsightsMainCharts = ({
   visualization,
 }: InsightsMainChartsProps) => {
   const cardBg = useColorModeValue("white", "gray.700");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   if (!ledgerId) {
     return (
@@ -33,7 +34,7 @@ const InsightsMainCharts = ({
         boxShadow="md"
         textAlign="center"
       >
-        <Text fontSize="lg" color="tertiaryTextColor">
+        <Text fontSize="lg" color={tertiaryTextColor}>
           Select a ledger to view insights
         </Text>
       </Box>
@@ -73,7 +74,7 @@ const InsightsMainCharts = ({
             boxShadow="md"
             textAlign="center"
           >
-            <Text fontSize="lg" color="tertiaryTextColor">
+            <Text fontSize="lg" color={tertiaryTextColor}>
               Visualization not found
             </Text>
           </Box>

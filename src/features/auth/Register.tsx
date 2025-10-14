@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { AxiosError } from "axios";
-import { Flex, useToast } from "@chakra-ui/react";
+import { Flex, useToast, useColorModeValue } from "@chakra-ui/react";
 import RegisterForm from "@features/auth/components/RegisterForm";
 import api from "@/lib/api";
 
@@ -77,12 +77,14 @@ const Register: React.FC = () => {
     registerMutation.mutate(formDetails);
   };
 
+  const pageBg = useColorModeValue("primaryBg", "primaryBg");
+
   return (
     <Flex
       align="center"
       justify="center"
       minH="100vh"
-      bg={{ base: "white", md: "gray.50" }}
+      bg={pageBg}
       px={0}
     >
       <RegisterForm

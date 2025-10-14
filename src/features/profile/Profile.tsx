@@ -8,9 +8,18 @@ import { useNavigate } from "react-router-dom";
 import PageContainer from "@components/shared/PageContainer";
 import PageHeader from "@components/shared/PageHeader";
 import { User } from "lucide-react";
+import { useColorModeValue } from "@chakra-ui/react";
 
 const Profile: React.FC = () => {
   const navigate = useNavigate();
+
+  const cardBg = useColorModeValue("white", "cardDarkBg");
+  const borderColor = useColorModeValue("gray.200", "gray.700");
+  const selectedTabColor = useColorModeValue("teal.700", "teal.200");
+  const selectedTabBg = useColorModeValue("teal.50", "teal.900");
+  const selectedTabBorderColor = useColorModeValue("teal.400", "teal.600");
+  const hoverTabBg = useColorModeValue("teal.25", "teal.800");
+  const tabColor = useColorModeValue("gray.600", "gray.400");
 
   // handle logout
   const handleLogout = (): void => {
@@ -27,7 +36,7 @@ const Profile: React.FC = () => {
       />
       <Box flex={1} overflowY="auto">
         <PageContainer>
-          <Box borderRadius="lg" boxShadow="lg" bg="white" overflow="hidden">
+          <Box borderRadius="lg" boxShadow="lg" bg={cardBg} overflow="hidden">
              <Tabs
                variant="soft-rounded"
                colorScheme="teal"
@@ -36,7 +45,7 @@ const Profile: React.FC = () => {
               <Box
                 p={{ base: 2, md: 4 }}
                 borderBottom="1px solid"
-                borderColor="gray.200"
+                borderColor={borderColor}
               >
                 <TabList
                   minW={{ base: "auto", md: "auto" }}
@@ -50,15 +59,16 @@ const Profile: React.FC = () => {
                      borderRadius="md"
                      whiteSpace="nowrap"
                      flex={{ base: 1, md: "none" }}
+                     color={tabColor}
                      _selected={{
-                       color: "teal.700",
-                       bg: "teal.50",
+                       color: selectedTabColor,
+                       bg: selectedTabBg,
                        fontWeight: "semibold",
                        border: "1px solid",
-                       borderColor: "teal.400",
+                       borderColor: selectedTabBorderColor,
                      }}
                      _hover={{
-                       bg: "teal.25",
+                       bg: hoverTabBg,
                      }}
                    >
                      Account Details
@@ -70,15 +80,16 @@ const Profile: React.FC = () => {
                      borderRadius="md"
                      whiteSpace="nowrap"
                      flex={{ base: 1, md: "none" }}
+                     color={tabColor}
                      _selected={{
-                       color: "teal.700",
-                       bg: "teal.50",
+                       color: selectedTabColor,
+                       bg: selectedTabBg,
                        fontWeight: "semibold",
                        border: "1px solid",
-                       borderColor: "teal.400",
+                       borderColor: selectedTabBorderColor,
                      }}
                      _hover={{
-                       bg: "teal.25",
+                       bg: hoverTabBg,
                      }}
                    >
                      Security
@@ -90,15 +101,16 @@ const Profile: React.FC = () => {
                      borderRadius="md"
                      whiteSpace="nowrap"
                      flex={{ base: 1, md: "none" }}
+                     color={tabColor}
                      _selected={{
-                       color: "teal.700",
-                       bg: "teal.50",
+                       color: selectedTabColor,
+                       bg: selectedTabBg,
                        fontWeight: "semibold",
                        border: "1px solid",
-                       borderColor: "teal.400",
+                       borderColor: selectedTabBorderColor,
                      }}
                      _hover={{
-                       bg: "teal.25",
+                       bg: hoverTabBg,
                      }}
                    >
                      System

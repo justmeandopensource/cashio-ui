@@ -13,6 +13,7 @@ import {
   Skeleton,
   SkeletonText,
   SkeletonCircle,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { Plus, ChevronLeft, ChevronRight, Filter, AlignLeft } from "lucide-react";
 
@@ -89,7 +90,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   const [transferDetails, setTransferDetails] =
     useState<TransferDetails | null>(null);
   const [expandedTransaction, setExpandedTransaction] = useState<string | null>(
-    null,
+    null
   );
 
   const [isSplitLoading, setIsSplitLoading] = useState(false);
@@ -97,7 +98,7 @@ const Transactions: React.FC<TransactionsProps> = ({
 
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(
-    null,
+    null
   );
 
   const [searchParams, setSearchParams] = useSearchParams();
@@ -291,7 +292,7 @@ const Transactions: React.FC<TransactionsProps> = ({
     setIsSplitLoading(true);
     try {
       const response = await api.get(
-        `/ledger/${ledgerId}/transaction/${transactionId}/splits`,
+        `/ledger/${ledgerId}/transaction/${transactionId}/splits`
       );
       setSplitTransactions(response.data);
     } finally {
@@ -313,9 +314,14 @@ const Transactions: React.FC<TransactionsProps> = ({
     deleteMutation.mutate(transactionId);
   };
 
+  const boxBg = useColorModeValue("secondaryBg", "cardDarkBg");
+  const skeletonBg = useColorModeValue("primaryBg", "primaryBg");
+  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+
   if (shouldFetch && isTransactionsLoading) {
     return (
-      <Box bg="gray.50" p={{ base: 3, lg: 6 }} borderRadius="lg">
+      <Box bg={boxBg} p={{ base: 3, lg: 6 }} borderRadius="lg">
         <Flex justify="space-between" align="center" mb={4}>
           <Flex align="center" gap={2}>
             <SkeletonCircle size="6" />
@@ -325,7 +331,7 @@ const Transactions: React.FC<TransactionsProps> = ({
         </Flex>
         <VStack spacing={3} align="stretch">
           {Array.from({ length: 5 }).map((_, index) => (
-            <Box key={index} bg="white" p={4} borderRadius="md" boxShadow="sm">
+            <Box key={index} bg={skeletonBg} p={4} borderRadius="md" boxShadow="sm">
               <Flex justify="space-between" align="center" mb={2}>
                 <Skeleton height="4" width="20" />
                 <Skeleton height="5" width="16" />
@@ -348,7 +354,7 @@ const Transactions: React.FC<TransactionsProps> = ({
   }
 
   return (
-    <Box bg="gray.50" p={{ base: 3, lg: 6 }} borderRadius="lg">
+    <Box bg={boxBg} p={{ base: 3, lg: 6 }} borderRadius="lg">
       {!shouldFetch || !transactionsData || transactionsData.length === 0 ? (
         <Box
           textAlign="center"
@@ -370,7 +376,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           {hasActiveFilters ? (
             <Button
               leftIcon={<Filter />}
-              colorScheme="teal"
+              colorScheme="brand"
               onClick={handleResetFilters}
               mr={3}
             >
@@ -379,7 +385,7 @@ const Transactions: React.FC<TransactionsProps> = ({
           ) : (
             <Button
               leftIcon={<Plus />}
-              colorScheme="teal"
+              colorScheme="brand"
               onClick={onAddTransaction}
             >
               Add Transaction
@@ -390,8 +396,8 @@ const Transactions: React.FC<TransactionsProps> = ({
         <>
           <Flex justify="space-between" align="center" mb={4}>
             <Flex align="center" gap={2}>
-              <Icon as={AlignLeft} size={24} color="gray.600" />
-              <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold" color="primaryTextColor">
+              <Icon as={AlignLeft} size={24} color="secondaryTextColor" />
+              <Text fontSize={{ base: "lg", lg: "xl" }} fontWeight="bold" color={tertiaryTextColor}>
                 Transactions
               </Text>
             </Flex>

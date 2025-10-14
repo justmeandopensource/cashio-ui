@@ -98,11 +98,12 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
   // Color modes
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
   const gridStroke = useColorModeValue("#e2e8f0", "#2d3748");
   const axisTickColor = useColorModeValue("#718096", "#cbd5e0");
   const tooltipBg = useColorModeValue("#fff", "#2d3748");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Fetch data
   const { data, isLoading, isError } = useQuery<InsightsData>({
@@ -266,7 +267,7 @@ const IncomeExpenseTrend: React.FC<IncomeExpenseTrendProps> = ({
             textAlign="center"
             p={6}
           >
-            <Icon as={BarChart2} boxSize={6} color="tertiaryTextColor" mb={4} />
+            <Icon as={BarChart2} boxSize={6} color={tertiaryTextColor} mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Financial Data Available
             </Heading>

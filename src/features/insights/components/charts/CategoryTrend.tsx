@@ -152,11 +152,12 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
   // Color modes
   const bgColor = useColorModeValue("white", "gray.800");
   const cardBg = useColorModeValue("gray.50", "gray.700");
-  const primaryTextColor = useColorModeValue("gray.800", "white");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
   const gridStroke = useColorModeValue("#e2e8f0", "#2d3748");
   const axisTickColor = useColorModeValue("#718096", "#cbd5e0");
   const tooltipBg = useColorModeValue("#fff", "#2d3748");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
 
   // Fetch categories
   const { data: categories, isLoading: isCategoriesLoading } = useQuery<
@@ -511,7 +512,7 @@ const CategoryTrend: React.FC<CategoryTrendProps> = () => {
             textAlign="center"
             p={6}
           >
-            <Icon as={BarChart2} boxSize={16} color="tertiaryTextColor" mb={4} />
+            <Icon as={BarChart2} boxSize={16} color={tertiaryTextColor} mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Category Data Available
             </Heading>

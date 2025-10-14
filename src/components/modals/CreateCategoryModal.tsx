@@ -265,7 +265,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                   }}
                   autoFocus
                 />
-                <FormHelperText mt={2}>
+                <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
                   Enter a descriptive name for your {categoryType} category
                 </FormHelperText>
               </FormControl>
@@ -285,7 +285,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                     <Text fontWeight="semibold" mb={1}>
                       Group Category
                     </Text>
-                    <Text fontSize="sm" color="gray.600">
+                    <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
                       Group categories can contain other categories but cannot
                       be assigned to transactions
                     </Text>
@@ -318,8 +318,8 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                   {isGroupCategoriesLoading && (
                     <Flex justify="center" align="center" py={8}>
                       <VStack spacing={3}>
-                        <Spinner size="md" color="teal.500" thickness="3px" />
-                        <Text fontSize="sm" color="gray.600">
+                        <Spinner size="md" color={useColorModeValue("teal.500", "teal.300")} thickness="3px" />
+                        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
                           Loading group categories...
                         </Text>
                       </VStack>
@@ -329,13 +329,13 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                   {/* Show error message if fetching group categories fails */}
                   {isGroupCategoriesError && (
                     <Box
-                      bg="red.50"
+                      bg={useColorModeValue("red.50", "red.900")}
                       border="2px solid"
-                      borderColor="red.200"
+                      borderColor={useColorModeValue("red.200", "red.700")}
                       borderRadius="md"
                       p={4}
                     >
-                      <Text color="red.700" fontSize="sm" fontWeight="medium">
+                      <Text color={useColorModeValue("red.700", "red.300")} fontSize="sm" fontWeight="medium">
                         Failed to load group categories. Please try again.
                       </Text>
                     </Box>
@@ -370,7 +370,7 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                             </option>
                           ))}
                         </Select>
-                        <FormHelperText mt={2}>
+                        <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
                           Organize this category under an existing group
                         </FormHelperText>
                       </>
@@ -382,14 +382,14 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
                     !isGroupCategoriesLoading &&
                     !isGroupCategoriesError && (
                       <Box
-                        bg="blue.50"
+                        bg={useColorModeValue("blue.50", "blue.900")}
                         border="2px solid"
-                        borderColor="blue.200"
+                        borderColor={useColorModeValue("blue.200", "blue.700")}
                         borderRadius="md"
                         p={4}
                       >
                         <Text
-                          color="blue.700"
+                          color={useColorModeValue("blue.700", "blue.300")}
                           fontSize="sm"
                           fontWeight="medium"
                         >
@@ -435,7 +435,12 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
               isDisabled={createCategoryMutation.isPending}
               leftIcon={<X />}
               borderWidth="2px"
-              _hover={{ bg: cardBg }}
+              borderColor={useColorModeValue("gray.300", "gray.600")}
+              color={useColorModeValue("gray.600", "gray.200")}
+              _hover={{
+                bg: useColorModeValue("gray.50", "gray.600"),
+                borderColor: useColorModeValue("gray.400", "gray.500"),
+              }}
             >
               Cancel
             </Button>
@@ -481,7 +486,12 @@ const CreateCategoryModal: React.FC<CreateCategoryModalProps> = ({
             py={3}
             borderRadius="md"
             borderWidth="2px"
-            _hover={{ bg: inputBg }}
+            borderColor={useColorModeValue("gray.300", "gray.600")}
+            color={useColorModeValue("gray.600", "gray.200")}
+            _hover={{
+              bg: useColorModeValue("gray.50", "gray.600"),
+              borderColor: useColorModeValue("gray.400", "gray.500"),
+            }}
           >
             Cancel
           </Button>

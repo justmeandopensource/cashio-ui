@@ -75,8 +75,13 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   const [oldStats, setOldStats] = useState<{totalValue: number, totalUnrealizedPnL: number} | null>(null);
   const [portfolioChanges, setPortfolioChanges] = useState<{totalValueChange: number, totalValueChangePercent: number} | null>(null);
   const toast = useToast();
-  const emptyStateBg = useColorModeValue("gray.50", "gray.800");
-  const emptyStateTextColor = useColorModeValue("gray.600", "gray.400");
+  const emptyStateBg = useColorModeValue("secondaryBg", "cardDarkBg");
+  const emptyStateTextColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+  const primaryTextColor = useColorModeValue("gray.800", "gray.400");
+  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+
+   const iconColor = useColorModeValue("brand.500", "brand.300");
+  const textColor = primaryTextColor;
 
   const toNumber = (value: number | string): number =>
     typeof value === "string" ? parseFloat(value) : value;
@@ -161,216 +166,223 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
     setShowChangeModal(true);
   };
 
+  const totalValueColor = useColorModeValue("brand.600", "brand.400");
+  const realizedGainColor = useColorModeValue("green.500", "green.300");
+  const unrealizedPnlColor = useColorModeValue("red.500", "red.300");
+  const totalFundsColor = useColorModeValue("blue.600", "blue.400");
+  const emptyStateBorderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
+  const emptyStateIconColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+
   return (
     <Box>
       <VStack spacing={6} align="stretch">
-        {amcs.length > 0 && (
-          <Box p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" boxShadow="sm">
-            <Flex
-              direction={{ base: "column", md: "row" }}
-              justify="space-between"
-              align={{ base: "start", md: "center" }}
-              mb={4}
-              gap={{ base: 4, md: 0 }}
-            >
-              <Flex align="center" mb={{ base: 2, md: 0 }}>
-                <Icon as={TrendingUp} mr={2} color="teal.500" />
-                <Text
-                  fontSize={{ base: "lg", md: "xl" }}
-                  fontWeight="semibold"
-                  color="gray.700"
-                >
-                  Mutual Funds Portfolio
-                </Text>
-              </Flex>
-              <Flex gap={2} width={{ base: "full", md: "auto" }} direction={{ base: "column", md: "row" }}>
-                <Button
-                  leftIcon={<Building2 size={16} />}
-                  colorScheme="teal"
-                  variant="outline"
-                  size={{ base: "md", md: "sm" }}
-                  onClick={onCreateAmc}
-                >
-                  Create AMC
-                </Button>
-                <Button
-                  leftIcon={<PieChart size={16} />}
-                  colorScheme="teal"
-                  variant={amcs.length === 0 ? "outline" : "solid"}
-                  size={{ base: "md", md: "sm" }}
-                  onClick={() => onCreateFund()}
-                  title={
-                    amcs.length === 0
-                      ? "Create an AMC first"
-                      : "Create a new mutual fund"
-                  }
-                >
-                  Create Fund
-                </Button>
-                {fundsWithCodes.length > 0 && (
-                  <Button
-                    leftIcon={<RefreshCw size={16} />}
-                    colorScheme="teal"
-                    variant="outline"
-                    size={{ base: "md", md: "sm" }}
-                    onClick={handleOpenBulkNavModal}
-                    title={`Update NAVs for ${fundsWithCodes.length} funds`}
-                  >
-                    Update NAVs
-                  </Button>
-                )}
-              </Flex>
-            </Flex>
+         {amcs.length > 0 && (
+           <>
+             <Flex
+               direction={{ base: "column", md: "row" }}
+               justify="space-between"
+               align={{ base: "start", md: "center" }}
+               mb={4}
+               gap={{ base: 4, md: 0 }}
+             >
+               <Flex align="center" mb={{ base: 2, md: 0 }}>
+                 <Icon as={TrendingUp} mr={2} color={iconColor} />
+                 <Text
+                   fontSize={{ base: "lg", md: "xl" }}
+                   fontWeight="semibold"
+                   color={tertiaryTextColor}
+                 >
+                   Mutual Funds Portfolio
+                 </Text>
+               </Flex>
+               <Flex gap={2} width={{ base: "full", md: "auto" }} direction={{ base: "column", md: "row" }}>
+                 <Button
+                   leftIcon={<Building2 size={16} />}
+                   colorScheme="brand"
+                   variant="outline"
+                   size={{ base: "md", md: "sm" }}
+                   onClick={onCreateAmc}
+                 >
+                   Create AMC
+                 </Button>
+                 <Button
+                   leftIcon={<PieChart size={16} />}
+                   colorScheme="brand"
+                   variant={amcs.length === 0 ? "outline" : "solid"}
+                   size={{ base: "md", md: "sm" }}
+                   onClick={() => onCreateFund()}
+                   title={
+                     amcs.length === 0
+                       ? "Create an AMC first"
+                       : "Create a new mutual fund"
+                   }
+                 >
+                   Create Fund
+                 </Button>
+                 {fundsWithCodes.length > 0 && (
+                   <Button
+                     leftIcon={<RefreshCw size={16} />}
+                     colorScheme="brand"
+                     variant="outline"
+                     size={{ base: "md", md: "sm" }}
+                     onClick={handleOpenBulkNavModal}
+                     title={`Update NAVs for ${fundsWithCodes.length} funds`}
+                   >
+                     Update NAVs
+                   </Button>
+                 )}
+               </Flex>
+             </Flex>
 
-            <SimpleGrid
-              columns={{ base: 1, sm: 2, lg: 5 }}
-              spacing={{ base: 4, md: 6 }}
-            >
-              <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
-                <Text fontSize="sm" color="gray.600" mb={1}>
-                  Total Invested
-                </Text>
-                <HStack spacing={0} align="baseline">
-                  <Text
-                    fontSize={{ base: "xl", md: "2xl" }}
-                    fontWeight="semibold"
-                    color="gray.600"
-                  >
-                    {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").main}
-                  </Text>
-                  <Text
-                    fontSize={{ base: "md", md: "lg" }}
-                    fontWeight="semibold"
-                    color="gray.600"
-                    opacity={0.7}
-                  >
-                    {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").decimals}
-                  </Text>
-                </HStack>
-              </Box>
+             <SimpleGrid
+               columns={{ base: 1, sm: 2, lg: 5 }}
+               spacing={{ base: 4, md: 6 }}
+             >
+               <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
+                 <Text fontSize="sm" color={tertiaryTextColor} mb={1}>
+                   Total Invested
+                 </Text>
+                 <HStack spacing={0} align="baseline">
+                   <Text
+                     fontSize={{ base: "xl", md: "2xl" }}
+                     fontWeight="semibold"
+                     color={tertiaryTextColor}
+                   >
+                     {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").main}
+                   </Text>
+                   <Text
+                     fontSize={{ base: "md", md: "lg" }}
+                     fontWeight="semibold"
+                     color={tertiaryTextColor}
+                     opacity={0.7}
+                   >
+                     {splitCurrencyForDisplay(totalInvested, currencySymbol || "₹").decimals}
+                   </Text>
+                 </HStack>
+               </Box>
 
-              <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
-                <Text fontSize="sm" color="gray.600" mb={1}>
-                  Total Value
-                </Text>
-                <HStack spacing={0} align="baseline">
-                  <Text
-                    fontSize={{ base: "xl", md: "2xl" }}
-                    fontWeight="semibold"
-                    color="teal.600"
-                  >
-                    {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").main}
-                  </Text>
-                  <Text
-                    fontSize={{ base: "md", md: "lg" }}
-                    fontWeight="semibold"
-                    color="teal.600"
-                    opacity={0.7}
-                  >
-                    {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").decimals}
-                  </Text>
-                </HStack>
-              </Box>
+               <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
+                 <Text fontSize="sm" color={emptyStateTextColor} mb={1}>
+                   Total Value
+                 </Text>
+                 <HStack spacing={0} align="baseline">
+                   <Text
+                     fontSize={{ base: "xl", md: "2xl" }}
+                     fontWeight="semibold"
+                     color={totalValueColor}
+                   >
+                     {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").main}
+                   </Text>
+                   <Text
+                     fontSize={{ base: "md", md: "lg" }}
+                     fontWeight="semibold"
+                     color={totalValueColor}
+                     opacity={0.7}
+                   >
+                     {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").decimals}
+                   </Text>
+                 </HStack>
+               </Box>
 
-              <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
-                <Text fontSize="sm" color="gray.600" mb={1}>
-                  Total Realized Gain
-                </Text>
-                <HStack spacing={0} align="baseline">
-                  <Text
-                    fontSize={{ base: "xl", md: "2xl" }}
-                    fontWeight="semibold"
-                    color={totalRealizedGain >= 0 ? "green.500" : "red.500"}
-                  >
-                    {
-                      splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
-                        .main
-                    }
-                  </Text>
-                  <Text
-                    fontSize={{ base: "md", md: "lg" }}
-                    fontWeight="semibold"
-                    color={totalRealizedGain >= 0 ? "green.500" : "red.500"}
-                    opacity={0.7}
-                  >
-                    {
-                      splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
-                        .decimals
-                    }
-                  </Text>
-                </HStack>
-              </Box>
+               <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
+                 <Text fontSize="sm" color={emptyStateTextColor} mb={1}>
+                   Total Realized Gain
+                 </Text>
+                 <HStack spacing={0} align="baseline">
+                   <Text
+                     fontSize={{ base: "xl", md: "2xl" }}
+                     fontWeight="semibold"
+                     color={totalRealizedGain >= 0 ? realizedGainColor : unrealizedPnlColor}
+                   >
+                     {
+                       splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
+                         .main
+                     }
+                   </Text>
+                   <Text
+                     fontSize={{ base: "md", md: "lg" }}
+                     fontWeight="semibold"
+                     color={totalRealizedGain >= 0 ? realizedGainColor : unrealizedPnlColor}
+                     opacity={0.7}
+                   >
+                     {
+                       splitCurrencyForDisplay(Math.abs(totalRealizedGain), currencySymbol || "₹")
+                         .decimals
+                     }
+                   </Text>
+                 </HStack>
+               </Box>
 
-              <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
-                <Text fontSize="sm" color="gray.600" mb={1}>
-                  Total Unrealized P&L
-                </Text>
-                <VStack align="start" spacing={0}>
-                  <HStack spacing={0} align="baseline">
-                    <Text
-                      fontSize={{ base: "xl", md: "2xl" }}
-                      fontWeight="semibold"
-                      color={totalUnrealizedPnL >= 0 ? "green.500" : "red.500"}
-                    >
-                      {
-                        splitCurrencyForDisplay(
-                          Math.abs(totalUnrealizedPnL),
-                          currencySymbol || "₹",
-                        ).main
-                      }
-                    </Text>
-                    <Text
-                      fontSize={{ base: "md", md: "lg" }}
-                      fontWeight="semibold"
-                      color={totalUnrealizedPnL >= 0 ? "green.500" : "red.500"}
-                      opacity={0.7}
-                    >
-                      {
-                        splitCurrencyForDisplay(
-                          Math.abs(totalUnrealizedPnL),
-                          currencySymbol || "₹",
-                        ).decimals
-                      }
-                    </Text>
-                  </HStack>
+               <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
+                 <Text fontSize="sm" color={emptyStateTextColor} mb={1}>
+                   Total Unrealized P&L
+                 </Text>
+                 <VStack align="start" spacing={0}>
                    <HStack spacing={0} align="baseline">
                      <Text
-                       fontSize="sm"
-                       color={totalUnrealizedPnL >= 0 ? "green.500" : "red.500"}
+                       fontSize={{ base: "xl", md: "2xl" }}
+                       fontWeight="semibold"
+                       color={totalUnrealizedPnL >= 0 ? realizedGainColor : unrealizedPnlColor}
                      >
-                       {splitPercentageForDisplay(totalPnLPercentage).main}
+                       {
+                         splitCurrencyForDisplay(
+                           Math.abs(totalUnrealizedPnL),
+                           currencySymbol || "₹"
+                         ).main
+                       }
                      </Text>
                      <Text
-                       fontSize="xs"
-                       color={totalUnrealizedPnL >= 0 ? "green.500" : "red.500"}
+                       fontSize={{ base: "md", md: "lg" }}
+                       fontWeight="semibold"
+                       color={totalUnrealizedPnL >= 0 ? realizedGainColor : unrealizedPnlColor}
                        opacity={0.7}
                      >
-                       {splitPercentageForDisplay(totalPnLPercentage).decimals}
+                       {
+                         splitCurrencyForDisplay(
+                           Math.abs(totalUnrealizedPnL),
+                           currencySymbol || "₹"
+                         ).decimals
+                       }
                      </Text>
                    </HStack>
-                </VStack>
-              </Box>
+                    <HStack spacing={0} align="baseline">
+                      <Text
+                        fontSize="sm"
+                        color={totalUnrealizedPnL >= 0 ? realizedGainColor : unrealizedPnlColor}
+                      >
+                        {splitPercentageForDisplay(totalPnLPercentage).main}
+                      </Text>
+                      <Text
+                        fontSize="xs"
+                        color={totalUnrealizedPnL >= 0 ? realizedGainColor : unrealizedPnlColor}
+                        opacity={0.7}
+                      >
+                        {splitPercentageForDisplay(totalPnLPercentage).decimals}
+                      </Text>
+                    </HStack>
+                 </VStack>
+               </Box>
 
-              <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
-                <Text fontSize="sm" color="gray.600" mb={1}>
-                  Total Funds
-                </Text>
-                <VStack align="start" spacing={0}>
-                  <Text
-                    fontSize={{ base: "xl", md: "2xl" }}
-                    fontWeight="bold"
-                    color="blue.600"
-                  >
-                    {filteredMutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
-                  </Text>
-                  <Text fontSize="xs" color="gray.500">
-                    Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
-                  </Text>
-                </VStack>
-              </Box>
-            </SimpleGrid>
-          </Box>
-        )}
+               <Box p={4} borderRadius="lg" boxShadow="md" bg={emptyStateBg}>
+                 <Text fontSize="sm" color={emptyStateTextColor} mb={1}>
+                   Total Funds
+                 </Text>
+                 <VStack align="start" spacing={0}>
+                   <Text
+                     fontSize={{ base: "xl", md: "2xl" }}
+                     fontWeight="bold"
+                     color={totalFundsColor}
+                   >
+                     {filteredMutualFunds.filter(fund => toNumber(fund.total_units) > 0).length}
+                   </Text>
+                   <Text fontSize="xs" color={emptyStateTextColor}>
+                     Across {amcs.length} AMC{amcs.length !== 1 ? "s" : ""}
+                   </Text>
+                 </VStack>
+               </Box>
+             </SimpleGrid>
+           </>
+         )}
 
           {amcs.length === 0 ? (
             <Box
@@ -379,19 +391,19 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
               bg={emptyStateBg}
               borderRadius="lg"
               border="2px dashed"
-              borderColor="gray.300"
+              borderColor={emptyStateBorderColor}
             >
               <VStack spacing={4}>
-                <Icon as={TrendingUp} boxSize={16} color="gray.400" />
+                <Icon as={TrendingUp} boxSize={16} color={emptyStateIconColor} />
                 <VStack spacing={2}>
-                  <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+                  <Text fontSize="xl" fontWeight="semibold" color={textColor}>
                     No AMCs Created Yet
                   </Text>
                   <Text fontSize="md" color={emptyStateTextColor} maxW="400px">
                     Create your first Asset Management Company to start tracking mutual fund investments
                   </Text>
                 </VStack>
-                <Button colorScheme="teal" onClick={onCreateAmc} size="lg">
+                <Button colorScheme="brand" onClick={onCreateAmc} size="lg">
                   Create Your First AMC
                 </Button>
               </VStack>
@@ -403,35 +415,37 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
               bg={emptyStateBg}
               borderRadius="lg"
               border="2px dashed"
-              borderColor="gray.300"
+              borderColor={emptyStateBorderColor}
             >
               <VStack spacing={4}>
-                <Icon as={TrendingUp} boxSize={16} color="gray.400" />
+                <Icon as={TrendingUp} boxSize={16} color={emptyStateIconColor} />
                 <VStack spacing={2}>
-                  <Text fontSize="xl" fontWeight="semibold" color="gray.700">
+                  <Text fontSize="xl" fontWeight="semibold" color={textColor}>
                     No Mutual Funds Yet
                   </Text>
                   <Text fontSize="md" color={emptyStateTextColor} maxW="400px">
                     Create your first mutual fund to start tracking your portfolio
                   </Text>
                 </VStack>
-                <Button colorScheme="teal" onClick={() => onCreateFund()} size="lg">
+                <Button colorScheme="brand" onClick={() => onCreateFund()} size="lg">
                   Create Your First Fund
                 </Button>
               </VStack>
             </Box>
          ) : (
-             <MutualFundsTable
-               amcs={amcs}
-               mutualFunds={mutualFunds}
-               onTradeUnits={onTradeUnits}
-               onTransferUnits={onTransferUnits}
-               onUpdateNav={onUpdateNav}
-               onCloseFund={onCloseFund}
-               onViewTransactions={onViewTransactions}
-               filters={filters}
-               onFiltersChange={onFiltersChange}
-             />
+             <Box bg={useColorModeValue("primaryBg", "cardDarkBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+               <MutualFundsTable
+                 amcs={amcs}
+                 mutualFunds={mutualFunds}
+                 onTradeUnits={onTradeUnits}
+                 onTransferUnits={onTransferUnits}
+                 onUpdateNav={onUpdateNav}
+                 onCloseFund={onCloseFund}
+                 onViewTransactions={onViewTransactions}
+                 filters={filters}
+                 onFiltersChange={onFiltersChange}
+               />
+             </Box>
          )}
       </VStack>
       <BulkNavUpdateModal

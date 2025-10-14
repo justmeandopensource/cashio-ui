@@ -38,6 +38,8 @@ import {
   Input,
   InputGroup,
   InputLeftElement,
+  useColorModeValue,
+  Card,
 } from "@chakra-ui/react";
 import { AlertTriangle, Trash2, X, Calendar, Search } from "lucide-react";
 import { useAllAssetTransactions, useDeleteAssetTransaction } from "../api";
@@ -71,6 +73,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
   const [openPopoverId, setOpenPopoverId] = useState<number | null>(null);
   const toast = useToast();
+  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
 
   // Responsive breakpoint
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -168,6 +171,10 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
     setOpenPopoverId(null);
   };
 
+   const accountLinkColor = useColorModeValue("blue.500", "blue.300");
+   const notesColor = useColorModeValue("primaryTextColor", "primaryTextColor");
+   const modalDeleteBg = useColorModeValue("secondaryBg", "secondaryBg");
+
   // Render mobile card view
   const renderMobileCards = () => (
     <VStack spacing={3} align="stretch">
@@ -181,20 +188,20 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
             p={4}
             borderWidth="1px"
             borderRadius="lg"
-            bg="white"
+            bg={useColorModeValue("white", "cardDarkBg")}
             boxShadow="sm"
             onClick={() => handleCardToggle(transaction.asset_transaction_id)}
             cursor="pointer"
             transition="all 0.2s"
-            _hover={{ bg: "gray.50" }}
+            _hover={{ bg: useColorModeValue("secondaryBg", "secondaryBg") }}
           >
             {/* Main row with essential info */}
             <Flex justify="space-between" align="flex-start">
               {/* Left side with date and asset */}
               <VStack align="flex-start" spacing={1} maxW="70%">
                 <HStack spacing={2}>
-                  <Icon as={Calendar} color="gray.500" />
-                  <Text fontSize="sm" color="gray.600">
+                  <Icon as={Calendar} color={tertiaryTextColor} />
+                  <Text fontSize="sm" color={tertiaryTextColor}>
                     {formatDate(transaction.transaction_date)}
                   </Text>
                   <Tooltip label={isBuy ? "Buy Transaction" : "Sell Transaction"}>
@@ -206,14 +213,14 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
                   </Tooltip>
                 </HStack>
 
-                <Text fontWeight="medium">
+                <Text fontWeight="medium" color={tertiaryTextColor}>
                   {transaction.physical_asset?.name || "N/A"}
                 </Text>
 
                 <ChakraLink
                   as={Link}
                   to={`/account/${transaction.account_id}`}
-                  color="blue.500"
+                  color={accountLinkColor}
                   fontSize="sm"
                   fontWeight="medium"
                   _hover={{ textDecoration: "underline" }}
@@ -245,13 +252,13 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
                      {splitCurrencyForDisplay(transaction.total_amount, currencySymbol || "$").decimals}
                    </Text>
                  </HStack>
-                <Text fontSize="sm" color="gray.600" fontWeight="medium">
+                <Text fontSize="sm" color={tertiaryTextColor} fontWeight="medium">
                   {formatQuantity(transaction.quantity)}{" "}
                   {transaction.physical_asset?.asset_type?.unit_symbol || ""}
                 </Text>
                 <Box
                   bg="gray.100"
-                  color="gray.700"
+                  color={tertiaryTextColor}
                   px={2}
                   py={0.5}
                   borderRadius="full"
@@ -284,7 +291,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
                   <Box mb={2}>
                     <Text
                       fontSize="sm"
-                      color="gray.700"
+                      color={notesColor}
                       bg="gray.50"
                       p={2}
                       borderRadius="md"
@@ -323,7 +330,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
       <Center p={8}>
         <VStack spacing={4}>
           <Spinner size="lg" color="teal.500" />
-          <Text color="gray.600">Loading transaction history...</Text>
+          <Text color={tertiaryTextColor}>Loading transaction history...</Text>
         </VStack>
       </Center>
     );
@@ -352,7 +359,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
     <Box>
       <VStack spacing={6} align="stretch">
         {/* Header */}
-        <Box mb={6} p={{ base: 4, md: 6 }} bg="white" borderRadius="lg" boxShadow="sm">
+        <Box mb={6} p={{ base: 4, md: 6 }} bg={useColorModeValue("primaryBg", "cardDarkBg")} borderRadius="lg" boxShadow="sm">
           <Flex
             direction={{ base: "column", md: "row" }}
             justify="space-between"
@@ -360,11 +367,11 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
              gap={{ base: 4, md: 0 }}
              mb={4}
           >
-            <Flex align="center" mb={{ base: 2, md: 0 }}>
-               <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color="gray.700">
-                 Transactions
-               </Text>
-            </Flex>
+             <Flex align="center" mb={{ base: 2, md: 0 }}>
+                <Text fontSize={{ base: "lg", md: "xl" }} fontWeight="semibold" color={tertiaryTextColor}>
+                  Transactions
+                </Text>
+             </Flex>
           </Flex>
 
            {/* Search and Filters */}
@@ -433,12 +440,12 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
         </Box>
 
         {/* Transactions Table/Cards */}
-        <Box>
+        <Card bg={useColorModeValue("primaryBg", "cardDarkBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
           {isMobile ? (
         renderMobileCards()
       ) : (
         <Box overflowX="auto">
-          <Table variant="simple" size="sm">
+          <Table variant="simple" size="sm" borderColor={useColorModeValue("gray.200", "gray.500")}>
             <Thead>
               <Tr>
                 <Th>Date</Th>
@@ -455,7 +462,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
                {filteredTransactions.map((transaction) => (
                 <Tr
                   key={transaction.asset_transaction_id}
-                  _hover={{ bg: "gray.100" }}
+                  _hover={{ bg: useColorModeValue("secondaryBg", "secondaryBg") }}
                   onMouseLeave={handleRowMouseLeave}
                   sx={{
                     "&:hover .action-icons": {
@@ -464,12 +471,12 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
                   }}
                 >
                   <Td>
-                    <Text fontWeight="medium">
+                    <Text fontWeight="medium" color={tertiaryTextColor}>
                       {formatDate(transaction.transaction_date)}
                     </Text>
                   </Td>
                   <Td>
-                    <Text fontWeight="medium">
+                    <Text fontWeight="medium" color={tertiaryTextColor}>
                       {transaction.physical_asset?.name || "N/A"}
                     </Text>
                   </Td>
@@ -484,13 +491,13 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
                     </Badge>
                   </Td>
                   <Td isNumeric>
-                    <Text fontWeight="medium">
+                    <Text fontWeight="medium" color={tertiaryTextColor}>
                       {formatQuantity(transaction.quantity)}{" "}
                       {transaction.physical_asset?.asset_type?.unit_symbol || ""}
                     </Text>
                   </Td>
                   <Td isNumeric>
-                    <Text fontWeight="medium">
+                    <Text fontWeight="medium" color={tertiaryTextColor}>
                       {formatCurrencyWithSymbol(
                         transaction.price_per_unit,
                         currencySymbol || "$",
@@ -576,6 +583,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
           </Table>
         </Box>
       )}
+        </Card>
 
       {/* Confirmation Modal */}
       <Modal
@@ -598,11 +606,11 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
               undone.
             </Text>
             {selectedTransactionId && (
-              <Box p={3} bg="gray.50" borderRadius="md">
+              <Box p={3} bg={modalDeleteBg} borderRadius="md">
                 <Text fontWeight="bold">
                   {filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.physical_asset?.name || "Asset"}
                 </Text>
-                <Text fontSize="sm" color="gray.600">
+                <Text fontSize="sm" color={tertiaryTextColor}>
                   {selectedTransactionId && formatDate(
                     filteredTransactions.find(t => t.asset_transaction_id === selectedTransactionId)?.transaction_date || ""
                   )}
@@ -654,7 +662,6 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
           </ModalFooter>
         </ModalContent>
       </Modal>
-        </Box>
       </VStack>
     </Box>
   );
