@@ -63,9 +63,17 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
   const stopFetchRef = useRef(false);
   const [fetchedCount, setFetchedCount] = useState(0);
 
-  const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.100", "gray.700");
-  const cardBg = useColorModeValue("gray.50", "gray.700");
+   const bgColor = useColorModeValue("white", "gray.800");
+   const borderColor = useColorModeValue("gray.100", "gray.700");
+   const cardBg = useColorModeValue("gray.50", "gray.700");
+   const textColor = useColorModeValue("gray.800", "gray.100");
+   const subTextColor = useColorModeValue("gray.600", "gray.400");
+   const mutedTextColor = useColorModeValue("gray.400", "gray.500");
+   const successColor = useColorModeValue("green.500", "green.300");
+   const dangerColor = useColorModeValue("red.500", "red.300");
+   const warningColor = useColorModeValue("orange.500", "orange.300");
+   const infoColor = useColorModeValue("blue.500", "blue.300");
+   const tealColor = useColorModeValue("teal.500", "teal.300");
 
   useEffect(() => {
     if (isOpen) {
@@ -214,18 +222,18 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
           <VStack spacing={6} align="stretch">
             {results.size > 0 && (
               <HStack spacing={6} justify="center">
-                <Box textAlign="center">
-                  <Text fontSize="2xl" fontWeight="bold" color="teal.500">{successfulComparisons.length}</Text>
-                  <Text fontSize="sm" color="gray.600">Updates Found</Text>
-                </Box>
-                <Box textAlign="center">
-                  <Text fontSize="2xl" fontWeight="bold" color="red.500">{failedComparisons.length}</Text>
-                  <Text fontSize="sm" color="gray.600">Failed Fetches</Text>
-                </Box>
-                <Box textAlign="center">
-                  <Text fontSize="2xl" fontWeight="bold" color="blue.500">{selectedFunds.size}</Text>
-                  <Text fontSize="sm" color="gray.600">Selected</Text>
-                </Box>
+                 <Box textAlign="center">
+                   <Text fontSize="2xl" fontWeight="bold" color={tealColor}>{successfulComparisons.length}</Text>
+                   <Text fontSize="sm" color={subTextColor}>Updates Found</Text>
+                 </Box>
+                 <Box textAlign="center">
+                   <Text fontSize="2xl" fontWeight="bold" color={dangerColor}>{failedComparisons.length}</Text>
+                   <Text fontSize="sm" color={subTextColor}>Failed Fetches</Text>
+                 </Box>
+                 <Box textAlign="center">
+                   <Text fontSize="2xl" fontWeight="bold" color={infoColor}>{selectedFunds.size}</Text>
+                   <Text fontSize="sm" color={subTextColor}>Selected</Text>
+                 </Box>
               </HStack>
             )}
 
@@ -252,26 +260,26 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
                         )}
                       </Td>
                       <Td><Text fontWeight="medium">{c.fund.name}</Text></Td>
-                      <Td><Text fontSize="sm" color="gray.600">{c.fund.code}</Text></Td>
-                       <Td isNumeric><Text fontWeight="semibold" color="gray.600">{currencySymbol || "₹"}{c.currentNav.toFixed(2)}</Text></Td>
-                      <Td isNumeric>
-                        {c.isFetching ? (
-                          <Spinner size="xs" color="teal.500" />
-                        ) : c.fetchedNav !== null ? (
-                           <Text fontWeight={c.isUpToDate ? "normal" : "semibold"} color="black">{currencySymbol || "₹"}{c.fetchedNav.toFixed(2)}</Text>
-                        ) : (
-                          <Text color="gray.400">-</Text>
-                        )}
-                      </Td>
-                      <Td isNumeric>
-                        {c.fetchedResult?.success && successfulComparisons.some(sc => sc.fund.mutual_fund_id === c.fund.mutual_fund_id) && (
-                           <Text fontSize="sm" fontWeight="semibold" color={c.change! >= 0 ? "green.500" : "red.500"}>{Math.abs(c.changePercent!).toFixed(2)}%</Text>
-                        )}
-                      </Td>
-                      <Td textAlign="center">
-                        {c.fetchedResult?.success && Math.abs(c.changePercent || 0) > 10 && <Icon as={AlertTriangle} size={16} color="orange.500" />}
-                      </Td>
-                      <Td>{c.fetchedResult?.nav_date ? new Date(c.fetchedResult.nav_date.split('-').reverse().join('-')).toLocaleDateString() : (c.fund.last_nav_update ? new Date(c.fund.last_nav_update).toLocaleDateString() : <Text as="span" color="gray.400">Never</Text>)}</Td>
+                       <Td><Text fontSize="sm" color={subTextColor}>{c.fund.code}</Text></Td>
+                        <Td isNumeric><Text fontWeight="semibold" color={subTextColor}>{currencySymbol || "₹"}{c.currentNav.toFixed(2)}</Text></Td>
+                       <Td isNumeric>
+                         {c.isFetching ? (
+                           <Spinner size="xs" color={tealColor} />
+                         ) : c.fetchedNav !== null ? (
+                            <Text fontWeight={c.isUpToDate ? "normal" : "semibold"} color={textColor}>{currencySymbol || "₹"}{c.fetchedNav.toFixed(2)}</Text>
+                         ) : (
+                           <Text color={mutedTextColor}>-</Text>
+                         )}
+                       </Td>
+                       <Td isNumeric>
+                         {c.fetchedResult?.success && successfulComparisons.some(sc => sc.fund.mutual_fund_id === c.fund.mutual_fund_id) && (
+                            <Text fontSize="sm" fontWeight="semibold" color={c.change! >= 0 ? successColor : dangerColor}>{Math.abs(c.changePercent!).toFixed(2)}%</Text>
+                         )}
+                       </Td>
+                       <Td textAlign="center">
+                         {c.fetchedResult?.success && Math.abs(c.changePercent || 0) > 10 && <Icon as={AlertTriangle} size={16} color={warningColor} />}
+                       </Td>
+                       <Td>{c.fetchedResult?.nav_date ? new Date(c.fetchedResult.nav_date.split('-').reverse().join('-')).toLocaleDateString() : (c.fund.last_nav_update ? new Date(c.fund.last_nav_update).toLocaleDateString() : <Text as="span" color={mutedTextColor}>Never</Text>)}</Td>
                     </Tr>
                   ))}
                 </Tbody>
@@ -280,10 +288,10 @@ const BulkNavUpdateModal: FC<BulkNavUpdateModalProps> = ({
 
             {failedComparisons.length > 0 && (
                 <Box>
-                  <HStack spacing={2} mb={4}>
-                    <XCircle size={20} color="red" />
-                    <Text fontSize="lg" fontWeight="semibold">Funds with Fetch Errors ({failedComparisons.length})</Text>
-                  </HStack>
+                   <HStack spacing={2} mb={4}>
+                     <XCircle size={20} color={dangerColor} />
+                     <Text fontSize="lg" fontWeight="semibold">Funds with Fetch Errors ({failedComparisons.length})</Text>
+                   </HStack>
                   <VStack spacing={3} align="stretch">
                     {failedComparisons.map((c) => (
                       <Alert key={c.fund.mutual_fund_id} status="error" borderRadius="md">
