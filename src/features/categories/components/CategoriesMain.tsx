@@ -48,9 +48,8 @@ const CategoriesMain: React.FC = () => {
   const cardBg = useColorModeValue("white", "cardDarkBg");
   const hoverBg = useColorModeValue("gray.50", "secondaryBg");
   const groupCategoryBg = useColorModeValue("teal.50", "teal.900");
-  const groupCategoryTextColor = useColorModeValue("teal.600", "teal.300");
-  const normalCategoryTextColor = useColorModeValue("secondaryTextColor", "primaryTextColor");
-  const iconColor = useColorModeValue("teal.500", "teal.300");
+   const groupCategoryTextColor = useColorModeValue("teal.600", "teal.300");
+   const iconColor = useColorModeValue("teal.500", "teal.300");
   const iconHoverColor = useColorModeValue("teal.600", "teal.400");
   const errorTextColor = useColorModeValue("red.500", "red.300");
   const emptyStateTextColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");

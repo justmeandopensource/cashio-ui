@@ -120,8 +120,17 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
   const cardBg = useColorModeValue("gray.50", "gray.700");
   const inputBg = useColorModeValue("white", "gray.700");
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
-  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
-  const highlightColor = useColorModeValue("teal.50", "teal.900");
+   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+   const highlightColor = useColorModeValue("teal.50", "teal.900");
+   const helperTextColor = useColorModeValue("gray.500", "gray.400");
+   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
+   const buttonBorderColor = useColorModeValue("gray.300", "gray.600");
+   const buttonColor = useColorModeValue("gray.600", "gray.200");
+   const buttonHoverBg = useColorModeValue("gray.50", "gray.600");
+   const buttonHoverBorderColor = useColorModeValue("gray.400", "gray.500");
+   const addonColor = useColorModeValue("gray.600", "gray.200");
+   const errorBg = useColorModeValue("red.50", "red.700");
+   const successBg = useColorModeValue("teal.50", "teal.700");
 
   const resetForm = () => {
     setDate(new Date());
@@ -435,10 +444,10 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                        borderColor: "red.400",
                        fontWeight: "semibold",
                      }}
-                     _hover={{
-                       bg: useColorModeValue("red.50", "red.700"),
-                       _selected: { bg: "red.300" }
-                     }}
+                      _hover={{
+                        bg: errorBg,
+                        _selected: { bg: "red.300" }
+                      }}
                      borderRadius="sm"
                      onClick={() => setType("expense")}
                    >
@@ -451,10 +460,10 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                        borderColor: "teal.500",
                        fontWeight: "semibold",
                      }}
-                     _hover={{
-                       bg: useColorModeValue("teal.50", "teal.700"),
-                       _selected: { bg: "teal.400" }
-                     }}
+                      _hover={{
+                        bg: successBg,
+                        _selected: { bg: "teal.400" }
+                      }}
                      borderRadius="sm"
                      onClick={() => setType("income")}
                    >
@@ -519,13 +528,13 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                       Amount
                     </FormLabel>
                     <InputGroup size="lg">
-                      <InputLeftAddon
-                        bg={inputBorderColor}
-                        borderWidth="2px"
-                        borderColor={inputBorderColor}
-                        color={useColorModeValue("gray.600", "gray.200")}
-                        fontWeight="semibold"
-                      >
+                       <InputLeftAddon
+                         bg={inputBorderColor}
+                         borderWidth="2px"
+                         borderColor={inputBorderColor}
+                         color={addonColor}
+                         fontWeight="semibold"
+                       >
                         {currencySymbol}
                       </InputLeftAddon>
                       <Input
@@ -548,9 +557,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                         autoFocus
                       />
                     </InputGroup>
-                    <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                      Enter the transaction amount
-                    </FormHelperText>
+                     <FormHelperText mt={2} color={helperTextColor}>
+                       Choose which account this transaction belongs to
+                     </FormHelperText>
                   </FormControl>
                 </Stack>
 
@@ -603,9 +612,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                           ))}
                       </optgroup>
                     </Select>
-                    <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                      Choose which account this transaction belongs to
-                    </FormHelperText>
+                     <FormHelperText mt={2} color={helperTextColor}>
+                       Choose which account this transaction belongs to
+                     </FormHelperText>
                   </FormControl>
                 )}
               </VStack>
@@ -624,8 +633,8 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                   <Text fontWeight="semibold" mb={1}>
                     Split Transaction
                   </Text>
-                  <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
-                    Divide this transaction across multiple categories
+                  <Text fontSize="sm" color={secondaryTextColor}>
+                    {type === "income" ? "Income" : "Expense"} amount
                   </Text>
                 </Box>
                 <Switch
@@ -709,9 +718,9 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                         ))}
                     </optgroup>
                   </Select>
-                  <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                    Choose the category for this {type}
-                  </FormHelperText>
+                   <FormHelperText mt={2} color={helperTextColor}>
+                     Choose the category for this {type}
+                   </FormHelperText>
                 </FormControl>
               </Box>
             )}
@@ -802,13 +811,13 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               borderRadius="md"
               isDisabled={isLoading}
               leftIcon={<X />}
-              borderWidth="2px"
-              borderColor={useColorModeValue("gray.300", "gray.600")}
-              color={useColorModeValue("gray.600", "gray.200")}
-              _hover={{
-                bg: useColorModeValue("gray.50", "gray.600"),
-                borderColor: useColorModeValue("gray.400", "gray.500"),
-              }}
+               borderWidth="2px"
+               borderColor={buttonBorderColor}
+               color={buttonColor}
+               _hover={{
+                 bg: buttonHoverBg,
+                 borderColor: buttonHoverBorderColor,
+               }}
             >
               Cancel
             </Button>
@@ -862,13 +871,13 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             px={6}
             py={3}
             borderRadius="md"
-            borderWidth="2px"
-            borderColor={useColorModeValue("gray.300", "gray.600")}
-            color={useColorModeValue("gray.600", "gray.200")}
-            _hover={{
-              bg: useColorModeValue("gray.50", "gray.600"),
-              borderColor: useColorModeValue("gray.400", "gray.500"),
-            }}
+             borderWidth="2px"
+             borderColor={buttonBorderColor}
+             color={buttonColor}
+             _hover={{
+               bg: buttonHoverBg,
+               borderColor: buttonHoverBorderColor,
+             }}
           >
             Cancel
           </Button>

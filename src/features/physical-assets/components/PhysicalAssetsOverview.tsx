@@ -64,7 +64,9 @@ const PhysicalAssetsOverview: FC<PhysicalAssetsOverviewProps> = ({
   const emptyStateBg = useColorModeValue("secondaryBg", "cardDarkBg");
   const emptyStateTextColor = useColorModeValue("gray.600", "gray.400");
   const emptyStateHeadingColor = useColorModeValue("gray.700", "gray.200");
-  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const tealColor = useColorModeValue("teal.600", "teal.300");
+   const blueColor = useColorModeValue("blue.600", "blue.300");
 
   // Helper function to convert string|number to number
   const toNumber = (value: number | string): number =>
@@ -169,19 +171,18 @@ const PhysicalAssetsOverview: FC<PhysicalAssetsOverviewProps> = ({
                    Total Value
                  </Text>
                  <HStack spacing={0} align="baseline">
-                   <Text
-                     fontSize={{ base: "xl", md: "2xl" }}
-                     fontWeight="semibold"
-                     color={useColorModeValue("teal.600", "teal.300")}
-                   >
+                    <Text
+                      fontSize={{ base: "xl", md: "2xl" }}
+                      fontWeight="semibold"
+                      color={tealColor}
+                    >
                      {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").main}
                    </Text>
-                   <Text
-                     fontSize={{ base: "md", md: "lg" }}
-                     fontWeight="semibold"
-                     color={useColorModeValue("teal.600", "teal.300")}
-                     opacity={0.7}
-                   >
+                    <Text
+                      fontSize={{ base: "md", md: "lg" }}
+                      fontWeight="semibold"
+                      color={tealColor}
+                    >
                      {splitCurrencyForDisplay(totalCurrentValue, currencySymbol || "₹").decimals}
                    </Text>
                  </HStack>
@@ -245,7 +246,7 @@ const PhysicalAssetsOverview: FC<PhysicalAssetsOverviewProps> = ({
                    <Text
                      fontSize={{ base: "xl", md: "2xl" }}
                      fontWeight="bold"
-                     color={useColorModeValue("blue.600", "blue.300")}
+                      color={blueColor}
                    >
                      {filteredAssets.filter(asset => toNumber(asset.total_quantity) > 0).length}
                    </Text>

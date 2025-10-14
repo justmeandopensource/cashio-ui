@@ -78,6 +78,16 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
   const inputBg = useColorModeValue("white", "gray.700");
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+  const textColor = useColorModeValue("gray.600", "gray.300");
+  const textColorSecondary = useColorModeValue("gray.500", "gray.400");
+  const textColorTertiary = useColorModeValue("gray.600", "gray.200");
+  const textColorError = useColorModeValue("red.700", "red.300");
+  const bgInfo = useColorModeValue("blue.50", "blue.900");
+  const borderColorInfo = useColorModeValue("blue.200", "blue.700");
+  const textColorInfo = useColorModeValue("blue.700", "blue.300");
+  const buttonBorderColor = useColorModeValue("gray.300", "gray.600");
+  const buttonHoverBg = useColorModeValue("gray.50", "gray.600");
+  const buttonHoverBorderColor = useColorModeValue("gray.400", "gray.500");
 
   // Update parentAccount state when parentAccountId prop changes
   useEffect(() => {
@@ -293,9 +303,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                   }}
                   autoFocus
                 />
-                <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                  Enter a descriptive name for your {accountType} account
-                </FormHelperText>
+                 <FormHelperText mt={2} color={textColorSecondary}>
+                   Enter a descriptive name for your {accountType} account
+                 </FormHelperText>
               </FormControl>
             </Box>
 
@@ -315,10 +325,10 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                       <Text fontWeight="semibold" mb={1}>
                         Group Account
                       </Text>
-                      <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
-                        Group accounts can contain other accounts but cannot
-                        hold transactions
-                      </Text>
+                       <Text fontSize="sm" color={textColor}>
+                         Group accounts can contain other accounts but cannot
+                         hold transactions
+                       </Text>
                     </Box>
                     <Checkbox
                       isChecked={isGroupAccount}
@@ -340,7 +350,7 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                         bg={inputBorderColor}
                         borderWidth="2px"
                         borderColor={inputBorderColor}
-                        color={useColorModeValue("gray.600", "gray.200")}
+                        color={textColorTertiary}
                         fontWeight="semibold"
                       >
                         {currencySymbol}
@@ -361,9 +371,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                         }}
                       />
                     </InputGroup>
-                    <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                      Starting balance for this account (optional)
-                    </FormHelperText>
+                     <FormHelperText mt={2} color={textColorSecondary}>
+                       Starting balance for this account (optional)
+                     </FormHelperText>
                   </FormControl>
                 )}
               </VStack>
@@ -388,9 +398,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                     <Flex justify="center" align="center" py={8}>
                       <VStack spacing={3}>
                         <Spinner size="md" color="teal.500" thickness="3px" />
-                        <Text fontSize="sm" color={useColorModeValue("gray.600", "gray.300")}>
-                          Loading group accounts...
-                        </Text>
+                         <Text fontSize="sm" color={textColor}>
+                           Loading group accounts...
+                         </Text>
                       </VStack>
                     </Flex>
                   )}
@@ -404,13 +414,13 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                       borderRadius="md"
                       p={4}
                     >
-                                            <Text
-                                              color={useColorModeValue("red.700", "red.300")}
-                                              fontSize="sm"
-                                              fontWeight="medium"
-                                            >
-                                              Failed to load group accounts. Please try again.
-                                            </Text>
+                                             <Text
+                                               color={textColorError}
+                                               fontSize="sm"
+                                               fontWeight="medium"
+                                             >
+                                               Failed to load group accounts. Please try again.
+                                             </Text>
                     </Box>
                   )}
 
@@ -443,9 +453,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                             </option>
                           ))}
                         </Select>
-                        <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                          Organize this account under an existing group
-                        </FormHelperText>
+                         <FormHelperText mt={2} color={textColorSecondary}>
+                           Organize this account under an existing group
+                         </FormHelperText>
                       </>
                     )}
 
@@ -454,22 +464,22 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                     groupAccounts.length === 0 &&
                     !isGroupAccountsLoading &&
                     !isGroupAccountsError && (
-                      <Box
-                        bg={useColorModeValue("blue.50", "blue.900")}
-                        border="2px solid"
-                        borderColor={useColorModeValue("blue.200", "blue.700")}
-                        borderRadius="md"
-                        p={4}
-                      >
-                        <Text
-                          color={useColorModeValue("blue.700", "blue.300")}
-                          fontSize="sm"
-                          fontWeight="medium"
-                        >
-                          No group accounts available. This account will be
-                          created at the root level.
-                        </Text>
-                      </Box>
+                       <Box
+                         bg={bgInfo}
+                         border="2px solid"
+                         borderColor={borderColorInfo}
+                         borderRadius="md"
+                         p={4}
+                       >
+                         <Text
+                           color={textColorInfo}
+                           fontSize="sm"
+                           fontWeight="medium"
+                         >
+                           No group accounts available. This account will be
+                           created at the root level.
+                         </Text>
+                       </Box>
                     )}
                 </FormControl>
                </Box>
@@ -504,9 +514,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                      }}
                      isDisabled={createAccountMutation.isPending}
                    />
-                   <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                     A brief overview of this account&apos;s purpose (optional)
-                   </FormHelperText>
+                    <FormHelperText mt={2} color={textColorSecondary}>
+                      A brief overview of this account&apos;s purpose (optional)
+                    </FormHelperText>
                  </FormControl>
 
                  <FormControl>
@@ -530,9 +540,9 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
                      }}
                      isDisabled={createAccountMutation.isPending}
                    />
-                   <FormHelperText mt={2} color={useColorModeValue("gray.500", "gray.400")}>
-                     Detailed notes for this account (optional)
-                   </FormHelperText>
+                    <FormHelperText mt={2} color={textColorSecondary}>
+                      Detailed notes for this account (optional)
+                    </FormHelperText>
                  </FormControl>
                </VStack>
              </Box>
@@ -569,13 +579,13 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
               borderRadius="md"
               isDisabled={createAccountMutation.isPending}
               leftIcon={<X />}
-              borderWidth="2px"
-              borderColor={useColorModeValue("gray.300", "gray.600")}
-              color={useColorModeValue("gray.600", "gray.200")}
-              _hover={{
-                bg: useColorModeValue("gray.50", "gray.600"),
-                borderColor: useColorModeValue("gray.400", "gray.500"),
-              }}
+               borderWidth="2px"
+               borderColor={buttonBorderColor}
+               color={textColorTertiary}
+               _hover={{
+                 bg: buttonHoverBg,
+                 borderColor: buttonHoverBorderColor,
+               }}
             >
               Cancel
             </Button>
@@ -620,13 +630,13 @@ const CreateAccountModal: React.FC<CreateAccountModalProps> = ({
             px={6}
             py={3}
             borderRadius="md"
-            borderWidth="2px"
-            borderColor={useColorModeValue("gray.300", "gray.600")}
-            color={useColorModeValue("gray.600", "gray.200")}
-            _hover={{
-              bg: useColorModeValue("gray.50", "gray.600"),
-              borderColor: useColorModeValue("gray.400", "gray.500"),
-            }}
+             borderWidth="2px"
+             borderColor={buttonBorderColor}
+             color={textColorTertiary}
+             _hover={{
+               bg: buttonHoverBg,
+               borderColor: buttonHoverBorderColor,
+             }}
           >
             Cancel
           </Button>

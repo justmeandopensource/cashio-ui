@@ -163,15 +163,15 @@ const MfTransactions: FC<MfTransactionsProps> = ({
 
   const hoverBg = useColorModeValue("secondaryBg", "secondaryBg");
   const iconColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
-  const transactionTypeIndicatorColor = (type: MfTransaction['transaction_type']) => {
-    switch (type) {
-      case 'buy': return useColorModeValue("green.400", "green.300");
-      case 'sell': return useColorModeValue("red.400", "red.300");
-      case 'switch_out': return useColorModeValue("purple.400", "purple.300");
-      case 'switch_in': return useColorModeValue("orange.400", "orange.300");
-      default: return useColorModeValue("gray.400", "gray.300");
-    }
-  };
+   const transactionTypeIndicatorColor = (type: MfTransaction['transaction_type']) => {
+     switch (type) {
+       case 'buy': return buyIndicatorColor;
+       case 'sell': return sellIndicatorColor;
+       case 'switch_out': return switchOutIndicatorColor;
+       case 'switch_in': return switchInIndicatorColor;
+       default: return defaultIndicatorColor;
+     }
+   };
   const accountLinkColor = useColorModeValue("brand.500", "brand.300");
    const navBg = useColorModeValue("secondaryBg", "secondaryBg");
    const notesBg = useColorModeValue("secondaryBg", "secondaryBg");
@@ -181,8 +181,14 @@ const MfTransactions: FC<MfTransactionsProps> = ({
   const emptyStateBorderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
   const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
   const deleteIconColor = useColorModeValue("red.500", "red.300");
-  const deleteIconHoverColor = useColorModeValue("red.600", "red.400");
-  const modalDeleteBg = useColorModeValue("secondaryBg", "secondaryBg");
+   const deleteIconHoverColor = useColorModeValue("red.600", "red.400");
+   const modalDeleteBg = useColorModeValue("secondaryBg", "secondaryBg");
+   const buyIndicatorColor = useColorModeValue("green.400", "green.300");
+   const sellIndicatorColor = useColorModeValue("red.400", "red.300");
+   const switchOutIndicatorColor = useColorModeValue("purple.400", "purple.300");
+   const switchInIndicatorColor = useColorModeValue("orange.400", "orange.300");
+   const defaultIndicatorColor = useColorModeValue("gray.400", "gray.300");
+   const tableBorderColor = useColorModeValue("gray.200", "gray.500");
 
   // Render mobile card view
   const renderMobileCards = () => (
@@ -514,7 +520,7 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                  renderMobileCards()
                ) : (
                  <Box overflowX="auto">
-                   <Table variant="simple" size="sm" borderColor={useColorModeValue("gray.200", "gray.500")}>
+                    <Table variant="simple" size="sm" borderColor={tableBorderColor}>
                       <Thead>
                         <Tr>
                           <Th>Date</Th>

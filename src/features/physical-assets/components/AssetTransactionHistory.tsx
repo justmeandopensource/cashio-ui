@@ -72,11 +72,20 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
   >(null);
   const [expandedCardId, setExpandedCardId] = useState<number | null>(null);
   const [openPopoverId, setOpenPopoverId] = useState<number | null>(null);
-  const toast = useToast();
-  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const toast = useToast();
+   const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const accountLinkColor = useColorModeValue("blue.500", "blue.300");
+   const notesColor = useColorModeValue("primaryTextColor", "primaryTextColor");
+   const modalDeleteBg = useColorModeValue("secondaryBg", "secondaryBg");
+   const mobileCardBg = useColorModeValue("white", "cardDarkBg");
+   const hoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+   const headerBg = useColorModeValue("primaryBg", "cardDarkBg");
+   const cardBg = useColorModeValue("primaryBg", "cardDarkBg");
+   const tableBorderColor = useColorModeValue("gray.200", "gray.500");
+   const tableRowHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
 
-  // Responsive breakpoint
-  const isMobile = useBreakpointValue({ base: true, md: false });
+   // Responsive breakpoint
+   const isMobile = useBreakpointValue({ base: true, md: false });
 
   // State for filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -167,13 +176,9 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
     setOpenPopoverId(null);
   };
 
-  const handleRowMouseLeave = () => {
-    setOpenPopoverId(null);
-  };
-
-   const accountLinkColor = useColorModeValue("blue.500", "blue.300");
-   const notesColor = useColorModeValue("primaryTextColor", "primaryTextColor");
-   const modalDeleteBg = useColorModeValue("secondaryBg", "secondaryBg");
+   const handleRowMouseLeave = () => {
+     setOpenPopoverId(null);
+   };
 
   // Render mobile card view
   const renderMobileCards = () => (
@@ -183,17 +188,17 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
         const isBuy = transaction.transaction_type === "buy";
 
         return (
-          <Box
-            key={transaction.asset_transaction_id}
-            p={4}
-            borderWidth="1px"
-            borderRadius="lg"
-            bg={useColorModeValue("white", "cardDarkBg")}
-            boxShadow="sm"
-            onClick={() => handleCardToggle(transaction.asset_transaction_id)}
-            cursor="pointer"
-            transition="all 0.2s"
-            _hover={{ bg: useColorModeValue("secondaryBg", "secondaryBg") }}
+           <Box
+             key={transaction.asset_transaction_id}
+             p={4}
+             borderWidth="1px"
+             borderRadius="lg"
+             bg={mobileCardBg}
+             boxShadow="sm"
+             onClick={() => handleCardToggle(transaction.asset_transaction_id)}
+             cursor="pointer"
+             transition="all 0.2s"
+             _hover={{ bg: hoverBg }}
           >
             {/* Main row with essential info */}
             <Flex justify="space-between" align="flex-start">
@@ -359,7 +364,7 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
     <Box>
       <VStack spacing={6} align="stretch">
         {/* Header */}
-        <Box mb={6} p={{ base: 4, md: 6 }} bg={useColorModeValue("primaryBg", "cardDarkBg")} borderRadius="lg" boxShadow="sm">
+         <Box mb={6} p={{ base: 4, md: 6 }} bg={headerBg} borderRadius="lg" boxShadow="sm">
           <Flex
             direction={{ base: "column", md: "row" }}
             justify="space-between"
@@ -440,12 +445,12 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
         </Box>
 
         {/* Transactions Table/Cards */}
-        <Card bg={useColorModeValue("primaryBg", "cardDarkBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+         <Card bg={cardBg} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
           {isMobile ? (
         renderMobileCards()
       ) : (
         <Box overflowX="auto">
-          <Table variant="simple" size="sm" borderColor={useColorModeValue("gray.200", "gray.500")}>
+          <Table variant="simple" size="sm" borderColor={tableBorderColor}>
             <Thead>
               <Tr>
                 <Th>Date</Th>
@@ -460,10 +465,10 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
             </Thead>
              <Tbody>
                {filteredTransactions.map((transaction) => (
-                <Tr
-                  key={transaction.asset_transaction_id}
-                  _hover={{ bg: useColorModeValue("secondaryBg", "secondaryBg") }}
-                  onMouseLeave={handleRowMouseLeave}
+                 <Tr
+                   key={transaction.asset_transaction_id}
+                   _hover={{ bg: tableRowHoverBg }}
+                   onMouseLeave={handleRowMouseLeave}
                   sx={{
                     "&:hover .action-icons": {
                       opacity: 1,
@@ -532,12 +537,12 @@ const AssetTransactionHistory: FC<AssetTransactionHistoryProps> = ({
                      </HStack>
                    </Td>
                   <Td>
-                    <ChakraLink
-                      as={Link}
-                      to={`/account/${transaction.account_id}`}
-                      color="blue.500"
-                      fontSize="sm"
-                    >
+                     <ChakraLink
+                       as={Link}
+                       to={`/account/${transaction.account_id}`}
+                       color={accountLinkColor}
+                       fontSize="sm"
+                     >
                       {transaction.account_name ||
                         `Account ${transaction.account_id}`}
                     </ChakraLink>

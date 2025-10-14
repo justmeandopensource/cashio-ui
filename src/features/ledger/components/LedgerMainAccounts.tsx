@@ -138,8 +138,9 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   const cardBorderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
   const groupCardBg = useColorModeValue("teal.50", "teal.900");
   const groupCardBorderColor = useColorModeValue("brand.200", "brand.700");
-  const groupTextColor = useColorModeValue("brand.700", "brand.200");
-  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const groupTextColor = useColorModeValue("brand.700", "brand.200");
+   const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const loadingBg = useColorModeValue("gray.50", "primaryBg");
 
   // Function to render accounts in table format (for larger screens)
   const renderAccountsTable = (
@@ -167,13 +168,11 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
           account.is_group
         );
 
-        const trSx = !account.is_group
-          ? {
-              "&:hover .action-icons": {
-                opacity: 1,
-              },
-            }
-          : {};
+        const trSx = {
+          "&:hover .action-icons": {
+            opacity: !account.is_group ? 1 : 0,
+          },
+        };
 
         return (
           <React.Fragment key={account.account_id}>
@@ -475,14 +474,14 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
 
   if (isLoading) {
     return (
-      <Box bg={useColorModeValue("gray.50", "primaryBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+      <Box bg={loadingBg} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
         <LoadingState />
       </Box>
     );
   }
 
   return (
-    <Box bg={useColorModeValue("gray.50", "primaryBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+    <Box bg={loadingBg} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
       <SimpleGrid
         columns={{ base: 1, md: 1, lg: 2 }}
         spacing={{ base: 4, md: 6 }}

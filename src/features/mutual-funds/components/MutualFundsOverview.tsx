@@ -171,7 +171,8 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
   const unrealizedPnlColor = useColorModeValue("red.500", "red.300");
   const totalFundsColor = useColorModeValue("blue.600", "blue.400");
   const emptyStateBorderColor = useColorModeValue("tertiaryBg", "tertiaryBg");
-  const emptyStateIconColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const emptyStateIconColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const overviewBg = useColorModeValue("primaryBg", "cardDarkBg");
 
   return (
     <Box>
@@ -433,7 +434,7 @@ const MutualFundsOverview: FC<MutualFundsOverviewProps> = ({
               </VStack>
             </Box>
          ) : (
-             <Box bg={useColorModeValue("primaryBg", "cardDarkBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+             <Box bg={overviewBg} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
                <MutualFundsTable
                  amcs={amcs}
                  mutualFunds={mutualFunds}

@@ -105,7 +105,14 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
   const cardBg = useColorModeValue("gray.50", "gray.700");
   const inputBg = useColorModeValue("white", "gray.700");
   const inputBorderColor = useColorModeValue("gray.200", "gray.600");
-  const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+   const focusBorderColor = useColorModeValue("teal.500", "teal.300");
+   const addonColor = useColorModeValue("gray.600", "gray.200");
+   const buttonBorderColor = useColorModeValue("gray.300", "gray.600");
+   const buttonColor = useColorModeValue("gray.600", "gray.200");
+   const buttonHoverBg = useColorModeValue("gray.50", "gray.600");
+   const buttonHoverBorderColor = useColorModeValue("gray.400", "gray.500");
+   const tabBuyHoverBg = useColorModeValue("teal.50", "teal.700");
+   const tabSellHoverBg = useColorModeValue("red.50", "red.700");
 
   const { data: accounts, isLoading: accountsLoading } = useQuery<Account[]>({
     queryKey: ["accounts", ledgerId],
@@ -384,25 +391,25 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
             </FormControl>
 
             <FormControl flex={1} isInvalid={!!errors.amount_excluding_charges}>
-              <FormLabel fontWeight="semibold" mb={2}>
-                <HStack spacing={2}>
-                  <DollarSign size={16} />
-                  <Text>
-                     Amount{" "}
-                    <Text as="span" color="red.500">
-                      *
-                    </Text>
-                  </Text>
-                </HStack>
-              </FormLabel>
-              <InputGroup size="lg">
-                <InputLeftAddon
-                  bg={inputBorderColor}
-                  borderWidth="2px"
-                  borderColor={inputBorderColor}
-                  color={useColorModeValue("gray.600", "gray.200")}
-                  fontWeight="semibold"
-                >
+               <FormLabel fontWeight="semibold" mb={2}>
+                 <HStack spacing={2}>
+                   <DollarSign size={16} />
+                   <Text>
+                      Amount{" "}
+                     <Text as="span" color="red.500">
+                       *
+                     </Text>
+                   </Text>
+                 </HStack>
+               </FormLabel>
+               <InputGroup size="lg">
+                 <InputLeftAddon
+                   bg={inputBorderColor}
+                   borderWidth="2px"
+                   borderColor={inputBorderColor}
+                   color={addonColor}
+                   fontWeight="semibold"
+                 >
                   {currencySymbol || "₹"}
                 </InputLeftAddon>
                 <Input
@@ -560,20 +567,20 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
 
           <Stack direction={{ base: "column", md: "row" }} spacing={4}>
             <FormControl flex={1} isInvalid={!!errors.other_charges}>
-              <FormLabel fontWeight="semibold" mb={2}>
-                <HStack spacing={2}>
-                  <DollarSign size={16} />
-                  <Text>Other Charges</Text>
-                </HStack>
-              </FormLabel>
-              <InputGroup size="lg">
-                <InputLeftAddon
-                  bg={inputBorderColor}
-                  borderWidth="2px"
-                  borderColor={inputBorderColor}
-                  color={useColorModeValue("gray.600", "gray.200")}
-                  fontWeight="semibold"
-                >
+               <FormLabel fontWeight="semibold" mb={2}>
+                 <HStack spacing={2}>
+                   <DollarSign size={16} />
+                   <Text>Other Charges</Text>
+                 </HStack>
+               </FormLabel>
+               <InputGroup size="lg">
+                 <InputLeftAddon
+                   bg={inputBorderColor}
+                   borderWidth="2px"
+                   borderColor={inputBorderColor}
+                   color={addonColor}
+                   fontWeight="semibold"
+                 >
                   {currencySymbol || "₹"}
                 </InputLeftAddon>
                 <Input
@@ -728,19 +735,19 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
           {type === "buy" ? "Buy Units" : "Sell Units"}
         </Button>
 
-        <Button
-          variant="outline"
-          onClick={handleClose}
-          size="lg"
-          width="100%"
-          borderRadius="md"
-          borderWidth="2px"
-          borderColor={useColorModeValue("gray.300", "gray.600")}
-          color={useColorModeValue("gray.600", "gray.200")}
-          _hover={{
-            bg: useColorModeValue("gray.50", "gray.600"),
-            borderColor: useColorModeValue("gray.400", "gray.500"),
-          }}
+         <Button
+           variant="outline"
+           onClick={handleClose}
+           size="lg"
+           width="100%"
+           borderRadius="md"
+           borderWidth="2px"
+           borderColor={buttonBorderColor}
+           color={buttonColor}
+           _hover={{
+             bg: buttonHoverBg,
+             borderColor: buttonHoverBorderColor,
+           }}
           isDisabled={transactionMutation.isPending}
           transition="all 0.2s"
         >
@@ -854,16 +861,16 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                 borderColor={inputBorderColor}
                 mb={6}
               >
-                <Tab
-                  _selected={{
-                    bg: "teal.500",
-                    color: "white",
-                    borderColor: "teal.500",
-                    fontWeight: "bold",
-                  }}
-                                  _hover={{
-                                    bg: useColorModeValue("teal.50", "teal.700"),
-                                    _selected: { bg: "teal.400" },                  }}
+                 <Tab
+                   _selected={{
+                     bg: "teal.500",
+                     color: "white",
+                     borderColor: "teal.500",
+                     fontWeight: "bold",
+                   }}
+                                   _hover={{
+                                     bg: tabBuyHoverBg,
+                                     _selected: { bg: "teal.400" },                  }}
                   borderRadius="sm"
                   fontSize="md"
                   py={3}
@@ -874,16 +881,16 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
                     <Text>Buy</Text>
                   </HStack>
                 </Tab>
-                <Tab
-                  _selected={{
-                    bg: "red.400",
-                    color: "white",
-                    borderColor: "red.400",
-                    fontWeight: "bold",
-                  }}
-                                  _hover={{
-                                    bg: useColorModeValue("red.50", "red.700"),
-                                    _selected: { bg: "red.300" },                  }}
+                 <Tab
+                   _selected={{
+                     bg: "red.400",
+                     color: "white",
+                     borderColor: "red.400",
+                     fontWeight: "bold",
+                   }}
+                                   _hover={{
+                                     bg: tabSellHoverBg,
+                                     _selected: { bg: "red.300" },                  }}
                   borderRadius="sm"
                   fontSize="md"
                   py={3}
@@ -944,20 +951,20 @@ const BuySellMfModal: FC<BuySellMfModalProps> = ({
             {currentType === "buy" ? "Buy Units" : "Sell Units"}
           </Button>
 
-          <Button
-            variant="outline"
-            onClick={handleClose}
-            isDisabled={transactionMutation.isPending}
-            px={6}
-            py={3}
-            borderRadius="md"
-            borderWidth="2px"
-            borderColor={useColorModeValue("gray.300", "gray.600")}
-            color={useColorModeValue("gray.600", "gray.200")}
-            _hover={{
-              bg: useColorModeValue("gray.50", "gray.600"),
-              borderColor: useColorModeValue("gray.400", "gray.500"),
-            }}
+           <Button
+             variant="outline"
+             onClick={handleClose}
+             isDisabled={transactionMutation.isPending}
+             px={6}
+             py={3}
+             borderRadius="md"
+             borderWidth="2px"
+             borderColor={buttonBorderColor}
+             color={buttonColor}
+             _hover={{
+               bg: buttonHoverBg,
+               borderColor: buttonHoverBorderColor,
+             }}
           >
             Cancel
           </Button>

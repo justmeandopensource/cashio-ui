@@ -367,9 +367,10 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
-  const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
-  const isMobile = useBreakpointValue({ base: true, md: false });
-  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+   const isMobile = useBreakpointValue({ base: true, md: false });
+   const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const tableBorderColor = useColorModeValue("gray.200", "gray.500");
 
    // State for sorting
     const [sortField, setSortField] =
@@ -916,7 +917,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
         </VStack>
       ) : (
         <Box overflowX="auto">
-          <Table variant="simple" size="sm" minW="800px" borderColor={useColorModeValue("gray.200", "gray.500")}>
+          <Table variant="simple" size="sm" minW="800px" borderColor={tableBorderColor}>
             <Thead>
               <Tr>
                 <Th width="2%"></Th>

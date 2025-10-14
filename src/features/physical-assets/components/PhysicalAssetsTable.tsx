@@ -265,8 +265,11 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
-  const isMobile = useBreakpointValue({ base: true, md: false });
-  const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const isMobile = useBreakpointValue({ base: true, md: false });
+   const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+   const tableBg = useColorModeValue("primaryBg", "cardDarkBg");
+   const tableBorderColor = useColorModeValue("gray.200", "gray.500");
+   const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
 
    // State for sorting
    const [sortField, setSortField] =
@@ -586,8 +589,8 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
           ))}
         </VStack>
       ) : (
-        <Box overflowX="auto" bg={useColorModeValue("primaryBg", "cardDarkBg")} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
-          <Table variant="simple" size="sm" minW="800px" borderColor={useColorModeValue("gray.200", "gray.500")}>
+        <Box overflowX="auto" bg={tableBg} p={{ base: 3, md: 4, lg: 6 }} borderRadius="lg">
+          <Table variant="simple" size="sm" minW="800px" borderColor={tableBorderColor}>
             <Thead>
               <Tr>
                 <Th width="2%"></Th>
@@ -667,10 +670,10 @@ const PhysicalAssetsTable: React.FC<PhysicalAssetsTableProps> = ({
             <Tbody>
               {sortedAssets.map((asset) => (
                 <React.Fragment key={asset.physical_asset_id}>
-                  <Tr
-                    _hover={{ bg: useColorModeValue("secondaryBg", "secondaryBg"), cursor: "pointer" }}
-                    onClick={() => toggleRowExpansion(asset.physical_asset_id)}
-                  >
+                   <Tr
+                     _hover={{ bg: tableHoverBg, cursor: "pointer" }}
+                     onClick={() => toggleRowExpansion(asset.physical_asset_id)}
+                   >
                     <Td>
                       <IconButton
                         icon={

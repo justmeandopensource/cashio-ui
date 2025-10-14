@@ -67,7 +67,15 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
   const cardBg = useColorModeValue("gray.50", "gray.700");
   const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
-  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+   const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+   const legendColor0 = useColorModeValue("#eeeeee", "gray.700");
+   const legendColor1 = useColorModeValue("#B2F5EA", "teal.900");
+   const legendColor2 = useColorModeValue("#81E6D9", "teal.800");
+   const legendColor3 = useColorModeValue("#4FD1C5", "teal.700");
+   const legendColor4 = useColorModeValue("#38B2AC", "teal.600");
+   const legendColor5 = useColorModeValue("#2C7A7B", "teal.500");
+   const legendColor6 = useColorModeValue("#234E52", "teal.400");
+   const legendColor7 = useColorModeValue("#1D4044", "teal.300");
 
   // Generate year options (current year and previous 4 years)
   const yearOptions = Array.from({ length: 5 }, (_, i) => currentYear - i);
@@ -215,7 +223,7 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
           </Center>
         ) : (
           <Center height="full" bg={bgColor} borderRadius="lg" flexDirection="column" textAlign="center" p={6}>
-            <Icon as={Calendar} boxSize={6} color="tertiaryTextColor" mb={4} />
+             <Icon as={Calendar} boxSize={6} color={tertiaryTextColor} mb={4} />
             <Heading size="md" mb={2} color={secondaryTextColor}>
               No Expense Data Available
             </Heading>
@@ -235,35 +243,35 @@ const ExpenseCalendarHeatmap: React.FC<ExpenseCalendarHeatmapProps> = ({ ledgerI
         </Text>
         <HStack spacing={4} wrap="wrap">
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#eeeeee", "gray.700")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor0} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}0`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#B2F5EA", "teal.900")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor1} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}1-9`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#81E6D9", "teal.800")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor2} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}10-49`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#4FD1C5", "teal.700")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor3} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}50-99`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#38B2AC", "teal.600")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor4} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}100-199`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#2C7A7B", "teal.500")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor5} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}200-499`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#234E52", "teal.400")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor6} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}500-999`}</Text>
           </HStack>
           <HStack spacing={2}>
-            <Box w={3} h={3} bg={useColorModeValue("#1D4044", "teal.300")} borderRadius="sm" />
+            <Box w={3} h={3} bg={legendColor7} borderRadius="sm" />
             <Text fontSize="xs" color={secondaryTextColor}>{`${currencySymbol}1000+`}</Text>
           </HStack>
         </HStack>

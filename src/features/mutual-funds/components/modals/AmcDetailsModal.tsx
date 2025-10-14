@@ -33,10 +33,9 @@ const AmcDetailsModal: React.FC<AmcDetailsModalProps> = ({
   onEditAmc,
 }) => {
   const bgColor = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.100", "gray.700");
-  const cardBg = useColorModeValue("gray.50", "gray.700");
-  const inputBg = useColorModeValue("white", "gray.700");
-  const textSecondary = useColorModeValue("gray.600", "gray.400");
+   const borderColor = useColorModeValue("gray.100", "gray.700");
+   const cardBg = useColorModeValue("gray.50", "gray.700");
+   const textSecondary = useColorModeValue("gray.600", "gray.400");
   const textMuted = useColorModeValue("gray.500", "gray.500");
   const iconColor = useColorModeValue("teal.500", "teal.300");
 

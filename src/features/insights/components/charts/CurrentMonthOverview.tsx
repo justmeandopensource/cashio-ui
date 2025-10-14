@@ -17,7 +17,6 @@ import {
   GridItem,
   Collapse,
   Flex,
-  useColorMode,
 } from "@chakra-ui/react";
 import { ResponsiveContainer, Treemap, Tooltip } from "recharts";
 import { useQuery } from "@tanstack/react-query";
@@ -104,7 +103,6 @@ interface NestedCategoryBreakdownProps {
   type: "income" | "expense";
   currencySymbol: string;
   primaryTextColor: string;
-  secondaryTextColor: string;
 }
 
 const NestedCategoryBreakdown: React.FC<NestedCategoryBreakdownProps> = ({
@@ -112,9 +110,16 @@ const NestedCategoryBreakdown: React.FC<NestedCategoryBreakdownProps> = ({
   type,
   currencySymbol,
   primaryTextColor,
-  secondaryTextColor,
 }) => {
   const [expandedCategories, setExpandedCategories] = useState<string[]>([]);
+
+  const topLevelIncomeTextColor = useColorModeValue("teal.700", "teal.400");
+  const topLevelExpenseTextColor = useColorModeValue("red.700", "red.400");
+  const hoverBgIncome = useColorModeValue("teal.100", "teal.800");
+  const hoverBgExpense = useColorModeValue("red.100", "red.800");
+  const headingIncomeColor = useColorModeValue("teal.600", "teal.300");
+  const headingExpenseColor = useColorModeValue("red.600", "red.300");
+  const breakdownBg = useColorModeValue("gray.50", "gray.700");
 
   const toggleCategory = (categoryName: string) => {
     setExpandedCategories((prev) =>
@@ -128,10 +133,7 @@ const NestedCategoryBreakdown: React.FC<NestedCategoryBreakdownProps> = ({
     const isExpanded = expandedCategories.includes(category.name);
     const hasChildren = category.children && category.children.length > 0;
 
-    const categoryTextColor = useColorModeValue(
-      level === 0 ? `${type === "income" ? "teal" : "red"}.700` : primaryTextColor,
-      level === 0 ? `${type === "income" ? "teal" : "red"}.400` : secondaryTextColor,
-    );
+    const categoryTextColor = level === 0 ? (type === "income" ? topLevelIncomeTextColor : topLevelExpenseTextColor) : primaryTextColor;
 
     return (
       <Box key={category.name}>
@@ -146,10 +148,7 @@ const NestedCategoryBreakdown: React.FC<NestedCategoryBreakdownProps> = ({
             hasChildren ? () => toggleCategory(category.name) : undefined
           }
           _hover={{
-            bg: useColorModeValue(
-              `${type === "income" ? "teal" : "red"}.100`,
-              `${type === "income" ? "teal" : "red"}.800`,
-            ),
+            bg: type === "income" ? hoverBgIncome : hoverBgExpense,
           }}
         >
           {hasChildren && (
@@ -185,10 +184,7 @@ const NestedCategoryBreakdown: React.FC<NestedCategoryBreakdownProps> = ({
     <Box>
       <Heading
         size="sm"
-        color={useColorModeValue(
-          `${type === "income" ? "teal" : "red"}.600`,
-          `${type === "income" ? "teal" : "red"}.300`,
-        )}
+        color={type === "income" ? headingIncomeColor : headingExpenseColor}
         mb={4}
         display="flex"
         alignItems="center"
@@ -203,7 +199,7 @@ const NestedCategoryBreakdown: React.FC<NestedCategoryBreakdownProps> = ({
       <VStack
         align="stretch"
         spacing={2}
-        bg={useColorModeValue("gray.50", "gray.700")}
+        bg={breakdownBg}
         p={4}
         borderRadius="lg"
       >
@@ -260,9 +256,9 @@ const CurrentMonthOverview: React.FC = () => {
   const cardBg = useColorModeValue("gray.50", "gray.700");
   const primaryTextColor = useColorModeValue("gray.800", "gray.400");
   const secondaryTextColor = useColorModeValue("gray.600", "gray.300");
-  const customToolTipBorderColor = useColorModeValue("gray.200", "gray.600");
-  const treemapStrokeColor = useColorModeValue("#fff", "gray.800");
-  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+   const customToolTipBorderColor = useColorModeValue("gray.200", "gray.600");
+   const treemapStrokeColor = useColorModeValue("#fff", "gray.800");
+   const expenseColor = useColorModeValue("red.500", "red.400");
 
   const incomeColors = useColorModeValue(INCOME_COLORS_LIGHT, INCOME_COLORS_DARK);
   const expenseColors = useColorModeValue(EXPENSE_COLORS_LIGHT, EXPENSE_COLORS_DARK);
@@ -407,10 +403,10 @@ const CurrentMonthOverview: React.FC = () => {
         <Box bg={cardBg} p={6} borderRadius="lg" width="full" boxShadow="md">
           <VStack align="stretch" spacing={4}>
             <HStack justifyContent="space-between">
-              <Heading size="md" color={useColorModeValue("red.500", "red.400")}>
-                Expenses
-              </Heading>
-              <Icon as={TrendingDown} color={useColorModeValue("red.500", "red.400")} size={24} />
+               <Heading size="md" color={expenseColor}>
+                 Expenses
+               </Heading>
+               <Icon as={TrendingDown} color={expenseColor} size={24} />
             </HStack>
 
             <Stat>
@@ -486,7 +482,7 @@ const CurrentMonthOverview: React.FC = () => {
                   display="flex"
                   alignItems="center"
                 >
-                  <Icon as={PieChart} mr={2} color={useColorModeValue("red.500", "red.400")} />
+                   <Icon as={PieChart} mr={2} color={expenseColor} />
                   Expense Breakdown
                 </Heading>
                 <Box height="300px" width="full">
@@ -514,25 +510,23 @@ const CurrentMonthOverview: React.FC = () => {
           {/* Nested Category Breakdown Section */}
           {data.income_categories_breakdown.length > 0 && (
             <GridItem>
-              <NestedCategoryBreakdown
-                categories={data.income_categories_breakdown}
-                type="income"
-                currencySymbol={currencySymbol as string}
-                primaryTextColor={primaryTextColor}
-                secondaryTextColor={secondaryTextColor}
-              />
+               <NestedCategoryBreakdown
+                 categories={data.income_categories_breakdown}
+                 type="income"
+                 currencySymbol={currencySymbol as string}
+                 primaryTextColor={primaryTextColor}
+               />
             </GridItem>
           )}
 
           {data.expense_categories_breakdown.length > 0 && (
             <GridItem>
-              <NestedCategoryBreakdown
-                categories={data.expense_categories_breakdown}
-                type="expense"
-                currencySymbol={currencySymbol as string}
-                primaryTextColor={primaryTextColor}
-                secondaryTextColor={secondaryTextColor}
-              />
+               <NestedCategoryBreakdown
+                 categories={data.expense_categories_breakdown}
+                 type="expense"
+                 currencySymbol={currencySymbol as string}
+                 primaryTextColor={primaryTextColor}
+               />
             </GridItem>
           )}
         </Grid>
