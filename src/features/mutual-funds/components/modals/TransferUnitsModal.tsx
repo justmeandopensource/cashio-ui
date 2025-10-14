@@ -386,14 +386,14 @@ const TransferUnitsModal: FC<TransferUnitsModalProps> = ({
                            boxShadow: `0 0 0 1px ${focusBorderColor}`,
                          }}
                        >
-                     {mutualFunds
-                       .filter(fund => fund.mutual_fund_id !== fromFundId && fund.owner === sourceFund?.owner)
-                       .sort((a, b) => a.name.localeCompare(b.name))
-                       .map((fund) => (
-                            <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
-                              {fund.name} ({fund.amc?.name})
-                            </option>
-                          ))}
+                      {mutualFunds
+                        .filter(fund => fund.mutual_fund_id !== fromFundId && fund.amc_id === sourceFund?.amc_id && fund.owner === sourceFund?.owner)
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((fund) => (
+                             <option key={fund.mutual_fund_id} value={fund.mutual_fund_id.toString()}>
+                               {fund.name} ({fund.amc?.name})
+                             </option>
+                           ))}
                       </Select>
                        <FormErrorMessage>{errors.to_fund_id}</FormErrorMessage>
                      </FormControl>

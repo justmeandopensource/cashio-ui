@@ -49,11 +49,11 @@ interface FormData {
 }
 
 const ASSET_CLASSES = [
-  { value: "Equity", label: "Equity" },
   { value: "Debt", label: "Debt" },
+  { value: "Equity", label: "Equity" },
   { value: "Hybrid", label: "Hybrid" },
   { value: "Others", label: "Others" },
-];
+].sort((a, b) => a.label.localeCompare(b.label));
 
 const ASSET_SUB_CLASSES = {
   Equity: [
@@ -66,7 +66,7 @@ const ASSET_SUB_CLASSES = {
     { value: "ELSS", label: "ELSS" },
     { value: "Index", label: "Index" },
     { value: "Sectoral", label: "Sectoral" },
-  ],
+  ].sort((a, b) => a.label.localeCompare(b.label)),
   Debt: [
     { value: "Liquid", label: "Liquid" },
     { value: "Overnight", label: "Overnight" },
@@ -74,12 +74,12 @@ const ASSET_SUB_CLASSES = {
     { value: "Banking", label: "Banking" },
     { value: "Short Duration", label: "Short Duration" },
     { value: "Ultra Short Duration", label: "Ultra Short Duration" },
-  ],
+  ].sort((a, b) => a.label.localeCompare(b.label)),
   Hybrid: [],
   Others: [
     { value: "Gold", label: "Gold" },
     { value: "Silver", label: "Silver" },
-  ],
+  ].sort((a, b) => a.label.localeCompare(b.label)),
 };
 
 const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
@@ -521,29 +521,31 @@ const CreateMutualFundModal: FC<CreateMutualFundModalProps> = ({
                         </Text>
                       </HStack>
                     </FormLabel>
-                    <Select
-                      value={formData.amc_id}
-                      onChange={(e) =>
-                        handleInputChange("amc_id", e.target.value)
-                      }
-                      placeholder="Select the AMC"
-                      size="lg"
-                      bg={inputBg}
-                      borderColor={inputBorderColor}
-                      borderWidth="2px"
-                      borderRadius="md"
-                      _hover={{ borderColor: "teal.300" }}
-                      _focus={{
-                        borderColor: focusBorderColor,
-                        boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                      }}
-                    >
-                      {amcs.map((amc) => (
-                        <option key={amc.amc_id} value={amc.amc_id.toString()}>
-                          {amc.name}
-                        </option>
-                      ))}
-                    </Select>
+                     <Select
+                       value={formData.amc_id}
+                       onChange={(e) =>
+                         handleInputChange("amc_id", e.target.value)
+                       }
+                       placeholder="Select the AMC"
+                       size="lg"
+                       bg={inputBg}
+                       borderColor={inputBorderColor}
+                       borderWidth="2px"
+                       borderRadius="md"
+                       _hover={{ borderColor: "teal.300" }}
+                       _focus={{
+                         borderColor: focusBorderColor,
+                         boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                       }}
+                     >
+                       {amcs
+                         .sort((a, b) => a.name.localeCompare(b.name))
+                         .map((amc) => (
+                           <option key={amc.amc_id} value={amc.amc_id.toString()}>
+                             {amc.name}
+                           </option>
+                         ))}
+                     </Select>
                     <FormErrorMessage>{errors.amc_id}</FormErrorMessage>
                     <FormHelperText>
                       Choose the AMC that manages this mutual fund
