@@ -59,9 +59,19 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
   const textColor = useColorModeValue("gray.600", "gray.300");
   const textColorSecondary = useColorModeValue("gray.500", "gray.400");
   const textColorTertiary = useColorModeValue("gray.600", "gray.200");
-  const buttonBorderColor = useColorModeValue("gray.300", "gray.600");
-  const buttonHoverBg = useColorModeValue("gray.50", "gray.600");
-  const buttonHoverBorderColor = useColorModeValue("gray.400", "gray.500");
+   const buttonBorderColor = useColorModeValue("gray.300", "gray.600");
+   const buttonHoverBg = useColorModeValue("gray.50", "gray.600");
+   const buttonHoverBorderColor = useColorModeValue("gray.400", "gray.500");
+   const positiveBg = useColorModeValue("green.50", "green.900");
+   const negativeBg = useColorModeValue("red.50", "red.900");
+   const positiveBorder = useColorModeValue("green.200", "green.700");
+   const negativeBorder = useColorModeValue("red.200", "red.700");
+   const positiveText = useColorModeValue("green.700", "green.300");
+   const negativeText = useColorModeValue("red.700", "red.300");
+   const positiveTextSecondary = useColorModeValue("green.600", "green.400");
+   const negativeTextSecondary = useColorModeValue("red.600", "red.400");
+   const positiveIconColor = useColorModeValue("#38A169", "#68D391");
+   const negativeIconColor = useColorModeValue("#E53E3E", "#FC8181");
 
   const updatePriceMutation = useUpdatePhysicalAssetPrice();
 
@@ -344,28 +354,28 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                 {newPrice &&
                   !errors.price &&
                   newPriceValue !== currentPrice && (
-                    <Box
-                      p={4}
-                      bg={priceChange >= 0 ? "green.50" : "red.50"}
-                      borderRadius="md"
-                      border="1px solid"
-                      borderColor={priceChange >= 0 ? "green.200" : "red.200"}
-                    >
+                     <Box
+                       p={4}
+                       bg={priceChange >= 0 ? positiveBg : negativeBg}
+                       borderRadius="md"
+                       border="1px solid"
+                       borderColor={priceChange >= 0 ? positiveBorder : negativeBorder}
+                     >
                       <HStack spacing={3} mb={2}>
-                        <TrendingUp
-                          size={18}
-                          color={priceChange >= 0 ? "#38A169" : "#E53E3E"}
-                          style={{
-                            transform:
-                              priceChange < 0 ? "rotate(180deg)" : "none",
-                          }}
-                        />
-                        <Text
-                          fontWeight="semibold"
-                          color={priceChange >= 0 ? "green.700" : "red.700"}
-                        >
-                          Price Change Preview
-                        </Text>
+                         <TrendingUp
+                           size={18}
+                           color={priceChange >= 0 ? positiveIconColor : negativeIconColor}
+                           style={{
+                             transform:
+                               priceChange < 0 ? "rotate(180deg)" : "none",
+                           }}
+                         />
+                         <Text
+                           fontWeight="semibold"
+                           color={priceChange >= 0 ? positiveText : negativeText}
+                         >
+                           Price Change Preview
+                         </Text>
                       </HStack>
                       <HStack justify="space-between" align="center">
                         <VStack align="start" spacing={1}>
@@ -373,19 +383,19 @@ const UpdatePriceModal: FC<UpdatePriceModalProps> = ({
                      Change Amount
                    </Text>
                           <HStack spacing={0} align="baseline">
-                            <Text
-                              fontSize="lg"
-                              fontWeight="bold"
-                              color={priceChange >= 0 ? "green.600" : "red.600"}
-                            >
-                              {splitCurrencyForDisplay(Math.abs(priceChange), currencySymbol || "$").main}
-                            </Text>
-                            <Text
-                              fontSize="md"
-                              fontWeight="bold"
-                              color={priceChange >= 0 ? "green.600" : "red.600"}
-                              opacity={0.7}
-                            >
+                             <Text
+                               fontSize="lg"
+                               fontWeight="bold"
+                               color={priceChange >= 0 ? positiveTextSecondary : negativeTextSecondary}
+                             >
+                               {splitCurrencyForDisplay(Math.abs(priceChange), currencySymbol || "$").main}
+                             </Text>
+                             <Text
+                               fontSize="md"
+                               fontWeight="bold"
+                               color={priceChange >= 0 ? positiveTextSecondary : negativeTextSecondary}
+                               opacity={0.7}
+                             >
                               {splitCurrencyForDisplay(Math.abs(priceChange), currencySymbol || "$").decimals}
                             </Text>
                           </HStack>
