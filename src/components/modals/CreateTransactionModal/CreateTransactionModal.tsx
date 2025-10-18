@@ -483,11 +483,11 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
             >
               <VStack spacing={5} align="stretch">
                 <Stack direction={{ base: "column", md: "row" }} spacing={4}>
-                  {/* Date Picker */}
-                  <FormControl flex="1" isRequired>
-                    <FormLabel fontWeight="semibold" mb={2}>
-                      Date
-                    </FormLabel>
+                   {/* Date Picker */}
+                   <FormControl flex="1" isRequired>
+                     <FormLabel fontWeight="semibold" mb={2}>
+                       Transaction date
+                     </FormLabel>
                     <Box
                       sx={{
                         ".react-datepicker-wrapper": {
@@ -522,45 +522,42 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
                     </Box>
                   </FormControl>
 
-                  {/* Amount Input */}
-                  <FormControl flex="1" isRequired>
-                    <FormLabel fontWeight="semibold" mb={2}>
-                      Amount
-                    </FormLabel>
-                    <InputGroup size="lg">
-                       <InputLeftAddon
-                         bg={inputBorderColor}
+                   {/* Amount Input */}
+                   <FormControl flex="1" isRequired>
+                     <FormLabel fontWeight="semibold" mb={2}>
+                       {type === "expense" ? "Expense amount" : "Income amount"}
+                     </FormLabel>
+                     <InputGroup size="lg">
+                        <InputLeftAddon
+                          bg={inputBorderColor}
+                          borderWidth="2px"
+                          borderColor={inputBorderColor}
+                          color={addonColor}
+                          fontWeight="semibold"
+                        >
+                         {currencySymbol}
+                       </InputLeftAddon>
+                       <Input
+                         type="text"
+                         inputMode="decimal"
+                         value={amount}
+                         onChange={(e) => setAmount(e.target.value)}
+                         onKeyDown={(e) => handleNumericInput(e, amount)}
+                         onPaste={(e) => handleNumericPaste(e, setAmount)}
+                         placeholder="0.00"
                          borderWidth="2px"
                          borderColor={inputBorderColor}
-                         color={addonColor}
-                         fontWeight="semibold"
-                       >
-                        {currencySymbol}
-                      </InputLeftAddon>
-                      <Input
-                        type="text"
-                        inputMode="decimal"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        onKeyDown={(e) => handleNumericInput(e, amount)}
-                        onPaste={(e) => handleNumericPaste(e, setAmount)}
-                        placeholder="0.00"
-                        borderWidth="2px"
-                        borderColor={inputBorderColor}
-                        bg={inputBg}
-                        borderRadius="md"
-                        _hover={{ borderColor: "teal.300" }}
-                        _focus={{
-                          borderColor: focusBorderColor,
-                          boxShadow: `0 0 0 1px ${focusBorderColor}`,
-                        }}
-                        autoFocus
-                      />
-                    </InputGroup>
-                     <FormHelperText mt={2} color={helperTextColor}>
-                       Choose which account this transaction belongs to
-                     </FormHelperText>
-                  </FormControl>
+                         bg={inputBg}
+                         borderRadius="md"
+                         _hover={{ borderColor: "teal.300" }}
+                         _focus={{
+                           borderColor: focusBorderColor,
+                           boxShadow: `0 0 0 1px ${focusBorderColor}`,
+                         }}
+                         autoFocus
+                       />
+                     </InputGroup>
+                   </FormControl>
                 </Stack>
 
                 {/* Account Dropdown (only shown if no accountId is provided) */}
@@ -620,32 +617,32 @@ const CreateTransactionModal: React.FC<CreateTransactionModalProps> = ({
               </VStack>
             </Box>
 
-            {/* Split Toggle Card */}
-            <Box
-              bg={cardBg}
-              p={{ base: 4, sm: 6 }}
-              borderRadius="md"
-              border="1px solid"
-              borderColor={borderColor}
-            >
-              <HStack justifyContent="space-between" align="center">
-                <Box>
-                  <Text fontWeight="semibold" mb={1}>
-                    Split Transaction
-                  </Text>
-                  <Text fontSize="sm" color={secondaryTextColor}>
-                    {type === "income" ? "Income" : "Expense"} amount
-                  </Text>
-                </Box>
-                <Switch
-                  colorScheme="teal"
-                  size="lg"
-                  isChecked={isSplit}
-                  onChange={(e) => handleSplitToggle(e.target.checked)}
-                  isDisabled={!amount} // Disable if amount is not entered
-                />
-              </HStack>
-            </Box>
+             {/* Split Toggle Card */}
+             <Box
+               bg={cardBg}
+               p={{ base: 4, sm: 6 }}
+               borderRadius="md"
+               border="1px solid"
+               borderColor={borderColor}
+             >
+               <HStack justifyContent="space-between" align="center">
+                 <Box>
+                   <Text fontWeight="semibold" mb={1}>
+                     Split Transaction
+                   </Text>
+                   <Text fontSize="sm" color={secondaryTextColor}>
+                     Divide this transaction across multiple categories
+                   </Text>
+                 </Box>
+                 <Switch
+                   colorScheme="teal"
+                   size="lg"
+                   isChecked={isSplit}
+                   onChange={(e) => handleSplitToggle(e.target.checked)}
+                   isDisabled={!amount} // Disable if amount is not entered
+                 />
+               </HStack>
+             </Box>
 
             {/* Category or Split Transaction Section */}
             {isSplit ? (
