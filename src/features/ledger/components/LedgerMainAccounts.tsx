@@ -78,6 +78,11 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
     }));
   };
 
+  // Color variables for balance display
+  const positiveColor = useColorModeValue("green.500", "green.300");
+  const negativeColor = useColorModeValue("red.500", "red.300");
+  const groupPositiveColor = useColorModeValue("green.400", "green.400");
+
   // Helper function to determine text color based on account type, balance, and whether it's a group account
   const getBalanceColor = (
     balance: number,
@@ -86,15 +91,15 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
   ) => {
     if (accountType === "asset") {
       if (balance >= 0) {
-        return isGroup ? "green.400" : "green.500";
+        return isGroup ? groupPositiveColor : positiveColor;
       } else {
-        return "red.400";
+        return negativeColor;
       }
     } else if (accountType === "liability") {
       if (balance <= 0) {
-        return isGroup ? "green.400" : "green.500";
+        return isGroup ? groupPositiveColor : positiveColor;
       } else {
-        return "red.400";
+        return negativeColor;
       }
     }
     return "secondaryTextColor";

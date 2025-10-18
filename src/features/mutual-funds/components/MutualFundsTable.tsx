@@ -78,7 +78,7 @@ interface ExpandedFundRowProps {
 }
 /* eslint-enable no-unused-vars */
 
-const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
+const ExpandedFundRow: React.FC<ExpandedFundRowProps & { positiveColor: string; negativeColor: string }> = ({
   fund,
   currencySymbol,
   mutedColor,
@@ -88,6 +88,8 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
   onUpdateNav,
   onCloseFund,
   onViewTransactions,
+  positiveColor,
+  negativeColor,
 }) => {
   const { realizedPnl } = calculateFundPnL(fund);
   const { data: transactions = [], isLoading: isLoadingTransactions } =
@@ -213,10 +215,10 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
               Realized P&L
             </StatLabel>
             <HStack spacing={0} align="baseline">
-              <StatNumber
-                fontSize="sm"
-                color={realizedPnl >= 0 ? "green.500" : "red.500"}
-              >
+               <StatNumber
+                 fontSize="sm"
+                 color={realizedPnl >= 0 ? positiveColor : negativeColor}
+               >
                 {
                   splitCurrencyForDisplay(
                     Math.abs(realizedPnl),
@@ -224,11 +226,11 @@ const ExpandedFundRow: React.FC<ExpandedFundRowProps> = ({
                   ).main
                 }
               </StatNumber>
-              <Text
-                fontSize="xs"
-                color={realizedPnl >= 0 ? "green.500" : "red.500"}
-                opacity={0.7}
-              >
+               <Text
+                 fontSize="xs"
+                 color={realizedPnl >= 0 ? positiveColor : negativeColor}
+                 opacity={0.7}
+               >
                 {
                   splitCurrencyForDisplay(
                     Math.abs(realizedPnl),
@@ -367,10 +369,13 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
 }) => {
   const { currencySymbol } = useLedgerStore();
   const mutedColor = useColorModeValue("gray.600", "gray.400");
-   const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
-   const isMobile = useBreakpointValue({ base: true, md: false });
-   const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
-   const tableBorderColor = useColorModeValue("gray.200", "gray.500");
+    const tableHoverBg = useColorModeValue("secondaryBg", "secondaryBg");
+    const isMobile = useBreakpointValue({ base: true, md: false });
+    const tertiaryTextColor = useColorModeValue("tertiaryTextColor", "tertiaryTextColor");
+    const tableBorderColor = useColorModeValue("gray.200", "gray.500");
+    const amcFundNameColor = useColorModeValue("teal.500", "teal.300");
+    const positiveColor = useColorModeValue("green.500", "green.300");
+    const negativeColor = useColorModeValue("red.500", "red.300");
 
    // State for sorting
     const [sortField, setSortField] =
@@ -663,6 +668,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               onUpdateNav={onUpdateNav}
               onCloseFund={onCloseFund}
               onViewTransactions={onViewTransactions}
+              positiveColor={positiveColor}
+              negativeColor={negativeColor}
             />
           </Collapse>
         </Td>
@@ -699,31 +706,31 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
             <Flex justify="space-between" align="start">
               <Box maxW="80%">
                 <HStack spacing={1} align="baseline" wrap="wrap">
-                  <Text
-                    fontWeight="medium"
-                    noOfLines={2}
-                    color="teal.500"
-                    cursor="pointer"
-                    _hover={{ textDecoration: "underline" }}
-                    onClick={() => onFundClick(fund)}
-                  >
-                    {fund.name}
-                  </Text>
+                   <Text
+                     fontWeight="medium"
+                     noOfLines={2}
+                     color={amcFundNameColor}
+                     cursor="pointer"
+                     _hover={{ textDecoration: "underline" }}
+                     onClick={() => onFundClick(fund)}
+                   >
+                     {fund.name}
+                   </Text>
                   {getPlanInitials(fund.plan) && ( <Text as="span" fontSize="xs" color="gray.500">({getPlanInitials(fund.plan)})</Text> )}
                   {getOwnerInitials(fund.owner) && ( <Text as="span" fontSize="xs" color="gray.500">[{getOwnerInitials(fund.owner)}]</Text> )}
                 </HStack>
-                <Text
-                  fontSize="sm"
-                  color="teal.500"
-                  cursor="pointer"
-                  _hover={{ textDecoration: "underline" }}
-                  onClick={() => {
-                    const amc = amcs.find(a => a.amc_id === fund.amc_id);
-                    if (amc) onAmcClick(amc);
-                  }}
-                >
-                  {fund.amc_name}
-                </Text>
+                 <Text
+                   fontSize="sm"
+                   color={amcFundNameColor}
+                   cursor="pointer"
+                   _hover={{ textDecoration: "underline" }}
+                   onClick={() => {
+                     const amc = amcs.find(a => a.amc_id === fund.amc_id);
+                     if (amc) onAmcClick(amc);
+                   }}
+                 >
+                   {fund.amc_name}
+                 </Text>
               </Box>
               <IconButton
                 icon={isExpanded ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
@@ -752,19 +759,19 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               <StatLabel fontSize="xs" color={mutedColor}>P&L</StatLabel>
               <StatNumber>
                 <HStack spacing={0} align="baseline">
-                  <Text fontSize="lg" fontWeight="bold" color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}>
+                  <Text fontSize="lg" fontWeight="bold" color={fund.unrealized_pnl >= 0 ? positiveColor : negativeColor}>
                     {splitCurrencyForDisplay(Math.abs(fund.unrealized_pnl), currencySymbol || "₹").main}
                   </Text>
-                  <Text fontSize="sm" fontWeight="bold" color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"} opacity={0.7}>
+                  <Text fontSize="sm" fontWeight="bold" color={fund.unrealized_pnl >= 0 ? positiveColor : negativeColor} opacity={0.7}>
                     {splitCurrencyForDisplay(Math.abs(fund.unrealized_pnl), currencySymbol || "₹").decimals}
                   </Text>
                 </HStack>
               </StatNumber>
                <HStack spacing={0} align="baseline">
-                 <Text fontSize="xs" color={fund.unrealized_pnl_percentage >= 0 ? "green.500" : "red.500"}>
+                 <Text fontSize="xs" color={fund.unrealized_pnl_percentage >= 0 ? positiveColor : negativeColor}>
                    {splitPercentageForDisplay(fund.unrealized_pnl_percentage).main}
                  </Text>
-                 <Text fontSize="xs" color={fund.unrealized_pnl_percentage >= 0 ? "green.500" : "red.500"} opacity={0.7}>
+                 <Text fontSize="xs" color={fund.unrealized_pnl_percentage >= 0 ? positiveColor : negativeColor} opacity={0.7}>
                    {splitPercentageForDisplay(fund.unrealized_pnl_percentage).decimals}
                  </Text>
                </HStack>
@@ -798,11 +805,11 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>Realized P&L</StatLabel>
-                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={realizedPnl >= 0 ? "green.500" : "red.500"}>{splitCurrencyForDisplay(Math.abs(realizedPnl), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" color={realizedPnl >= 0 ? "green.500" : "red.500"} opacity={0.7}>{splitCurrencyForDisplay(Math.abs(realizedPnl), currencySymbol || "₹").decimals}</Text></HStack>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={realizedPnl >= 0 ? positiveColor : negativeColor}>{splitCurrencyForDisplay(Math.abs(realizedPnl), currencySymbol || "₹").main}</StatNumber><Text fontSize="xs" color={realizedPnl >= 0 ? positiveColor : negativeColor} opacity={0.7}>{splitCurrencyForDisplay(Math.abs(realizedPnl), currencySymbol || "₹").decimals}</Text></HStack>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>XIRR %</StatLabel>
-                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={(fund.xirr_percentage || 0) >= 0 ? "green.500" : "red.500"}>{splitPercentageForDisplay(fund.xirr_percentage || 0).main}</StatNumber><Text fontSize="xs" color={(fund.xirr_percentage || 0) >= 0 ? "green.500" : "red.500"} opacity={0.7}>{splitPercentageForDisplay(fund.xirr_percentage || 0).decimals}</Text></HStack>
+                <HStack spacing={0} align="baseline"><StatNumber fontSize="sm" color={(fund.xirr_percentage || 0) >= 0 ? positiveColor : negativeColor}>{splitPercentageForDisplay(fund.xirr_percentage || 0).main}</StatNumber><Text fontSize="xs" color={(fund.xirr_percentage || 0) >= 0 ? positiveColor : negativeColor} opacity={0.7}>{splitPercentageForDisplay(fund.xirr_percentage || 0).decimals}</Text></HStack>
               </Stat>
               <Stat size="sm">
                 <StatLabel fontSize="2xs" color={mutedColor}>NAV Updated</StatLabel>
@@ -1025,32 +1032,32 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                          cursor="pointer"
                        />
                      </Td>
-                     <Td fontWeight="medium">
-                       <Text
-                         as="span"
-                         color="teal.500"
-                         cursor="pointer"
-                         _hover={{ textDecoration: "underline" }}
-                         onClick={() => {
-                           const amc = amcs.find(a => a.amc_id === fund.amc_id);
-                           if (amc) handleAmcClick(amc);
-                         }}
-                       >
-                         {fund.amc_name}
-                       </Text>
-                     </Td>
-                      <Td>
-                        <HStack spacing={1} align="baseline">
-                          <Text
-                            fontWeight="medium"
-                            noOfLines={1}
-                            color="teal.500"
-                            cursor="pointer"
-                            _hover={{ textDecoration: "underline" }}
-                            onClick={() => handleFundClick(fund)}
-                          >
-                            {fund.name}
-                          </Text>
+                      <Td fontWeight="medium">
+                        <Text
+                          as="span"
+                          color={amcFundNameColor}
+                          cursor="pointer"
+                          _hover={{ textDecoration: "underline" }}
+                          onClick={() => {
+                            const amc = amcs.find(a => a.amc_id === fund.amc_id);
+                            if (amc) handleAmcClick(amc);
+                          }}
+                        >
+                          {fund.amc_name}
+                        </Text>
+                      </Td>
+                       <Td>
+                         <HStack spacing={1} align="baseline">
+                           <Text
+                             fontWeight="medium"
+                             noOfLines={1}
+                             color={amcFundNameColor}
+                             cursor="pointer"
+                             _hover={{ textDecoration: "underline" }}
+                             onClick={() => handleFundClick(fund)}
+                           >
+                             {fund.name}
+                           </Text>
                           {getPlanInitials(fund.plan) && (
                             <Text
                               as="span"
@@ -1126,7 +1133,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                       <HStack spacing={0} align="baseline" justify="flex-end">
                         <Text
                           fontSize="sm"
-                          color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}
+                          color={fund.unrealized_pnl >= 0 ? positiveColor : negativeColor}
                         >
                           {
                             splitCurrencyForDisplay(
@@ -1137,7 +1144,7 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                         </Text>
                         <Text
                           fontSize="xs"
-                          color={fund.unrealized_pnl >= 0 ? "green.500" : "red.500"}
+                          color={fund.unrealized_pnl >= 0 ? positiveColor : negativeColor}
                           opacity={0.7}
                         >
                           {
@@ -1156,8 +1163,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                           fontWeight="semibold"
                           color={
                             fund.unrealized_pnl_percentage >= 0
-                              ? "green.500"
-                              : "red.500"
+                              ? positiveColor
+                              : negativeColor
                           }
                         >
                           {
@@ -1171,8 +1178,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                           fontWeight="semibold"
                           color={
                             fund.unrealized_pnl_percentage >= 0
-                              ? "green.500"
-                              : "red.500"
+                              ? positiveColor
+                              : negativeColor
                           }
                           opacity={0.7}
                         >
@@ -1191,8 +1198,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                            fontWeight="semibold"
                            color={
                              (fund.xirr_percentage || 0) >= 0
-                               ? "green.500"
-                               : "red.500"
+                               ? positiveColor
+                               : negativeColor
                            }
                          >
                            {
@@ -1206,8 +1213,8 @@ const MutualFundsTable: React.FC<MutualFundsTableProps> = ({
                            fontWeight="semibold"
                            color={
                              (fund.xirr_percentage || 0) >= 0
-                               ? "green.500"
-                               : "red.500"
+                               ? positiveColor
+                               : negativeColor
                            }
                            opacity={0.7}
                          >

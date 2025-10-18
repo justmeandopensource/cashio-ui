@@ -41,7 +41,7 @@ import { Amc, MutualFund, MfTransaction } from "../types";
 import { formatUnits, formatNav, getTransactionTypeText, splitCurrencyForDisplay } from "../utils";
 import { formatDate } from "../../physical-assets/utils";
 import { deleteMfTransaction } from "../api";
-import { getPnLColor } from "../../physical-assets/utils";
+
 import useLedgerStore from "@/components/shared/store";
 import MfTransactionNotesPopover from "./MfTransactionNotesPopover";
 
@@ -67,8 +67,10 @@ const MfTransactions: FC<MfTransactionsProps> = ({
    const cardBg = useColorModeValue("primaryBg", "cardDarkBg");
    const mutedColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
   const emptyStateBg = useColorModeValue("secondaryBg", "secondaryBg");
-  const emptyStateTextColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
-  const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+   const emptyStateTextColor = useColorModeValue("secondaryTextColor", "secondaryTextColor");
+   const tertiaryTextColor = useColorModeValue("gray.600", "gray.400");
+   const positiveColor = useColorModeValue("green.500", "green.300");
+   const negativeColor = useColorModeValue("red.500", "red.300");
 
   // State for filters
   const [searchTerm, setSearchTerm] = useState("");
@@ -253,35 +255,35 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                <Flex justify="space-between" align="baseline">
                  <VStack align="start" spacing={0.5}>
                    <HStack spacing={0} align="baseline">
-                     <Text
-                       fontSize="sm"
-                       fontWeight="semibold"
-                       color={getPnLColor(
-                         transaction.transaction_type === 'buy'
-                           ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
-                           : transaction.transaction_type === 'sell'
-                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                           : transaction.transaction_type === 'switch_out'
-                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                           : 0 // switch_in = neutral
-                       )}
-                     >
+                      <Text
+                        fontSize="sm"
+                        fontWeight="semibold"
+                        color={
+                          transaction.transaction_type === 'buy'
+                            ? positiveColor
+                            : transaction.transaction_type === 'sell'
+                            ? negativeColor
+                            : transaction.transaction_type === 'switch_out'
+                            ? negativeColor
+                            : positiveColor // switch_in = neutral, default to positive
+                        }
+                      >
                        {splitCurrencyForDisplay(Number(transaction.amount_excluding_charges), currencySymbol || "₹").main}
                      </Text>
-                     <Text
-                       fontSize="xs"
-                       fontWeight="semibold"
-                       opacity={0.7}
-                       color={getPnLColor(
-                         transaction.transaction_type === 'buy'
-                           ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
-                           : transaction.transaction_type === 'sell'
-                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                           : transaction.transaction_type === 'switch_out'
-                           ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                           : 0 // switch_in = neutral
-                       )}
-                     >
+                      <Text
+                        fontSize="xs"
+                        fontWeight="semibold"
+                        opacity={0.7}
+                        color={
+                          transaction.transaction_type === 'buy'
+                            ? positiveColor
+                            : transaction.transaction_type === 'sell'
+                            ? negativeColor
+                            : transaction.transaction_type === 'switch_out'
+                            ? negativeColor
+                            : positiveColor // switch_in = neutral, default to positive
+                        }
+                      >
                        {splitCurrencyForDisplay(Number(transaction.amount_excluding_charges), currencySymbol || "₹").decimals}
                      </Text>
                    </HStack>
@@ -575,19 +577,19 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                               </Td>
                               <Td isNumeric>
                                  <HStack spacing={0} align="baseline" justify="flex-end">
-                                   <Text
-                                     fontSize="sm"
-                                     fontWeight="semibold"
-                                     color={getPnLColor(
-                                       transaction.transaction_type === 'buy'
-                                         ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
-                                         : transaction.transaction_type === 'sell'
-                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                                         : transaction.transaction_type === 'switch_out'
-                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                                         : 0 // switch_in = neutral
-                                     )}
-                                   >
+                                    <Text
+                                      fontSize="sm"
+                                      fontWeight="semibold"
+                                      color={
+                                        transaction.transaction_type === 'buy'
+                                          ? positiveColor
+                                          : transaction.transaction_type === 'sell'
+                                          ? negativeColor
+                                          : transaction.transaction_type === 'switch_out'
+                                          ? negativeColor
+                                          : positiveColor // switch_in = neutral, default to positive
+                                      }
+                                    >
                                      {splitCurrencyForDisplay(
                                        transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
                                          ? Number(transaction.amount_excluding_charges)
@@ -595,20 +597,20 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                                        currencySymbol || "₹"
                                      ).main}
                                    </Text>
-                                   <Text
-                                     fontSize="xs"
-                                     fontWeight="semibold"
-                                     opacity={0.7}
-                                     color={getPnLColor(
-                                       transaction.transaction_type === 'buy'
-                                         ? Number(transaction.amount_excluding_charges) // Positive for green (money in)
-                                         : transaction.transaction_type === 'sell'
-                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                                         : transaction.transaction_type === 'switch_out'
-                                         ? -Math.abs(Number(transaction.amount_excluding_charges)) // Always negative for red (money out)
-                                         : 0 // switch_in = neutral
-                                     )}
-                                   >
+                                    <Text
+                                      fontSize="xs"
+                                      fontWeight="semibold"
+                                      opacity={0.7}
+                                      color={
+                                        transaction.transaction_type === 'buy'
+                                          ? positiveColor
+                                          : transaction.transaction_type === 'sell'
+                                          ? negativeColor
+                                          : transaction.transaction_type === 'switch_out'
+                                          ? negativeColor
+                                          : positiveColor // switch_in = neutral, default to positive
+                                      }
+                                    >
                                      {splitCurrencyForDisplay(
                                        transaction.transaction_type === 'sell' || transaction.transaction_type === 'switch_out'
                                          ? Number(transaction.amount_excluding_charges)
@@ -732,35 +734,35 @@ const MfTransactions: FC<MfTransactionsProps> = ({
                   </Text>
                   <VStack align="start" spacing={1}>
                      <HStack spacing={0} align="baseline">
-                        <Text
-                          fontSize="sm"
-                          fontWeight="semibold"
-                          color={getPnLColor(
-                            transactionToDelete.transaction_type === 'buy'
-                              ? Number(transactionToDelete.amount_excluding_charges) // Positive for green (money in)
-                              : transactionToDelete.transaction_type === 'sell'
-                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
-                              : transactionToDelete.transaction_type === 'switch_out'
-                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
-                              : 0
-                          )}
-                        >
+                         <Text
+                           fontSize="sm"
+                           fontWeight="semibold"
+                           color={
+                             transactionToDelete.transaction_type === 'buy'
+                               ? positiveColor
+                               : transactionToDelete.transaction_type === 'sell'
+                               ? negativeColor
+                               : transactionToDelete.transaction_type === 'switch_out'
+                               ? negativeColor
+                               : positiveColor // switch_in = neutral, default to positive
+                           }
+                         >
                            {splitCurrencyForDisplay(Number(transactionToDelete.amount_excluding_charges), currencySymbol || "₹").main}
                         </Text>
-                        <Text
-                          fontSize="xs"
-                          fontWeight="semibold"
-                          opacity={0.7}
-                          color={getPnLColor(
-                            transactionToDelete.transaction_type === 'buy'
-                              ? Number(transactionToDelete.amount_excluding_charges) // Positive for green (money in)
-                              : transactionToDelete.transaction_type === 'sell'
-                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
-                              : transactionToDelete.transaction_type === 'switch_out'
-                              ? -Math.abs(Number(transactionToDelete.amount_excluding_charges)) // Always negative for red (money out)
-                              : 0
-                          )}
-                        >
+                         <Text
+                           fontSize="xs"
+                           fontWeight="semibold"
+                           opacity={0.7}
+                           color={
+                             transactionToDelete.transaction_type === 'buy'
+                               ? positiveColor
+                               : transactionToDelete.transaction_type === 'sell'
+                               ? negativeColor
+                               : transactionToDelete.transaction_type === 'switch_out'
+                               ? negativeColor
+                               : positiveColor // switch_in = neutral, default to positive
+                           }
+                         >
                            {splitCurrencyForDisplay(Number(transactionToDelete.amount_excluding_charges), currencySymbol || "₹").decimals}
                         </Text>
                       <Text fontSize="xs" color={mutedColor} ml={1}>
