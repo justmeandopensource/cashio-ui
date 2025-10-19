@@ -14,6 +14,7 @@ import {
   Link as ChakraLink,
   IconButton,
   Heading,
+  HStack,
   Card,
   CardHeader,
   Stack,
@@ -23,8 +24,8 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import { Plus, Repeat, Eye, EyeOff, Building, ShieldAlert } from "lucide-react";
 import CreateAccountModal from "@components/modals/CreateAccountModal";
-import { formatNumberAsCurrency } from "@components/shared/utils";
 import useLedgerStore from "@/components/shared/store";
+import { splitCurrencyForDisplay } from "../../mutual-funds/utils";
 
 interface Account {
   account_id: string;
@@ -209,15 +210,24 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                   </Text>
                 )}
               </Td>
-              <Td isNumeric>
-                <Text
-                  fontWeight={account.is_group ? "bold" : "normal"}
-                  color={balanceColor}
-                  fontSize={account.is_group ? "md" : "sm"}
-                >
-                  {formatNumberAsCurrency(balance, currencySymbol as string)}
-                </Text>
-              </Td>
+               <Td isNumeric>
+                 <HStack spacing={0} align="baseline" justify="flex-end">
+                   <Text
+                     fontWeight="semibold"
+                     color={balanceColor}
+                     fontSize={account.is_group ? "md" : "sm"}
+                   >
+                     {splitCurrencyForDisplay(balance, currencySymbol || "₹").main}
+                   </Text>
+                   <Text
+                     fontSize="xs"
+                     color={balanceColor}
+                     opacity={0.7}
+                   >
+                     {splitCurrencyForDisplay(balance, currencySymbol || "₹").decimals}
+                   </Text>
+                 </HStack>
+               </Td>
               <Td>
                 <Box display="flex" gap={2}>
                   {account.is_group && (
@@ -366,15 +376,21 @@ const LedgerMainAccounts: React.FC<LedgerMainAccountsProps> = ({
                         </Text>
                       )}
                     </Flex>
-                    <Text
-                      fontWeight={account.is_group ? "medium" : "normal"}
-                      color={balanceColor}
-                    >
-                      {formatNumberAsCurrency(
-                        balance,
-                        currencySymbol as string
-                      )}
-                    </Text>
+                     <HStack spacing={0} align="baseline">
+                       <Text
+                         fontWeight="semibold"
+                         color={balanceColor}
+                       >
+                         {splitCurrencyForDisplay(balance, currencySymbol || "₹").main}
+                       </Text>
+                       <Text
+                         fontSize="xs"
+                         color={balanceColor}
+                         opacity={0.7}
+                       >
+                         {splitCurrencyForDisplay(balance, currencySymbol || "₹").decimals}
+                       </Text>
+                     </HStack>
                   </Flex>
                   {!account.is_group ? (
                     <Flex gap={2} align="center" justify="flex-end">

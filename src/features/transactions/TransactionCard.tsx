@@ -30,10 +30,10 @@ import { Link } from "react-router-dom";
 import {
   formatAmount,
   formatDate,
-  formatNumberAsCurrency,
 } from "@/components/shared/utils";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 import useLedgerStore from "@/components/shared/store";
+import { splitCurrencyForDisplay } from "../mutual-funds/utils";
 
 interface TagItem {
   tag_id: string;
@@ -116,6 +116,7 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
     transaction.debit,
     currencySymbol as string
   );
+  const amountValue = transaction.credit !== 0 ? transaction.credit : transaction.debit;
 
   const { isOpen, onOpen, onClose } = useDisclosure();
   const modalSize = useBreakpointValue({ base: "full", md: "md" });
@@ -236,12 +237,17 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             )}
            </VStack>
 
-           {/* Right side with amount */}
-           <Box textAlign="right">
-             <Text fontWeight="bold" fontSize="lg" color={amount.color}>
-               {amount.value}
-             </Text>
-           </Box>
+            {/* Right side with amount */}
+            <Box textAlign="right">
+              <HStack spacing={0} align="baseline">
+                <Text fontWeight="semibold" fontSize="lg" color={amount.color}>
+                  {splitCurrencyForDisplay(amountValue, currencySymbol || "₹").main}
+                </Text>
+                <Text fontSize="xs" color={amount.color} opacity={0.7}>
+                  {splitCurrencyForDisplay(amountValue, currencySymbol || "₹").decimals}
+                </Text>
+              </HStack>
+            </Box>
         </Flex>
 
         {/* Expandable section */}
@@ -316,12 +322,14 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
                             <Text fontSize="sm" fontWeight="medium">
                               {split.category_name}
                             </Text>
-                            <Text fontSize="sm" fontWeight="bold">
-                              {formatNumberAsCurrency(
-                                split.debit,
-                                currencySymbol as string
-                              )}
-                            </Text>
+                             <HStack spacing={0} align="baseline">
+                               <Text fontSize="sm" fontWeight="semibold">
+                                 {splitCurrencyForDisplay(split.debit, currencySymbol || "₹").main}
+                               </Text>
+                               <Text fontSize="xs" opacity={0.7}>
+                                 {splitCurrencyForDisplay(split.debit, currencySymbol || "₹").decimals}
+                               </Text>
+                             </HStack>
                           </Flex>
 
                           {/* Split notes row - only displayed if notes exist */}
@@ -457,9 +465,14 @@ const TransactionCard: React.FC<TransactionCardProps> = ({
             <Box mt={4} p={3} bg={modalBg} borderRadius="md">
               <Text fontWeight="bold">{transaction.category_name}</Text>
               <Text>{formatDate(transaction.date)}</Text>
-               <Text fontWeight="bold" color={amount.color}>
-                 {amount.value}
-               </Text>
+                <HStack spacing={0} align="baseline">
+                  <Text fontWeight="semibold" color={amount.color}>
+                    {splitCurrencyForDisplay(amountValue, currencySymbol || "₹").main}
+                  </Text>
+                  <Text fontSize="xs" color={amount.color} opacity={0.7}>
+                    {splitCurrencyForDisplay(amountValue, currencySymbol || "₹").decimals}
+                  </Text>
+                </HStack>
             </Box>
           </ModalBody>
           <ModalFooter>

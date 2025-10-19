@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { formatDate, formatNumberAsCurrency } from "@/components/shared/utils";
+import { formatDate } from "@/components/shared/utils";
 import {
   Table,
   Thead,
@@ -35,8 +35,10 @@ import {
   Link as ChakraLink,
   useBreakpointValue,
   useColorModeValue,
+  HStack,
 } from "@chakra-ui/react";
 import { CreditCard, Trash2, Edit, Copy } from "lucide-react";
+import { splitCurrencyForDisplay } from "../mutual-funds/utils";
 import { Link } from "react-router-dom";
 import { SplitTransactionSkeleton, TransferDetailsSkeleton } from "./Skeletons";
 import useLedgerStore from "@/components/shared/store";
@@ -318,17 +320,20 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                                 >
                                   {split.category_name}
                                 </Box>
-                                <Box
-                                  flex="1"
-                                  textAlign="right"
-                                  color={popoverItemColor}
-                                  fontWeight="bold"
-                                >
-                                  {formatNumberAsCurrency(
-                                    split.debit,
-                                    currencySymbol as string
-                                  )}
-                                </Box>
+                                 <Box
+                                   flex="1"
+                                   textAlign="right"
+                                   color={popoverItemColor}
+                                 >
+                                   <HStack spacing={0} align="baseline" justify="flex-end">
+                                     <Text fontWeight="semibold">
+                                       {splitCurrencyForDisplay(split.debit, currencySymbol || "₹").main}
+                                     </Text>
+                                     <Text fontSize="xs" opacity={0.7}>
+                                       {splitCurrencyForDisplay(split.debit, currencySymbol || "₹").decimals}
+                                     </Text>
+                                   </HStack>
+                                 </Box>
                                 <Box flex="3" ml={4} color={popoverItemColor}>
                                   {split.notes || "-"}
                                 </Box>
@@ -445,26 +450,30 @@ const TransactionTable: React.FC<TransactionTableProps> = ({
                    )}
                  </Flex>
                </Td>
-              <Td width="10%" isNumeric>
-                {transaction.credit !== 0 && (
-                  <Text color={creditColor}>
-                    {formatNumberAsCurrency(
-                      transaction.credit,
-                      currencySymbol as string
-                    )}
-                  </Text>
-                )}
-              </Td>
-              <Td width="10%" isNumeric>
-                {transaction.debit !== 0 && (
-                  <Text color={debitColor}>
-                    {formatNumberAsCurrency(
-                      transaction.debit,
-                      currencySymbol as string
-                    )}
-                  </Text>
-                )}
-              </Td>
+               <Td width="10%" isNumeric>
+                 {transaction.credit !== 0 && (
+                   <HStack spacing={0} align="baseline" justify="flex-end">
+                     <Text color={creditColor} fontWeight="semibold">
+                       {splitCurrencyForDisplay(transaction.credit, currencySymbol || "₹").main}
+                     </Text>
+                     <Text fontSize="xs" color={creditColor} opacity={0.7}>
+                       {splitCurrencyForDisplay(transaction.credit, currencySymbol || "₹").decimals}
+                     </Text>
+                   </HStack>
+                 )}
+               </Td>
+               <Td width="10%" isNumeric>
+                 {transaction.debit !== 0 && (
+                   <HStack spacing={0} align="baseline" justify="flex-end">
+                     <Text color={debitColor} fontWeight="semibold">
+                       {splitCurrencyForDisplay(transaction.debit, currencySymbol || "₹").main}
+                     </Text>
+                     <Text fontSize="xs" color={debitColor} opacity={0.7}>
+                       {splitCurrencyForDisplay(transaction.debit, currencySymbol || "₹").decimals}
+                     </Text>
+                   </HStack>
+                 )}
+               </Td>
               <Td width="2%">
                 <Flex
                   gap={2}
